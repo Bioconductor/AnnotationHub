@@ -1,0 +1,14 @@
+Package: AnnotationHub
+Type: Package
+Title: A client for pulling Bioc objects down from AnnotationHub
+Version: 1.0.0
+Depends: RCurl, methods
+Imports: BiocGenerics
+Suggests: RUnit
+Author: Marc Carlson 
+Maintainer: Maintainer: Marc Carlson <mcarlson@fhcrc.org>
+Description: A client for retrieving data from the Bioconductor
+	     AnnotationHub online services.
+License: Artistic License 2.0
+biocViews: Annotation, Infrastructure
+LazyLoad: yes
