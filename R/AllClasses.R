@@ -1,5 +1,6 @@
 setClass("AnnotationHub", representation(curPath = "character",
                                          paths="character",
-                                         pattern="character"))
+                                         pattern="character",
+                                         curPathExtendedYet="logical"))
 
 

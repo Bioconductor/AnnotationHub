@@ -45,20 +45,12 @@
 ## ## and this (to define a method for $ (so we can actually return something)
 ## setMethod("$", "AnnotationHub", function(x, name){name})
 
-## .retrieveNextPathVals <- function(curPath){}
+## .retrieveNextPathVals <- function(curPath){
+##   ## whenever we get new values we set curPathExtendedYet back to FALSE
+##   x@curPathExtendedYet <- FALSE 
+## }
 
 
-
-
-## This is the workhorse for the tab stuff.
-## When the user hits tab, we want to complete what we can here
-.DollarNames.AnnotationHub <- function(x, pattern=""){
-  ## change this to store the pattern immediately
-  x@pattern <- pattern
-  ## change this so that it retrieves from Web Service
-  ## x@paths <- .retrieveNextPathVals(x@curPath)
-  grep(x@pattern, x@paths, value=TRUE)
-}
 
 
 ## take a name, some paths and a pattern and returns either the single value, or the set that matches.
@@ -71,22 +63,55 @@
   }
 }
 
-## This code extends the curPath variable
-##             res <- .getPotentialNames(name, x@paths, x@pattern)
-##             ## if .getPotentialNames is length == 1, then we can save new value
-##             ## to curPath (paste onto current val), otherwise we just want to
-##             ## return the value and wait till the user gets more specific.
-##             if(length(res)==1){
-##               ## get last piece of curPath
-##               splitPath <- strSplit(x@curPath, ".")
-##               lastPiece <- splitPath[-1]
-##               if(!(lastPiece %in% splitPath)){##Weak check: foo.foo will fail!
-##                  x@curPath <- paste(character, res, sep=".")
-##                }
-##               res
-##             }else{
-##               res
-##             }
+## This code attempts to extend the curPath variable based on what is present
+## and what is reasonable.
+
+.extendCurPath <- function(){
+  res <- .getPotentialNames(name, x@paths, x@pattern)
+  ## if .getPotentialNames is length == 1, then we can save new value
+  ## to curPath (paste onto current val), otherwise we just want to
+  ## return the value and wait till the user gets more specific.
+  if(length(res)==1){
+    ## get last piece of curPath
+    splitPath <- strSplit(x@curPath, ".")
+    lastPiece <- splitPath[-1]
+    if(!(lastPiece %in% splitPath)){
+      ## this is a WEAK thing to check: foo.foo will fail!
+      ## to do this right, I need to track whether or not something has been
+      ## added since the last call to the web service via another variable.
+      x@curPath <- paste(character, res, sep=".")
+      ## TODO:
+      ## Check curPathExtendedYet instead (once there is a service to ping)
+      ## x@curPathExtendedYet <- TRUE 
+    }
+    return(res)
+  }else{
+    return(res)
+  }
+}
+
+
+
+## This is the workhorse for the tab stuff.
+## When the user hits tab, we want to complete what we can here
+.DollarNames.AnnotationHub <- function(x, pattern=""){
+  ## change this to store the pattern immediately
+  x@pattern <- pattern
+
+  ## then try to modify the currentPath
+  ## res <- .extendCurPath
+
+  ## And if curPathExtendedYet is TRUE, we can get the next set of path vals
+  ## TODO: change this so that it retrieves from Web Service
+  ## if( x@curPathExtendedYet==TRUE){
+  ##   x@paths <- .retrieveNextPathVals(x@curPath)
+  ## }
+  
+  ## This is what we return (always)
+  grep(x@pattern, x@paths, value=TRUE)
+}
+
+
 
 
 ## $ is what is called when I hit enter, so this method will have to actually
