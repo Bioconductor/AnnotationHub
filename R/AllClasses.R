@@ -1,3 +1,2 @@
-setClass("AnnotationHub", representation(path="character"),
-         prototype(path=character(0)))
+setClass("AnnotationHub", representation(paths="character"))
 
