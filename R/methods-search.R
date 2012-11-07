@@ -47,7 +47,11 @@
 
 ## .retrieveNextPathVals <- function(curPath){}
 
-## define method here?
+
+
+
+## This is the workhorse for the tab stuff.
+## When the user hits tab, we want to complete what we can here
 .DollarNames.AnnotationHub <- function(x, pattern=""){
   ## change this to store the pattern immediately
   x@pattern <- pattern
@@ -57,21 +61,47 @@
 }
 
 
-.validateName <- function(name, paths, pattern){
+## take a name, some paths and a pattern and returns either the single value, or the set that matches.
+.getPotentialNames <- function(name, paths, pattern){
   if(name %in% paths){
     return(name)
   }else{
-    return(.DollarNames.AnnotationHub(AnnotationHub, pattern) )
+    #return(.DollarNames.AnnotationHub(AnnotationHub, pattern) )
+    return(grep(pattern, paths, value=TRUE))
   }
 }
 
-## and this (to define a method for $ (so we can actually return something)
+## This code extends the curPath variable
+##             res <- .getPotentialNames(name, x@paths, x@pattern)
+##             ## if .getPotentialNames is length == 1, then we can save new value
+##             ## to curPath (paste onto current val), otherwise we just want to
+##             ## return the value and wait till the user gets more specific.
+##             if(length(res)==1){
+##               ## get last piece of curPath
+##               splitPath <- strSplit(x@curPath, ".")
+##               lastPiece <- splitPath[-1]
+##               if(!(lastPiece %in% splitPath)){##Weak check: foo.foo will fail!
+##                  x@curPath <- paste(character, res, sep=".")
+##                }
+##               res
+##             }else{
+##               res
+##             }
+
+
+## $ is what is called when I hit enter, so this method will have to actually
+## get the data once we have a full path.
+## And so this is to define a method for $ (so we can actually return something)
 setMethod("$", "AnnotationHub",
           function(x, name){
-            .validateName(name, x@paths, x@pattern)
-            #name
+            .getPotentialNames(name, x@paths, x@pattern)
           }
 )
+
+
+
+
+
 
 
 
