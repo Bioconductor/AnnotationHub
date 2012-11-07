@@ -1,2 +1,7 @@
 import(BiocGenerics)
 
+## export our S3 method.
+S3method(.DollarNames, AnnotationHub)
+
+
+exportMethods("$")
