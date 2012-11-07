@@ -1,3 +1,5 @@
-setClass("AnnotationHub", representation(paths="character"))
+setClass("AnnotationHub", representation(curPath = "character",
+                                         paths="character",
+                                         pattern="character"))
 
 

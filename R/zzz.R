@@ -2,7 +2,9 @@
 {
   ns <- asNamespace(pkgname)
   AnnotationHub <- new("AnnotationHub",
-                        paths=c("foo.bar.","foo.baz.","foo.bar.sna."))
+                       curPath="resource",
+                       paths=c("foo","fu"),
+                       pattern="")
   assign("AnnotationHub", AnnotationHub, envir=ns)
   namespaceExport(ns, "AnnotationHub")
 }
