@@ -37,13 +37,12 @@
 ## > setMethod("$", "A", function(x, name) name)
 
 
-## So we need this where we grep based on the values in paths
-.DollarNames.AnnotationHub <- function(x, pattern=""){
-  grep(pattern, x@paths, value=TRUE)
-}
+## ## define method here?
+## .DollarNames.AnnotationHub <- function(x, pattern=""){
+##   grep(pattern, x@paths, value=TRUE)
+## }
 
-## and this (to define a method for $ (so we can actually return something)
-setMethod("$", "AnnotationHub", function(x, name){name})
-
+## ## and this (to define a method for $ (so we can actually return something)
+## setMethod("$", "AnnotationHub", function(x, name){name})
 
 
