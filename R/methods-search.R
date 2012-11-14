@@ -48,6 +48,7 @@
     objName <- load(file=url(file))
     return(get(objName))
   }else{
+    ## otherwise list possible results
     message("Available results: ")
     return(file) ## TODO: why all 4 when I should only have two?
   }
@@ -65,8 +66,8 @@ setMethod("$", "AnnotationHub",
 
 
 ## TODO:
-## 2) make code that downloads differently for when things are not .rda files?
-
+## 2) Make code that downloads differently for when things are not .rda files?
+## 3) Plan out a way to handle oddball results (say 2000 of one thing an 2 of another...
 
 
 
