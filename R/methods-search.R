@@ -37,10 +37,12 @@
 ## > setMethod("$", "A", function(x, name) name)
 
 
-## ## define method here?
-## .DollarNames.AnnotationHub <- function(x, pattern=""){
-##   grep(pattern, x@paths, value=TRUE)
-## }
+#### ## define method here?
+#### .DollarNames.AnnotationHub <- function(x, pattern=""){
+####   grep(pattern, x@paths, value=TRUE)
+#### }
+
+
 
 
 ## ## and this (to define a method for $ (so we can actually return something)
@@ -73,19 +75,19 @@
 ## This code attempts to extend the curPath variable based on what is present
 ## and what is reasonable.
 
-.extendCurPath <- function(x, name, paths){
-  ## how many paths?
-  res <- .getPotentialNames(name, paths, x@pattern)
-  ## there is only one choice left
-  if(length(res)==1){ 
-    if(x@curPathExtendedYet==FALSE){ ## and we have not done so already
-      ## then append to the curPath
-      x@curPath <- paste(character, res, sep="")
-      ## then mark it as extended
-      x@curPathExtendedYet <- TRUE 
-    }
-  }
-}
+## .extendCurPath <- function(x, name, paths){
+##   ## how many paths?
+##   res <- .getPotentialNames(name, paths, x@pattern)
+##   ## there is only one choice left
+##   if(length(res)==1){ 
+##     if(x@curPathExtendedYet==FALSE){ ## and we have not done so already
+##       ## then append to the curPath
+##       x@curPath <- paste(character, res, sep="")
+##       ## then mark it as extended
+##       x@curPathExtendedYet <- TRUE 
+##     }
+##   }
+## }
 
 
 ## debug(AnnotationHub:::.DollarNames.AnnotationHub)
@@ -96,21 +98,24 @@
   ## always update the objects pattern value when the user hits tab
   x@pattern <- pattern
 
-  ## And if curPathExtendedYet is TRUE, we can get the next set of path vals
-  ## TODO: change this so that it retrieves from Web Service
-  if( x@curPathExtendedYet==TRUE){
-    newPaths <- .retrieveNextPathVals(x@curPath)
-  }else{
-    newPaths <- x@paths
-  }
+##   ## And if curPathExtendedYet is TRUE, we can get the next set of path vals
+##   ## TODO: change this so that it retrieves from Web Service
+##   if( x@curPathExtendedYet==TRUE){
+##     newPaths <- .retrieveNextPathVals(x@curPath)
+##   }else{
+##     newPaths <- x@paths
+##   }
 
-  ## then try to modify the currentPath
-  .extendCurPath(x, name=pattern, newPaths)
+##   ## then try to modify the currentPath
+##   .extendCurPath(x, name=pattern, newPaths)
 
+
+  ## substitute for tab completion. (but leave internal values unchanged)
+  paths = gsub("/", "..",x@paths)
   
   ## But in spite of all that stuff happening above,
   ## this is what we always want to return:
-  grep(x@pattern, x@paths, value=TRUE)
+  grep(x@pattern, paths, value=TRUE)
 }
 
 
@@ -119,9 +124,25 @@
 ## $ is what is called when I hit enter, so this method will have to actually
 ## get the data once we have a full path.
 ## And so this is to define a method for $ (so we can actually return something)
+
+.getResource <- function(x, name){
+  name <- gsub("\\.\\.", "/",name)
+  file <- .getPotentialNames(name, x@paths, x@pattern)
+  ## append full URL
+  file <- paste(x@curPath, file, sep="/")
+  ## Assuming that we have only got one item...
+  if(length(file)==1){
+    ## get something
+    message("Retrieving: ", file) 
+    load(file=url(file))
+  }else{
+    return(file) ## TODO, this needs to do a better job...
+  }
+}
+
 setMethod("$", "AnnotationHub",
           function(x, name){
-            .getPotentialNames(name, x@paths, x@pattern)
+            .getResource(x, name)
           }
 )
 
