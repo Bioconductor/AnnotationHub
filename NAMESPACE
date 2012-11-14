@@ -1,5 +1,7 @@
 import(BiocGenerics)
 
+importFrom(RJSONIO, fromJSON)
+
 ## export our S3 method.
 S3method(.DollarNames, AnnotationHub)
 

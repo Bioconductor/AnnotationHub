@@ -134,9 +134,10 @@
   if(length(file)==1){
     ## get something
     message("Retrieving: ", file) 
-    load(file=url(file))
+    objName <- load(file=url(file))
+    return(get(objName))
   }else{
-    return(file) ## TODO, this needs to do a better job...
+    return(file) ## TODO: why all 4 when I should only have two?
   }
 }
 
@@ -146,7 +147,8 @@ setMethod("$", "AnnotationHub",
           }
 )
 
-
+## example
+## obj = AnnotationHub$foo..adir..gr1.rda
 
 
 

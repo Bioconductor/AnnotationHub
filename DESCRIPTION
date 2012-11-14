@@ -2,8 +2,8 @@ Package: AnnotationHub
 Type: Package
 Title: A client for pulling Bioc objects down from AnnotationHub
 Version: 1.0.1
-Depends: RCurl, methods, RJSONIO
-Imports: BiocGenerics
+Depends: RCurl, methods
+Imports: BiocGenerics, RJSONIO
 Suggests: RUnit
 Author: Marc Carlson 
 Maintainer: Maintainer: Marc Carlson <mcarlson@fhcrc.org>
