@@ -19,15 +19,7 @@
 ## This is the workhorse for the tab stuff.
 ## When the user hits tab, we want to complete what we can here
 .DollarNames.AnnotationHub <- function(x, pattern=""){
-  ## always update the objects pattern value when the user hits tab
-  x@pattern <- pattern
-
-  ## substitute for tab completion. (but leave internal values unchanged)
-  paths = gsub("/", "..",x@paths)
-  
-  ## But in spite of all that stuff happening above,
-  ## this is what we always want to return:
-  grep(x@pattern, paths, value=TRUE)
+  grep(pattern, names(x@paths), value=TRUE)
 }
 
 
@@ -36,29 +28,26 @@
 ## $ is what is called when I hit enter, so this method actually gets the data
 ## once we have a full path.
 
-.getResource <- function(x, name){
-  name <- gsub("\\.\\.", "/",name)
-  file <- grep(name,x@paths, value=TRUE)
-  ## append full URL
-  file <- paste(x@curPath, file, sep="/")
+.getResource <- function(x, name) {
+  file <- x@paths[name]
   ## Assuming that we have only got one item...
-  if(length(file)==1){
+  if(!is.na(file)){
+    ## append full URL
+    file <- paste(x@curPath, file, sep="/")
     ## get something
     message("Retrieving: ", file)
     objName <- load(file=url(file))
     return(get(objName))
   }else{
     ## otherwise list possible results
-    message("Available results: ")
-    return(file) ## TODO: why all 4 when I should only have two?
+    possiblePaths <- x@paths[grep(name, names(x@paths))]
+    possiblePaths <- paste(x@curPath, possiblePaths, sep="/")
+    warning("incomplete path")
+    return(possiblePaths)
   }
 }
 
-setMethod("$", "AnnotationHub",
-          function(x, name){
-            .getResource(x, name)
-          }
-)
+setMethod("$", "AnnotationHub", .getResource)
 
 ## example
 ## obj = AnnotationHub$foo..adir..gr1.rda
@@ -68,7 +57,3 @@ setMethod("$", "AnnotationHub",
 ## TODO:
 ## 2) Make code that downloads differently for when things are not .rda files?
 ## 3) Plan out a way to handle oddball results (say 2000 of one thing an 2 of another...
-
-
-
-
