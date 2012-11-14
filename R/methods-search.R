@@ -15,12 +15,11 @@
 }
   
 
-
-
 ## take a name, some paths and a pattern and returns either the single value,
-## or just the set that matches.
-.getPotentialNames <- function(name, paths, pattern){
-  if(name %in% paths){
+## or just the set that matches.  Basically it's a grep, but IF there's a name,
+## then we have to have a special case and check for a single exact match.
+.getPotentialNames <- function(paths, pattern, name=NA){
+  if(!is.na(name) && name %in% paths){
     return(name)
   }else{
     #return(.DollarNames.AnnotationHub(AnnotationHub, pattern) )
@@ -29,21 +28,21 @@
 }
 
 
-
 ## This is the workhorse for the tab stuff.
 ## When the user hits tab, we want to complete what we can here
 .DollarNames.AnnotationHub <- function(x, pattern=""){
   ## always update the objects pattern value when the user hits tab
   x@pattern <- pattern
 
-
   ## substitute for tab completion. (but leave internal values unchanged)
   paths = gsub("/", "..",x@paths)
   
   ## But in spite of all that stuff happening above,
   ## this is what we always want to return:
-  grep(x@pattern, paths, value=TRUE)
+  ## grep(x@pattern, paths, value=TRUE)
+  .getPotentialNames(paths=paths, pattern=x@pattern)
 }
+
 
 
 
@@ -52,7 +51,7 @@
 
 .getResource <- function(x, name){
   name <- gsub("\\.\\.", "/",name)
-  file <- .getPotentialNames(name, x@paths, x@pattern)
+  file <- .getPotentialNames(paths=x@paths, pattern=name, name=name)
   ## append full URL
   file <- paste(x@curPath, file, sep="/")
   ## Assuming that we have only got one item...
