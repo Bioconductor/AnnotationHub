@@ -77,7 +77,7 @@ setMethod("keytypes", "AnnotationHub",
 .keys <- function(x, keytype){
   if(!is.character(keytype) || length(keytype)>1) stop("keytype must be a character vector of length 1")
   if(!any(keytype %in% keytypes(x))) stop("keytype must be an actual keytype, please call listKeytypes() for viable options.")
-  
+  ## then retrieve values from server
   baseUrl <- 'http://wilson2.fhcrc.org/cgi-bin/R/getAllValues?key='
   url <- paste0(baseUrl, keytype)
   unique(fromJSON(url))

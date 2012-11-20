@@ -6,13 +6,14 @@
 ## pattern = what tab completion has guess so far based on the paths and the
 ## user interaction.
 
-## keytypes = named list of character vectors that holds the keytypes (names)
-## and also their acceptable values
+## filters = named list of character vectors that holds the keytypes (names)
+## and also their acceptable values.  It has to be a list because sometimes
+## there may be multiple acceptable values for a given keytype.
 
 setClass("AnnotationHub", representation(curPath = "character",
                                          paths="character",
                                          pattern="character",
-                                         keytypes="list"))
+                                         filters="list"))
 
 
 
