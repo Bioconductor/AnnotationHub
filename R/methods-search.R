@@ -64,24 +64,31 @@ setMethod("$", "AnnotationHub", .getResource)
 ## Methods for exploring metatdata
 #####################################
 ## functions to explore what is on the server
-listAvailableKeytypes <- function(){
+.keytypes <- function(){
   fromJSON('http://wilson2.fhcrc.org/cgi-bin/R/getAllKeys')
 }
 
+setMethod("keytypes", "AnnotationHub",
+          function(x){
+            .keytypes()
+          })
 
 ## Need a method to list possible values for a given metadata keytype
-listAvailableKeys <- function(keytype){
+.keys <- function(x, keytype){
   if(!is.character(keytype) || length(keytype)>1) stop("keytype must be a character vector of length 1")
-  if(!any(keytype %in% listAvailableKeytypes())) stop("keytype must be an actual keytype, please call listKeytypes() for viable options.")
+  if(!any(keytype %in% keytypes(x))) stop("keytype must be an actual keytype, please call listKeytypes() for viable options.")
   
   baseUrl <- 'http://wilson2.fhcrc.org/cgi-bin/R/getAllValues?key='
   url <- paste0(baseUrl, keytype)
-  res <- fromJSON(url)
-  ## need to call unique, but we still want to keep the names (which are also
-  ## redundant)  So instead we use duplicated.es
-  res[!(duplicated(res))]
+  unique(fromJSON(url))
 }
 
+setMethod("keys", "AnnotationHub",
+    function(x, keytype){
+      if(missing(keytype)) keytype <- "Organism"
+      .keys(x, keytype)
+    }
+)
 
 
 ## Before I go any further I need helper methods that will get me a list of
@@ -108,8 +115,11 @@ listAvailableKeys <- function(keytype){
 
 }
 
+
 ## TODO: once methods exist, write some unit tests.
 
+
+## functions to modify our object:
 
 ## And then I can also do like this to get ALL the metadata based on certain
 ## keys.  All I really need is to get just the URL or file fields from this so
@@ -120,15 +130,18 @@ listAvailableKeys <- function(keytype){
 
 
 
-## functions to modify our object:
-## activeFilters(obj) method to show all filters currently active
-## activeFilters(obj)
+## A method to show all filters currently active
+## keytypes(obj)
+
+## A method to 
+
+
+
+## Setter method to set values:
+## keys(obj) <- NULL
+## keys(obj) <- c(Type=NULL)
+
+
 
 
 ## TODO: make it so that the object narrows contents of paths based on filters
-
-
-## removeFilters(obj, filters=c("foo","bar")) method to remove filters from
-## the object
-## removeFilters(obj, filters=c("foo","bar"))
-

@@ -3,7 +3,7 @@ Type: Package
 Title: A client for retrieving Bioconductor objects from AnnotationHub
 Version: 0.0.2
 Depends: RCurl, methods
-Imports: BiocGenerics, RJSONIO
+Imports: BiocGenerics, RJSONIO, AnnotationDbi
 Suggests: RUnit
 Author: Marc Carlson 
 Maintainer: Marc Carlson <mcarlson@fhcrc.org>
