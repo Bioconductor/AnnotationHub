@@ -54,6 +54,45 @@ setMethod("$", "AnnotationHub", .getResource)
 
 
 
-## TODO:
-## 2) Make code that downloads differently for when things are not .rda files?
-## 3) Plan out a way to handle oddball results (say 2000 of one thing an 2 of another...
+
+
+
+
+
+
+########################################
+## Methods for exploring metatdata
+#####################################
+## functions to explore what is on the server
+## listFilters() method to show all filters that can be used
+## listFilters()
+## http://wilson2.fhcrc.org/cgi-bin/R/getAllKeys
+
+
+## listFilterValues("filter") method to list values that can be used by a
+## filter of interest.
+## listFilterValues("filter")
+## http://wilson2.fhcrc.org/cgi-bin/R/getAllValues?key=Title
+
+
+
+## And then I can also do like this to get ALL the metadata based on certain
+## keys.  All I really need is to get just the URL or file fields from this so
+## I can limit the search of my object...  But this is really cool.  It
+## basically means that I can use this below with the filter function to
+## narrow the results of the object.
+## filter(obj, c(GenomeVersion='hg19'))
+## http://wilson2.fhcrc.org/cgi-bin/R/query?Organism=9606&GenomeVersion=hg19
+
+
+## functions to modify our object:
+## activeFilters(obj) method to show all filters currently active
+## activeFilters(obj)
+
+## TODO: make it so that the object narrows contents of paths based on filters
+
+
+## removeFilters(obj, filters=c("foo","bar")) method to remove filters from
+## the object
+## removeFilters(obj, filters=c("foo","bar"))
+
