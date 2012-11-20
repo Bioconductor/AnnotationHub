@@ -50,7 +50,7 @@
 setMethod("$", "AnnotationHub", .getResource)
 
 ## example
-## obj = AnnotationHub$foo..adir..gr1.rda
+## obj = AnnotationHub$foo.adir.gr1.rda
 
 
 
@@ -64,25 +64,18 @@ setMethod("$", "AnnotationHub", .getResource)
 ## Methods for exploring metatdata
 #####################################
 ## functions to explore what is on the server
-## listFilters() method to show all filters that can be used
-## listFilters()
-## http://wilson2.fhcrc.org/cgi-bin/R/getAllKeys
-listFilters <- function(){
+listAvailableKeytypes <- function(){
   fromJSON('http://wilson2.fhcrc.org/cgi-bin/R/getAllKeys')
 }
 
 
-## listFilterValues("filter") method to list values that can be used by a
-## filter of interest.
-## listFilterValues("filter")
-## http://wilson2.fhcrc.org/cgi-bin/R/getAllValues?key=Title
-
-listFilterValues <- function(filter){
-  if(!is.character(filter) || length(filter)>1) stop("filter must be a character vector of length 1")
-  if(!any(filter %in% listFilters())) stop("filter must be an actual filter, please call listFilters() for viable options.")
+## Need a method to list possible values for a given metadata keytype
+listAvailableKeys <- function(keytype){
+  if(!is.character(keytype) || length(keytype)>1) stop("keytype must be a character vector of length 1")
+  if(!any(keytype %in% listAvailableKeytypes())) stop("keytype must be an actual keytype, please call listKeytypes() for viable options.")
   
   baseUrl <- 'http://wilson2.fhcrc.org/cgi-bin/R/getAllValues?key='
-  url <- paste0(baseUrl, filter)
+  url <- paste0(baseUrl, keytype)
   res <- fromJSON(url)
   ## need to call unique, but we still want to keep the names (which are also
   ## redundant)  So instead we use duplicated.es
@@ -93,12 +86,9 @@ listFilterValues <- function(filter){
 
 ## Before I go any further I need helper methods that will get me a list of
 ## files based on only the metadata:
-## Both of these methods take a list of filterValues, which means that they
-## need a named character vector, where the names are the filters and the
-## values are the values those filters need to be set to.
 
 
-## So a URL like this allows me to get info based on filters.
+## So a URL like this allows me to get info based on keytypes and keys.
 ## http://wilson2.fhcrc.org/cgi-bin/R/query?Organism=9606&GenomeVersion=hg19
 
 ## return true if filter is valid
@@ -106,14 +96,14 @@ listFilterValues <- function(filter){
 
 }
 
-## get list of metadata character vectors that match the specified filterValues
+## get list of metadata character vectors that match the specified keys/keytypes
 .getMedata <- function(filterValues){
   baseUrl <- 'http://wilson2.fhcrc.org/cgi-bin/R/query?'
   
   
 }
 
-## get character vector of ResourcePath values that match the filterValues
+## get character vector of ResourcePath values that match the keys/keytypes
 .getFilesThatMatchFilters <- function(){
 
 }

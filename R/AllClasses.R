@@ -15,3 +15,15 @@ setClass("AnnotationHub", representation(curPath = "character",
                                          pattern="character"))
 
 
+
+
+## constructor
+AnnotationHub <- function(
+              curPath= "http://wilson2.fhcrc.org/cgi-bin/R/AnnotationHub"){
+  paths <- .retrievePathVals(curPath)
+  paths <- setNames(paths, make.names(paths))
+  AnnotationHub <- new("AnnotationHub",
+                       curPath=curPath,
+                       paths=paths)
+
+}
