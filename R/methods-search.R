@@ -90,18 +90,50 @@ listFilterValues <- function(filter){
 }
 
 
+
+## Before I go any further I need helper methods that will get me a list of
+## files based on only the metadata:
+## Both of these methods take a list of filterValues, which means that they
+## need a named character vector, where the names are the filters and the
+## values are the values those filters need to be set to.
+
+
+## So a URL like this allows me to get info based on filters.
+## http://wilson2.fhcrc.org/cgi-bin/R/query?Organism=9606&GenomeVersion=hg19
+
+## return true if filter is valid
+.validFilterValue <- function(){
+
+}
+
+## get list of metadata character vectors that match the specified filterValues
+.getMedata <- function(filterValues){
+  baseUrl <- 'http://wilson2.fhcrc.org/cgi-bin/R/query?'
+  
+  
+}
+
+## get character vector of ResourcePath values that match the filterValues
+.getFilesThatMatchFilters <- function(){
+
+}
+
+## TODO: once methods exist, write some unit tests.
+
+
 ## And then I can also do like this to get ALL the metadata based on certain
 ## keys.  All I really need is to get just the URL or file fields from this so
 ## I can limit the search of my object...  But this is really cool.  It
 ## basically means that I can use this below with the filter function to
 ## narrow the results of the object.
 ## filter(obj, c(GenomeVersion='hg19'))
-## http://wilson2.fhcrc.org/cgi-bin/R/query?Organism=9606&GenomeVersion=hg19
+
 
 
 ## functions to modify our object:
 ## activeFilters(obj) method to show all filters currently active
 ## activeFilters(obj)
+
 
 ## TODO: make it so that the object narrows contents of paths based on filters
 
