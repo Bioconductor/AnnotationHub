@@ -83,9 +83,10 @@ listFilterValues <- function(filter){
   
   baseUrl <- 'http://wilson2.fhcrc.org/cgi-bin/R/getAllValues?key='
   url <- paste0(baseUrl, filter)
-  fromJSON(url)
+  res <- fromJSON(url)
   ## need to call unique, but we still want to keep the names (which are also
-  ## redundant)
+  ## redundant)  So instead we use duplicated.es
+  res[!(duplicated(res))]
 }
 
 
