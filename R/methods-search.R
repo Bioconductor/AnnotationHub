@@ -67,6 +67,9 @@ setMethod("$", "AnnotationHub", .getResource)
 ## listFilters() method to show all filters that can be used
 ## listFilters()
 ## http://wilson2.fhcrc.org/cgi-bin/R/getAllKeys
+listFilters <- function(){
+  fromJSON('http://wilson2.fhcrc.org/cgi-bin/R/getAllKeys')
+}
 
 
 ## listFilterValues("filter") method to list values that can be used by a
@@ -74,6 +77,14 @@ setMethod("$", "AnnotationHub", .getResource)
 ## listFilterValues("filter")
 ## http://wilson2.fhcrc.org/cgi-bin/R/getAllValues?key=Title
 
+listFilterValues <- function(filter){
+  if(length(filter)>1) stop("filter must be a value of length 1")
+  if(!any(filter %in% listFilters())) stop("filter must be an actual filter, please call listFilters() for viable options.")
+  
+  baseUrl <- 'http://wilson2.fhcrc.org/cgi-bin/R/getAllValues?key='
+  url <- paste0(baseUrl, filter)
+  fromJSON(url)  
+}
 
 
 ## And then I can also do like this to get ALL the metadata based on certain

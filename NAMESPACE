@@ -7,3 +7,6 @@ S3method(.DollarNames, AnnotationHub)
 
 
 exportMethods("$")
+
+export("listFilters",
+       "listFilterValues")
