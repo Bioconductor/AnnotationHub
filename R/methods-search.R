@@ -78,12 +78,14 @@ listFilters <- function(){
 ## http://wilson2.fhcrc.org/cgi-bin/R/getAllValues?key=Title
 
 listFilterValues <- function(filter){
-  if(length(filter)>1) stop("filter must be a value of length 1")
+  if(!is.character(filter) || length(filter)>1) stop("filter must be a character vector of length 1")
   if(!any(filter %in% listFilters())) stop("filter must be an actual filter, please call listFilters() for viable options.")
   
   baseUrl <- 'http://wilson2.fhcrc.org/cgi-bin/R/getAllValues?key='
   url <- paste0(baseUrl, filter)
-  fromJSON(url)  
+  fromJSON(url)
+  ## need to call unique, but we still want to keep the names (which are also
+  ## redundant)
 }
 
 
