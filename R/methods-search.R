@@ -127,7 +127,9 @@ setMethod("keys", "AnnotationHub",
 .getFilesThatMatchFilters <- function(filterValues, x){
   ## get the ResourcePath for each. item that comes back from .getMetadata
   meta <- .getMetadata(filterValues, x) ## returns a list.
-  unlist(lapply(meta, function(x){x[names(x) %in% "ResourcePath"]}))
+  res <- unlist(lapply(meta, function(x){x[names(x) %in% "ResourcePath"]}))
+  res <- setNames(res, make.names(res))
+  res
 }
 
 
@@ -169,7 +171,11 @@ setReplaceMethod("filters", "AnnotationHub",
       ## This means we want to remove all the values of the slot.
       x@filters <- list()
     }
-    x
+   ## AND NOW, whenever we update this, we ALSO have to update the @paths!
+   newPaths <- .getFilesThatMatchFilters(value, x)
+   x@paths <- newPaths
+   ## Finally we can return the object back
+   x
   }
 )
 
@@ -185,3 +191,12 @@ setReplaceMethod("filters", "AnnotationHub",
 
 
 ## TODO: make it so that the object narrows contents of paths based on filters
+
+
+
+
+## Test:
+## library(AnnotationHub)
+## a = AnnotationHub()
+## filterValues <- list();filterValues[[1]] <- keys(a, "Organism");filterValues[[2]] <- keys(a, "BiocVersion");names(filterValues) <- c("Organism","BiocVersion")
+## filters(a) <- filterValues
