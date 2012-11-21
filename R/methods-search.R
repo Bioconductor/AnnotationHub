@@ -133,6 +133,19 @@ setMethod("keys", "AnnotationHub",
 }
 
 
+## This function gets new @paths values based new values for @filters
+## It can't just check the object for @filters though because it is needed in
+## middle of change to @filters
+.getNewPathsBasedOnFilters <- function(x, value){
+  if(length(value >0){
+    newPaths <- .getFilesThatMatchFilters(value, x)
+  }else{ ## meaning there are no filters
+    newPaths <- .retrievePathVals(x@curPath)
+    newPaths <- setNames(newPaths, make.names(newPaths))  
+  }
+  newPaths
+}
+
 
 
 ## TODO: once methods above exist, write some unit tests.
@@ -167,17 +180,12 @@ setReplaceMethod("filters", "AnnotationHub",
       curFilters <- curFilters[!(curNames %in% newNames)] 
       value <- c(curFilters, value) ## append
       x@filters <- value ## assign
-      ## AND NOW, whenever we update this, we ALSO have to update the @paths!
-      newPaths <- .getFilesThatMatchFilters(value, x)
     }else{
       ## This means we want to remove all the values of the slot.
       x@filters <- list()
-      ## AND NOW, whenever we update this, we ALSO have to update the @paths!
-      newPaths <- .retrievePathVals(x@curPath)
-      newPaths <- setNames(newPaths, make.names(newPaths))
     }
-   ## assign to @paths
-   x@paths <- newPaths
+   ## ALSO assign a new value to @paths!
+   x@paths <- .getNewPathsBasedOnFilters(x, value)
    ## Finally we can return the object back
    x
   }
