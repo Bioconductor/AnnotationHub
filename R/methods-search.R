@@ -137,7 +137,7 @@ setMethod("keys", "AnnotationHub",
 ## It can't just check the object for @filters though because it is needed in
 ## middle of change to @filters
 .getNewPathsBasedOnFilters <- function(x, value){
-  if(length(value >0){
+  if(length(value >0)){
     newPaths <- .getFilesThatMatchFilters(value, x)
   }else{ ## meaning there are no filters
     newPaths <- .retrievePathVals(x@curPath)
@@ -145,7 +145,7 @@ setMethod("keys", "AnnotationHub",
   }
   newPaths
 }
-
+## TODO: this method is producing a warning: investigate that.
 
 
 ## TODO: once methods above exist, write some unit tests.
@@ -167,29 +167,31 @@ setMethod("filters", "AnnotationHub",
 ## Setter method to set filters
 ## This method needs to be cumulative...  So whatever is currently in the slot
 ## needs to be added to (as appropriate) by what is coming in via values.
-setReplaceMethod("filters", "AnnotationHub",
-  function(x, value){
-   if (!is.null(value)) {
-      ## Then check
-      Map(.validFilterValue, value, names(value), MoreArgs=list(x=x))
-      ## If legit, then we want to add that to existing vals
-      curFilters <- x@filters
-      curNames <- names(curFilters)
-      newNames <- names(value)
-      ## drop any repeats from the old set 
-      curFilters <- curFilters[!(curNames %in% newNames)] 
-      value <- c(curFilters, value) ## append
-      x@filters <- value ## assign
-    }else{
-      ## This means we want to remove all the values of the slot.
-      x@filters <- list()
-    }
-   ## ALSO assign a new value to @paths!
-   x@paths <- .getNewPathsBasedOnFilters(x, value)
-   ## Finally we can return the object back
-   x
+.replaceFilter <- function(x, value){
+  if (!is.null(value)) {
+    ## Then check
+    Map(.validFilterValue, value, names(value), MoreArgs=list(x=x))
+    ## If legit, then we want to add that to existing vals
+    curFilters <- x@filters
+    curNames <- names(curFilters)
+    newNames <- names(value)
+    ## drop any repeats from the old set 
+    curFilters <- curFilters[!(curNames %in% newNames)] 
+    value <- c(curFilters, value) ## append
+    x@filters <- value ## assign
+  }else{
+    ## This means we want to remove all the values of the slot.
+    x@filters <- list()
   }
-)
+  ## ALSO assign a new value to @paths!
+  x@paths <- .getNewPathsBasedOnFilters(x, value)
+  ## Finally we can return the object back
+  x
+}
+  
+  
+setReplaceMethod("filters", "AnnotationHub",
+                 function(x,value){.replaceFilter(x,value)})
 
 ## TODO: filter removal doesn't work as expected...
 
