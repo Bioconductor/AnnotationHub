@@ -168,21 +168,25 @@ setMethod("filters", "AnnotationHub",
 ## This method needs to be cumulative...  So whatever is currently in the slot
 ## needs to be added to (as appropriate) by what is coming in via values.
 .replaceFilter <- function(x, value){
-  if (!is.null(value)) {
+##   if (!is.null(value)) {
     ## Then check
-    Map(.validFilterValue, value, names(value), MoreArgs=list(x=x))
-    ## If legit, then we want to add that to existing vals
+  Map(.validFilterValue, value, names(value), MoreArgs=list(x=x))
+  ## If legit, then we want to add that to existing vals
+  if(length(value) > 0){ ## if there is anything in value, then merge it in...
     curFilters <- x@filters
     curNames <- names(curFilters)
     newNames <- names(value)
     ## drop any repeats from the old set 
     curFilters <- curFilters[!(curNames %in% newNames)] 
     value <- c(curFilters, value) ## append
-    x@filters <- value ## assign
-  }else{
-    ## This means we want to remove all the values of the slot.
-    x@filters <- list()
+  }else{ ## user signaled that they want it wiped out.
+    value <- list()
   }
+  x@filters <- value ## assign
+  ## If values are now empty, then remove that filter from the list...
+  lens <- (unlist(lapply(x@filters, function(x){length(x)!=0})))
+  x@filters <-  x@filters[lens]
+  
   ## ALSO assign a new value to @paths!
   x@paths <- .getNewPathsBasedOnFilters(x, value)
   ## Finally we can return the object back
