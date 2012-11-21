@@ -98,6 +98,7 @@ setMethod("keys", "AnnotationHub",
 }
 
 ## Test:
+## library(AnnotationHub)
 ## a = AnnotationHub()
 ## filterValues <- list()
 ## filterValues[[1]] <- keys(a, "Organism")
@@ -132,13 +133,9 @@ setMethod("keys", "AnnotationHub",
 
 ## get character vector of ResourcePath values that match the keys/keytypes
 .getFilesThatMatchFilters <- function(filterValues, x){
-  baseUrl <- 'http://wilson2.fhcrc.org/cgi-bin/R/AnnotationHub'
-  ## plus the ResourcePath for each. item that comes back from .getMetadata
-  meta <- .getMetadata(filterValues, x)
-  ## This will need to be list oriented when the underlying structure gets
-  ## more complex)
-  resPaths <- meta[names(meta) %in% "ResourcePath"]
-  paste0(baseUrl, resPaths)
+  ## get the ResourcePath for each. item that comes back from .getMetadata
+  meta <- .getMetadata(filterValues, x) ## returns a list.
+  unlist(lapply(meta, function(x){x[names(x) %in% "ResourcePath"]}))
 }
 
 
