@@ -167,12 +167,16 @@ setReplaceMethod("filters", "AnnotationHub",
       curFilters <- curFilters[!(curNames %in% newNames)] 
       value <- c(curFilters, value) ## append
       x@filters <- value ## assign
+      ## AND NOW, whenever we update this, we ALSO have to update the @paths!
+      newPaths <- .getFilesThatMatchFilters(value, x)
     }else{
       ## This means we want to remove all the values of the slot.
       x@filters <- list()
+      ## AND NOW, whenever we update this, we ALSO have to update the @paths!
+      newPaths <- .retrievePathVals(x@curPath)
+      newPaths <- setNames(newPaths, make.names(newPaths))
     }
-   ## AND NOW, whenever we update this, we ALSO have to update the @paths!
-   newPaths <- .getFilesThatMatchFilters(value, x)
+   ## assign to @paths
    x@paths <- newPaths
    ## Finally we can return the object back
    x
@@ -199,4 +203,7 @@ setReplaceMethod("filters", "AnnotationHub",
 ## library(AnnotationHub)
 ## a = AnnotationHub()
 ## filterValues <- list();filterValues[[1]] <- keys(a, "Organism");filterValues[[2]] <- keys(a, "BiocVersion");names(filterValues) <- c("Organism","BiocVersion")
-## filters(a) <- filterValues
+## filters(a) <- filterValues  ## narrows things down a bit... (though maybe it shouldn't)
+
+## filterValues2 <- list(File=c("all.footprints.gz"))
+## filters(a) <- filterValues2
