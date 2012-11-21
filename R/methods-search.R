@@ -73,6 +73,7 @@ setMethod("keytypes", "AnnotationHub",
             .keytypes()
           })
 
+
 ## Need a method to list possible values for a given metadata keytype
 .keys <- function(x, keytype){
   if(!is.character(keytype) || length(keytype)>1) stop("keytype must be a character vector of length 1")
@@ -99,13 +100,32 @@ setMethod("keys", "AnnotationHub",
 ## http://wilson2.fhcrc.org/cgi-bin/R/query?Organism=9606&GenomeVersion=hg19
 
 ## return true if filter is valid
-.validFilterValue <- function(){
-
+.validFilterValue <- function(filter, x){
+  ## must be length 1
+  if(length(filter) >1) stop("can only handle one filter at at time.")
+  ## test the type. 
+  if(!is.list(filter)) stop("filter must be a list.")
+  if(!is.character(filter[[1]])) stop("contents of filters must be character vectors")
+  ## test if it is named and if the name is legit.
+  keytype = names(filter)
+  if(!any(keytypes(x) %in% keytype)) stop("Keytypes for the filter must be an actual keytype.  Please call the keytypes() method to list viable options")
+  ## test that the values it contains are also legit.
+  keys = filter[[1]]
+  if(!any(keys(x, keytype) %in% keys)) stop("Keys for the filter must be an actual keys.  Please call the keys() method to see viable options.")
 }
 
 ## get list of metadata character vectors that match the specified keys/keytypes
-.getMedata <- function(filterValues){
+.getMedata <- function(filterValues, x){
   baseUrl <- 'http://wilson2.fhcrc.org/cgi-bin/R/query?'
+  ## for each filter element in the list, we have to check the validity
+  ##lapply(filterValues, .validFilterValue, x=x)  ## doesn't work
+  for(i in seq_len(length(filterValues))){
+    filter = filterValues[i]
+    .validFilterValue(filter, x)
+  }
+  ## and assuming we get past that, we have to now assemble a URL from the
+  ## pieces
+  
   
   
 }

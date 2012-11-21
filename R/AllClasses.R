@@ -18,6 +18,8 @@ setClass("AnnotationHub", representation(curPath = "character",
 
 
 
+
+
 ## constructor
 AnnotationHub <- function(
               curPath= "http://wilson2.fhcrc.org/cgi-bin/R/AnnotationHub"){
