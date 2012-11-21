@@ -100,14 +100,9 @@ setMethod("keys", "AnnotationHub",
 ## http://wilson2.fhcrc.org/cgi-bin/R/query?Organism=9606&GenomeVersion=hg19
 
 ## return true if filter is valid
-.validFilterValue <- function(filter, x){
-  ## must be length 1
-  if(length(filter) >1) stop("can only handle one filter at at time.")
-  ## test the type. 
-  if(!is.list(filter)) stop("filter must be a list.")
-  if(!is.character(filter[[1]])) stop("contents of filters must be character vectors")
+.validFilterValue <- function(filter, filterName, x){
   ## test if it is named and if the name is legit.
-  keytype = names(filter)
+  keytype = filterName
   if(!any(keytypes(x) %in% keytype)) stop("Keytypes for the filter must be an actual keytype.  Please call the keytypes() method to list viable options")
   ## test that the values it contains are also legit.
   keys = filter[[1]]
@@ -115,7 +110,7 @@ setMethod("keys", "AnnotationHub",
 }
 
 ## helper to take a single filter and process it
-.processFilter <- function(filter){
+.processFilter <- function(filter, filterName){
   name <- names(filter)
 
 }
@@ -125,10 +120,12 @@ setMethod("keys", "AnnotationHub",
   baseUrl <- 'http://wilson2.fhcrc.org/cgi-bin/R/query?'
   ## for each filter element in the list, we have to check the validity
   ##lapply(filterValues, .validFilterValue, x=x)  ## doesn't work
-  for(i in seq_len(length(filterValues))){
-    filter = filterValues[i]
-    .validFilterValue(filter, x)
-  }
+  ## Following works, but doesn't feel very concise
+##   for(i in seq_len(length(filterValues))){  
+##     filter = filterValues[i]
+##     .validFilterValue(filter, x)
+##   }
+  Map(.validFilterValue, filterValues, names(filterValues), MoreArgs=list(x=x))
   ## and assuming we get past that, we have to now assemble a URL from the
   ## pieces. And once again, I am using lapply, so I can't really use the names...
 
