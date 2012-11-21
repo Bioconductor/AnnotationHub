@@ -73,10 +73,10 @@ setMethod("keytypes", "AnnotationHub",
 }
 
 setMethod("keys", "AnnotationHub",
-    function(x, keytype){
-      if(missing(keytype)) keytype <- "Organism"
-      .keys(x, keytype)
-    }
+  function(x, keytype){
+    if(missing(keytype)) keytype <- "Organism"
+    .keys(x, keytype)
+  }
 )
 
 
@@ -147,28 +147,42 @@ setMethod("keys", "AnnotationHub",
 ## TODO: once methods above exist, write some unit tests.
 
 
-## functions to modify our object:
 
-## And then I can also do like this to get ALL the metadata based on certain
-## keys.  All I really need is to get just the URL or file fields from this so
-## I can limit the search of my object...  But this is really cool.  It
-## basically means that I can use this below with the filter function to
-## narrow the results of the object.
-## filter(obj, c(GenomeVersion='hg19'))
+## a filter is a combination of keys and keytypes that the user wants to
+## specify that they are interested in.
 
-
-
-## A method to show all filters currently active
-## keytypes(obj)
-
-## A method to 
+## A method to extact the currently set filters
+setMethod("filters", "AnnotationHub",
+  function(x){
+    x@filters
+  }
+)
 
 
 
-## Setter method to set values:
-## keys(obj) <- NULL
-## keys(obj) <- c(Type=NULL)
-
+## Setter method to set filters
+## This method needs to be cumulative...  So whatever is currently in the slot
+## needs to be added to (as appropriate) by what is coming in via values.
+setReplaceMethod("filters", "AnnotationHub",
+  function(x, value){
+    if (!is.null(value)) {
+      ## Then check
+      Map(.validFilterValue, value, names(value), MoreArgs=list(x=x))
+      ## If legit, then we want to add that to existing vals
+      curFilters <- x@filters
+      curNames <- names(curFilters)
+      newNames <- names(value)
+      ## drop any repeats from the old set 
+      curFilters <- curFilters[!(curNames %in% newNames)] 
+      value <- c(curFilters, value) ## append
+      x@filters <- value ## assign
+    }else{
+      ## This means we want to remove all the values of the slot.
+      x@filters <- list()
+    }
+    x
+  }
+)
 
 
 

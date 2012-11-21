@@ -11,6 +11,8 @@ S3method(.DollarNames, AnnotationHub)
 
 exportMethods("$",
               "keytypes",
-              "keys")
+              "keys",
+              "filters",
+              "filters<-")
 
 export("AnnotationHub")
