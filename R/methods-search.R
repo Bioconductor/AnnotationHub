@@ -114,6 +114,12 @@ setMethod("keys", "AnnotationHub",
   if(!any(keys(x, keytype) %in% keys)) stop("Keys for the filter must be an actual keys.  Please call the keys() method to see viable options.")
 }
 
+## helper to take a single filter and process it
+.processFilter <- function(filter){
+  name <- names(filter)
+
+}
+
 ## get list of metadata character vectors that match the specified keys/keytypes
 .getMedata <- function(filterValues, x){
   baseUrl <- 'http://wilson2.fhcrc.org/cgi-bin/R/query?'
@@ -124,8 +130,9 @@ setMethod("keys", "AnnotationHub",
     .validFilterValue(filter, x)
   }
   ## and assuming we get past that, we have to now assemble a URL from the
-  ## pieces
-  
+  ## pieces. And once again, I am using lapply, so I can't really use the names...
+
+  url <- paste0(baseUrl, filters)
   
   
 }
