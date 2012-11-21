@@ -100,10 +100,7 @@ setMethod("keys", "AnnotationHub",
 ## Test:
 ## library(AnnotationHub)
 ## a = AnnotationHub()
-## filterValues <- list()
-## filterValues[[1]] <- keys(a, "Organism")
-## filterValues[[2]] <- keys(a, "BiocVersion")
-## names(filterValues) <- c("Organism","BiocVersion")
+## filterValues <- list();filterValues[[1]] <- keys(a, "Organism");filterValues[[2]] <- keys(a, "BiocVersion");names(filterValues) <- c("Organism","BiocVersion")
 
 ## helper to take a single filter and process it
 .processFilter <- function(filter, filterName){
@@ -115,20 +112,15 @@ setMethod("keys", "AnnotationHub",
 ## get list of metadata character vectors that match the specified keys/keytypes
 .getMetadata <- function(filterValues, x){
   baseUrl <- 'http://wilson2.fhcrc.org/cgi-bin/R/query?'
-  ## for each filter element in the list, we have to check the validity
-  ##lapply(filterValues, .validFilterValue, x=x)  ## doesn't work
-  ## Following works, but doesn't feel very concise
-##   for(i in seq_len(length(filterValues))){  
-##     filter = filterValues[i]
-##     .validFilterValue(filter, x)
-##   }
+  ## Map lets me process on both names and contents of a list.
   Map(.validFilterValue, filterValues, names(filterValues), MoreArgs=list(x=x))
   ## and assuming we get past that, we have to now assemble a URL from the
-  ## pieces. And once again, I am using lapply, so I can't really use the names
+  ## pieces. 
   filters <- unlist(Map(.processFilter, filterValues, names(filterValues)))
   filters <- paste(filters, collapse="&")
   url <- paste0(baseUrl, filters)
-  fromJSON(url)
+  ## Concerned: that this may become too slow as more metadata piles on...
+  fromJSON(url) ## returns a list with metadata for each
 }
 
 ## get character vector of ResourcePath values that match the keys/keytypes
@@ -154,7 +146,7 @@ setMethod("filters", "AnnotationHub",
     x@filters
   }
 )
-
+## filters(a)
 
 
 ## Setter method to set filters
@@ -162,7 +154,7 @@ setMethod("filters", "AnnotationHub",
 ## needs to be added to (as appropriate) by what is coming in via values.
 setReplaceMethod("filters", "AnnotationHub",
   function(x, value){
-    if (!is.null(value)) {
+   if (!is.null(value)) {
       ## Then check
       Map(.validFilterValue, value, names(value), MoreArgs=list(x=x))
       ## If legit, then we want to add that to existing vals
@@ -180,6 +172,15 @@ setReplaceMethod("filters", "AnnotationHub",
     x
   }
 )
+
+## TODO: filter removal doesn't work as expected...
+
+## filters(a) <- filterValues
+## filters(a) <- NULL  ## resets everything if I special case it
+## filters(a) <- filterValues
+## filters(a)[[1]] <- NULL  ## doesn't work
+## filters(a)["BiocVersion"] <- NULL  ## doesn't work
+## filters(a)[["BiocVersion"]] <- NULL  ## doesn't work
 
 
 
