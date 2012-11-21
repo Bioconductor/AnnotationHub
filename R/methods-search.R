@@ -1,18 +1,6 @@
 ## This file contains methods for finishing the tab-completion and searching
 ## the web service for available resources.
 
-
-## .retrievePathVals is for listing the items from the web server.
-.retrievePathVals <- function(curPath){
-  ## look for values
-  paths <- fromJSON(curPath)
-  ## if there are some new values we set curPathExtendedYet back to FALSE
-  if(length(paths) > 0 && exists("x")){
-    x@curPathExtendedYet <- FALSE
-  }
-  ## return the options...
-  paths
-}
   
 
 
@@ -109,14 +97,22 @@ setMethod("keys", "AnnotationHub",
   if(!any(keys(x, keytype) %in% keys)) stop("Keys for the filter must be an actual keys.  Please call the keys() method to see viable options.")
 }
 
+## Test:
+## a = AnnotationHub()
+## filterValues <- list()
+## filterValues[[1]] <- keys(a, "Organism")
+## filterValues[[2]] <- keys(a, "BiocVersion")
+## names(filterValues) <- c("Organism","BiocVersion")
+
 ## helper to take a single filter and process it
 .processFilter <- function(filter, filterName){
-  name <- names(filter)
-
+  filters <- paste(filter,collapse=',')
+  paste(filterName,'=',filters,'', sep="")
 }
 
+
 ## get list of metadata character vectors that match the specified keys/keytypes
-.getMedata <- function(filterValues, x){
+.getMetadata <- function(filterValues, x){
   baseUrl <- 'http://wilson2.fhcrc.org/cgi-bin/R/query?'
   ## for each filter element in the list, we have to check the validity
   ##lapply(filterValues, .validFilterValue, x=x)  ## doesn't work
@@ -127,20 +123,28 @@ setMethod("keys", "AnnotationHub",
 ##   }
   Map(.validFilterValue, filterValues, names(filterValues), MoreArgs=list(x=x))
   ## and assuming we get past that, we have to now assemble a URL from the
-  ## pieces. And once again, I am using lapply, so I can't really use the names...
-
+  ## pieces. And once again, I am using lapply, so I can't really use the names
+  filters <- unlist(Map(.processFilter, filterValues, names(filterValues)))
+  filters <- paste(filters, collapse="&")
   url <- paste0(baseUrl, filters)
-  
-  
+  fromJSON(url)
 }
 
 ## get character vector of ResourcePath values that match the keys/keytypes
-.getFilesThatMatchFilters <- function(){
-
+.getFilesThatMatchFilters <- function(filterValues, x){
+  baseUrl <- 'http://wilson2.fhcrc.org/cgi-bin/R/AnnotationHub'
+  ## plus the ResourcePath for each. item that comes back from .getMetadata
+  meta <- .getMetadata(filterValues, x)
+  ## This will need to be list oriented when the underlying structure gets
+  ## more complex)
+  resPaths <- meta[names(meta) %in% "ResourcePath"]
+  paste0(baseUrl, resPaths)
 }
 
 
-## TODO: once methods exist, write some unit tests.
+
+
+## TODO: once methods above exist, write some unit tests.
 
 
 ## functions to modify our object:
