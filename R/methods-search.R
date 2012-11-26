@@ -18,10 +18,11 @@
 
 .getResource <- function(x, name) {
   file <- x@paths[name]
+  basePath <- paste(x@curPath, "serve?path=", sep="/")
   ## Assuming that we have only got one item...
   if(!is.na(file)){
     ## append full URL
-    file <- paste(x@curPath, file, sep="/")
+    file <- paste(basePath, file, sep="")
     ## get something
     message("Retrieving: ", file)
     objName <- load(file=url(file))
@@ -29,7 +30,7 @@
   }else{
     ## otherwise list possible results
     possiblePaths <- x@paths[grep(name, names(x@paths))]
-    possiblePaths <- paste(x@curPath, possiblePaths, sep="/")
+    possiblePaths <- paste(basePath, possiblePaths, sep="")
     warning("incomplete path")
     return(possiblePaths)
   }

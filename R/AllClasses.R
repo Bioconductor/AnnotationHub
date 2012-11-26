@@ -23,6 +23,7 @@ setClass("AnnotationHub", representation(curPath = "character",
 ## .retrievePathVals is for listing the items from the web server.
 ## This method is only called by the constructor.
 .retrievePathVals <- function(curPath){
+  curPath <- paste(curPath,"AnnotationHub",sep="/")
   ## look for values
   paths <- fromJSON(curPath)
   ## if there are some new values we set curPathExtendedYet back to FALSE
@@ -36,7 +37,7 @@ setClass("AnnotationHub", representation(curPath = "character",
 
 ## constructor
 AnnotationHub <- function(
-              curPath= "http://wilson2.fhcrc.org/cgi-bin/R/AnnotationHub"){
+              curPath= "http://wilson2.fhcrc.org/cgi-bin/R"){
   paths <- .retrievePathVals(curPath)
   paths <- setNames(paths, make.names(paths))
   AnnotationHub <- new("AnnotationHub",
