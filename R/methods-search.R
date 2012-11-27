@@ -11,14 +11,17 @@
 }
 
 
-
+## Helper assembles correct base path for getting files.
+.getBaseServe <- function(x){
+  paste(x@curPath, "serve?path=", sep="/")
+}
 
 ## $ is what is called when I hit enter, so this method actually gets the data
 ## once we have a full path.
 
 .getResource <- function(x, name) {
   file <- x@paths[name]
-  basePath <- paste(x@curPath, "serve?path=", sep="/")
+  basePath <- .getBaseServe(x)
   ## Assuming that we have only got one item...
   if(!is.na(file)){
     ## append full URL
@@ -43,6 +46,22 @@ setMethod("$", "AnnotationHub", .getResource)
 
 
 
+setMethod("names", "AnnotationHub",
+          function(x){
+            names(x@paths)
+          })
+
+setMethod("length", "AnnotationHub",
+          function(x){
+            length(x@paths)
+          })
+
+setMethod("urls", "AnnotationHub",
+          function(x){
+            base <- .getBaseServe(x)
+            res <- paste(base, x@paths, sep="")
+            res
+          })
 
 
 

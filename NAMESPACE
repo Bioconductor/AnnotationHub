@@ -5,6 +5,7 @@ importFrom(RJSONIO, fromJSON)
 importFrom(AnnotationDbi, keys, keytypes)
 
 
+
 ## export our S3 method.
 S3method(.DollarNames, AnnotationHub)
 
@@ -12,6 +13,9 @@ S3method(.DollarNames, AnnotationHub)
 exportMethods("$",
               "keytypes",
               "keys",
+              "length",
+              "names",
+              "urls",
               "filters",
               "filters<-")
 
