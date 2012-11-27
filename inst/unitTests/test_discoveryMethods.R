@@ -3,7 +3,8 @@
 
 ## AnnotationHub$
 
-test_discovery <- function(){
+test_discovery <- function()
+{
 
 }
 

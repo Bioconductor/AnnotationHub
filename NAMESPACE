@@ -1,10 +1,12 @@
+import(methods)
+
+importFrom(AnnotationDbi, exists, keys, keytypes)
+
 import(BiocGenerics)
 
 importFrom(RJSONIO, fromJSON)
 
-importFrom(AnnotationDbi, keys, keytypes)
-
-
+importFrom(stats, setNames)
 
 ## export our S3 method.
 S3method(.DollarNames, AnnotationHub)
