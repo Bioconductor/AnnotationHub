@@ -155,14 +155,19 @@ setMethod("keys", "AnnotationHub",
 .getMetadata <-
     function(x, filterValues)
 {
-    .validFilterValues(x, filterValues)
-    ## and assuming we get past that, we have to now assemble a URL from the
-    ## pieces. 
-    filters <- unlist(Map(.processFilter, filterValues, names(filterValues)))
-    filters <- paste(filters, collapse="&")
-    url <- sprintf("%s/query?%s", x@curPath, filters)
-    ## Concerned: that this may become too slow as more metadata piles on...
-    fromJSON(url) ## returns a list with metadata for each
+    if(length(filterValues) == 0){
+        return(fromJSON(paste0(x@curPath,"/query?")))
+    } else {
+        .validFilterValues(x, filterValues)
+        ## and assuming we get past that, we have to now assemble a URL from
+        ## the pieces.
+        filters <- unlist(Map(.processFilter, filterValues,
+                              names(filterValues)))
+        filters <- paste(filters, collapse="&")
+        url <- sprintf("%s/query?%s", x@curPath, filters) ## vectorized?
+        ## Concerned: that this may become too slow as more metadata piles on.
+        return(fromJSON(url)) ## returns a list with metadata for each
+    }
 }
 
 ## get character vector of ResourcePath values that match the keys/keytypes
@@ -191,19 +196,6 @@ setMethod("keys", "AnnotationHub",
 }
 ## TODO: this method is producing a warning: investigate that.
 ## TODO: once methods above exist, write some unit tests.
-
-## Add metadata method
-## TODO: get a better baseUrl (this one only works temp.)
-## TODO: discuss with Dan why some empty field are not coming back sometimes?
-setMethod("metadata", "AnnotationHub",
-          function(x){
-            ## just get all the data
-            baseUrl <- paste0(Server,"/cgi-bin/R/query?Organism=9606")
-            fromJSON(baseUrl)
-          })
-
-
-
 
 
 
@@ -269,3 +261,29 @@ setReplaceMethod("filters", "AnnotationHub", .replaceFilter)
 
 ## filterValues2 <- list(File=c("all.footprints.gz"))
 ## filters(a) <- filterValues2
+
+
+
+
+## Add metadata method here
+## TODO: get a better baseUrl (this one only works temp.)
+## TODO: discuss with Dan why some empty field are not coming back sometimes?
+
+
+## I need a helper to call .getMetadata based on current filters (like getNewPathsBasedOnFilters does), but for this helper to work, I need a way for .getMetadata to be able to work when there are no filters...
+
+## Dan is setting up so that query? will give all metadata (instead of: [])
+
+
+setMethod("metadata", "AnnotationHub",
+          function(x){
+            res <- .getMetadata(x, x@filters)
+            ## TODO: make res into a data.frame()
+            res
+          })
+
+
+
+
+
+
