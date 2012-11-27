@@ -45,6 +45,8 @@ setMethod("$", "AnnotationHub", .getResource)
 ## example
 ## obj = AnnotationHub$foo.adir.gr1.rda
 
+
+### A few other helpful methods.  TODO: move these?
 setMethod("names", "AnnotationHub",
     function(x)
     {
@@ -189,6 +191,22 @@ setMethod("keys", "AnnotationHub",
 }
 ## TODO: this method is producing a warning: investigate that.
 ## TODO: once methods above exist, write some unit tests.
+
+## Add metadata method
+## TODO: get a better baseUrl (this one only works temp.)
+## TODO: discuss with Dan why some empty field are not coming back sometimes?
+setMethod("metadata", "AnnotationHub",
+          function(x){
+            ## just get all the data
+            baseUrl <- "http://wilson2.fhcrc.org/cgi-bin/R/query?Organism=9606"
+            fromJSON(baseUrl)
+          })
+
+
+
+
+
+
 
 ## a filter is a combination of keys and keytypes that the user wants to
 ## specify that they are interested in.

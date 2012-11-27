@@ -4,6 +4,8 @@ importFrom(AnnotationDbi, exists, keys, keytypes)
 
 import(BiocGenerics)
 
+importFrom(IRanges, metadata)
+
 importFrom(RJSONIO, fromJSON)
 
 importFrom(stats, setNames)
@@ -18,6 +20,7 @@ exportMethods("$",
               "length",
               "names",
               "urls",
+              "metadata",
               "filters",
               "filters<-")
 
