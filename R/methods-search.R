@@ -77,7 +77,7 @@ setMethod("urls", "AnnotationHub",
 .keytypes <-
     function()
 {
-    fromJSON('http://wilson2.fhcrc.org/cgi-bin/R/getAllKeys')
+    fromJSON(paste0(Server,'/cgi-bin/R/getAllKeytypes'))
 }
 
 setMethod("keytypes", "AnnotationHub",
@@ -96,7 +96,7 @@ setMethod("keytypes", "AnnotationHub",
     if(!any(keytype %in% keytypes(x)))
         stop("invalid 'keytype', see keytypes()")
     ## then retrieve values from server
-    url <- sprintf("%s/getAllValues?key=%s", x@curPath, keytype)
+    url <- sprintf("%s/getAllKeys?keytype=%s", x@curPath, keytype)
     unique(fromJSON(url))
 }
 
@@ -198,7 +198,7 @@ setMethod("keys", "AnnotationHub",
 setMethod("metadata", "AnnotationHub",
           function(x){
             ## just get all the data
-            baseUrl <- "http://wilson2.fhcrc.org/cgi-bin/R/query?Organism=9606"
+            baseUrl <- paste0(Server,"/cgi-bin/R/query?Organism=9606")
             fromJSON(baseUrl)
           })
 

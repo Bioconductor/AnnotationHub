@@ -9,6 +9,9 @@ Author: Marc Carlson
 Maintainer: Marc Carlson <mcarlson@fhcrc.org>
 Description: A client for retrieving data from the Bioconductor
     AnnotationHub online services.
+Collate: AllGenerics.R
+	 AllClasses.R
+	 methods-search.R
 License: Artistic-2.0
 biocViews: Annotation, Infrastructure
 LazyLoad: yes

@@ -21,14 +21,17 @@
 .retrievePathVals <-
     function(curPath)
 {
-    curPath <- paste(curPath, "AnnotationHub", sep="/")
+    curPath <- paste(curPath, "getAllResourcePaths", sep="/")
     ## look for values
     fromJSON(curPath)
 }
 
+## Server Name.  (package-wide global means one change when it moves)
+Server <- "http://wilson2.fhcrc.org"
+
 ## constructor
 AnnotationHub <-
-    function(curPath= "http://wilson2.fhcrc.org/cgi-bin/R", ...)
+    function(curPath= paste0(Server,"/cgi-bin/R"), ...)
 {
     paths <- .retrievePathVals(curPath)
     paths <- setNames(paths, make.names(paths))
