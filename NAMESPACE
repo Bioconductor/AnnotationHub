@@ -4,6 +4,8 @@ importFrom(AnnotationDbi, exists, keys, keytypes)
 
 import(BiocGenerics)
 
+importFrom(utils, .DollarNames)
+
 importFrom(IRanges, metadata)
 
 importFrom(RJSONIO, fromJSON)
