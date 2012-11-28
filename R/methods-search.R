@@ -266,20 +266,14 @@ setReplaceMethod("filters", "AnnotationHub", .replaceFilter)
 
 
 ## Add metadata method here
-## TODO: get a better baseUrl (this one only works temp.)
-## TODO: discuss with Dan why some empty field are not coming back sometimes?
-
-
-## I need a helper to call .getMetadata based on current filters (like getNewPathsBasedOnFilters does), but for this helper to work, I need a way for .getMetadata to be able to work when there are no filters...
-
-## Dan is setting up so that query? will give all metadata (instead of: [])
-
+## TODO: this metadata needs some controls on it.  For example: "GRanges" is
+## NOT a valid tax ID)
 
 setMethod("metadata", "AnnotationHub",
           function(x){
             res <- .getMetadata(x, x@filters)
             ## TODO: make res into a data.frame()
-            res
+            data.frame(do.call(rbind,res))
           })
 
 
