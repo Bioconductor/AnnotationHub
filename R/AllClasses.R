@@ -27,11 +27,14 @@
 }
 
 ## Server Name.  (package-wide global means one change when it moves)
-Server <- "http://wilson2.fhcrc.org"
+.getServer <- function()
+{
+    getOption("AnnotationHub.Server.Url", "http://wilson2.fhcrc.org")
+}
 
 ## constructor
 AnnotationHub <-
-    function(curPath= paste0(Server,"/cgi-bin/R"), ...)
+    function(curPath= paste0(.getServer() ,"/cgi-bin/R"), ...)
 {
     paths <- .retrievePathVals(curPath)
     paths <- setNames(paths, make.names(paths))
