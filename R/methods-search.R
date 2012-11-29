@@ -77,7 +77,7 @@ setMethod("urls", "AnnotationHub",
 .keytypes <-
     function()
 {
-    fromJSON(paste0(Server,'/cgi-bin/R/getAllKeytypes'))
+    fromJSON(paste0(.getServer(),'/cgi-bin/R/getAllKeytypes'))
 }
 
 setMethod("keytypes", "AnnotationHub",

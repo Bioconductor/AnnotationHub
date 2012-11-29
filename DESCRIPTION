@@ -2,9 +2,8 @@ Package: AnnotationHub
 Type: Package
 Title: A client for retrieving Bioconductor objects from AnnotationHub
 Version: 0.0.5
-Depends: RCurl
 Imports: methods, stats, utils, BiocGenerics, IRanges, RJSONIO, AnnotationDbi
-Suggests: RUnit
+Suggests: RUnit, RCurl
 Author: Marc Carlson 
 Maintainer: Marc Carlson <mcarlson@fhcrc.org>
 Description: A client for retrieving data from the Bioconductor
@@ -12,6 +11,7 @@ Description: A client for retrieving data from the Bioconductor
 Collate: AllGenerics.R
 	 AllClasses.R
 	 methods-search.R
+	 test_AnnotationHub_package.R
 License: Artistic-2.0
 biocViews: Annotation, Infrastructure
 LazyLoad: yes
