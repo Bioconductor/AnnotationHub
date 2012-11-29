@@ -29,7 +29,8 @@
 ## Server Name.  (package-wide global means one change when it moves)
 .getServer <- function()
 {
-    getOption("AnnotationHub.Server.Url", "http://wilson2.fhcrc.org")
+    getOption("AnnotationHub.Server.Url",
+              "http://annotationhub.bioconductor.org")
 }
 
 ## constructor
