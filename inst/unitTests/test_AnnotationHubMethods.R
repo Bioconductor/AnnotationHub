@@ -3,6 +3,8 @@
 
 x <- AnnotationHub()
 
+## What is the shortest example to DL? A: stamH3K4me3ProfilePromoters.RData
+
 
 ## can we get and set filters() for an object?
 test_filters <- function(){
@@ -21,30 +23,37 @@ test_filters <- function(){
 ## Does that happen?
 test_getResource <- function(){
     ## try a specific name
-    ## TODO: what is the shortest example? A - stamH3K4
     name <- "pub.databases.ensembl.encode.supplementary.integration_data_jan2011.byDataType.openchrom.jan2011.promoter_predictions.stamH3K4me3ProfilePromoters.RData"
     res <- AnnotationHub:::.getResource(x, name)
-    
+    checkTrue(class(res) == "GRanges")
     ## try a less specific name    
     name <- "goldenpath.hg19.encodeDCC.wgEncodeR"
-    res <- AnnotationHub:::.getResource(x, name)
-    
+    res2 <- AnnotationHub:::.getResource(x, name)
+    checkTrue(class(res2) == "character")
 }
 
 
-## test are valid filters being used?
-## a bunch of checkException calls...
+## test our filter Validation
+## Who watches the watchmen?
 test_validFilterValues <- function(){
-
+    badFilter <- list(Foo="9606") ## bad name
+    checkException(AnnotationHub:::.validFilterValues(x,badFilter))
+    badFilter2 <- list(Type="9606") ## bad value
+    checkException(AnnotationHub:::.validFilterValues(x,badFilter2))
 }
 
 
 
 ## .getMetadata needs to get metadata that is filtered OR NOT, depending.
-## both methods of access should work.
-## Lets get an example of both and then compare
+## Both methods of access should work.
 test_getMetadata <- function(){
-
+    filters <- NULL ## IOW: no filters
+    res <- AnnotationHub:::.getMetadata(x,filters)
+    checkTrue(length(res) > 1) ## should give multiple records 
+    ## check that we can get filtered metadata
+    filters <- list(Organism="9606", File="all.footprints.gz")
+    res <- AnnotationHub:::.getMetadata(x,filters)
+    checkTrue(length(res) == 1)  ## should only match one record
 }
 
 
@@ -59,14 +68,32 @@ test_getMetadata <- function(){
 ## test that this thing respects merging of values.  If values are
 ## repeated, they should not end up repeated in the result etc.
 test_replaceFilter <- function(){
-
+    filters(x) <- NULL ## null out filters
+    checkTrue(length(filters(x))==0)
+    x <- AnnotationHub:::.replaceFilter(x,list(Organism="9606"))
+    checkTrue(length(filters(x))==1)
+    ## now place a bigger filter on there
+    filters <- list(Organism="9606", File="all.footprints.gz")
+    x <- AnnotationHub:::.replaceFilter(x,filters)
+    checkTrue(length(filters(x))==2)  ## Organism should not repeat.
 }
 
 
 
 ## does this work as expected?  (it should respect the filter values)
 test_metadata <- function(){
-
+    filters(x) <- NULL ## null out filters
+    resFull <- metadata(x)
+    ## Now apply filters
+    filters <- list(Organism="9606", File="all.footprints.gz")
+    resPartial <- metadata(x)
+    checkTrue(dim(resFull)[2] == dim(resPartial)[2])
+    checkTrue(dim(resFull)[1] != dim(resPartial)[1])
 }
 
 
+## TODO: simplify getNewPathsBasedOnFilters()
+## TODO: solve bug that prevents the using of multi-valued keys in the
+## filter lists.
+## TODO: the test is correct.  I have a bug here.  metadata() is not
+## filtering out the unwanted rows...
