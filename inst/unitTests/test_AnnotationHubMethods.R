@@ -85,7 +85,7 @@ test_metadata <- function(){
     filters(x) <- NULL ## null out filters
     resFull <- metadata(x)
     ## Now apply filters
-    filters <- list(Organism="9606", File="all.footprints.gz")
+    filters(x) <- list(Organism="9606", File="all.footprints.gz")
     resPartial <- metadata(x)
     checkTrue(dim(resFull)[2] == dim(resPartial)[2])
     checkTrue(dim(resFull)[1] != dim(resPartial)[1])
@@ -95,5 +95,3 @@ test_metadata <- function(){
 ## TODO: simplify getNewPathsBasedOnFilters()
 ## TODO: solve bug that prevents the using of multi-valued keys in the
 ## filter lists.
-## TODO: the test is correct.  I have a bug here.  metadata() is not
-## filtering out the unwanted rows...
