@@ -166,6 +166,7 @@ setMethod("keys", "AnnotationHub",
         filters <- paste(filters, collapse="&")
         url <- sprintf("%s/query?%s", x@curPath, filters) ## vectorized?
         ## Concerned: that this may become too slow as more metadata piles on.
+        print(sprintf("url==%s",url))        
         return(fromJSON(url)) ## returns a list with metadata for each
     }
 }
