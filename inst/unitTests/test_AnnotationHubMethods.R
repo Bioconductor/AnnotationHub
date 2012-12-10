@@ -11,7 +11,9 @@ test_filters <- function(){
     ## by default: no filters (this may change)
     checkTrue(length(filters(x))==0)
     ## then add a filter
-    filters(x) <- list(Organism="9606", File="all.footprints.gz")
+    filters(x) <- list(TaxonomyId="9606",
+        OriginalFile=
+        "pub/databases/ensembl/encode/supplementary/integration_data_jan2011/byDataType/footprints/jan2011/all.footprints.gz")
     checkTrue(length(filters(x))==2)
     ## can we set them back to nothing?
     filters(x) <- NULL
@@ -25,7 +27,7 @@ test_getResource <- function(){
     ## try a specific name
 ##     name <- "pub.databases.ensembl.encode.supplementary.integration_data_jan2011.byDataType.openchrom.jan2011.promoter_predictions.stamH3K4me3ProfilePromoters.RData"
 
-    name <- "goldenpath/hg19/encodeDCC/wgEncodeRegDnaseClustered/wgEncodeRegDnaseClustered.bed-wgEncodeRegDnaseClusteredInputs.tab.RData"
+    name <- "goldenpath/hg19/encodeDCC/wgEncodeRegDnaseClustered/wgEncodeRegDnaseClustered.bed-wgEncodeRegDnaseClusteredInputs.tab.RData"    
     
     res <- AnnotationHub:::.getResource(x, name)
     checkTrue(class(res) == "GRanges")
@@ -41,7 +43,7 @@ test_getResource <- function(){
 test_validFilterValues <- function(){
     badFilter <- list(Foo="9606") ## bad name
     checkException(AnnotationHub:::.validFilterValues(x,badFilter))
-    badFilter2 <- list(Type="9606") ## bad value
+    badFilter2 <- list(Tags="9606") ## bad value
     checkException(AnnotationHub:::.validFilterValues(x,badFilter2))
 }
 
@@ -54,7 +56,9 @@ test_getMetadata <- function(){
     res <- AnnotationHub:::.getMetadata(x,filters)
     checkTrue(length(res) > 1) ## should give multiple records 
     ## check that we can get filtered metadata
-    filters <- list(Organism="9606", File="all.footprints.gz")
+    filters <- list(TaxonomyId="9606",
+        OriginalFile=
+        "pub/databases/ensembl/encode/supplementary/integration_data_jan2011/byDataType/footprints/jan2011/all.footprints.gz")
     res <- AnnotationHub:::.getMetadata(x,filters)
     checkTrue(length(res) == 1)  ## should only match one record
 }
@@ -73,12 +77,14 @@ test_getMetadata <- function(){
 test_replaceFilter <- function(){
     filters(x) <- NULL ## null out filters
     checkTrue(length(filters(x))==0)
-    x <- AnnotationHub:::.replaceFilter(x,list(Organism="9606"))
+    x <- AnnotationHub:::.replaceFilter(x,list(TaxonomyId="9606"))
     checkTrue(length(filters(x))==1)
     ## now place a bigger filter on there
-    filters <- list(Organism="9606", File="all.footprints.gz")
+    filters <- list(TaxonomyId="9606",
+        OriginalFile=
+        "pub/databases/ensembl/encode/supplementary/integration_data_jan2011/byDataType/footprints/jan2011/all.footprints.gz")
     x <- AnnotationHub:::.replaceFilter(x,filters)
-    checkTrue(length(filters(x))==2)  ## Organism should not repeat.
+    checkTrue(length(filters(x))==2)  ## TaxonomyId should not repeat.
 }
 
 
@@ -88,7 +94,9 @@ test_metadata <- function(){
     filters(x) <- NULL ## null out filters
     resFull <- metadata(x)
     ## Now apply filters
-    filters(x) <- list(Organism="9606", File="all.footprints.gz")
+    filters(x) <- list(TaxonomyId="9606",
+        OriginalFile=
+        "pub/databases/ensembl/encode/supplementary/integration_data_jan2011/byDataType/footprints/jan2011/all.footprints.gz")
     resPartial <- metadata(x)
     checkTrue(dim(resFull)[2] == dim(resPartial)[2])
     checkTrue(dim(resFull)[1] != dim(resPartial)[1])
