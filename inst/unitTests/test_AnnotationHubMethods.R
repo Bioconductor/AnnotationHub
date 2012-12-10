@@ -25,15 +25,13 @@ test_filters <- function(){
 ## Does that happen?
 test_getResource <- function(){
     ## try a specific name
-##     name <- "pub.databases.ensembl.encode.supplementary.integration_data_jan2011.byDataType.openchrom.jan2011.promoter_predictions.stamH3K4me3ProfilePromoters.RData"
-
-    name <- "goldenpath/hg19/encodeDCC/wgEncodeRegDnaseClustered/wgEncodeRegDnaseClustered.bed-wgEncodeRegDnaseClusteredInputs.tab.RData"    
-    
+    name <- "pub.databases.ensembl.encode.supplementary.integration_data_jan2011.byDataType.openchrom.jan2011.promoter_predictions.master_known.bed.master_novel.bed.RData"
     res <- AnnotationHub:::.getResource(x, name)
     checkTrue(class(res) == "GRanges")
+    
     ## try a less specific name    
-    name <- "goldenpath.hg19.encodeDCC.wgEncodeR"
-    res2 <- AnnotationHub:::.getResource(x, name)
+    name <- "goldenpath.hg19.encodeDCC.wgEncodeRikenCage.wgEncodeRiken"
+    suppressWarnings(res2 <- AnnotationHub:::.getResource(x, name))
     checkTrue(class(res2) == "character")
 }
 

@@ -166,7 +166,6 @@ setMethod("keys", "AnnotationHub",
         filters <- paste(filters, collapse="&")
         url <- sprintf("%s/query?%s", x@curPath, filters) ## vectorized?
         ## Concerned: that this may become too slow as more metadata piles on.
-        print(sprintf("url==%s",url))        
         return(fromJSON(url)) ## returns a list with metadata for each
     }
 }
@@ -193,7 +192,7 @@ setMethod("keys", "AnnotationHub",
         newPaths <- .retrievePathVals(x@curPath)
         newPaths <- setNames(newPaths, make.names(newPaths))  
     }
-    newPaths
+    unlist(newPaths) ## This may be too aggressive?
 }
 ## TODO: this method is producing a warning: investigate that.
 ## TODO: once methods above exist, write some unit tests.
@@ -241,7 +240,14 @@ setMethod("filters", "AnnotationHub",
     x
 }
 
-setReplaceMethod("filters", "AnnotationHub", .replaceFilter)
+## setReplaceMethod("filters", "AnnotationHub", .replaceFilter)
+
+## YES. I know this is more verbose.
+## But please leave it so I can debug things later...
+setReplaceMethod("filters", "AnnotationHub",
+                 function(x, value){.replaceFilter(x, value)})
+
+
 
 ## TODO: filter removal doesn't work as expected...
 
