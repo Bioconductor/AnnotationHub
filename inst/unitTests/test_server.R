@@ -67,7 +67,7 @@ test_keytypesFunctionality <- function(){
 
 ## does keys link work?
 test_keysFunctionality <- function(){
-    res <- AnnotationHub:::.keys(x,keytype="Type")
+    res <- AnnotationHub:::.keys(x,keytype="Tags")
     checkTrue(length(res) > 0) ## at least one key exists?
 }
 
