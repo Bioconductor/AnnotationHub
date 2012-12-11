@@ -176,7 +176,7 @@ setMethod("keys", "AnnotationHub",
 {
     ## get the ResourcePath for each. item that comes back from .getMetadata
     meta <- .getMetadata(x, filterValues) ## returns a list.
-    res <- sapply(meta, function(x) x[names(x) %in% "ResourcePath"])
+    res <- unlist(sapply(meta, function(x) x[names(x) %in% "ResourcePath"]))
     setNames(res, make.names(res))
 }
 
@@ -192,13 +192,13 @@ setMethod("keys", "AnnotationHub",
         newPaths <- .retrievePathVals(x@curPath)
         newPaths <- setNames(newPaths, make.names(newPaths))  
     }
-    unlist(newPaths) ## This may be too aggressive?
+    newPaths
 }
 ## TODO: this method is producing a warning: investigate that.
 ## TODO: once methods above exist, write some unit tests.
-
-
-
+## a= AnnotationHub()
+## filters(a) <- list(TaxonomyId="9606", Title="stamConnectivity")
+## Not 100% sure WHERE the warning is coming from actually...
 
 ## a filter is a combination of keys and keytypes that the user wants to
 ## specify that they are interested in.
