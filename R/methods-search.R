@@ -186,7 +186,7 @@ setMethod("keys", "AnnotationHub",
 .getNewPathsBasedOnFilters <-
     function(x, value)
 {
-    if (length(value > 0)) {
+    if (length(value) > 0) {
         newPaths <- .getFilesThatMatchFilters(x, value)
     } else {                            # there are no filters
         newPaths <- .retrievePathVals(x@curPath)
