@@ -26,7 +26,7 @@
     ## Assuming that we have only got one item...
     if(!is.na(file)) {
         ## append full URL
-        file <- paste0(basePath, file)
+        file <- paste(basePath, file, sep="/")
         ## get something
         message("Retrieving: ", file)
         objName <- load(file=url(file))
