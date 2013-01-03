@@ -34,7 +34,7 @@
     } else {
         ## otherwise list possible results
         possiblePaths <- x@paths[grep(name, names(x))]
-        possiblePaths <- paste0(basePath, possiblePaths)
+        possiblePaths <- paste(basePath, possiblePaths, sep="/")
         warning("incomplete path")
         possiblePaths
     }
