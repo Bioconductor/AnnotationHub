@@ -35,7 +35,7 @@
 
 ## constructor
 AnnotationHub <-
-    function(curPath= paste0(.getServer() ,"/cgi-bin/R"), ...)
+    function(curPath= paste0(.getServer() ,"/ah"), ...)
 {
     paths <- .retrievePathVals(curPath)
     paths <- setNames(paths, make.names(paths))

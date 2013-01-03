@@ -13,7 +13,7 @@
 .getBaseServe <-
     function(x)
 {
-    paste(x@curPath, "serve?path=", sep="/")
+    paste(x@curPath, "resources", sep="/")
 }
 
 ## $ is what is called when I hit enter, so this method actually gets the data
@@ -77,7 +77,7 @@ setMethod("urls", "AnnotationHub",
 .keytypes <-
     function()
 {
-    fromJSON(paste0(.getServer(),'/cgi-bin/R/getAllKeytypes'))
+    fromJSON(paste0(.getServer(),'/ah/getAllKeytypes'))
 }
 
 setMethod("keytypes", "AnnotationHub",
@@ -96,7 +96,7 @@ setMethod("keytypes", "AnnotationHub",
     if(!any(keytype %in% keytypes(x)))
         stop("invalid 'keytype', see keytypes()")
     ## then retrieve values from server
-    url <- sprintf("%s/getAllKeys?keytype=%s", x@curPath, keytype)
+    url <- paste(x@curPath, "getAllKeys", keytype, sep="/")
     unique(fromJSON(url))
 }
 
@@ -113,7 +113,7 @@ setMethod("keys", "AnnotationHub",
 ## files based on only the metadata:
 
 ## So a URL like this allows me to get info based on keytypes and keys.
-## http://wilson2.fhcrc.org/cgi-bin/R/query?Organism=9606&GenomeVersion=hg19
+## http://wilson2.fhcrc.org/ah/query/Organism/9606/GenomeVersion/hg19
 
 ## return true all filters valid
 .validFilterValues <-
@@ -143,11 +143,26 @@ setMethod("keys", "AnnotationHub",
 ## filterValues[[2]] <- keys(a, "BiocVersion")
 ## names(filterValues) <- c("Organism","BiocVersion")
 
-## helper to take a single filter and process it
+## helper to take a single filterName and process it
 .processFilter <-
     function(filter, filterName)
 {
-    sprintf("%s=%s", filterName, paste(filter, collapse=','))
+    #sprintf("%s=%s", filterName, paste(filter, collapse=','))
+##     if(grepl("/", filter)){
+##         paste(paste(filterName,'"',filter,'"',sep='/'),collapse='/')
+##     }else{
+##         paste(paste(filterName, filter, sep="/"), collapse="/")
+##     }
+
+    res <- character()
+    for(i in seq_along(filter)){
+        if(grepl("/", filter[i])){
+            res[i] <- paste(filterName,paste('%22',filter,'%22',sep=""),sep='/')
+        }else{
+            res[i] <- paste(filterName,filter,sep='/')
+        }
+    }
+    paste(res,collapse="/")
 }
 
 ## get list of metadata character vectors that match the specified
@@ -156,15 +171,15 @@ setMethod("keys", "AnnotationHub",
     function(x, filterValues)
 {
     if(length(filterValues) == 0){
-        return(fromJSON(paste0(x@curPath,"/query?")))
+        return(fromJSON(paste0(x@curPath,"/query")))
     } else {
         .validFilterValues(x, filterValues)
         ## and assuming we get past that, we have to now assemble a URL from
         ## the pieces.
         filters <- unlist(Map(.processFilter, filterValues,
                               names(filterValues)))
-        filters <- paste(filters, collapse="&")
-        url <- sprintf("%s/query?%s", x@curPath, filters) ## vectorized?
+        filters <- paste(filters, collapse="/")
+        url <- paste(x@curPath, "query", filters, sep="/") ## vectorized?
         ## Concerned: that this may become too slow as more metadata piles on.
         return(fromJSON(url)) ## returns a list with metadata for each
     }
