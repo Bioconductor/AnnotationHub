@@ -25,8 +25,9 @@ test_filters <- function(){
 ## Does that happen?
 test_getResource <- function(){
     ## try a specific name
-    name <- "pub.databases.ensembl.encode.supplementary.integration_data_jan2011.byDataType.openchrom.jan2011.promoter_predictions.master_known.bed.master_novel.bed.RData"
-    res <- AnnotationHub:::.getResource(x, name)
+#    name <- "pub.databases.ensembl.encode.supplementary.integration_data_jan2011.byDataType.openchrom.jan2011.promoter_predictions.master_known.bed_0.0.1.RData"
+    altName <- "fakedata.data.bed_0.0.2.RData" 
+    res <- AnnotationHub:::.getResource(x, altName)
     checkTrue(class(res) == "GRanges")
     
     ## try a less specific name    

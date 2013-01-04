@@ -41,7 +41,7 @@ test_basePath <- function(){
 ## does the base serve path work?
 test_servePath <- function(){
     ## http://wilson2.fhcrc.org/cgi-bin/R/serve?path=
-    baseServe <- AnnotationHub:::.getBaseServe(x)
+    baseServe <- AnnotationHub:::.getBaseServe()
     res <- .getHeader(url=baseServe)
     checkTrue(length(grep("200 OK", res[1])) > 0)    
 }
@@ -50,7 +50,7 @@ test_servePath <- function(){
 ## does the path serve mechanism work?
 ## This one should be able to DL...
 test_servePathFuntionality <- function(){
-    baseServe <- AnnotationHub:::.getBaseServe(x)
+    baseServe <- AnnotationHub:::.getBaseServe()
     ## AND THEN we have to DL something specific:
     url <- paste(baseServe, x@paths[1], sep="/")
     res <- RCurl:::getBinaryURL(url)

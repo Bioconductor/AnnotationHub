@@ -11,9 +11,11 @@
 
 ## Helper assembles correct base path for getting files.
 .getBaseServe <-
-    function(x)
+    function()
 {
-    paste(x@curPath, "resources", sep="/")
+ ##   paste(x@curPath, "resources", sep="/")
+    ## for this we do NOT use the version and date info.
+    paste(.getServer() ,"ah", "resources", sep="/")
 }
 
 ## $ is what is called when I hit enter, so this method actually gets the data
@@ -22,7 +24,7 @@
     function(x, name) 
 {
     file <- x@paths[name]
-    basePath <- .getBaseServe(x)
+    basePath <- .getBaseServe()
     ## Assuming that we have only got one item...
     if(!is.na(file)) {
         ## append full URL
