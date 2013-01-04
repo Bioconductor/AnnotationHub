@@ -3,9 +3,10 @@
 
 ## 1st get the string for the base server
 server <- AnnotationHub:::.getServer() ## Can I test this???
-## string to get the curPath
-curPath <- paste0(AnnotationHub:::.getServer() ,"/cgi-bin/R")
+## testObject
 x <- AnnotationHub()
+## string to get the curPath
+curPath <- x@curPath
 
 
 ## Helper for getting headers into easily grep-able format
@@ -29,11 +30,11 @@ test_serverAvailability <- function(){
 }
 
 
-## is curpath pointing to nowhere? (this is expected for this one)
+## is curpath pointing to somewhere? (a change from last time)
 test_basePath <- function(){
     ## Now test that the base path has a header.
     res <- .getHeader(url=curPath)
-    checkTrue(length(grep("400", res[1])) > 0)
+    checkTrue(length(grep("200", res[1])) > 0)
 }
 
 
@@ -60,7 +61,7 @@ test_servePathFuntionality <- function(){
 
 ## does keytypes link work?
 test_keytypesFunctionality <- function(){
-    res <- AnnotationHub:::.keytypes()
+    res <- AnnotationHub:::.keytypes(x)
     checkTrue(length(res) > 0) ## contents may vary.  Are there some?
 }
 

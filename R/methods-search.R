@@ -74,16 +74,14 @@ setMethod("urls", "AnnotationHub",
 #####################################
 
 ## functions to explore what is on the server
-.keytypes <-
-    function()
-{
-    fromJSON(paste0(.getServer(),'/ah/getAllKeytypes'))
+.keytypes <-function(x){
+    fromJSON(paste0(x@curPath,'/getAllKeytypes'))
 }
 
 setMethod("keytypes", "AnnotationHub",
     function(x)
     {
-        .keytypes()
+        .keytypes(x)
     }
 )
 
@@ -96,7 +94,7 @@ setMethod("keytypes", "AnnotationHub",
     if(!any(keytype %in% keytypes(x)))
         stop("invalid 'keytype', see keytypes()")
     ## then retrieve values from server
-    url <- paste(x@curPath, "getAllKeys", keytype, sep="/")
+    url <- paste(x@curPath, "getAllKeys/keytype", keytype, sep="/")
     unique(fromJSON(url))
 }
 

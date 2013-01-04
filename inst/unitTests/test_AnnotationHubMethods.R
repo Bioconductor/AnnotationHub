@@ -12,7 +12,7 @@ test_filters <- function(){
     checkTrue(length(filters(x))==0)
     ## then add a filter
     filters(x) <- list(TaxonomyId="9606",
-        OriginalFile=
+        SourceFile=
         "pub/databases/ensembl/encode/supplementary/integration_data_jan2011/byDataType/footprints/jan2011/all.footprints.gz")
     checkTrue(length(filters(x))==2)
     ## can we set them back to nothing?
@@ -55,7 +55,7 @@ test_getMetadata <- function(){
     checkTrue(length(res) > 1) ## should give multiple records 
     ## check that we can get filtered metadata
     filters <- list(TaxonomyId="9606",
-        OriginalFile=
+        SourceFile=
         "pub/databases/ensembl/encode/supplementary/integration_data_jan2011/byDataType/footprints/jan2011/all.footprints.gz")
     res <- AnnotationHub:::.getMetadata(x,filters)
     checkTrue(length(res) == 1)  ## should only match one record
@@ -79,7 +79,7 @@ test_replaceFilter <- function(){
     checkTrue(length(filters(x))==1)
     ## now place a bigger filter on there
     filters <- list(TaxonomyId="9606",
-        OriginalFile=
+        SourceFile=
         "pub/databases/ensembl/encode/supplementary/integration_data_jan2011/byDataType/footprints/jan2011/all.footprints.gz")
     x <- AnnotationHub:::.replaceFilter(x,filters)
     checkTrue(length(filters(x))==2)  ## TaxonomyId should not repeat.
@@ -93,7 +93,7 @@ test_metadata <- function(){
     resFull <- metadata(x)
     ## Now apply filters
     filters(x) <- list(TaxonomyId="9606",
-        OriginalFile=
+        SourceFile=
         "pub/databases/ensembl/encode/supplementary/integration_data_jan2011/byDataType/footprints/jan2011/all.footprints.gz")
     resPartial <- metadata(x)
     checkTrue(dim(resFull)[2] == dim(resPartial)[2])
