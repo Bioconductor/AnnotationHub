@@ -13,31 +13,43 @@
 .AnnotationHub <- setClass("AnnotationHub",
                            representation(curPath = "character",
                                           paths="character",
+                                          versionString="character",
                                           pattern="character",
                                           filters="list"))
 
 ## .retrievePathVals is for listing the items from the web server.
 ## This method is only called by the constructor.
-.retrievePathVals <-
-    function(curPath)
-{
-    curPath <- paste(curPath, "getAllResourcePaths", sep="/")
+.retrievePathVals <- function(curPath){
+    url <- paste(curPath, "getAllResourcePaths", sep="/")
     ## look for values
-    fromJSON(curPath)
+    fromJSON(url)
 }
 
 ## Server Name.  (package-wide global means one change when it moves)
-.getServer <- function()
-{
+.getServer <- function(){
     getOption("AnnotationHub.Server.Url",
               "http://annotationhub.bioconductor.org")
 }
 
+## Takes the base path information and gets the version data for the constructor
+.getVersionString <- function(curPath){
+    version <- BiocInstaller:::BIOC_VERSION    
+    latestDateUrl <- paste(curPath, version, "getLatestSnapshotDate", sep="/")
+    date <- fromJSON(latestDateUrl)
+    paste(version, date, sep="/")
+}
+
+
 ## constructor
-AnnotationHub <-
-    function(curPath= paste0(.getServer() ,"/ah"), ...)
-{
+AnnotationHub <- function(curPath= paste0(.getServer() ,"/ah"), ...){
+    ## get the latest version info.
+    versionString <- .getVersionString(curPath)
+    ## set up curPath based on the latest snapshot
+    curPath <- paste(curPath, versionString, sep="/")
+    
+    ## Then get the paths etc.
     paths <- .retrievePathVals(curPath)
     paths <- setNames(paths, make.names(paths))
-    .AnnotationHub(curPath=curPath, paths=paths, ...)
+    .AnnotationHub(curPath=curPath, paths=paths, versionString=versionString,
+                   ...)
 }
