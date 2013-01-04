@@ -189,7 +189,7 @@ setMethod("keys", "AnnotationHub",
 {
     ## get the ResourcePath for each. item that comes back from .getMetadata
     meta <- .getMetadata(x, filterValues) ## returns a list.
-    res <- unlist(sapply(meta, function(x) x[names(x) %in% "ResourcePath"]))
+    res <- unlist(sapply(meta, function(x) x[names(x) %in% "RDataPath"]))
     setNames(res, make.names(res))
 }
 
