@@ -303,3 +303,40 @@ setMethod("metadata", "AnnotationHub",
 
 
 
+## A method to extact the currently set date
+setMethod("versionDate", "AnnotationHub",
+    function(x) {
+        x@versionString
+    }
+)
+## date(a)
+
+## exporting this function as a method too...
+.possibleDates <- function(){
+    version <- BiocInstaller:::BIOC_VERSION
+    url <- paste(paste0(.getServer(),"/ah"),version,"getSnapshotDates",sep="/")
+    fromJSON(url)
+}
+setMethod("possibleDates", "AnnotationHub", function(x) .possibleDates() ) 
+
+
+## Setter method to set date
+.replaceVersionDate <-
+    function(x, value)
+{
+    possibleDates <- .possibleDates()
+    if(value %in% possibleDates){
+        x@date<- value
+    }else{
+        stop("value must be an actual snapshot date.  See possibleDates() for viable snapshot dates.")
+    }
+    x
+}
+
+setReplaceMethod("versionDate", "AnnotationHub",
+                 function(x, value){.replaceVersionDate(x, value)})
+
+
+## TODO:
+## 1) decide whether to store version AND date or only date in the version slot and then make things consistent.
+## 2) add unit tests for these three new methods.

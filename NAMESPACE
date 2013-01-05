@@ -24,6 +24,9 @@ exportMethods("$",
               "urls",
               "metadata",
               "filters",
-              "filters<-")
+              "filters<-",
+              "versionDate",
+              "versionDate<-",
+              "possibleDates")
 
 export("AnnotationHub")
