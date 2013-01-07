@@ -14,8 +14,14 @@
                            representation(curPath = "character",
                                           paths="character",
                                           versionString="character",
+                                          dateString="character",
                                           pattern="character",
                                           filters="list"))
+
+## This is just how I declare the "base" curPath:
+.baseCurPath <- function(){
+    paste0(.getServer() ,"/ah")
+}
 
 ## .retrievePathVals is for listing the items from the web server.
 ## This method is only called by the constructor.
@@ -31,25 +37,26 @@
               "http://annotationhub.bioconductor.org")
 }
 
+
 ## Takes the base path information and gets the version data for the constructor
-.getVersionString <- function(curPath){
-    version <- BiocInstaller:::BIOC_VERSION    
-    latestDateUrl <- paste(curPath, version, "getLatestSnapshotDate", sep="/")
-    date <- fromJSON(latestDateUrl)
-    paste(version, date, sep="/")
+.getDateString <- function(curPath, versionString){
+    latestDateUrl <- paste(curPath, versionString,
+                           "getLatestSnapshotDate", sep="/")
+    fromJSON(latestDateUrl)
 }
 
 
 ## constructor
-AnnotationHub <- function(curPath= paste0(.getServer() ,"/ah"), ...){
+AnnotationHub <- function(curPath=.baseCurPath(), ...){
     ## get the latest version info.
-    versionString <- .getVersionString(curPath)
+    versionString <- as.character(BiocInstaller:::BIOC_VERSION)
+    dateString <- .getDateString(curPath, versionString)
     ## set up curPath based on the latest snapshot
-    curPath <- paste(curPath, versionString, sep="/")
+    curPath <- paste(curPath, versionString, dateString, sep="/")
     
     ## Then get the paths etc.
     paths <- .retrievePathVals(curPath)
     paths <- setNames(paths, make.names(paths))
     .AnnotationHub(curPath=curPath, paths=paths, versionString=versionString,
-                   ...)
+                   dateString=dateString, ...)
 }

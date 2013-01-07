@@ -250,7 +250,7 @@ setMethod("filters", "AnnotationHub",
     x@filters <-  value[sapply(value, length) != 0]
     
     ## ALSO assign a new value to @paths!
-    x@paths <- .getNewPathsBasedOnFilters(x, value)
+    x@paths <- .getNewPathsBasedOnFilters(x, x@filters)
     ## Finally we can return the object back
     x
 }
@@ -318,15 +318,23 @@ setMethod("versionDate", "AnnotationHub",
     fromJSON(url)
 }
 setMethod("possibleDates", "AnnotationHub", function(x) .possibleDates() ) 
+## possibleDates(x)
 
 
-## Setter method to set date
+## Setter method to set date (also needs to adjust the curPath)
 .replaceVersionDate <-
     function(x, value)
 {
     possibleDates <- .possibleDates()
     if(value %in% possibleDates){
-        x@date<- value
+        x@dateString<- value
+        ## also update the curPath.
+        curPath <-  .baseCurPath()
+        versionString <- BiocInstaller:::BIOC_VERSION
+        dateString <- .getDateString(curPath, versionString)
+        x@curPath <- paste(curPath, versionString, dateString, sep="/")        
+        ## also update the paths slot
+        x@paths <- .getNewPathsBasedOnFilters(x, x@filters)
     }else{
         stop("value must be an actual snapshot date.  See possibleDates() for viable snapshot dates.")
     }
@@ -338,5 +346,4 @@ setReplaceMethod("versionDate", "AnnotationHub",
 
 
 ## TODO:
-## 1) decide whether to store version AND date or only date in the version slot and then make things consistent.
 ## 2) add unit tests for these three new methods.
