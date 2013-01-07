@@ -37,6 +37,9 @@
               "http://annotationhub.bioconductor.org")
 }
 
+.getCurVersion <- function(){
+    as.character(BiocInstaller:::BIOC_VERSION)
+}
 
 ## Takes the base path information and gets the version data for the constructor
 .getDateString <- function(curPath, versionString){
@@ -49,7 +52,7 @@
 ## constructor
 AnnotationHub <- function(curPath=.baseCurPath(), ...){
     ## get the latest version info.
-    versionString <- as.character(BiocInstaller:::BIOC_VERSION)
+    versionString <- .getCurVersion()
     dateString <- .getDateString(curPath, versionString)
     ## set up curPath based on the latest snapshot
     curPath <- paste(curPath, versionString, dateString, sep="/")

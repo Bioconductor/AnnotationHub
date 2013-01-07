@@ -9,12 +9,11 @@
     grep(pattern, names(x), value=TRUE)
 }
 
-## Helper assembles correct base path for getting files.
+## Helper assembles correct base path for getting files.  NOTE: this
+## curPath does NOT need to have date or version information in it.
 .getBaseServe <-
     function()
 {
- ##   paste(x@curPath, "resources", sep="/")
-    ## for this we do NOT use the version and date info.
     paste(.getServer() ,"ah", "resources", sep="/")
 }
 
@@ -147,13 +146,6 @@ setMethod("keys", "AnnotationHub",
 .processFilter <-
     function(filter, filterName)
 {
-    #sprintf("%s=%s", filterName, paste(filter, collapse=','))
-##     if(grepl("/", filter)){
-##         paste(paste(filterName,'"',filter,'"',sep='/'),collapse='/')
-##     }else{
-##         paste(paste(filterName, filter, sep="/"), collapse="/")
-##     }
-
     res <- character()
     for(i in seq_along(filter)){
         if(grepl("/", filter[i])){
@@ -186,9 +178,7 @@ setMethod("keys", "AnnotationHub",
 }
 
 ## get character vector of ResourcePath values that match the keys/keytypes
-.getFilesThatMatchFilters <-
-    function(x, filterValues)
-{
+.getFilesThatMatchFilters <- function(x, filterValues) {
     ## get the ResourcePath for each. item that comes back from .getMetadata
     meta <- .getMetadata(x, filterValues) ## returns a list.
     res <- unlist(sapply(meta, function(x) x[names(x) %in% "RDataPath"]))
@@ -198,9 +188,7 @@ setMethod("keys", "AnnotationHub",
 ## This function gets new @paths values based new values for @filters
 ## It can't just check the object for @filters though because it is needed in
 ## middle of change to @filters
-.getNewPathsBasedOnFilters <-
-    function(x, value)
-{
+.getNewPathsBasedOnFilters <- function(x, value) {
     if (length(value) > 0) {
         newPaths <- .getFilesThatMatchFilters(x, value)
     } else {                            # there are no filters
@@ -209,8 +197,6 @@ setMethod("keys", "AnnotationHub",
     }
     newPaths
 }
-## TODO: this method is producing a warning: investigate that.
-## TODO: once methods above exist, write some unit tests.
 ## a= AnnotationHub()
 ## filters(a) <- list(TaxonomyId="9606", Title="stamConnectivity")
 ## Not 100% sure WHERE the warning is coming from actually...
@@ -250,7 +236,7 @@ setMethod("filters", "AnnotationHub",
     x@filters <-  value[sapply(value, length) != 0]
     
     ## ALSO assign a new value to @paths!
-    x@paths <- .getNewPathsBasedOnFilters(x, x@filters)
+    x@paths <- .getNewPathsBasedOnFilters(x, value)
     ## Finally we can return the object back
     x
 }
@@ -306,7 +292,7 @@ setMethod("metadata", "AnnotationHub",
 ## A method to extact the currently set date
 setMethod("versionDate", "AnnotationHub",
     function(x) {
-        x@versionString
+        x@dateString
     }
 )
 ## date(a)
@@ -326,17 +312,31 @@ setMethod("possibleDates", "AnnotationHub", function(x) .possibleDates() )
     function(x, value)
 {
     possibleDates <- .possibleDates()
-    if(value %in% possibleDates){
+    if(value %in% possibleDates && value != x@dateString){
         x@dateString<- value
         ## also update the curPath.
         curPath <-  .baseCurPath()
-        versionString <- BiocInstaller:::BIOC_VERSION
-        dateString <- .getDateString(curPath, versionString)
-        x@curPath <- paste(curPath, versionString, dateString, sep="/")        
-        ## also update the paths slot
-        x@paths <- .getNewPathsBasedOnFilters(x, x@filters)
+        versionString <- .getCurVersion()
+        dateString <- value
+        x@curPath <- paste(curPath, versionString, dateString, sep="/")
+        ## I also need to update @paths because different paths might
+        ## be available depending on the version date.  But this is
+        ## tricky, because I also want to try and keep their previous
+        ## filters...
+        ## 1st trap their current filters
+        filters = x@filters
+        ## then get paths assuming a fresh start.
+        locPaths <- .getNewPathsBasedOnFilters(x, NULL)
+        ## then ammend those to use the saved filters.
+        locPaths <- .getNewPathsBasedOnFilters(x, filters)
+        ## finally put those paths into @paths
+        if(!is.null(locPaths[[1]])){
+            x@paths <- locPaths
+        }else{
+            stop("There is not any data available for that version date.")
+        }
     }else{
-        stop("value must be an actual snapshot date.  See possibleDates() for viable snapshot dates.")
+        stop("value must be an actual snapshot date that is not currently being used.  See possibleDates() for viable snapshot dates.")
     }
     x
 }
