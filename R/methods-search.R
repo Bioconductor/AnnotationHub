@@ -65,7 +65,7 @@ setMethod("length", "AnnotationHub",
 setMethod("urls", "AnnotationHub",
     function(x)
     {
-      base <- .getBaseServe(x)
+      base <- .getBaseServe()
       paste0(base, x@paths)
     }
 )
