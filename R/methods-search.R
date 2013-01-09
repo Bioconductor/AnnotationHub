@@ -3,30 +3,53 @@
 
 ## This is the workhorse for the tab stuff.
 ## When the user hits tab, we want to complete what we can here
-.DollarNames.AnnotationHub <-
-    function(x, pattern="")
-{
+.DollarNames.AnnotationHub <- function(x, pattern=""){
     grep(pattern, names(x), value=TRUE)
 }
 
-## Helper assembles correct base path for getting files.  NOTE: this
-## curPath does NOT need to have date or version information in it.
-.getBaseServe <-
-    function()
-{
+## Helper assembles correct base path for getting online files.  NOTE:
+## this curPath does NOT need to have date or version information.
+.getBaseServe <- function(){
     paste(.getServer() ,"ah", "resources", sep="/")
 }
 
+
 ## the more specific path for stuff from the local cache
 .localCacheDir <- function(){
-    paste(.baseUserDir, x@dateString , x@versionString, "resources", sep="/")
+    file.path(.baseUserDir, x@versionString, x@dateString, "resources")
 }
+
+
+## helper to split file path in platform independent way
+.splitFilePath <- function(path){
+    fsep <- .Platform$file.sep
+    unlist(strsplit(path, split=fsep))
+}
+
+## This should help us to get the file path sorted so that we can save it.
+.createFilePathIfNeeded <- function(path){
+    pathVec <- .splitFilePath(path) ## split
+    pathVec <- pathVec[-length(pathVec)] ## and remove actual file
+    ## then I need to just make any dirs that don't exist already.
+    posPaths <- character()
+    for(i in seq_len(length(pathVec))){
+        posPaths[[i]] <- paste(pathVec[1:i], collapse= .Platform$file.sep)
+    }
+    ## And then I have to make sure 100% of the possible paths are created.
+    ## And yes this has to be done in sequence...  :P
+    for(i in seq_len(length(posPaths))){
+        if(!file.exists(posPaths[i])){
+            dir.create(posPaths[i])
+        }
+    }
+}
+
 
 ## is the file cached?  Lets look and see
 .isTheFileInCache <- function(file){
     ## Then we have to test if the file is cached already...
     cacheDir <- .localCacheDir()
-    cacheFile <- paste(cacheDir, file, sep="/")
+    cacheFile <- file.path(cacheDir, file)
     !is.na(file.info(cacheFile)[1])
 }
 
@@ -43,9 +66,7 @@
 
 ## $ is what is called when I hit enter, so this method actually gets the data
 ## once we have a full path to it.
-.getResource <-
-    function(x, name) 
-{
+.getResource <- function(x, name){
     file <- x@paths[name]    
     ## Assuming that we have only got one item...
     if(!is.na(file)) {
@@ -61,6 +82,8 @@
         obj <- get(objName)
         if(x@cachingEnabled == TRUE && .isTheFileInCache() == FALSE){
             ## only save if we are using cache AND file is not saved yet
+            ## but 1st make sure that the dir exists.
+            .createFilePathIfNeeded(path)
             save(obj,file=file)
         }
         obj

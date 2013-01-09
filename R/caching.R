@@ -89,13 +89,21 @@ ask.yes.no <- function(msg) {
 ## locally, it should be stored there after the 1st time.
 
 ## - In progress 
-## So I have to change the basePath (when its both available AND 
+## So I ONLY have to change the basePath (when its both available AND saved)
 
 ## More TODO:
 ## 1) include the date and version number - DONE
-## 2) there may be problems with the path/filename being passed in as
-## a string. - 
+## 2) there are problems with the path/filename being passed in as
+## a string. - DONE
 ## 3) test and debug
 ## 4) I will have to make this all work with not only the files, but
 ## also with the other data that can be obtained (so that things can
 ## work fully offline).
+
+
+
+## example URL for online
+## http://annotationhub.bioconductor.org/ah/resources/pub/databases/ensembl/encode/supplementary/integration_data_jan2011/byDataType/footprints/jan2011/all.footprints_0.0.1.RData
+
+## example URL for cache:
+## ~/R/x86_64-unknown-linux-gnu-library/3.0/ah/2.12/2013-01-02/resources/pub/databases/ensembl/encode/supplementary/integration_data_jan2011/byDataType/footprints/jan2011/all.footprints_0.0.1.RData
