@@ -88,5 +88,14 @@ ask.yes.no <- function(msg) {
 ## (providing that the flag is set).  If the file is not stored
 ## locally, it should be stored there after the 1st time.
 
-## - In progress
+## - In progress 
 ## So I have to change the basePath (when its both available AND 
+
+## More TODO:
+## 1) include the date and version number - DONE
+## 2) there may be problems with the path/filename being passed in as
+## a string. - 
+## 3) test and debug
+## 4) I will have to make this all work with not only the files, but
+## also with the other data that can be obtained (so that things can
+## work fully offline).

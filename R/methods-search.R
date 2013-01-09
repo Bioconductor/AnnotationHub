@@ -17,20 +17,24 @@
     paste(.getServer() ,"ah", "resources", sep="/")
 }
 
+## the more specific path for stuff from the local cache
+.localCacheDir <- function(){
+    paste(.baseUserDir, x@dateString , x@versionString, "resources", sep="/")
+}
 
-## TODO: work out the logic for cache enabled/disabled and saved/not saved.
-
+## is the file cached?  Lets look and see
 .isTheFileInCache <- function(file){
     ## Then we have to test if the file is cached already...
-    cacheDir <- paste(.baseUserDir, "resources", sep="/")
+    cacheDir <- .localCacheDir()
     cacheFile <- paste(cacheDir, file, sep="/")
     !is.na(file.info(cacheFile)[1])
 }
 
+## what should we use as a path?
 .chooseForeignOrLocalFileSource <- function(x, file){
     if(x@cachingEnabled == TRUE && .isTheFileInCache() == TRUE){
         ## is caching enabled AND is the file ALSO present?
-        basePath <- paste(.baseUserDir, "resources", sep="/")
+        basePath <- .localCacheDir()
     }else{
         basePath <- .getBaseServe()
     }
@@ -38,7 +42,7 @@
 }
 
 ## $ is what is called when I hit enter, so this method actually gets the data
-## once we have a full path.
+## once we have a full path to it.
 .getResource <-
     function(x, name) 
 {
