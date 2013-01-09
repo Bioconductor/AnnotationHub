@@ -17,21 +17,49 @@
     paste(.getServer() ,"ah", "resources", sep="/")
 }
 
+
+## TODO: work out the logic for cache enabled/disabled and saved/not saved.
+
+.isTheFileInCache <- function(file){
+    ## Then we have to test if the file is cached already...
+    cacheDir <- paste(.baseUserDir, "resources", sep="/")
+    cacheFile <- paste(cacheDir, file, sep="/")
+    !is.na(file.info(cacheFile)[1])
+}
+
+.chooseForeignOrLocalFileSource <- function(x, file){
+    if(x@cachingEnabled == TRUE && .isTheFileInCache() == TRUE){
+        ## is there a file here locally AND is it present?
+        basePath <- paste(.baseUserDir, "resources", sep="/")
+    }else{
+        basePath <- .getBaseServe()
+    }
+    basePath
+}
+
 ## $ is what is called when I hit enter, so this method actually gets the data
 ## once we have a full path.
 .getResource <-
     function(x, name) 
 {
-    file <- x@paths[name]
-    basePath <- .getBaseServe()
+    file <- x@paths[name]    
     ## Assuming that we have only got one item...
     if(!is.na(file)) {
+        
+        ## Set up the basePath based on caching.
+        basePath <- .chooseForeignOrLocalFileSource(x, file)
+        
         ## append full URL
         file <- paste(basePath, file, sep="/")
         ## get something
         message("Retrieving: ", file)
         objName <- load(file=url(file))
-        get(objName)
+        obj <- get(objName)
+        if(x@cachingEnabled == TRUE && .isTheFileInCache() == FALSE){
+            ## then we should also save it
+            save(obj,file=file)
+        }
+        obj
     } else {
         ## otherwise list possible results
         possiblePaths <- x@paths[grep(name, names(x))]
