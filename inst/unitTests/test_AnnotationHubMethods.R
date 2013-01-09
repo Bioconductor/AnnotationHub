@@ -110,8 +110,15 @@ test_metadata <- function(){
 
 
 
+## TODO: add tests for:
+## versionDate etc.  (make sure they are returning correct things).
 
-## debugging caching:
+## Add tests for caching
 
 
-## library(AnnotationHub); x = AnnotationHub(); filters(x) <- list(TaxonomyId="9606",SourceFile= "pub/databases/ensembl/encode/supplementary/integration_data_jan2011/byDataType/footprints/jan2011/all.footprints.gz"); x$pub.databases.ensembl.encode.supplementary.integration_data_jan2011.byDataType.footprints.jan2011.all.footprints_0.0.1.RData
+## some debugging code for caching:
+
+
+##  library(AnnotationHub); x = AnnotationHub(); filters(x) <- list(TaxonomyId="9606",SourceFile= "pub/databases/ensembl/encode/supplementary/integration_data_jan2011/byDataType/footprints/jan2011/all.footprints.gz");
+
+##  a = x$pub.databases.ensembl.encode.supplementary.integration_data_jan2011.byDataType.footprints.jan2011.all.footprints_0.0.1.RData

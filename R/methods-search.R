@@ -64,10 +64,14 @@
     basePath
 }
 
+.reformatFilePath <- function(filePath){
+    paste(.splitFilePath(filePath), collapse=.Platform$file.sep)
+}
+
 ## $ is what is called when I hit enter, so this method actually gets the data
 ## once we have a full path to it.
 .getResource <- function(x, name){
-    file <- x@paths[name]    
+    file <- x@paths[name]   
     ## Assuming that we have only got one item...
     if(!is.na(file)) {
         
@@ -76,10 +80,19 @@
         
         ## append full URL
         filePath <- file.path(basePath, file)
-        ## get something
+        ## load it
         message("Retrieving: ", filePath)
-        objName <- load(file=url(filePath))
+        if(x@cachingEnabled == FALSE || .isTheFileInCache(file) == FALSE){
+            objName <- load(file=url(filePath))
+        }else{
+            objName <- load(file=filePath)
+        }
+        ## then get it
+        
         obj <- get(objName)
+        ## for platform independence, reformat file string to match FS
+        file <- .reformatFilePath(file)
+        ## Then see if we need to interact with local FS for caching
         if(x@cachingEnabled == TRUE && .isTheFileInCache(file) == FALSE){
             ## only save if we are using cache AND file is not saved yet
             ## localPath of interest will NOW have to be the local one
