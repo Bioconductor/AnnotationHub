@@ -1,7 +1,7 @@
 Package: AnnotationHub
 Type: Package
 Title: A client for retrieving Bioconductor objects from AnnotationHub
-Version: 0.0.9
+Version: 0.0.10
 Imports: methods, stats, utils, BiocGenerics, IRanges, RJSONIO, AnnotationDbi
 Suggests: RUnit, RCurl
 Author: Marc Carlson 

@@ -113,7 +113,7 @@ test_metadata <- function(){
 ## TODO: add tests for:
 ## versionDate etc.  (make sure they are returning correct things).
 
-## Add tests for caching
+## Add tests for caching (test to make sure caching works, and that my helpers to test if cache is present etc. are working)
 
 
 ## some debugging code for caching:
@@ -121,4 +121,6 @@ test_metadata <- function(){
 
 ##  library(AnnotationHub); x = AnnotationHub(); filters(x) <- list(TaxonomyId="9606",SourceFile= "pub/databases/ensembl/encode/supplementary/integration_data_jan2011/byDataType/footprints/jan2011/all.footprints.gz");
 
-##  a = x$pub.databases.ensembl.encode.supplementary.integration_data_jan2011.byDataType.footprints.jan2011.all.footprints_0.0.1.RData
+##  system.time(a <- x$pub.databases.ensembl.encode.supplementary.integration_data_jan2011.byDataType.footprints.jan2011.all.footprints_0.0.1.RData)
+
+

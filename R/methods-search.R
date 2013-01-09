@@ -87,9 +87,9 @@
         }else{
             objName <- load(file=filePath)
         }
-        ## then get it
-        
+        ## then get it        
         obj <- get(objName)
+        
         ## for platform independence, reformat file string to match FS
         file <- .reformatFilePath(file)
         ## Then see if we need to interact with local FS for caching
