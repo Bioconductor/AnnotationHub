@@ -15,6 +15,7 @@
                                           paths="character",
                                           versionString="character",
                                           dateString="character",
+                                          cachingEnabled="logical",
                                           pattern="character",
                                           filters="list"))
 
@@ -60,6 +61,11 @@ AnnotationHub <- function(curPath=.baseCurPath(), ...){
     ## Then get the paths etc.
     paths <- .retrievePathVals(curPath)
     paths <- setNames(paths, make.names(paths))
+
+    ## Check for caching etc.
+    cachingEnabled <- .checkCaching()
+
+    
     .AnnotationHub(curPath=curPath, paths=paths, versionString=versionString,
-                   dateString=dateString, ...)
+                   dateString=dateString, cachingEnabled=cachingEnabled, ...)
 }
