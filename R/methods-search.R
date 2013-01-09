@@ -29,7 +29,7 @@
 
 .chooseForeignOrLocalFileSource <- function(x, file){
     if(x@cachingEnabled == TRUE && .isTheFileInCache() == TRUE){
-        ## is there a file here locally AND is it present?
+        ## is caching enabled AND is the file ALSO present?
         basePath <- paste(.baseUserDir, "resources", sep="/")
     }else{
         basePath <- .getBaseServe()
@@ -56,7 +56,7 @@
         objName <- load(file=url(file))
         obj <- get(objName)
         if(x@cachingEnabled == TRUE && .isTheFileInCache() == FALSE){
-            ## then we should also save it
+            ## only save if we are using cache AND file is not saved yet
             save(obj,file=file)
         }
         obj
