@@ -15,8 +15,9 @@
 
 
 ## the more specific path for stuff from the local cache
-.localCacheDir <- function(){
-    file.path(.baseUserDir, x@versionString, x@dateString, "resources")
+.localCacheDir <- function(x){
+    file.path(.baseUserDir(), as.character(x@versionString),
+              versionDate(x), "resources")
 }
 
 
@@ -48,16 +49,15 @@
 ## is the file cached?  Lets look and see
 .isTheFileInCache <- function(file){
     ## Then we have to test if the file is cached already...
-    cacheDir <- .localCacheDir()
-    cacheFile <- file.path(cacheDir, file)
+    cacheFile <- file.path(.localCacheDir(x), file)
     !is.na(file.info(cacheFile)[1])
 }
 
 ## what should we use as a path?
 .chooseForeignOrLocalFileSource <- function(x, file){
-    if(x@cachingEnabled == TRUE && .isTheFileInCache() == TRUE){
+    if(x@cachingEnabled == TRUE && .isTheFileInCache(file) == TRUE){
         ## is caching enabled AND is the file ALSO present?
-        basePath <- .localCacheDir()
+        basePath <- .localCacheDir(x)
     }else{
         basePath <- .getBaseServe()
     }
@@ -75,16 +75,18 @@
         basePath <- .chooseForeignOrLocalFileSource(x, file)
         
         ## append full URL
-        file <- paste(basePath, file, sep="/")
+        filePath <- file.path(basePath, file)
         ## get something
-        message("Retrieving: ", file)
-        objName <- load(file=url(file))
+        message("Retrieving: ", filePath)
+        objName <- load(file=url(filePath))
         obj <- get(objName)
-        if(x@cachingEnabled == TRUE && .isTheFileInCache() == FALSE){
+        if(x@cachingEnabled == TRUE && .isTheFileInCache(file) == FALSE){
             ## only save if we are using cache AND file is not saved yet
-            ## but 1st make sure that the dir exists.
-            .createFilePathIfNeeded(path)
-            save(obj,file=file)
+            ## localPath of interest will NOW have to be the local one
+            localPath <- file.path(.localCacheDir(x), file)
+            ## make sure that the dir exists.
+            .createFilePathIfNeeded(localPath)
+            save(obj,file=localPath)
         }
         obj
     } else {
@@ -96,7 +98,8 @@
     }
 }
 
-setMethod("$", "AnnotationHub", .getResource)
+setMethod("$", "AnnotationHub", function(x, name) .getResource(x, name) )
+
 
 ## example
 ## obj = AnnotationHub$foo.adir.gr1.rda

@@ -105,3 +105,13 @@ test_metadata <- function(){
 ## TODO: simplify getNewPathsBasedOnFilters()
 ## TODO: solve bug that prevents the using of multi-valued keys in the
 ## filter lists.
+
+
+
+
+
+
+## debugging caching:
+
+
+## library(AnnotationHub); x = AnnotationHub(); filters(x) <- list(TaxonomyId="9606",SourceFile= "pub/databases/ensembl/encode/supplementary/integration_data_jan2011/byDataType/footprints/jan2011/all.footprints.gz"); x$pub.databases.ensembl.encode.supplementary.integration_data_jan2011.byDataType.footprints.jan2011.all.footprints_0.0.1.RData
