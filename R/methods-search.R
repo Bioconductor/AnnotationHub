@@ -1,6 +1,13 @@
 ## This file contains methods for finishing the tab-completion and searching
 ## the web service for available resources.
 
+
+## One of the most common things we need to do is to replace URL
+## separated paths with equivalent ones from the local FS
+.reformatFilePath <- function(filePath){
+    paste(.splitFilePath(filePath), collapse=.Platform$file.sep)
+}
+
 ## This is the workhorse for the tab stuff.
 ## When the user hits tab, we want to complete what we can here
 .DollarNames.AnnotationHub <- function(x, pattern=""){
@@ -47,15 +54,15 @@
 
 
 ## is the file cached?  Lets look and see
-.isTheFileInCache <- function(file){
+.isTheFileInCache <- function(x, file){
     ## Then we have to test if the file is cached already...
-    cacheFile <- file.path(.localCacheDir(x), file)
+    cacheFile <- file.path(.localCacheDir(x), .reformatFilePath(file))
     !is.na(file.info(cacheFile)[1])
 }
 
 ## what should we use as a path?
 .chooseForeignOrLocalFileSource <- function(x, file){
-    if(x@cachingEnabled == TRUE && .isTheFileInCache(file) == TRUE){
+    if(x@cachingEnabled == TRUE && .isTheFileInCache(x, file) == TRUE){
         ## is caching enabled AND is the file ALSO present?
         basePath <- .localCacheDir(x)
     }else{
@@ -64,39 +71,35 @@
     basePath
 }
 
-.reformatFilePath <- function(filePath){
-    paste(.splitFilePath(filePath), collapse=.Platform$file.sep)
-}
 
 ## $ is what is called when I hit enter, so this method actually gets the data
 ## once we have a full path to it.
 .getResource <- function(x, name){
     file <- x@paths[name]   
+    ## Set up the basePath based on caching.
+    basePath <- .chooseForeignOrLocalFileSource(x, file)
+    
     ## Assuming that we have only got one item...
     if(!is.na(file)) {
-        
-        ## Set up the basePath based on caching.
-        basePath <- .chooseForeignOrLocalFileSource(x, file)
-        
         ## append full URL
-        filePath <- file.path(basePath, file)
+        filePath <- paste(basePath, file, sep="/")
         ## load it
         message("Retrieving: ", filePath)
-        if(x@cachingEnabled == FALSE || .isTheFileInCache(file) == FALSE){
+        if(x@cachingEnabled == FALSE || .isTheFileInCache(x, file) == FALSE){
             objName <- load(file=url(filePath))
         }else{
-            objName <- load(file=filePath)
+            objName <- load(file=.reformatFilePath(filePath))
         }
         ## then get it        
         obj <- get(objName)
         
         ## for platform independence, reformat file string to match FS
-        file <- .reformatFilePath(file)
+        localFile <- .reformatFilePath(file)
         ## Then see if we need to interact with local FS for caching
-        if(x@cachingEnabled == TRUE && .isTheFileInCache(file) == FALSE){
+        if(x@cachingEnabled == TRUE && .isTheFileInCache(x, localFile) ==FALSE){
             ## only save if we are using cache AND file is not saved yet
             ## localPath of interest will NOW have to be the local one
-            localPath <- file.path(.localCacheDir(x), file)
+            localPath <- file.path(.localCacheDir(x), localFile)
             ## make sure that the dir exists.
             .createFilePathIfNeeded(localPath)
             save(obj,file=localPath)
