@@ -364,12 +364,8 @@ setMethod("metadata", "AnnotationHub",
 
 
 ## A method to extact the currently set date
-setMethod("versionDate", "AnnotationHub",
-    function(x) {
-        x@dateString
-    }
-)
-## date(a)
+setMethod("versionDate", "AnnotationHub", function(x) x@dateString )
+## versionDate(a)
 
 ## exporting this function as a method too...
 .possibleDates <- function(){
@@ -382,9 +378,7 @@ setMethod("possibleDates", "AnnotationHub", function(x) .possibleDates() )
 
 
 ## Setter method to set date (also needs to adjust the curPath)
-.replaceVersionDate <-
-    function(x, value)
-{
+.replaceVersionDate <- function(x, value) {
     possibleDates <- .possibleDates()
     if(value %in% possibleDates && value != x@dateString){
         x@dateString<- value

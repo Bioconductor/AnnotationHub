@@ -69,3 +69,5 @@ AnnotationHub <- function(curPath=.baseCurPath(), ...){
     .AnnotationHub(curPath=curPath, paths=paths, versionString=versionString,
                    dateString=dateString, cachingEnabled=cachingEnabled, ...)
 }
+
+
