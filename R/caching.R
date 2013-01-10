@@ -36,6 +36,7 @@
 .baseUserDir <- function(){
     userDir <- unlist(strsplit(Sys.getenv("R_LIBS_USER"),
                                .Platform$path.sep))[1L]
+    userDir <- dirname(dirname(userDir))
     userDir <- file.path(userDir, "ah")
     userDir
 }
