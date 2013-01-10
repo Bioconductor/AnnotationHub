@@ -56,19 +56,26 @@
 ##     }
 ## }
 
+## A method to just extact the current caching value
+setMethod("caching", "AnnotationHub", function(x) x@cachingEnabled )
 
 ## TODO: switch enableCaching to be a replaceMethod semantic
-.enableCaching <- function(x){
+## So it should be: caching(x) <- TRUE
+
+.caching <- function(x, value){
     userDir <- .baseUserDir()
     if(!dir.create(userDir, recursive=TRUE)){
         warning(gettextf("unable to create %s", sQuote(userDir)),
                 domain = NA)
     }else{
         message("switching on the caching and creating a local cache.")
+        x@cachingEnabled <- value
     }
+    x
 }
 
-setMethod("enableCaching", "AnnotationHub", function(x) .enableCaching(x) )
+setReplaceMethod("caching", "AnnotationHub",
+                 function(x, value){.caching(x, value)} )
 
 
 ## This helper tries to hook users up with a cache.

@@ -5,6 +5,6 @@
 .onLoad <- function(libname, pkgname)
 {
     if(.checkCaching()==FALSE){   
-        message("Caching is not currently enabled.  To enable local caching mechanism, please call the enableCaching() method on your AnnotationHub object.")
+        message("Caching is not currently enabled.  To enable local caching mechanism, please use the caching() replacement method with your AnnotationHub object.")
     }
 }

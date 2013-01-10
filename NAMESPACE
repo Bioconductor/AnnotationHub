@@ -28,6 +28,7 @@ exportMethods("$",
               "versionDate",
               "versionDate<-",
               "possibleDates",
-              "enableCaching")
+              "caching",
+              "caching<-")
 
 export("AnnotationHub")
