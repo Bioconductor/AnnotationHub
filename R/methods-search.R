@@ -2,6 +2,12 @@
 ## the web service for available resources.
 
 
+## helper to split file path in platform independent way
+.splitFilePath <- function(path){
+    fsep <- .Platform$file.sep
+    unlist(strsplit(path, split=fsep))
+}
+
 ## One of the most common things we need to do is to replace URL
 ## separated paths with equivalent ones from the local FS
 .reformatFilePath <- function(filePath){
@@ -28,28 +34,14 @@
 }
 
 
-## helper to split file path in platform independent way
-.splitFilePath <- function(path){
-    fsep <- .Platform$file.sep
-    unlist(strsplit(path, split=fsep))
-}
 
 ## This should help us to get the file path sorted so that we can save it.
 .createFilePathIfNeeded <- function(path){
-    pathVec <- .splitFilePath(path) ## split
-    pathVec <- pathVec[-length(pathVec)] ## and remove actual file
-    ## then I need to just make any dirs that don't exist already.
-    posPaths <- character()
-    for(i in seq_len(length(pathVec))){
-        posPaths[[i]] <- paste(pathVec[1:i], collapse= .Platform$file.sep)
-    }
-    ## And then I have to make sure 100% of the possible paths are created.
-    ## And yes this has to be done in sequence...  :P
-    for(i in seq_len(length(posPaths))){
-        if(!file.exists(posPaths[i])){
-            dir.create(posPaths[i])
-        }
-    }
+    path <- dirname(path)
+    if(!dir.create(path, recursive=TRUE)){
+        warning(gettextf("unable to create %s", sQuote(path)),
+                domain = NA)
+    }    
 }
 
 
