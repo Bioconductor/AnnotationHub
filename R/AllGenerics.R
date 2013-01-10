@@ -12,3 +12,6 @@ setGeneric("versionDate<-", signature="x",
            function(x, ..., value) standardGeneric("versionDate<-"))
 
 setGeneric("possibleDates", function(x, ...) standardGeneric("possibleDates"))
+
+
+setGeneric("enableCaching", function(x, ...) standardGeneric("enableCaching"))

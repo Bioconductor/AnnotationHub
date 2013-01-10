@@ -42,45 +42,65 @@
 }
 
 
-## borrowed from utils package (where it's not exported)
-ask.yes.no <- function(msg) {
-    userdir <- .baseUserDir()
-    ##' returns "no" for "no",  otherwise 'ans', a string
-    msg <- gettext(msg)
-    if(.Platform$OS.type == "windows") {
-        ans <- winDialog("yesno", sprintf(msg, sQuote(userdir)))
-        if(ans != "YES") "no" else ans
-    } else {
-        ans <- readline(paste(sprintf(msg, userdir), " (y/n) "))
-        if(substr(ans, 1L, 1L) == "n") "no" else ans
+## ## borrowed from utils package (where it's not exported)
+## ask.yes.no <- function(msg) {
+##     userdir <- .baseUserDir()
+##     ##' returns "no" for "no",  otherwise 'ans', a string
+##     msg <- gettext(msg)
+##     if(.Platform$OS.type == "windows") {
+##         ans <- winDialog("yesno", sprintf(msg, sQuote(userdir)))
+##         if(ans != "YES") "no" else ans
+##     } else {
+##         ans <- readline(paste(sprintf(msg, userdir), " (y/n) "))
+##         if(substr(ans, 1L, 1L) == "n") "no" else ans
+##     }
+## }
+
+
+## TODO: switch enableCaching to be a replaceMethod semantic
+.enableCaching <- function(x){
+    userDir <- .baseUserDir()
+    if(!dir.create(userDir, recursive=TRUE)){
+        warning(gettextf("unable to create %s", sQuote(userDir)),
+                domain = NA)
+    }else{
+        message("switching on the caching and creating a local cache.")
     }
 }
-  
+
+setMethod("enableCaching", "AnnotationHub", function(x) .enableCaching(x) )
+
 
 ## This helper tries to hook users up with a cache.
 ## It returns TRUE if one exists or if it can be set up, and FALSE otherwise.
 .checkCaching <- function(){
     userDir <- .baseUserDir()
-    if(!file.exists(userDir)) {
-        ans <- ask.yes.no("Would you like to create a cache\n%s\nto save downloaded web resources into?")
-        if(identical(ans, "no")){
-            message("switching the caching off for this session.")
-            return(FALSE)
-        }else if(!dir.create(userDir, recursive = TRUE)){
-            warning(gettextf("unable to create %s", sQuote(userDir)),
-                 domain = NA)
-            return(FALSE)
-        }else{
-            ## set the flag in the object.
-            message("switching on the caching and creating a local cache.")
-            return(TRUE)
-        }
-    }else{## file exists
-        ## set the flag
-        message("Using the available cache directory.")
+    if(file.exists(userDir)){
         return(TRUE)
+    }else{
+        return(FALSE)
     }
 }
+    
+##         ans <- ask.yes.no("Would you like to create a cache\n%s\nto save downloaded web resources into?")
+##         if(identical(ans, "no")){
+##             message("switching the caching off for this session.")
+##             return(FALSE)
+##         }else if(!dir.create(userDir, recursive = TRUE)){
+##             warning(gettextf("unable to create %s", sQuote(userDir)),
+##                  domain = NA)
+##             return(FALSE)
+##         }else{
+##             ## set the flag in the object.
+##             message("switching on the caching and creating a local cache.")
+##             return(TRUE)
+##         }
+##     }else{## file exists
+##         ## set the flag
+##         message("Using the available cache directory.")
+##         return(TRUE)
+##     }
+## }
 
 
 
