@@ -1,3 +1,7 @@
+useDynLib(AnnotationHub)
+
+import(Rcpp)
+
 import(methods)
 
 importFrom(AnnotationDbi, exists, keys, keytypes)
@@ -15,7 +19,6 @@ importFrom(stats, setNames)
 ## export our S3 method.
 S3method(.DollarNames, AnnotationHub)
 
-
 exportMethods("$",
               "keytypes",
               "keys",
@@ -31,4 +34,4 @@ exportMethods("$",
               "caching",
               "caching<-")
 
-export("AnnotationHub")
+export("AnnotationHub", "Trie")
