@@ -1,13 +1,17 @@
 ## This file contains methods for finishing the tab-completion and searching
 ## the web service for available resources.
 
+## GENERAL means that I think it should work with either files or metadata...
 
+
+## GENERAL
 ## helper to split file path in platform independent way
 .splitFilePath <- function(path){
     fsep <- .Platform$file.sep
     unlist(strsplit(path, split=fsep))
 }
 
+## GENERAL
 ## One of the most common things we need to do is to replace URL
 ## separated paths with equivalent ones from the local FS
 .reformatFilePath <- function(filePath){
@@ -20,6 +24,7 @@
     grep(pattern, names(x), value=TRUE)
 }
 
+
 ## Helper assembles correct base path for getting online files.  NOTE:
 ## this curPath does NOT need to have date or version information.
 .getBaseServe <- function(){
@@ -27,14 +32,19 @@
 }
 
 
+## GENERAL
 ## the more specific path for stuff from the local cache
 .localCacheDir <- function(x){
-    file.path(.baseUserDir(), as.character(x@versionString),
-              versionDate(x), "resources")
+    ## IN future, we may want to do airplane mode.  If we do that, we
+    ## will need to uncomment the following so that we store the cache
+    ## files in a more specific place.
+##     file.path(.baseUserDir(), as.character(x@versionString),
+##               versionDate(x))
+    .baseUserDir()
 }
 
 
-
+## GENERAL
 ## This should help us to get the file path sorted so that we can save it.
 .createFilePathIfNeeded <- function(path){
     path <- dirname(path)
@@ -44,19 +54,22 @@
     }    
 }
 
-
+## SPECIFIC to FILES  :(  - TODO: make one for metadata or generalize this.
+## I vote to generalize it. I can pass in the equiv of "resources" for each.
 ## is the file cached?  Lets look and see
 .isTheFileInCache <- function(x, file){
     ## Then we have to test if the file is cached already...
-    cacheFile <- file.path(.localCacheDir(x), .reformatFilePath(file))
+    cacheFile <- file.path(.localCacheDir(x),"resources",
+                           .reformatFilePath(file))
     !is.na(file.info(cacheFile)[1])
 }
 
+## SPECIFIC to FILES  - TODO: make this or a version of this for metadata?
 ## what should we use as a path?
 .chooseForeignOrLocalFileSource <- function(x, file){
     if(x@cachingEnabled == TRUE && .isTheFileInCache(x, file) == TRUE){
         ## is caching enabled AND is the file ALSO present?
-        basePath <- .localCacheDir(x)
+        basePath <- file.path(.localCacheDir(x), "resources")
     }else{
         basePath <- .getBaseServe()
     }
@@ -91,7 +104,7 @@
         if(x@cachingEnabled == TRUE && .isTheFileInCache(x, localFile) ==FALSE){
             ## only save if we are using cache AND file is not saved yet
             ## localPath of interest will NOW have to be the local one
-            localPath <- file.path(.localCacheDir(x), localFile)
+            localPath <- file.path(.localCacheDir(x), "resources", localFile)
             ## make sure that the dir exists.
             .createFilePathIfNeeded(localPath)
             save(obj,file=localPath)

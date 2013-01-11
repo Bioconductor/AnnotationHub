@@ -121,6 +121,11 @@ test_metadata <- function(){
 
 ##  library(AnnotationHub); x = AnnotationHub(); filters(x) <- list(TaxonomyId="9606",SourceFile= "pub/databases/ensembl/encode/supplementary/integration_data_jan2011/byDataType/footprints/jan2011/all.footprints.gz");
 
-##  system.time(a <- x$pub.databases.ensembl.encode.supplementary.integration_data_jan2011.byDataType.footprints.jan2011.all.footprints_0.0.1.RData)
+##  system.time(a <- x$pub.databases.ensembl.encode.supplementary.integration_data_jan2011.byDataType.footprints.jan2011.all.footprints_0.0.1.RData)  
 
+
+
+##  FOR testing the caching. the test code should look at the dir that
+##  is generated (we have helper for this), and see if the appropriate
+##  dirs and files are being generated when code is run.
 
