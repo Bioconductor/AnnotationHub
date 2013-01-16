@@ -77,38 +77,86 @@
 }
 
 
+## FaFileList() TODOs:
+## 1) add function to check the metadata for a record (check RDataClass) (metadata() should work fine).
+## 2) call function to handle each case depending on the value of RDataClass
+
+## Helper for getting magical rda files.
+.getRda <- function(x, basePath, file){
+    ## append full URL
+    filePath <- paste(basePath, file, sep="/")
+    ## load it
+    message("Retrieving: ", filePath)
+    if(x@cachingEnabled == FALSE || .isTheFileInCache(x, file) == FALSE){
+        objName <- load(file=url(filePath))
+    }else{
+        objName <- load(file=.reformatFilePath(filePath))
+    }
+    ## then get it        
+    obj <- get(objName)
+    
+    ## for platform independence, reformat file string to match FS
+    localFile <- .reformatFilePath(file)
+    ## Then see if we need to interact with local FS for caching
+    if(x@cachingEnabled == TRUE && .isTheFileInCache(x, localFile) ==FALSE){
+        ## only save if we are using cache AND file is not saved yet
+        ## localPath of interest will NOW have to be the local one
+        localPath <- file.path(.localCacheDir(x), "resources", localFile)
+        ## make sure that the dir exists.
+        .createFilePathIfNeeded(localPath)
+        save(obj,file=localPath)
+    }
+    obj
+}
+
+## TODO: modify this for FASTA files.  Specifically, move save to top, and then 
+.getFasta <- function(x, basePath, file){
+    ## append full URL
+    filePath <- paste(basePath, file, sep="/")
+    ## load it
+    message("Retrieving: ", filePath)
+    if(x@cachingEnabled == FALSE || .isTheFileInCache(x, file) == FALSE){
+        objName <- load(file=url(filePath))
+    }else{
+        objName <- load(file=.reformatFilePath(filePath))
+    }
+    ## then get it        
+    obj <- get(objName)
+    
+    ## for platform independence, reformat file string to match FS
+    localFile <- .reformatFilePath(file)
+    ## Then see if we need to interact with local FS for caching
+    if(x@cachingEnabled == TRUE && .isTheFileInCache(x, localFile) ==FALSE){
+        ## only save if we are using cache AND file is not saved yet
+        ## localPath of interest will NOW have to be the local one
+        localPath <- file.path(.localCacheDir(x), "resources", localFile)
+        ## make sure that the dir exists.
+        .createFilePathIfNeeded(localPath)
+        save(obj,file=localPath)
+    }
+    obj
+}
+
+
 ## $ is what is called when I hit enter, so this method actually gets the data
 ## once we have a full path to it.
 .getResource <- function(x, name){
     file <- x@paths[name]   
     ## Set up the basePath based on caching.
     basePath <- .chooseForeignOrLocalFileSource(x, file)
+
+    ## Get the metadata
+    m <- metadata(x)
+    ## subset that down to just the piece we need
+    m <- unlist(m[m$RDataPath==file,"RDataClass"])
     
-    ## Assuming that we have only got one item...
-    if(!is.na(file)) {
-        ## append full URL
-        filePath <- paste(basePath, file, sep="/")
-        ## load it
-        message("Retrieving: ", filePath)
-        if(x@cachingEnabled == FALSE || .isTheFileInCache(x, file) == FALSE){
-            objName <- load(file=url(filePath))
-        }else{
-            objName <- load(file=.reformatFilePath(filePath))
-        }
-        ## then get it        
-        obj <- get(objName)
-        
-        ## for platform independence, reformat file string to match FS
-        localFile <- .reformatFilePath(file)
-        ## Then see if we need to interact with local FS for caching
-        if(x@cachingEnabled == TRUE && .isTheFileInCache(x, localFile) ==FALSE){
-            ## only save if we are using cache AND file is not saved yet
-            ## localPath of interest will NOW have to be the local one
-            localPath <- file.path(.localCacheDir(x), "resources", localFile)
-            ## make sure that the dir exists.
-            .createFilePathIfNeeded(localPath)
-            save(obj,file=localPath)
-        }
+    if(!is.na(file)) { ## Test that it's one thing...
+
+## TODO: Call your method based on the results of the metadata here        
+        obj <- switch(m,
+                      "GRanges"=.getRda(x,basePath,file),
+                      "fasta"=.getFasta(x,basePath,file)
+                      )
         obj
     } else {
         ## otherwise list possible results
@@ -117,6 +165,7 @@
         warning("incomplete path")
         possiblePaths
     }
+    
 }
 
 setMethod("$", "AnnotationHub", function(x, name) .getResource(x, name) )
@@ -360,7 +409,13 @@ setMethod("metadata", "AnnotationHub",
           function(x){
             res <- .getMetadata(x, x@filters)
             ## TODO: make res into a data.frame()
-            data.frame(do.call(rbind,res))
+            
+            ## data.frame(do.call(rbind,res)) ## Bad idea
+            ## allNames <- unique(unlist(lapply(foo, names)))
+            ## 1st sort based on names (THEN rbind together)
+            sorted <- lapply(res, function(x) x[sort(names(x))] )
+            data.frame(do.call(rbind,sorted))
+            
           })
 
 
@@ -403,7 +458,7 @@ setMethod("possibleDates", "AnnotationHub", function(x) .possibleDates() )
         ## then ammend those to use the saved filters.
         locPaths <- .getNewPathsBasedOnFilters(x, filters)
         ## finally put those paths into @paths
-        if(!is.null(locPaths[[1]])){
+        if(!is.null(locPaths[[1]])){ ## TODO: this is not getting hit.  So I need a better way to handle this error.
             x@paths <- locPaths
         }else{
             stop("There is not any data available for that version date.")
