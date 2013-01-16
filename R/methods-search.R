@@ -54,14 +54,13 @@
     }    
 }
 
-## SPECIFIC to FILES  :(  - TODO: make one for metadata or generalize this.
-## I vote to generalize it. I can pass in the equiv of "resources" for each.
-## is the file cached?  Lets look and see
+## is the file cached?  Lets look and see  - works for files OR dirs
 .isTheFileInCache <- function(x, file){
     ## Then we have to test if the file is cached already...
     cacheFile <- file.path(.localCacheDir(x),"resources",
                            .reformatFilePath(file))
     !is.na(file.info(cacheFile)[1])
+
 }
 
 ## SPECIFIC to FILES  - TODO: make this or a version of this for metadata?
@@ -109,31 +108,55 @@
     obj
 }
 
-## TODO: modify this for FASTA files.  Specifically, move save to top, and then 
+
+## TODO: learn how to pull down files and just save them locally
+
+## TODO: modify this for FASTA files.  Specifically, move save to top,
+## and then call FaFileList() (and return that) on those files (using
+## dir() etc.)
 .getFasta <- function(x, basePath, file){
+    require(Rsamtools)
     ## append full URL
     filePath <- paste(basePath, file, sep="/")
     ## load it
-    message("Retrieving: ", filePath)
-    if(x@cachingEnabled == FALSE || .isTheFileInCache(x, file) == FALSE){
-        objName <- load(file=url(filePath))
-    }else{
-        objName <- load(file=.reformatFilePath(filePath))
-    }
-    ## then get it        
-    obj <- get(objName)
-    
-    ## for platform independence, reformat file string to match FS
-    localFile <- .reformatFilePath(file)
-    ## Then see if we need to interact with local FS for caching
-    if(x@cachingEnabled == TRUE && .isTheFileInCache(x, localFile) ==FALSE){
-        ## only save if we are using cache AND file is not saved yet
+    message("Retrieving data from: ", filePath)
+    ## always save it 1st, and then load it
+
+    if(x@cachingEnabled == FALSE && .isTheFileInCache(x, file) == FALSE){
+        tempPath <- tempDir()
+        ## get the data and save it to tempPath
+        
+        ## then call FaFileList on that
+        ffl <- FaFileList(tempPath)
+        
+        ## objName <- load(file=url(filePath))
+    }else if(x@cachingEnabled == TRUE && .isTheFileInCache(x, file) == FALSE){
+        ## Then save it locally 1st
+
+        
         ## localPath of interest will NOW have to be the local one
-        localPath <- file.path(.localCacheDir(x), "resources", localFile)
-        ## make sure that the dir exists.
+        localPath <- file.path(.localCacheDir(x), "resources",
+                               .reformatFilePath(file))
+        ## make sure that the correct dir exists.
         .createFilePathIfNeeded(localPath)
-        save(obj,file=localPath)
+
+        ## TODO: .createFilePathIfNeeded() will need to call dirname
+        ## ONLY if it's a file (not if its just a dir) - so add a
+        ## check.
+        
+        ## TODO: now save all the files to localPath .. 
+##        save(obj,file=localPath)
+        
+        ## and THEN make the handle 
+        ffl <- FaFileList(localPath)        
+    }else{
+        ## just get/make file handle.        
+        ffl <- FaFileList(localPath)
+        
+        ## objName <- load(file=.reformatFilePath(filePath))
     }
+    
+    
     obj
 }
 
@@ -151,8 +174,7 @@
     m <- unlist(m[m$RDataPath==file,"RDataClass"])
     
     if(!is.na(file)) { ## Test that it's one thing...
-
-## TODO: Call your method based on the results of the metadata here        
+        ## Call correct function based on the results of the metadata
         obj <- switch(m,
                       "GRanges"=.getRda(x,basePath,file),
                       "fasta"=.getFasta(x,basePath,file)

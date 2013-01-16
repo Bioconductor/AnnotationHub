@@ -26,7 +26,7 @@ test_filters <- function(){
 test_getResource <- function(){
     ## try a specific name
 #    name <- "pub.databases.ensembl.encode.supplementary.integration_data_jan2011.byDataType.openchrom.jan2011.promoter_predictions.master_known.bed_0.0.1.RData"
-    altName <- "fakedata.data.bed_0.0.2.RData" 
+    altName <- "fakedata.data.bed_0.0.3.RData" 
     res <- AnnotationHub:::.getResource(x, altName)
     checkTrue(class(res) == "GRanges")
     
