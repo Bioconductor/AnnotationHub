@@ -129,3 +129,8 @@ test_metadata <- function(){
 ##  is generated (we have helper for this), and see if the appropriate
 ##  dirs and files are being generated when code is run.
 
+
+
+
+
+## lets just get download.file to work for us:

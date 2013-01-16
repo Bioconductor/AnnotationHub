@@ -114,50 +114,57 @@
 ## TODO: modify this for FASTA files.  Specifically, move save to top,
 ## and then call FaFileList() (and return that) on those files (using
 ## dir() etc.)
-.getFasta <- function(x, basePath, file){
-    require(Rsamtools)
-    ## append full URL
+.getFasta <- function(x, file){
+    require(Rsamtools)  ## only needed here
+    ## For this function, basePath must always refer to the URL
+    basePath <- .getBaseServe()
+    ## filePath (singular) is just the root path to the dir contents
     filePath <- paste(basePath, file, sep="/")
-    ## load it
-    message("Retrieving data from: ", filePath)
-    ## always save it 1st, and then load it
+    ## get the subPaths
+    subPaths <- .getMetaFieldForFile(x, file, type="SubPaths")
+    ## filePaths (plural) can be many things (there can be many SubPaths)
+    filePaths <- paste(paste(basePath, file, sep="/"), subPaths, sep="")
 
+    ## always save it 1st (if not cached), and then load it    
     if(x@cachingEnabled == FALSE && .isTheFileInCache(x, file) == FALSE){
-        tempPath <- tempDir()
-        ## get the data and save it to tempPath
-        
-        ## then call FaFileList on that
-        ffl <- FaFileList(tempPath)
-        
-        ## objName <- load(file=url(filePath))
+        message("Retrieving data from: ", filePath)
+        tempPath <- tempdir()
+        tempPaths <- file.path(tempPath, subPaths)
+        ## make sure that all the local dir exists. (only done once)
+        .createFilePathIfNeeded(localPath)
+        ## then download all the files.
+        if(length(filePaths)==length(localPaths)){
+            mapply(download.file, url=filePaths, destfile=localPaths)
+        }else{
+            stop("There was a problem generating local dirs for resources.")
+        }   
+        ## and THEN make the handle 
+        ffl <- FaFileList(tempPath)                
     }else if(x@cachingEnabled == TRUE && .isTheFileInCache(x, file) == FALSE){
-        ## Then save it locally 1st
-
-        
-        ## localPath of interest will NOW have to be the local one
+        message("Retrieving data from: ", filePath)
+        ## localPath(s) of interest will be the local one(s)
         localPath <- file.path(.localCacheDir(x), "resources",
                                .reformatFilePath(file))
-        ## make sure that the correct dir exists.
-        .createFilePathIfNeeded(localPath)
-
-        ## TODO: .createFilePathIfNeeded() will need to call dirname
-        ## ONLY if it's a file (not if its just a dir) - so add a
-        ## check.
-        
-        ## TODO: now save all the files to localPath .. 
-##        save(obj,file=localPath)
-        
+        localPaths <- file.path(localPath, subPaths)
+        ## make sure that all the local dir exists. (only done once)
+        .createFilePathIfNeeded(localPath)    
+        ## Now save it locally
+        #download.file(url=url(filePaths), destfile=localPaths)
+        if(length(filePaths)==length(localPaths)){
+            mapply(download.file, url=filePaths, destfile=localPaths)
+        }else{
+            stop("There was a problem generating local dirs for resources.")
+        }   
         ## and THEN make the handle 
-        ffl <- FaFileList(localPath)        
-    }else{
+        ffl <- FaFileList(localPaths)        
+    }else{ ## this means caching is on AND it exists.
+        localPath <- file.path(.localCacheDir(x), "resources",
+                               .reformatFilePath(file))
+        localPaths <- file.path(localPath, subPaths)
         ## just get/make file handle.        
-        ffl <- FaFileList(localPath)
-        
-        ## objName <- load(file=.reformatFilePath(filePath))
+        ffl <- FaFileList(localPaths)
     }
-    
-    
-    obj
+    ffl
 }
 
 
@@ -169,15 +176,13 @@
     basePath <- .chooseForeignOrLocalFileSource(x, file)
 
     ## Get the metadata
-    m <- metadata(x)
-    ## subset that down to just the piece we need
-    m <- unlist(m[m$RDataPath==file,"RDataClass"])
+    m <- .getMetaFieldForFile(x, file, type="RDataClass")
     
     if(!is.na(file)) { ## Test that it's one thing...
         ## Call correct function based on the results of the metadata
         obj <- switch(m,
                       "GRanges"=.getRda(x,basePath,file),
-                      "fasta"=.getFasta(x,basePath,file)
+                      "fasta"=.getFasta(x,file)
                       )
         obj
     } else {
@@ -441,7 +446,13 @@ setMethod("metadata", "AnnotationHub",
           })
 
 
-
+## an additional helper to get the metadata of a particular type that
+## goes with a certain file...
+.getMetaFieldForFile <- function(x, file, type){
+    m <- metadata(x)
+    ## subset that down to just the piece we need
+    unlist(m[m$RDataPath==file,type])
+}
 
 
 
