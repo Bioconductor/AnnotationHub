@@ -59,7 +59,6 @@
     cacheFile <- file.path(.localCacheDir(x),"resources",
                            .reformatFilePath(file))
     !is.na(file.info(cacheFile)[1])
-
 }
 
 ## SPECIFIC to FILES  - TODO: make this or a version of this for metadata?
@@ -75,20 +74,17 @@
 }
 
 
-## FaFileList() TODOs:
-## 1) add function to check the metadata for a record (check RDataClass) (metadata() should work fine).
-## 2) call function to handle each case depending on the value of RDataClass
 
 ## Helper for getting magical rda files.
-.getRda <- function(x, basePath, file){
+.getRda <- function(x, urlPath, file){
     ## append full URL
-    filePath <- paste(basePath, file, sep="/")
+    urlFilePath <- paste(urlPath, file, sep="/")
     ## load it
-    message("Retrieving: ", filePath)
+    message("Retrieving: ", urlFilePath)
     if(x@cachingEnabled == FALSE || .isTheFileInCache(x, file) == FALSE){
-        objName <- load(file=url(filePath))
+        objName <- load(file=url(urlFilePath))
     }else{
-        objName <- load(file=.reformatFilePath(filePath))
+        objName <- load(file=.reformatFilePath(urlFilePath))
     }
     ## then get it        
     obj <- get(objName)
@@ -108,60 +104,48 @@
 }
 
 
-## TODO: learn how to pull down files and just save them locally
+## helper for downloading fasta files and returning a FaFile object.
+.downloadFasta <- function(dir, file, indFile, urlFilePath, indUrlFilePath){
+        message("Retrieving data from: ", urlFilePath)
+        locPath <- file.path(dir,"resources",
+                                 .reformatFilePath(file))
+        .createFilePathIfNeeded(dirname(locPath)) 
+        download.file(url=urlFilePath, destfile=locPath)
+        ## Also download the Index file
+        message("Retrieving data from: ", indUrlFilePath)
+        indLocPath <- file.path(dir,"resources",
+                                 .reformatFilePath(indFile))
+        download.file(url=indUrlFilePath, destfile=indLocPath)
+        FaFile(locPath)
+}
 
-## TODO: modify this for FASTA files.  Specifically, move save to top,
-## and then call FaFileList() (and return that) on those files (using
-## dir() etc.)
+## Gets fasta Files downloaded and then makes a FaFile handle for them
 .getFasta <- function(x, file){
     require(Rsamtools)  ## only needed here
-    ## For this function, basePath must always refer to the URL
-    basePath <- .getBaseServe()
-    ## filePath (singular) is just the root path to the dir contents
-    filePath <- paste(basePath, file, sep="/")
-    ## get the subPaths
-    subPaths <- .getMetaFieldForFile(x, file, type="SubPaths")
-    ## filePaths (plural) can be many things (there can be many SubPaths)
-    filePaths <- paste(paste(basePath, file, sep="/"), subPaths, sep="")
+    ## For this function, urlPath must always refer to the URL
+    urlPath <- .getBaseServe()
+    ## urlFilePath is just the URL path to the file
+    urlFilePath <- paste(urlPath, file, sep="/")
+    ## need a modified name for the index file
+    indFile <- paste(file,".fai",sep="")
+    ## and for the index Path
+    indUrlFilePath <- paste(urlPath, indFile, sep="/")
 
     ## always save it 1st (if not cached), and then load it    
     if(x@cachingEnabled == FALSE && .isTheFileInCache(x, file) == FALSE){
-        message("Retrieving data from: ", filePath)
         tempPath <- tempdir()
-        tempPaths <- file.path(tempPath, subPaths)
-        ## then download all the files.
-        if(length(filePaths)==length(tempPaths)){
-            mapply(download.file, url=filePaths, destfile=tempPaths)
-        }else{
-            stop("There was a problem generating local dirs for resources.")
-        }   
-        ## and THEN make the handle 
-        ffl <- FaFileList(tempPaths)                
+        ff<- .downloadFasta(tempdir(), file, indFile, urlFilePath,
+                            indUrlFilePath)
     }else if(x@cachingEnabled == TRUE && .isTheFileInCache(x, file) == FALSE){
-        message("Retrieving data from: ", filePath)
-        ## localPath(s) of interest will be the local one(s)
-        localPath <- file.path(.localCacheDir(x), "resources",
-                               .reformatFilePath(file))
-        localPaths <- file.path(localPath, subPaths)
-        ## make sure that all the local dir exists. (only done once)
-        .createFilePathIfNeeded(localPath)    
-        ## Now save it locally
-        #download.file(url=url(filePaths), destfile=localPaths)
-        if(length(filePaths)==length(localPaths)){
-            mapply(download.file, url=filePaths, destfile=localPaths)
-        }else{
-            stop("There was a problem generating local dirs for resources.")
-        }   
-        ## and THEN make the handle 
-        ffl <- FaFileList(localPaths)        
+        ff<- .downloadFasta(.localCacheDir(x), file, indFile, urlFilePath,
+                            indUrlFilePath)
     }else{ ## this means caching is on AND it exists.
         localPath <- file.path(.localCacheDir(x), "resources",
                                .reformatFilePath(file))
-        localPaths <- file.path(localPath, subPaths)
         ## just get/make file handle.        
-        ffl <- FaFileList(localPaths)
+        ff <- FaFile(localPath)
     }
-    ffl
+    ff
 }
 
 
@@ -169,8 +153,8 @@
 ## once we have a full path to it.
 .getResource <- function(x, name){
     file <- x@paths[name]   
-    ## Set up the basePath based on caching.
-    basePath <- .chooseForeignOrLocalFileSource(x, file)
+    ## Set up the urlPath based on caching.
+    urlPath <- .chooseForeignOrLocalFileSource(x, file)
 
     ## Get the metadata
     m <- .getMetaFieldForFile(x, file, type="RDataClass")
@@ -178,14 +162,14 @@
     if(!is.na(file)) { ## Test that it's one thing...
         ## Call correct function based on the results of the metadata
         obj <- switch(m,
-                      "GRanges"=.getRda(x,basePath,file),
+                      "GRanges"=.getRda(x,urlPath,file),
                       "fasta"=.getFasta(x,file)
                       )
         obj
     } else {
         ## otherwise list possible results
         possiblePaths <- x@paths[grep(name, names(x))]
-        possiblePaths <- paste(basePath, possiblePaths, sep="/")
+        possiblePaths <- paste(urlPath, possiblePaths, sep="/")
         warning("incomplete path")
         possiblePaths
     }

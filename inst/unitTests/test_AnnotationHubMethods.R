@@ -133,4 +133,8 @@ test_metadata <- function(){
 
 
 
-## lets just get download.file to work for us:
+
+## more testing
+
+## library(AnnotationHub); x = AnnotationHub(); filters(x) <- list(TaxonomyId="9606")
+
