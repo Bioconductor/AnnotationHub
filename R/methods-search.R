@@ -47,7 +47,6 @@
 ## GENERAL
 ## This should help us to get the file path sorted so that we can save it.
 .createFilePathIfNeeded <- function(path){
-    path <- dirname(path)
     if(!dir.create(path, recursive=TRUE)){
         warning(gettextf("unable to create %s", sQuote(path)),
                 domain = NA)
@@ -102,7 +101,7 @@
         ## localPath of interest will NOW have to be the local one
         localPath <- file.path(.localCacheDir(x), "resources", localFile)
         ## make sure that the dir exists.
-        .createFilePathIfNeeded(localPath)
+        .createFilePathIfNeeded(dirname(localPath))
         save(obj,file=localPath)
     }
     obj
@@ -130,16 +129,14 @@
         message("Retrieving data from: ", filePath)
         tempPath <- tempdir()
         tempPaths <- file.path(tempPath, subPaths)
-        ## make sure that all the local dir exists. (only done once)
-        .createFilePathIfNeeded(localPath)
         ## then download all the files.
-        if(length(filePaths)==length(localPaths)){
-            mapply(download.file, url=filePaths, destfile=localPaths)
+        if(length(filePaths)==length(tempPaths)){
+            mapply(download.file, url=filePaths, destfile=tempPaths)
         }else{
             stop("There was a problem generating local dirs for resources.")
         }   
         ## and THEN make the handle 
-        ffl <- FaFileList(tempPath)                
+        ffl <- FaFileList(tempPaths)                
     }else if(x@cachingEnabled == TRUE && .isTheFileInCache(x, file) == FALSE){
         message("Retrieving data from: ", filePath)
         ## localPath(s) of interest will be the local one(s)
