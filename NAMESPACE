@@ -1,6 +1,8 @@
 useDynLib(AnnotationHub)
 
-import(Rcpp)
+importClassesFrom(Rcpp, "C++Class")
+
+importFrom(Rcpp, loadModule)
 
 import(methods)
 

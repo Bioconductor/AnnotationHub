@@ -6,8 +6,7 @@
     userDir <- unlist(strsplit(Sys.getenv("R_LIBS_USER"),
                                .Platform$path.sep))[1L]
     userDir <- dirname(dirname(userDir))
-    userDir <- file.path(userDir, "ah")
-    userDir
+    file.path(userDir, "ah")
 }
 
 
@@ -37,11 +36,7 @@ setReplaceMethod("caching", "AnnotationHub",
 ## It returns TRUE if one exists or if it can be set up, and FALSE otherwise.
 .checkCaching <- function(){
     userDir <- .baseUserDir()
-    if(file.exists(userDir)){
-        return(TRUE)
-    }else{
-        return(FALSE)
-    }
+    file.exists(userDir)
 }
 
 

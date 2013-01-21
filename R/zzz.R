@@ -3,9 +3,8 @@
 
 .onLoad <- function(libname, pkgname)
 {
-    if(.checkCaching()==FALSE){   
-        message("Caching is not currently enabled.  To enable local caching mechanism, please use the caching() replacement method with your AnnotationHub object.")
-    }
+    if (!.checkCaching())
+        message("See ?caching to enable an AnnotationHub cache")
 }
 
 ## Load cpp Trie module
