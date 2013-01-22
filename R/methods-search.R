@@ -437,9 +437,11 @@ setMethod("metadata", "AnnotationHub",
 ## an additional helper to get the metadata of a particular type that
 ## goes with a certain file...
 .getMetaFieldForFile <- function(x, file, type){
-    m <- metadata(x)
+    #m <- metadata(x)
     ## subset that down to just the piece we need
-    unlist(m[m$RDataPath==file,type])
+    #unlist(m[m$RDataPath==file,type])
+        url <- paste(x@curPath, "query", "RDataPath", file, sep="/")
+        obj <- fromJSON(url)
 }
 
 
