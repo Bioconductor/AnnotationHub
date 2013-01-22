@@ -296,7 +296,7 @@ setMethod("keys", "AnnotationHub",
 .getJSONFromURL <- function(url)
 {
     t <- tempfile()
-    download.file(url, t, quiet=TRUE, method="curl")
+    download.file(url, t, quiet=TRUE)
     fromJSON(paste0(readLines(t), collapse=""))
 }
 
@@ -440,8 +440,10 @@ setMethod("metadata", "AnnotationHub",
     #m <- metadata(x)
     ## subset that down to just the piece we need
     #unlist(m[m$RDataPath==file,type])
-        url <- paste(x@curPath, "query", "RDataPath", file, sep="/")
-        obj <- fromJSON(url)
+    escapedFile <- paste0('"', file, '"')
+    url <- paste(x@curPath, "query", "RDataPath", escapedFile, sep="/")
+    obj <- fromJSON(url)
+    obj[[1]][[type]]
 }
 
 
