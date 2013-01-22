@@ -441,7 +441,7 @@ setMethod("metadata", "AnnotationHub",
     ## subset that down to just the piece we need
     #unlist(m[m$RDataPath==file,type])
     escapedFile <- paste0('"', file, '"')
-    url <- paste(x@curPath, "query", "RDataPath", escapedFile, sep="/")
+    url <- paste(x@curPath, "query", type, escapedFile, sep="/")
     obj <- fromJSON(url)
     obj[[1]][[type]]
 }
