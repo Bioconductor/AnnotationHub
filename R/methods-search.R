@@ -293,13 +293,20 @@ setMethod("keys", "AnnotationHub",
     paste(res,collapse="/")
 }
 
+.getJSONFromURL <- function(url)
+{
+    t <- tempfile()
+    download.file(url, t, quiet=TRUE, method="curl")
+    fromJSON(paste0(readLines(t), collapse=""))
+}
+
 ## get list of metadata character vectors that match the specified
 ## keys/keytypes
 .getMetadata <-
     function(x, filterValues)
 {
     if(length(filterValues) == 0){
-        return(fromJSON(paste0(x@curPath,"/query")))
+        return(.getJSONFromURL(paste0(x@curPath, "/query")))
     } else {
         .validFilterValues(x, filterValues)
         ## and assuming we get past that, we have to now assemble a URL from
@@ -309,7 +316,7 @@ setMethod("keys", "AnnotationHub",
         filters <- paste(filters, collapse="/")
         url <- paste(x@curPath, "query", filters, sep="/") ## vectorized?
         ## Concerned: that this may become too slow as more metadata piles on.
-        return(fromJSON(url)) ## returns a list with metadata for each
+        return(.getJSONFromURL(url)) ## returns a list with metadata for each
     }
 }
 
