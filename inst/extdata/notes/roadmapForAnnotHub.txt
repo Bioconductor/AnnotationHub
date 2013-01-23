@@ -28,7 +28,8 @@ What resources should be included?
 #############
 ## Huge resources from national centers:
 
-* NCBI: (gene stuff is well supported already, but MANY other kinds of data are not)
+* NCBI: (gene stuff is well supported already, but MANY other kinds of
+  data are not)
 
 http://www.ncbi.nlm.nih.gov/guide/all/#downloads_
 
@@ -37,7 +38,7 @@ modernizing e-utils?  Does Sean know him?
 (OR we can just raid their FTP sites as usual)
 
 
-For existing annots: should just make our packages available on AnnotationHub.
+For existing NCBI annots: just make our Objs available in AnnotationHub.
 
 Unsupported Annotations:
 1000 Genomes (in progress)
@@ -51,8 +52,10 @@ Taxonomy
 (and more)
 
 
+
 * ensembl:
- (FTP files are in progress.  Most gene oriented stuff is already in biomaRt)
+(FTP files are in progress.  Most gene oriented stuff is already in biomaRt)
+
 http://uswest.ensembl.org/info/data/ftp/index.html
 
 
@@ -60,7 +63,8 @@ http://uswest.ensembl.org/info/data/ftp/index.html
 
 
 #############
-## Very popular specialized community resources (most of these would be covered if we just make packages available).
+## Very popular specialized community resources (most of these would
+## be covered if we just make packages available).
 
 * UCSC: Contains many tracks that we should probably expose (as GRanges)
 
