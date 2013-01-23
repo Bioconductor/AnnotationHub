@@ -1,0 +1,98 @@
+This document needs to outline a roadmap for the future of
+AnnotationHub and AnnotationHubServer.  Specifically: What resources
+should be included?  What is the expected time when those resources
+should be made available?  And how should we justify the inclusion of
+some resources and not others?  
+
+Before adressing the 1st two questions, lets consider the last one.
+What considerations should be given to a resource to merit it's
+inclusion?  A big part of this is how can we discriminate annotations
+from mere data sets?  For while many annotations may start as data
+sets, not all data sets eventually become annotations.
+
+
+1) The annotations should be widely used.
+
+2) The annotations should come from respectable sources.
+
+3) The annotations should be considered valuable by the community.
+
+4) The annotations should have input from multiple different resources.
+
+
+
+
+
+What resources should be included?
+
+#############
+## Huge resources from national centers:
+
+* NCBI: (gene stuff is well supported already, but MANY other kinds of data are not)
+
+http://www.ncbi.nlm.nih.gov/guide/all/#downloads_
+
+For other data: possibility of communicating with Eric Sayers Ph.D. to see about
+modernizing e-utils?  Does Sean know him?
+(OR we can just raid their FTP sites as usual)
+
+
+For existing annots: should just make our packages available on AnnotationHub.
+
+Unsupported Annotations:
+1000 Genomes (in progress)
+ENCODE (in progress?)
+ATCC
+CDD
+dbVar, dbGaP, dbSNP
+PopSet, HomoloGene, Protein clusters
+OMIM, OMIA
+Taxonomy 
+(and more)
+
+
+* ensembl:
+ (FTP files are in progress.  Most gene oriented stuff is already in biomaRt)
+http://uswest.ensembl.org/info/data/ftp/index.html
+
+
+
+
+
+#############
+## Very popular specialized community resources (most of these would be covered if we just make packages available).
+
+* UCSC: Contains many tracks that we should probably expose (as GRanges)
+
+* KEGG: Available again as KEGGREST
+  
+* Reactome: Available as a Database object (but much room for improvement)
+
+* GO: Available as a Database object
+
+* Uniprot: Available as a web service
+
+
+
+
+
+#############
+## Support for more specialized centers?:
+
+* Tair: Available as a OrgDb object
+
+* SGD: Available as a OrgDb object
+
+* Blast2Go: Available as a mappings only (should probably be expanded)
+
+* Allen Brain data: Could make a web service (they claim a restful interface)
+
+* PlasmoDB:  Partially available as a OrgDb object.
+
+* PANTHER:  Might be made available by volunteer?
+
+
+
+
+
+
