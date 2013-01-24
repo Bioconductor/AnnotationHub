@@ -26,8 +26,8 @@ setMethod("caching", "AnnotationHub", function(x) x@cachingEnabled )
     }
     x
 }
-setReplaceMethod("caching", "AnnotationHub",
-                 function(x, value){.caching(x, value)} )
+setReplaceMethod("caching", c("AnnotationHub", "logical"),
+                 function(x, ..., value){.caching(x, value)} )
 
 ## So it should be: caching(x) <- TRUE
 

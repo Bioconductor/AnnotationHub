@@ -1,5 +1,7 @@
 useDynLib(AnnotationHub)
 
+import(Biobase)
+
 importClassesFrom(Rcpp, "C++Class")
 
 importFrom(Rcpp, loadModule)
@@ -34,6 +36,7 @@ exportMethods("$",
               "versionDate<-",
               "possibleDates",
               "caching",
-              "caching<-")
+              "caching<-",
+              "show")
 
 export("AnnotationHub", "Trie")

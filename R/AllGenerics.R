@@ -16,5 +16,5 @@ setGeneric("possibleDates", function(x, ...) standardGeneric("possibleDates"))
 
 setGeneric("caching", function(x, ...) standardGeneric("caching"))
 
-setGeneric("caching<-", signature="x",
-           function(x, ...) standardGeneric("caching<-"))
+setGeneric("caching<-", signature=c("x","value"),
+           function(x, ..., value) standardGeneric("caching<-"))

@@ -71,3 +71,11 @@ AnnotationHub <- function(curPath=.baseCurPath(), ...){
 }
 
 
+## Show method (I am not really sure what to put here)
+setMethod("show", "AnnotationHub",
+    function(object)
+    {
+        cat("class:", class(object), "\n")
+        cat("Data snapshot date:", versionDate(object), "\n")
+    }
+)
