@@ -31,7 +31,7 @@ test_getResource <- function(){
     checkTrue(class(res) == "GRanges")
     
     ## try a less specific name    
-    name <- "goldenpath.hg19.encodeDCC.wgEncodeRikenCage.wgEncodeRiken"
+    name <- "goldenpath.hg19.encodeDCC.wgEncodeRikenCage.wgEncodeRikenCage"
     suppressWarnings(res2 <- AnnotationHub:::.getResource(x, name))
     checkTrue(class(res2) == "character")
 }

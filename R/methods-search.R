@@ -156,10 +156,10 @@
     ## Set up the urlPath based on caching.
     urlPath <- .chooseForeignOrLocalFileSource(x, file)
 
-    ## Get the metadata
-    m <- .getMetaFieldForFile(x, file, type="RDataClass")
     
     if(!is.na(file)) { ## Test that it's one thing...
+        ## Get the metadata
+        m <- .getMetaFieldForFile(x, file, type="RDataClass")
         ## Call correct function based on the results of the metadata
         obj <- switch(m,
                       "GRanges"=.getRda(x,urlPath,file),
