@@ -64,7 +64,6 @@ AnnotationHub <- function(curPath=.baseCurPath(), ...){
 
     ## Check for caching etc.
     cachingEnabled <- .checkCaching()
-
     
     .AnnotationHub(curPath=curPath, paths=paths, versionString=versionString,
                    dateString=dateString, cachingEnabled=cachingEnabled, ...)

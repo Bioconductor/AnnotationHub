@@ -3,9 +3,13 @@
 
 ## Function for getting the base directory to use for caching.
 .baseUserDir <- function(){
-    userDir <- unlist(strsplit(Sys.getenv("R_LIBS_USER"),
-                               .Platform$path.sep))[1L]
-    userDir <- dirname(dirname(userDir))
+    if("AnnotationHubCache" %in% names(options())){ ## User has an option set. 
+        userDir <- getOption("AnnotationHubCache")
+    }else{    
+        userDir <- unlist(strsplit(Sys.getenv("R_LIBS_USER"),
+                                   .Platform$path.sep))[1L]
+        userDir <- dirname(dirname(userDir))
+    }
     file.path(userDir, "ah")
 }
 
@@ -14,9 +18,7 @@
 ## A method to just extact the current caching value
 setMethod("caching", "AnnotationHub", function(x) x@cachingEnabled )
 
-## replacement for caching value also checks for local cache presence/absence
-.caching <- function(x, value){
-    userDir <- .baseUserDir()
+.tryCacheCreate <- function(x, userDir){
     if(!dir.create(userDir, recursive=TRUE)){
         warning(gettextf("unable to create %s", sQuote(userDir)),
                 domain = NA)
@@ -26,8 +28,26 @@ setMethod("caching", "AnnotationHub", function(x) x@cachingEnabled )
     }
     x
 }
+
+## replacement for caching value also checks for local cache presence/absence
+.caching <- function(x, value){
+    userDir <- .baseUserDir()
+    .tryCacheCreate(x, userDir)
+}
 setReplaceMethod("caching", c("AnnotationHub", "logical"),
                  function(x, ..., value){.caching(x, value)} )
+
+
+## replacement for caching when an alternative is offered.
+.charCaching <- function(x, value){
+    options("AnnotationHubCache"=value) ## set the option
+    .tryCacheCreate(x, getOption("AnnotationHubCache")) ## And try to use it
+}
+
+setReplaceMethod("caching", c("AnnotationHub", "character"),
+                 function(x, ..., value){.charCaching(x, value)} )
+
+
 
 ## So it should be: caching(x) <- TRUE
 
