@@ -23,6 +23,10 @@ sets, not all data sets eventually become annotations.
 
 
 
+
+
+
+
 What resources should be included?
 
 #############
@@ -99,4 +103,105 @@ http://uswest.ensembl.org/info/data/ftp/index.html
 
 
 
+
+
+
+################################
+## Ideas for future deployment:
+
+## GOALS:
+
+1) We want to accomodate a vastly diverse set of annotation types, and
+present them to users in a form that is useful.
+
+2) We want to bring our annotation resources (and indeed the resources
+that the world has to offer) under one umbrella and have them
+accessible to R/Bioc.
+
+3) We want to do this in a way that is easy to maintain over the long
+term.  This is tricky because the annotations are rapidly changing,
+with new kinds showing up all the time.  Also things are integrating
+with each other in new an often unpredictable ways. 
+
+4) We want to make it easy for users to combine different annotations together.
+
+5) We want to make it easy for users to work with these different
+annotations (the format they are presented in should seem intuitive).
+Sometimes this may mean that some resources may be present in more
+than one format.
+
+6) We want to make it easy to add new resources into the repos.  We
+want the process to be simple enough that users can contribute in a
+semi-automatic way.  The community is the reason why the software
+branch of this project is a success, and it's crucial to extend this
+philosphy here.  In fact this may be the single most important thing
+to get right.  
+
+
+
+
+## One plan:
+
+1) Roll out current Anntotation packages as .sqlite files.  The Hub
+can be used to pull those down (caching them for future use) and can
+execute the call to spawn the appropriate object (OrgDb object etc.)
+and Hand that back to the user.  .Rdas can be used for Org.db objects
+(and code can check to pre-download dependencies for these).  I do NOT
+think we should support classic mappings in this way.  Just the newer
+selectable objects.
+
+2) Long term (very long term as this is a very ambitious goal) some
+DBs are just too large to be downloaded as chunks (Reactome comes to
+mind).  So for these it might make sense to have a way of calling
+select() on the AnnotationHub object itself (with appropriate keys
+etc.)  This change would be sticky though!  Because we currently have
+keys and keytypes methods defined for this object (and they return
+things that are conceptually the same as other keys/keytypes methods,
+but they will actually be different values from what we want to have
+happen if we want to do: select(AnnHub,k,c,kt).  Currently,
+keys/keytypes returns values that control metadata, and what we need
+for select(AnnHub,k,c,kt) to work are keys and keytypes that relate to
+things you can get back from the DBs in the background.  ALSO: there
+are serious questions about how smart it is to define
+keys/keytypes/cols when you will have so many kinds of data
+represented. This brings me to:
+
+3) If we want to do something like #2, select and its supporting
+methods will have to respect filters().  Otherwise there will just be
+too many keytypes etc.  So one important filtertype is the TaxonomyId.
+Without that being set, it's going to be really hard to manage all the
+data.
+
+4) Another implication of #2 is that we would need to be able to
+integrate all the resources together behind the scenes.  There are
+multiple ways we could do this.  I don't think that OrganismDbi is
+necessarily the ultimate answer, but it would allow a quick way to
+"get there" for resources that have a select interface already.
+
+
+## Another plan (I presently like this one better):
+
+1) Roll out current Annotation packages as .sqlite files (same as #1
+from other plan).
+
+2) Don't try so hard to reinvent the world of annotations.  Keep
+different kinds of annotations modularized so that they can be easily
+added/removed.  For some things a select interface will make sense and
+that object can be returned, but for other things we won't want that.
+
+3) Re-make the code that generates things like the org packages as
+into recipe format (all the code should live in an R package).
+Currently a lot of it doesn't, and that's not good.
+
+4) Add new recipes for many other kinds of annotation resources
+(depending on what we are talking about).  Code that can make a
+database from a set of text files could be generalized.
+
+5) Alternatively for web services, AH could just give the user an
+object (installing or informing about any dependencies?) so that they
+could access the web service.
+
+6) OrganismDbi would still work as it presently does to connect
+several resources together (when appropriate foreign keys are
+defined).
 
