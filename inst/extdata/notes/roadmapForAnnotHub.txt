@@ -205,3 +205,31 @@ could access the web service.
 several resources together (when appropriate foreign keys are
 defined).
 
+
+
+
+#######################################################################
+#######################################################################
+## Some low hanging fruit
+## Things that we should try to add next
+## (Avoid things that are existing resources - for now)
+
+
+
+
+## Ensembl regulation? (as annotated GRanges?) 0r maybe even as TxDb?
+
+## UCSC tracks? (as Annotated GRangs)
+
+## And some "hot" stuff
+
+## 1000 Genomes? (maybe just get this via UCSC?)
+## (There are a couple tracks already)
+
+## Encode?  (maybe also via UCSC?)
+## http://genome.ucsc.edu/ENCODE/downloads.html
+
+
+## And CDD (Because I worry that we have neglected making it easy for
+   users to get this data at the sequence level and not just the gene
+   level) 
