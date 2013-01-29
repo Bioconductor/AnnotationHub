@@ -1,12 +1,11 @@
 ## a set of methods to make sure that our server is live and the that
 ## current URLs are all valid.
 
-## 1st get the string for the base server
-server <- AnnotationHub:::.getServer() ## Can I test this???
+## For current examples of how URLs should look. see README.md from the
+## AnnotationHubServer package
+
 ## testObject
 x <- AnnotationHub()
-## string to get the curPath
-curPath <- x@curPath
 
 
 ## Helper for getting headers into easily grep-able format
@@ -17,6 +16,7 @@ curPath <- x@curPath
 }
 
 
+
 #########################
 ##       Tests:
 #########################
@@ -25,7 +25,7 @@ curPath <- x@curPath
 test_serverAvailability <- function(){
     ## Now I need to basically ping that string (plus other things) to
     ## check various things...
-    res <- .getHeader(url=server)
+    res <- .getHeader(url=AnnotationHub:::.hostUrl())
     checkTrue(length(grep("200 OK", res[1])) > 0)
 }
 
@@ -33,26 +33,27 @@ test_serverAvailability <- function(){
 ## is curpath pointing to somewhere? (a change from last time)
 test_basePath <- function(){
     ## Now test that the base path has a header.
-    res <- .getHeader(url=curPath)
+    res <- .getHeader(url=snapshotUrl(x))
     checkTrue(length(grep("200", res[1])) > 0)
 }
 
 
-## does the base serve path work?
-test_servePath <- function(){
-    ## http://wilson2.fhcrc.org/cgi-bin/R/serve?path=
-    baseServe <- AnnotationHub:::.getBaseServe()
-    res <- .getHeader(url=baseServe)
-    checkTrue(length(grep("200 OK", res[1])) > 0)    
-}
+## ## I think I no longer need to test this (things have drifted)
+## ## does the base serve path work?
+## test_servePath <- function(){
+##     ## http://wilson2.fhcrc.org/cgi-bin/R/serve?path=
+##     baseServe <- AnnotationHub:::.getBaseServe()
+##     res <- .getHeader(url=baseServe)
+##     checkTrue(length(grep("200 OK", res[1])) > 0)    
+## }
 
 
 ## does the path serve mechanism work?
 ## This one should be able to DL...
 test_servePathFuntionality <- function(){
-    baseServe <- AnnotationHub:::.getBaseServe()
+    baseServe <- hubUrl(x)
     ## AND THEN we have to DL something specific:
-    url <- paste(baseServe, x@paths[1], sep="/")
+    url <- paste(baseServe, snapshotPaths(x)[1], sep="/")
     res <- RCurl:::getBinaryURL(url)
     ## res is a bin, but we ONLY want to check that we can get it so:
     checkTrue(length(res) > 0) ## there should be something here.
@@ -61,29 +62,27 @@ test_servePathFuntionality <- function(){
 
 ## does keytypes link work?
 test_keytypesFunctionality <- function(){
-    res <- AnnotationHub:::.keytypes(x)
+    res <- AnnotationHub:::.keytypes(snapshotUrl(x))
     checkTrue(length(res) > 0) ## contents may vary.  Are there some?
 }
 
 
 ## does keys link work?
 test_keysFunctionality <- function(){
-    res <- AnnotationHub:::.keys(x,keytype="Tags")
+    res <- AnnotationHub:::.keys(snapshotUrl(x),keytype="Tags")
     checkTrue(length(res) > 0) ## at least one key exists?
 }
 
 
-## does a query point somewhere meaningful?
-test_queryPath <- function(){
-    paste0(x@curPath,"/query?")
-}
+
+
 
 ## does query engine work?
 ## ALSO test the .validFilterValues() separately from this as it's complex.
 ## but this test is JUST for whether the server is serving up answers
-
 test_queryPathResults <- function(){ 
-    url <- "http://wilson2.fhcrc.org/cgi-bin/R/query?Organism=9606"
+##     url <- "http://wilson2.fhcrc.org/cgi-bin/R/query?Organism=9606"
+    url <- "http://annotationhub.bioconductor.org/ah/2.12/2013-01-22/query/TaxonomyId/9606"
     res <- RCurl:::getURLContent(url)
     emptyVal <- "[]\n"
     checkTrue(res != emptyVal) ## should not just be the empty braces.
