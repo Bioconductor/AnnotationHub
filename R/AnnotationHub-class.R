@@ -137,6 +137,9 @@ setMethod("filters", "AnnotationHub", function(x) {
     x@filters
 })
 
+setReplaceMethod("filters", "AnnotationHub",
+                 function(x, ..., value) .replaceFilter(x, value))
+
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### vector-like interface
 ###

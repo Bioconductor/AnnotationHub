@@ -105,10 +105,6 @@
 
 ## setReplaceMethod("filters", "AnnotationHub", .replaceFilter)
 
-## YES. I know this is more verbose.
-## But please leave it so I can debug things later...
-setReplaceMethod("filters", "AnnotationHub",
-                 function(x, value) .replaceFilter(x, value))
 
 
 
