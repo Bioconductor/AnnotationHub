@@ -3,8 +3,12 @@
 
 .onLoad <- function(libname, pkgname)
 {
-    if (!.checkCaching())
-        message("See ?caching to enable an AnnotationHub cache")
+    if (is.na(hubCache())) {
+        cache <- tempfile()
+        dir.create(tempfile(), recursive=TRUE)
+        options(AnnotationHub.Cache=cache)
+        message("See ?hubCache to enable a permanent AnnotationHub cache")
+    }
 }
 
 ## Load cpp Trie module

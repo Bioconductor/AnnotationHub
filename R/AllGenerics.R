@@ -1,20 +1,34 @@
-setGeneric("filters", function(x, ...) standardGeneric("filters"))
+## Accessors
+setGeneric("hubUrl", function(x, ...) standardGeneric("hubUrl"))
 
-setGeneric("filters<-", signature="x",
-           function(x, ..., value) standardGeneric("filters<-"))
+setGeneric("hubCache", function(x, ...) standardGeneric("hubCache"))
 
-setGeneric("urls", function(x, ...) standardGeneric("urls"))
+setGeneric("hubCache<-",
+           function(x, ..., value) standardGeneric("hubCache<-"))
 
+setGeneric("snapshotVersion",
+           function(x, ...) standardGeneric("snapshotVersion"))
 
-setGeneric("versionDate", function(x, ...) standardGeneric("versionDate"))
+setGeneric("snapshotDate", function(x, ...) standardGeneric("snapshotDate"))
 
-setGeneric("versionDate<-", signature="x",
-           function(x, ..., value) standardGeneric("versionDate<-"))
+setGeneric("snapshotUrl",
+           function(x, ...) standardGeneric("snapshotUrl"))
+
+setGeneric("snapshotPaths",
+           function(x, ...) standardGeneric("snapshotPaths"))
+
+setGeneric("snapshotUrls",
+           function(x, ...) standardGeneric("snapshotUrls"))
+
+setGeneric("snapshotDate<-", signature=c("x", "value"),
+           function(x, ..., value) standardGeneric("snapshotDate<-"))
 
 setGeneric("possibleDates", function(x, ...) standardGeneric("possibleDates"))
 
+setGeneric("hubResource", signature="x",
+           function(x, path=character(), ...) standardGeneric("hubResource"))
 
-setGeneric("caching", function(x, ...) standardGeneric("caching"))
+setGeneric("filters", function(x, ...) standardGeneric("filters"))
 
-setGeneric("caching<-", signature=c("x","value"),
-           function(x, ..., value) standardGeneric("caching<-"))
+setGeneric("filters<-", signature=c("x", "value"),
+           function(x, ..., value) standardGeneric("filters<-"))

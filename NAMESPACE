@@ -1,8 +1,6 @@
 useDynLib(AnnotationHub)
 
-import(Biobase)
-
-importClassesFrom(Rcpp, "C++Class")
+importClassesFrom(Rcpp, "C++Object")
 
 importFrom(Rcpp, loadModule)
 
@@ -11,6 +9,8 @@ import(methods)
 importFrom(AnnotationDbi, exists, keys, keytypes)
 
 import(BiocGenerics)
+
+importFrom(BiocInstaller, biocVersion)
 
 importFrom(utils, .DollarNames)
 
@@ -24,19 +24,22 @@ importFrom(stats, setNames)
 S3method(.DollarNames, AnnotationHub)
 
 exportMethods("$",
-              "keytypes",
-              "keys",
-              "length",
-              "names",
-              "urls",
-              "metadata",
-              "filters",
-              "filters<-",
-              "versionDate",
-              "versionDate<-",
-              "possibleDates",
-              "caching",
-              "caching<-",
-              "show")
+              filters, "filters<-",
+              hubUrl,
+              hubCache, "hubCache<-",
+              hubResource,
+              keys,
+              keytypes,
+              length,
+              metadata,
+              names,
+              possibleDates,
+              show,
+              snapshotDate, "snapshotDate<-",
+              snapshotPaths,
+              snapshotUrl,
+              snapshotUrls,
+              snapshotVersion
+              )
 
 export("AnnotationHub", "Trie")
