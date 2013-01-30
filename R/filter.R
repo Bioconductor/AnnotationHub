@@ -60,11 +60,43 @@
     paste(res, collapse="/")
 }
 
-.getJSONFromURL <- function(url)
-{
-    t <- tempfile()
-    download.file(url, t, quiet=TRUE)
-    fromJSON(paste0(readLines(t), collapse=""))
+## .getJSONFromURL <- function(url)
+## {
+##     t <- tempfile()
+##     download.file(url, t, quiet=TRUE)
+##     fromJSON(paste0(readLines(t), collapse=""))
+## }
+
+
+
+######################################################################
+## TODO: these need to be fixed up so that I can call:
+## .getNewPathsBasedOnFilters()
+
+## SO:
+## 1) call .metadata() passing in list of filterValues.
+## 2) get the RDataPath field out
+## 3) setNames so that things are properly formatted.
+
+
+## get character vector of ResourcePath values that match the keys/keytypes
+.getFilesThatMatchFilters <- function(x, filterValues) {    
+    ## get the ResourcePath for each. item that comes back from .getMetadata
+    meta <- .metadata(x, filterValues) ## returns a list.
+    ##res <- unlist(sapply(meta, function(x) x[names(x) %in% "RDataPath"]))
+    res <- head(unlist(meta[names(meta) %in% "RDataPath"]))
+    setNames(res, make.names(res))
+}
+
+## This function gets new @paths values based new values for @filters
+## It can't just check the object for @filters though because it is needed in
+## middle of change to @filters
+.getNewPathsBasedOnFilters <- function(x, value) {
+    if (length(value) > 0) {
+        .getFilesThatMatchFilters(x, value)
+    } else {                            # there are no filters
+        snapshotPaths(x)
+    }
 }
 
 ## a= AnnotationHub()
@@ -89,7 +121,7 @@
         curNames <- names(curFilters)
         newNames <- names(value)
         ## drop any repeats from the old set 
-        curFilters <- curFilters[!(curNames %in% newNames)] 
+        curFilters <- curFilters[!(curNames %in% newNames)]
         value <- c(curFilters, value) ## append
     } else { ## user signaled that they want it wiped out.
         value <- list()

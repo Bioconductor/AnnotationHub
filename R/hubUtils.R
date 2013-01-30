@@ -42,6 +42,15 @@
     sort(as.POSIXlt(fromJSON(url)))
 }
 
+
+## TODO: vectorize for both paths and fields.
+## I should be able to vectorize on fields in .metadata, and then just
+## use the helper below to also vectorize on paths.
+## ALSO: this function should not just assume that we want to use "RDataPath"
+## Instead it should be using field there in a general way.
+## So in both cases, I need a helper for processing the URLs.
+## .metadataURLPath() ???
+
 .metadataPathField <- function(x, path, field) {
     ## get the metadata of a particular path and type
     escapedPath <- paste0('"', path, '"')
@@ -49,16 +58,57 @@
     fromJSON(url)[[1]][[field]]
 }
 
-.metadata <- function(snapshotUrl, filter=character()) {
-    url <- if (length(filter)) {
-        paste(snapshotUrl, "query", filter, sep="/")
-    } else paste(snapshotUrl, "query", sep="/")
+## ## a vectorized version of the above.
+## .metadataPathsField <- function(x, path, field) {
+##     lapply(path, .metadataPathField, x=x, field=field)
+## }
+
+
+
+## TODO: fix .metadata()
+## This function is nice and terse, but it won't work because we store
+## filter values in a list object (for the case where we have more
+## than one thing kind of TaxonomyId etc.)  Also, the URL needs both
+## names and values to be put together. "/TaxonomyId/9606" etc.
+
+## SO:
+## 1) filter needs to be a list
+## 2) needs to create a URL to do it's job
+## 3) needs to return a (filtered) DataFrame to complete it's job.
+## .metadata <- function(snapshotUrl, filter=character()) {
+##     url <- if (length(filter)) {
+##         paste(snapshotUrl, "query", filter, sep="/")
+##     } else paste(snapshotUrl, "query", sep="/")
+##     meta <- .fromJSON_file(url)
+##     ## Concerned: that this may become too slow as more metadata piles on.
+##     ## 1st sort based on names (THEN rbind together)
+##     sorted <- lapply(meta, function(x) x[sort(names(x))])
+##     data.frame(do.call(rbind, sorted))
+## }
+
+.metadata <-
+    function(x, filterValues=list()) {
+    ## 1st validate filters
+    .validFilterValues(x, filterValues)
+    ## then make a url
+    url <- if (length(filter)) { ## get some
+        ## URL must be specific
+        filters <- unlist(Map(.processFilter, filterValues,
+                              names(filterValues)))
+        filters <- paste(filters, collapse="/")
+        url <- paste(snapshotUrl(), "query", filters, sep="/") ## vectorized?
+    } else {## get all of them
+        paste(snapshotUrl(), "query", sep="/")
+    }
+    ## get the metadata
     meta <- .fromJSON_file(url)
-    ## Concerned: that this may become too slow as more metadata piles on.
-    ## 1st sort based on names (THEN rbind together)
+    ## This will change if the json changes.
     sorted <- lapply(meta, function(x) x[sort(names(x))])
-    data.frame(do.call(rbind, sorted))
+    data.frame(do.call(rbind, sorted))  ## TODO: changeover to DataFrame
 }
+
+
+
 
 .keytypes <-function(snapshotUrl) {
     url <- paste(snapshotUrl, 'getAllKeytypes', sep="/")
@@ -119,5 +169,9 @@ setMethod("hubResource", "missing", function(x, path=character(), ...) {
 })
 
 setMethod("metadata", "missing", function(x, ...) {
+    .metadata(snapshotUrl())
+})
+
+setMethod("metadata", "list", function(x, ...) {
     .metadata(snapshotUrl())
 })

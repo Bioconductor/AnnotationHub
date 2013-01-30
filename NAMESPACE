@@ -8,6 +8,8 @@ import(methods)
 
 importFrom(AnnotationDbi, exists, keys, keytypes)
 
+importFrom(IRanges, DataFrame)
+
 import(BiocGenerics)
 
 importFrom(BiocInstaller, biocVersion)
