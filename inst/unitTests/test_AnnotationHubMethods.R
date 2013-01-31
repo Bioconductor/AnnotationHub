@@ -52,14 +52,14 @@ test_validFilterValues <- function(){
 ## Both methods of access should work.
 test_getMetadata <- function(){
     filters <- NULL ## IOW: no filters
-    res <- AnnotationHub:::.getMetadata(x,filters)
-    checkTrue(length(res) > 1) ## should give multiple records 
+    res <- AnnotationHub:::.metadata(x,filters)
+    checkTrue(dim(res)[1] > 1) ## should give multiple records 
     ## check that we can get filtered metadata
     filters <- list(TaxonomyId="9606",
         SourceFile=
         "pub/databases/ensembl/encode/supplementary/integration_data_jan2011/byDataType/footprints/jan2011/all.footprints.gz")
-    res <- AnnotationHub:::.getMetadata(x,filters)
-    checkTrue(length(res) == 1)  ## should only match one record
+    res <- AnnotationHub:::.metadata(x,filters)
+    checkTrue(dim(res)[1] == 1)  ## should only match one record
 }
 
 
