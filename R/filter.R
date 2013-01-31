@@ -74,15 +74,15 @@
 ## .getNewPathsBasedOnFilters()
 
 ## SO:
-## 1) call .metadata() passing in list of filterValues.
+## 1) call .metadata() passing in list of filters.
 ## 2) get the RDataPath field out
 ## 3) setNames so that things are properly formatted.
 
 
 ## get character vector of ResourcePath values that match the keys/keytypes
-.getFilesThatMatchFilters <- function(x, filterValues) {    
+.getFilesThatMatchFilters <- function(x, filters) {    
     ## get the ResourcePath for each. item that comes back from .getMetadata
-    meta <- .metadata(x, filterValues) ## returns a list.
+    meta <- .metadata(x, filters) ## returns a list.
     ##res <- unlist(sapply(meta, function(x) x[names(x) %in% "RDataPath"]))
     res <- head(unlist(meta[names(meta) %in% "RDataPath"]))
     setNames(res, make.names(res))

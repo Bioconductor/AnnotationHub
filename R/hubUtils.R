@@ -87,16 +87,15 @@
 ## }
 
 .metadata <-
-    function(x, filterValues=list()) {
-    ## 1st validate filters
-    .validFilterValues(x, filterValues)
+    function(x, filters=list()) {
     ## then make a url
-    url <- if (length(filter)) { ## get some
+    url <- if (length(filters)>0 && filters!="" &&
+               !is.null(filters)) { ## get some
         ## URL must be specific
-        filters <- unlist(Map(.processFilter, filterValues,
-                              names(filterValues)))
+        filters <- unlist(Map(.processFilter, filters,
+                              names(filters)))
         filters <- paste(filters, collapse="/")
-        url <- paste(snapshotUrl(), "query", filters, sep="/") ## vectorized?
+        paste(snapshotUrl(), "query", filters, sep="/") ## vectorized?
     } else {## get all of them
         paste(snapshotUrl(), "query", sep="/")
     }
@@ -172,6 +171,6 @@ setMethod("metadata", "missing", function(x, ...) {
     .metadata(snapshotUrl())
 })
 
-setMethod("metadata", "list", function(x, ...) {
-    .metadata(snapshotUrl())
-})
+## setMethod("metadata", "list", function(x, filters, ...) {
+##     .metadata(x, filters, ...)
+## })

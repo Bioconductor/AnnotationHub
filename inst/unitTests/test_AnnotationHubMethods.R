@@ -1,9 +1,13 @@
 ## Unit tests for methods and helpers that are used to set and use
 ## filters on an AnnotationHub object.
 
+## require(AnnotationHub)
+## debug(AnnotationHub:::.metadata)
+
 x <- AnnotationHub()
 
-## What is the shortest example to DL? A: stamH3K4me3ProfilePromoters.RData
+
+##  What is the shortest example to DL? A: stamH3K4me3ProfilePromoters.RData
 
 
 ## can we get and set filters() for an object?
