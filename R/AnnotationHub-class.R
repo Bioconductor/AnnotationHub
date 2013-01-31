@@ -166,12 +166,8 @@ setMethod("keys", "AnnotationHub", function(x, keytype) {
     .keys(snapshotUrl(x), keytype)
 })
 
-setMethod("metadata", "AnnotationHub", function(x) {
-    filters <- filters(x)
-    filters <- unlist(Map(.processFilter, filters, names(filters)),
-                      use.names=FALSE)
-    filters <- paste(filters, collapse="/")
-    .metadata(snapshotUrl(x), filters)
+setMethod("metadata", "AnnotationHub", function(x, ...) {
+    .metadata(snapshotUrl(x), filters(x))
 })
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

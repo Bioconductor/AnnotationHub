@@ -168,7 +168,7 @@ setMethod("hubResource", "missing", function(x, path=character(), ...) {
 })
 
 setMethod("metadata", "missing", function(x, ...) {
-    .metadata(snapshotUrl())
+    .metadata(snapshotUrl(), list())
 })
 
 ## setMethod("metadata", "list", function(x, filters, ...) {
