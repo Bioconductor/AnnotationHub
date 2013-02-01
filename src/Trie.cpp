@@ -2,11 +2,15 @@
 
 using namespace std;
 
-//SEXP Trie::printTrie()
-//{
-//    SEXP x;
-//    return print(x, 0);
-//}
+SEXP Trie::printTrie()
+{
+    string_vec res;
+    string_vec *res_ptr;
+    res_ptr = &res;
+    Node* current = root;
+    current->printNodeDFS("", res_ptr);
+    return(Rcpp::wrap(res));
+}
 
 SEXP Trie::printTrie(SEXP x, int max)
 {
@@ -18,15 +22,10 @@ SEXP Trie::printTrie(SEXP x, int max)
     string_vec res;
     string_vec *res_ptr;
     res_ptr = &res;
-
     Node* current = root;
-    if (s.size() == 0) {
-        current->printNodeDFS("", res_ptr);
-    } else { 
-        current = getPrefixNode(s);
-        if (current != 0)
-            current->printNodeBFS(s, res_ptr, max);
-    }
+    current = getPrefixNode(s);
+    if (current != 0)
+        current->printNodeBFS(s, res_ptr, max);
     return(Rcpp::wrap(res));
     END_RCPP
 }
@@ -83,11 +82,7 @@ RCPP_MODULE(TrieModule){
     .constructor()
     .method("buildTrie", &Trie::buildTrie,
         "Construct a Trie from a vector of strings")
-    //#.method("printTrie", &Trie::printTrie,
-    //#    List::create(),
-    //#    "Print all words")
-    .method("printTrie", &Trie::printTrie,
-    //    List::create(_["x"], ["max"]),
-        "Print all words with the given prefix")
+    .method("printTrie", (SEXP (Trie::*)(SEXP, int))(&Trie::printTrie))
+    .method("printTrie", (SEXP (Trie::*)())(&Trie::printTrie))
     ;
 }

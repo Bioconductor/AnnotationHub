@@ -20,7 +20,7 @@ public:
     // search
     Node* getPrefixNode(std::string s);
     // print
-    //SEXP print();
+    SEXP printTrie();
     SEXP printTrie(SEXP x, int max);
 
 private:

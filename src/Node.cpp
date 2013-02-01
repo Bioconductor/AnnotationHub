@@ -32,7 +32,7 @@ void Node::printNodeBFS(std::string s, string_vec* res_ptr, unsigned int max)
             // add children
             if (current->children.size() > 0) {
                 for (unsigned int i = 0; i < current->children.size(); i++)
-                	q.push(current->children[i]);
+                    q.push(current->children[i]);
             }
             // add words
             if (current->getWordMarker()) {
