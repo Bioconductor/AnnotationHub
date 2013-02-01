@@ -1,27 +1,27 @@
 #include <Rcpp.h>
 #include "Node.h"
 
-
 using namespace Rcpp;
 
 class Trie {
 public:
-    // constructor, deconstructor 
-    Trie() { root = new Node(); }
-    void deleteTrie() 
+    // constructor, destructor
+    Trie() {root = new Node();}
+    ~Trie() 
     {
         Node* current = root;
         current->deleteAllNodes(); 
         delete root;
     }
-    // getters and setters
-    Node* getPrefixNode(std::string s);
-    // helpers 
-    void buildTrie(SEXP x); 
+
+    // build
+    void buildTrie(SEXP x);
     void addWord(std::string s);
-    bool findWord(std::string s);
-    // print 
-    SEXP printTrie(SEXP x); 
+    // search
+    Node* getPrefixNode(std::string s);
+    // print
+    //SEXP print();
+    SEXP printTrie(SEXP x, int max);
 
 private:
     Node* root;

@@ -1,38 +1,42 @@
 #include <Rcpp.h>
 
+using namespace std;
 typedef std::vector<std::string> string_vec;
 
 class Node {
 public:
-    // constructor, deconstructor 
-    Node() { value = ' '; wordMarker = false; }
+    // constructor, destructor
+    Node() {value = ' '; wordMarker = false;}
     void deleteAllNodes()
     {
-        for ( int i = 0; i < children.size(); i++ )
+        for (unsigned int i = 0; i < children.size(); i++)
         {
             Node* tmp = children.at(i);
-            // no children and wordMarker == TRUE 
-            if ( tmp->getWordMarker() && tmp->children.size() == 0 ) {
+            if (tmp->getWordMarker() && tmp->children.size() == 0) {
                 delete tmp;
             } else {
                 tmp->deleteAllNodes();
             }
         }
     }
-    // getters and setters
-    char getValue() { return value; }
-    void setValue(char c) { value = c; }
-    bool getWordMarker() { return wordMarker; }
-    void setWordMarker() { wordMarker = true; }
-    std::vector<Node*> getChildren() { return children; }
-    // helpers
-    void appendChild(Node* child) { children.push_back(child); }
+    // getters, setters
+    char getValue() {return value;}
+    void setValue(char c) {value = c;}
+    bool getWordMarker() {return wordMarker;}
+    void setWordMarker() {wordMarker = true;}
+    Node* getParent() {return parent;}
+    void setParent(Node* p) {parent = p;}
+    // search
+    std::vector<Node*> getChildren() {return children;}
+    void appendChild(Node* child) {children.push_back(child);}
     Node* findChild(char c);
     // print
-    void printNode(std::string s, string_vec * res_ptr);
+    void printNodeDFS(std::string s, string_vec* res_ptr);
+    void printNodeBFS(std::string s, string_vec* res_ptr, unsigned int max);
 
 private:
     char value;
     bool wordMarker;
+    Node* parent;
     std::vector<Node*> children;
 };
