@@ -69,7 +69,8 @@
     }
 
     ## Get the metadata
-    m <- .metadataPathField(x, path, "RDataClass")
+    m <- as.character(.metadata(x, filters=list(RDataPath=path),
+                                keytypes="RDataClass"))
 
     ## Call correct function based on the results of the metadata
     FUN <- switch(m, fasta=.getFasta, .getRda)

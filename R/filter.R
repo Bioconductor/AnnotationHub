@@ -60,13 +60,11 @@
     paste(res, collapse="/")
 }
 
-## .getJSONFromURL <- function(url)
-## {
-##     t <- tempfile()
-##     download.file(url, t, quiet=TRUE)
-##     fromJSON(paste0(readLines(t), collapse=""))
-## }
-
+.makeURLFilters <- function(filters){
+    filters <- unlist(Map(.processFilter, filters,
+                              names(filters)))
+    paste(filters, collapse="/")
+}
 
 
 ######################################################################
@@ -82,9 +80,8 @@
 ## get character vector of ResourcePath values that match the keys/keytypes
 .getFilesThatMatchFilters <- function(x, filters) {    
     ## get the ResourcePath for each. item that comes back from .getMetadata
-    meta <- .metadata(x, filters) ## returns a list.
-    ##res <- unlist(sapply(meta, function(x) x[names(x) %in% "RDataPath"]))
-    res <- head(unlist(meta[names(meta) %in% "RDataPath"]))
+    meta <- .metadata(x, filters, keytypes="RDataPath")
+    res <- unlist(meta)
     setNames(res, make.names(res))
 }
 

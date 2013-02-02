@@ -103,6 +103,8 @@ test_metadata <- function(){
     resPartial <- metadata(x)
     checkTrue(dim(resFull)[2] == dim(resPartial)[2])
     checkTrue(dim(resFull)[1] != dim(resPartial)[1])
+
+    ## TODO: add tests to spot check certain things are true about fakeData
 }
 
 

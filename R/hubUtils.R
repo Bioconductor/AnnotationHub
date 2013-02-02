@@ -51,12 +51,13 @@
 ## So in both cases, I need a helper for processing the URLs.
 ## .metadataURLPath() ???
 
-.metadataPathField <- function(x, path, field) {
-    ## get the metadata of a particular path and type
-    escapedPath <- paste0('"', path, '"')
-    url <- paste(snapshotUrl(x), "query", "RDataPath", escapedPath, sep="/")
-    fromJSON(url)[[1]][[field]]
-}
+## .metadataPathField <- function(x, path, field) {
+##     ## get the metadata of a particular path and type
+##     escapedPath <- paste0('"', path, '"')
+##     url <- paste(snapshotUrl(x), "query", "RDataPath", escapedPath, sep="/")
+##     fromJSON(url)[[1]][[field]]
+## }
+
 
 ## ## a vectorized version of the above.
 ## .metadataPathsField <- function(x, path, field) {
@@ -64,47 +65,58 @@
 ## }
 
 
-
-## TODO: fix .metadata()
-## This function is nice and terse, but it won't work because we store
-## filter values in a list object (for the case where we have more
-## than one thing kind of TaxonomyId etc.)  Also, the URL needs both
-## names and values to be put together. "/TaxonomyId/9606" etc.
-
-## SO:
-## 1) filter needs to be a list
-## 2) needs to create a URL to do it's job
-## 3) needs to return a (filtered) DataFrame to complete it's job.
-## .metadata <- function(snapshotUrl, filter=character()) {
-##     url <- if (length(filter)) {
-##         paste(snapshotUrl, "query", filter, sep="/")
-##     } else paste(snapshotUrl, "query", sep="/")
-##     meta <- .fromJSON_file(url)
-##     ## Concerned: that this may become too slow as more metadata piles on.
-##     ## 1st sort based on names (THEN rbind together)
-##     sorted <- lapply(meta, function(x) x[sort(names(x))])
-##     data.frame(do.call(rbind, sorted))
-## }
-
-.metadata <-
-    function(x, filters=list()) {
+## metadata takes a filter list and keytypes and returns a DataFrame
+.metadata <- function(x, filters=list(), keytypes=c("Title","Species",
+                                           "TaxonomyId","Genome","Description",
+                                           "Tags","RDataClass","Notes")) {
+    ## format keytypes
+    keytypes <- paste("cols",keytypes, sep="/", collapse="/")
     ## then make a url
     url <- if (length(filters)>0 && filters!="" &&
                !is.null(filters)) { ## get some
         ## URL must be specific
-        filters <- unlist(Map(.processFilter, filters,
-                              names(filters)))
-        filters <- paste(filters, collapse="/")
-        paste(snapshotUrl(), "query", filters, sep="/") ## vectorized?
+        filters <- .makeURLFilters(filters)
+        paste(snapshotUrl(), "query", filters, keytypes, sep="/") ##vectorized?
     } else {## get all of them
-        paste(snapshotUrl(), "query", sep="/")
+        paste(snapshotUrl(), "query", keytypes, sep="/")
     }
     ## get the metadata
-    meta <- .fromJSON_file(url)
-    ## This will change if the json changes.
-    sorted <- lapply(meta, function(x) x[sort(names(x))])
-    data.frame(do.call(rbind, sorted))  ## TODO: changeover to DataFrame
+    meta <- .fromJSON_file(url) ## list form (by row)
+
+    ## make a data.frame (remove this later)
+    if(class(meta)=="list"){
+        mat <- do.call(cbind, meta) ## as matrix
+        data.frame(mat)  ## TODO: changeover to DataFrame
+    }else{
+        ## double cast so label is the colname, and return val is consistent.
+        as.data.frame(as.list(meta)) 
+    }
+    
+## TODO switch from data.frame to DataFrame (compute this from the
+## list obj "meta")
+    
+##     ## So split that into a list of columns...
+##     ## TEMP HACK to remove problem columns
+##     smat <- mat[,c(1:15)]
+## ##   cols <- apply(smat, 2, function(x) unlist(as.vector(x), recursive=FALSE)) )
+## ##    smat <- mat[1:4,c(1,15)]
+## ##    smat <- mat[1:4,c(1,15:16)] ## still causes grief for some compound things
+##     cols <- apply(smat, 2, function(x){as(x, "List")} )
+##     DataFrame(cols)
+    
 }
+
+## TODO: I need to use splitAsList() with a factor for each column
+## that I want to squish? : not quite
+
+## So I want to convert everything to "List" with as()
+## And for the complicated ones I want to do it like this
+## (notice unlist2 from AnntoationDbi is making an appearance):
+## foo = lapply(smat[,3], unlist2)
+## OR lapply(smat[,3] I) (less invasive)
+## And then:
+## as(foo, "List")
+
 
 
 
@@ -113,6 +125,7 @@
     url <- paste(snapshotUrl, 'getAllKeytypes', sep="/")
     fromJSON(url)
 }
+
 
 .keys <-
     function(snapshotUrl, keytype)
