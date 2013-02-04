@@ -1,7 +1,7 @@
 Package: AnnotationHub
 Type: Package
 Title: A client for retrieving Bioconductor objects from AnnotationHub
-Version: 0.0.23
+Version: 0.0.24
 Depends: Rcpp (>= 0.10.1), Biobase
 Imports: methods, stats, utils, BiocGenerics, IRanges, RJSONIO, AnnotationDbi, 
 	 IRanges, BiocInstaller

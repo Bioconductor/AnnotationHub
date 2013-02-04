@@ -69,8 +69,8 @@
     }
 
     ## Get the metadata
-    m <- as.character(.metadata(x, filters=list(RDataPath=path),
-                                keytypes="RDataClass"))
+    m <- as.character(unlist(.metadata(x, filters=list(RDataPath=path),
+                                keytypes="RDataClass")))
 
     ## Call correct function based on the results of the metadata
     FUN <- switch(m, fasta=.getFasta, .getRda)

@@ -82,14 +82,22 @@
     }
     ## get the metadata
     meta <- .fromJSON_file(url) ## list form (by row)
-
+    
     ## make a data.frame (remove this later)
     if(class(meta)=="list"){
-        mat <- do.call(cbind, meta) ## as matrix
-        data.frame(mat)  ## TODO: changeover to DataFrame
+##         mat <- do.call(cbind, meta) ## as matrix
+##         data.frame(mat)  ## TODO: changeover to DataFrame
+
+        ## TODO: have lapply call a smarter function that tests the
+        ## type of elements (any() is.list()), and then call either
+        ## I() or convert with unlist2()
+        ls <- lapply(meta, as, "List")
+        DataFrame(ls)
     }else{
         ## double cast so label is the colname, and return val is consistent.
-        as.data.frame(as.list(meta)) 
+##         as.data.frame(as.list(meta))
+
+        DataFrame(as.list(meta))
     }
     
 ## TODO switch from data.frame to DataFrame (compute this from the
