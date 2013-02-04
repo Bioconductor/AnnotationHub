@@ -5,7 +5,7 @@
 ## debug(AnnotationHub:::.metadata)
 
 x <- AnnotationHub()
-
+## m <- metadata(x, keytypes="Title")
 
 ##  What is the shortest example to DL? A: stamH3K4me3ProfilePromoters.RData
 

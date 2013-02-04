@@ -80,7 +80,7 @@
 ## get character vector of ResourcePath values that match the keys/keytypes
 .getFilesThatMatchFilters <- function(x, filters) {    
     ## get the ResourcePath for each. item that comes back from .getMetadata
-    meta <- .metadata(x, filters, keytypes="RDataPath")
+    meta <- metadata(x, filters, keytypes="RDataPath")
     res <- unlist(meta)
     setNames(res, make.names(res))
 }

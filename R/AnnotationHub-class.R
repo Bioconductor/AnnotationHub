@@ -107,7 +107,7 @@ setMethod("possibleDates", "AnnotationHub", function(x, ...) {
     if (!snapshotDate %in% possibleDates)
         stop("'value' is not in possibleDates(x)")
 
-    paths <- .metadata(x)$RDataPath
+    paths <- metadata(x)$RDataPath
     snapshotPaths <- setNames(urls, make.names(paths))
     if (0L == length(snapshotPaths))
         stop("no 'snapshotPaths' for 'snapshotDate' and 'filters'")
@@ -167,10 +167,12 @@ setMethod("keys", "AnnotationHub", function(x, keytype) {
 })
 
 
-setMethod("metadata", "AnnotationHub", function(x, ...) {
-    .metadata(snapshotUrl(x), filters(x), keytypes=c("Title","Species",
-                                            "TaxonomyId","Genome","Description",
-                                            "Tags","RDataClass","Notes"))
+setMethod("metadata", "AnnotationHub", function(x, keytypes, ...) {
+    if(missing(keytypes)){
+        keytypes <- c("Title","Species","TaxonomyId","Genome",
+                      "Description","Tags","RDataClass","Notes")
+    }
+    .metadata(snapshotUrl(x), filters(x), keytypes)
 })
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

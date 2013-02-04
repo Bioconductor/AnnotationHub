@@ -58,27 +58,6 @@
 }
 
 
-## TODO: vectorize for both paths and fields.
-## I should be able to vectorize on fields in .metadata, and then just
-## use the helper below to also vectorize on paths.
-## ALSO: this function should not just assume that we want to use "RDataPath"
-## Instead it should be using field there in a general way.
-## So in both cases, I need a helper for processing the URLs.
-## .metadataURLPath() ???
-
-## .metadataPathField <- function(x, path, field) {
-##     ## get the metadata of a particular path and type
-##     escapedPath <- paste0('"', path, '"')
-##     url <- paste(snapshotUrl(x), "query", "RDataPath", escapedPath, sep="/")
-##     .parseJSON(url)[[1]][[field]]
-## }
-
-
-## ## a vectorized version of the above.
-## .metadataPathsField <- function(x, path, field) {
-##     lapply(path, .metadataPathField, x=x, field=field)
-## }
-
 
 ## metadata takes a filter list and keytypes and returns a DataFrame
 .metadata <- function(x, filters=list(), keytypes=c("Title","Species",
