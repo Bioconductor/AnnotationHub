@@ -85,48 +85,13 @@
     
     ## make a data.frame (remove this later)
     if(class(meta)=="list"){
-##         mat <- do.call(cbind, meta) ## as matrix
-##         data.frame(mat)  ## TODO: changeover to DataFrame
-
-        ## TODO: have lapply call a smarter function that tests the
-        ## type of elements (any() is.list()), and then call either
-        ## I() or convert with unlist2()
-        ls <- lapply(meta, as, "List")
+        ls <- lapply(meta, as, "List") ##Converting to "List" allows compression
         DataFrame(ls)
     }else{
         ## double cast so label is the colname, and return val is consistent.
-##         as.data.frame(as.list(meta))
-
         DataFrame(as.list(meta))
     }
-    
-## TODO switch from data.frame to DataFrame (compute this from the
-## list obj "meta")
-    
-##     ## So split that into a list of columns...
-##     ## TEMP HACK to remove problem columns
-##     smat <- mat[,c(1:15)]
-## ##   cols <- apply(smat, 2, function(x) unlist(as.vector(x), recursive=FALSE)) )
-## ##    smat <- mat[1:4,c(1,15)]
-## ##    smat <- mat[1:4,c(1,15:16)] ## still causes grief for some compound things
-##     cols <- apply(smat, 2, function(x){as(x, "List")} )
-##     DataFrame(cols)
-    
 }
-
-## TODO: I need to use splitAsList() with a factor for each column
-## that I want to squish? : not quite
-
-## So I want to convert everything to "List" with as()
-## And for the complicated ones I want to do it like this
-## (notice unlist2 from AnntoationDbi is making an appearance):
-## foo = lapply(smat[,3], unlist2)
-## OR lapply(smat[,3] I) (less invasive)
-## And then:
-## as(foo, "List")
-
-
-
 
 
 .keytypes <-function(snapshotUrl) {
@@ -192,6 +157,3 @@ setMethod("metadata", "missing", function(x, ...) {
     .metadata(snapshotUrl(), list())
 })
 
-## setMethod("metadata", "list", function(x, filters, ...) {
-##     .metadata(x, filters, ...)
-## })
