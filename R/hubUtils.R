@@ -1,10 +1,25 @@
 ## JSON utilities
 
-.fromJSON_file <- function(url)
+## helper to add some error handling for when the server is throwing errors.
+## TODO: make this work and then replace all fromJSON calls with it.
+.parseJSON <- function(url){
+    tryCatch({
+        fromJSON(url)
+    }, error=function(err){
+        stop("An error occured when parsing the JSON: ", err)
+    } )
+}
+
+## .parseJSON("http://annotationhub.bioconductor.org/ah/2.12/2013-01-22/getAllResourcePaths")
+## VS a bad URL:
+## .parseJSON("http://foo/bar")
+
+
+.parseJSON_file <- function(url)
 {
     tmp <- tempfile()
     download.file(url, tmp, quiet=TRUE)
-    fromJSON(paste0(readLines(tmp), collapse=""))
+    .parseJSON(paste0(readLines(tmp), collapse=""))
 }
 
 ## queries
@@ -20,7 +35,7 @@
 
 .snapshotPaths <- function(snapshotUrl) {
     url <- paste(snapshotUrl, "getAllResourcePaths", sep="/")
-    urls <- fromJSON(url)
+    urls <- .parseJSON(url)
     setNames(urls, make.names(urls))
 }
 
@@ -29,7 +44,7 @@
 .snapshotDate <- function(hubUrl, snapshotVersion) {
     url <- paste(hubUrl, snapshotVersion, "getLatestSnapshotDate",
                  sep="/")
-    as.POSIXlt(fromJSON(url))
+    as.POSIXlt(.parseJSON(url))
 }
 
 .snapshotUrl <- function(hubUrl, snapshotVersion, snapshotDate) {
@@ -39,7 +54,7 @@
 .possibleDates <- function(hubUrl, snapshotVersion) {
     url <- paste(hubUrl, snapshotVersion, "getSnapshotDates",
                   sep="/")
-    sort(as.POSIXlt(fromJSON(url)))
+    sort(as.POSIXlt(.parseJSON(url)))
 }
 
 
@@ -55,7 +70,7 @@
 ##     ## get the metadata of a particular path and type
 ##     escapedPath <- paste0('"', path, '"')
 ##     url <- paste(snapshotUrl(x), "query", "RDataPath", escapedPath, sep="/")
-##     fromJSON(url)[[1]][[field]]
+##     .parseJSON(url)[[1]][[field]]
 ## }
 
 
@@ -81,7 +96,7 @@
         paste(snapshotUrl(), "query", keytypes, sep="/")
     }
     ## get the metadata
-    meta <- .fromJSON_file(url) ## list form (by row)
+    meta <- .parseJSON_file(url) ## list form (by row)
     
     ## make a data.frame (remove this later)
     if(class(meta)=="list"){
@@ -96,7 +111,7 @@
 
 .keytypes <-function(snapshotUrl) {
     url <- paste(snapshotUrl, 'getAllKeytypes', sep="/")
-    fromJSON(url)
+    .parseJSON(url)
 }
 
 
@@ -107,7 +122,7 @@
         stop("'keytype' must be a character vector of length 1")
     ## then retrieve values from host
     url <- paste(snapshotUrl, "getAllKeys", "keytype", keytype, sep="/")
-    unique(fromJSON(url))
+    unique(.parseJSON(url))
 }
 
 setMethod("snapshotVersion", "missing", function(x, ...) {

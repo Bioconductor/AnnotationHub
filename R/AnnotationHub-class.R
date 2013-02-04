@@ -168,7 +168,7 @@ setMethod("keys", "AnnotationHub", function(x, keytype) {
 
 
 setMethod("metadata", "AnnotationHub", function(x, ...) {
-    AnnotationHub:::.metadata(snapshotUrl(x), filters(x), keytypes=c("Title","Species",
+    .metadata(snapshotUrl(x), filters(x), keytypes=c("Title","Species",
                                             "TaxonomyId","Genome","Description",
                                             "Tags","RDataClass","Notes"))
 })
