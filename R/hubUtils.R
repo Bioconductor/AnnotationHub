@@ -59,20 +59,20 @@
 
 
 
-## metadata takes a filter list and keytypes and returns a DataFrame
-.metadata <- function(x, filters=list(), keytypes=c("Title","Species",
+## metadata takes a filter list and cols and returns a DataFrame
+.metadata <- function(x, filters=list(), cols=c("Title","Species",
                                            "TaxonomyId","Genome","Description",
                                            "Tags","RDataClass","Notes")) {
-    ## format keytypes
-    keytypes <- paste("cols",keytypes, sep="/", collapse="/")
+    ## format cols
+    cols <- paste("cols",cols, sep="/", collapse="/")
     ## then make a url
     url <- if (length(filters)>0 && filters!="" &&
                !is.null(filters)) { ## get some
         ## URL must be specific
         filters <- .makeURLFilters(filters)
-        paste(snapshotUrl(), "query", filters, keytypes, sep="/") ##vectorized?
+        paste(snapshotUrl(), "query", filters, cols, sep="/") ##vectorized?
     } else {## get all of them
-        paste(snapshotUrl(), "query", keytypes, sep="/")
+        paste(snapshotUrl(), "query", cols, sep="/")
     }
     ## get the metadata
     meta <- .parseJSON_file(url) ## list form (by row)

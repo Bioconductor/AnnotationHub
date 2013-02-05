@@ -160,6 +160,11 @@ setMethod("keytypes", "AnnotationHub", function(x) {
     .keytypes(snapshotUrl(x))
 })
 
+## For this cols does the same thing as keytypes
+setMethod("cols", "AnnotationHub", function(x) {
+    .keytypes(snapshotUrl(x))
+})
+
 setMethod("keys", "AnnotationHub", function(x, keytype) {
     if (!any(keytype %in% keytypes(x)))
         stop("invalid 'keytype', see keytypes(x)")
@@ -167,12 +172,12 @@ setMethod("keys", "AnnotationHub", function(x, keytype) {
 })
 
 
-setMethod("metadata", "AnnotationHub", function(x, keytypes, ...) {
-    if(missing(keytypes)){
-        keytypes <- c("Title","Species","TaxonomyId","Genome",
+setMethod("metadata", "AnnotationHub", function(x, cols, ...) {
+    if(missing(cols)){
+        cols <- c("Title","Species","TaxonomyId","Genome",
                       "Description","Tags","RDataClass","Notes")
     }
-    .metadata(snapshotUrl(x), filters(x), keytypes)
+    .metadata(snapshotUrl(x), filters(x), cols)
 })
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

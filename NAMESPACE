@@ -6,7 +6,7 @@ importFrom(Rcpp, loadModule)
 
 import(methods)
 
-importFrom(AnnotationDbi, exists, keys, keytypes)
+importFrom(AnnotationDbi, exists, keys, keytypes, cols)
 
 importFrom(IRanges, DataFrame)
 
@@ -32,6 +32,7 @@ exportMethods("$",
               hubResource,
               keys,
               keytypes,
+              cols,
               length,
               metadata,
               names,
