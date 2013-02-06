@@ -62,7 +62,7 @@
 ## metadata takes a filter list and cols and returns a DataFrame
 .metadata <- function(x, filters=list(), cols=c("Title","Species",
                                            "TaxonomyId","Genome","Description",
-                                           "Tags","RDataClass","Notes")) {
+                                           "Tags","RDataClass","Notes")) {    
     ## format cols
     cols <- paste("cols",cols, sep="/", collapse="/")
     ## then make a url

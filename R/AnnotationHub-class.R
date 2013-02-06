@@ -177,6 +177,10 @@ setMethod("metadata", "AnnotationHub", function(x, cols, ...) {
         cols <- c("Title","Species","TaxonomyId","Genome",
                       "Description","Tags","RDataClass","Notes")
     }
+    ## check cols to avoid user error (can't live in .metadata b/c of usage)
+    if(!all(cols %in% cols(x))){
+        stop("All cols arguments must be values returned by the cols method.")
+    }
     .metadata(snapshotUrl(x), filters(x), cols)
 })
 

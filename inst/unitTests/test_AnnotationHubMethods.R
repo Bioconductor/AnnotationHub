@@ -5,6 +5,7 @@
 ## debug(AnnotationHub:::.metadata)
 
 x <- AnnotationHub()
+
 ## m <- metadata(x, cols="Title")
 
 ##  What is the shortest example to DL? A: stamH3K4me3ProfilePromoters.RData
@@ -104,15 +105,25 @@ test_metadata <- function(){
     checkTrue(dim(resFull)[2] == dim(resPartial)[2])
     checkTrue(dim(resFull)[1] != dim(resPartial)[1])
 
-    ## TODO: add tests to spot check certain things are true about fakeData
+    ## does cols argument work?
+    resPartial2 <- metadata(x, cols="TaxonomyId")
+    checkTrue(dim(resPartial2)[2] == 1)
+    
+    resPartial3 <- metadata(x, cols=c("Title","TaxonomyId"))
+    checkTrue(dim(resPartial3)[2] == 2)
+
+    ## spot check that fakeData has correct metadata values
+    filters(x) <- NULL
+    filters(x) <- list(RDataPath="fakedata/data.bed_0.0.3.RData")
+    resPartial4 <- metadata(x)
+    checkTrue(resPartial4$Tags == "fake")
+    checkTrue(resPartial4$Species == "Homo sapiens")    
 }
 
 
 ## TODO: simplify getNewPathsBasedOnFilters()
 ## TODO: solve bug that prevents the using of multi-valued keys in the
 ## filter lists.
-
-
 
 
 
@@ -143,4 +154,17 @@ test_metadata <- function(){
 ## more testing
 
 ## library(AnnotationHub); x = AnnotationHub(); filters(x) <- list(TaxonomyId="9606")
+
+
+
+
+########################################################################
+## TODO: add tests for: caching, versionDate (and other accessors), 
+
+
+## PROBLEM: this filter breaks things (x$ no longer works after:)
+## filters(x) <- list(Title="Fake versioned data")
+
+## But this one DOES work (maybe because of whitespace?)
+## filters(x) <- list(RDataPath="fakedata/data.bed_0.0.3.RData")
 
