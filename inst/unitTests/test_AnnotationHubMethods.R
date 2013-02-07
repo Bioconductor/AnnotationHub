@@ -121,6 +121,7 @@ test_metadata <- function(){
 }
 
 
+
 ## TODO: simplify getNewPathsBasedOnFilters()
 ## TODO: solve bug that prevents the using of multi-valued keys in the
 ## filter lists.
@@ -130,22 +131,34 @@ test_metadata <- function(){
 ## TODO: add tests for:
 ## versionDate etc.  (make sure they are returning correct things).
 
+
 ## Add tests for caching (test to make sure caching works, and that my helpers to test if cache is present etc. are working)
 
 
 ## some debugging code for caching:
 
 
-##  library(AnnotationHub); x = AnnotationHub(); filters(x) <- list(TaxonomyId="9606",SourceFile= "pub/databases/ensembl/encode/supplementary/integration_data_jan2011/byDataType/footprints/jan2011/all.footprints.gz");
-
 ##  system.time(a <- x$pub.databases.ensembl.encode.supplementary.integration_data_jan2011.byDataType.footprints.jan2011.all.footprints_0.0.1.RData)  
 
+
+
+## 
+test_caching <- function(){
+    file <- "fakedata/data.bed_0.0.3.RData"
+    ## set to just the one file
+    filters(x) <- list(RDataPath=file)
+    ## now "get" the file
+    x$fakedata.data.bed_0.0.3.RData
+    ## now it *should* exist here:
+    path <- hubResource(x)    
+    ## so we should not be able to test if the file exists here or not.
+    checkTrue(file.exists(file.path(path, file)))
+}
 
 
 ##  FOR testing the caching. the test code should look at the dir that
 ##  is generated (we have helper for this), and see if the appropriate
 ##  dirs and files are being generated when code is run.
-
 
 
 
@@ -158,9 +171,22 @@ test_metadata <- function(){
 
 
 
-########################################################################
-## TODO: add tests for: caching, versionDate (and other accessors), 
 
+########################################################################
+## TODO: add tests for: caching 
+
+
+
+
+
+
+
+
+
+
+##########################################################################
+## OTHER ISSUES:
+##
 
 ## PROBLEM: this filter breaks things (x$ no longer works after:)
 ## filters(x) <- list(Title="Fake versioned data")
