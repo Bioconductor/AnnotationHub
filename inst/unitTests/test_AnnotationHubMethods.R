@@ -116,8 +116,8 @@ test_metadata <- function(){
     filters(x) <- NULL
     filters(x) <- list(RDataPath="fakedata/data.bed_0.0.3.RData")
     resPartial4 <- metadata(x)
-    checkTrue(resPartial4$Tags == "fake")
-    checkTrue(resPartial4$Species == "Homo sapiens")    
+    checkTrue(as.character(resPartial4$Tags) == "fake") 
+    checkTrue(as.character(resPartial4$Species) == "Homo sapiens")    
 }
 
 
@@ -148,7 +148,8 @@ test_caching <- function(){
     ## set to just the one file
     filters(x) <- list(RDataPath=file)
     ## now "get" the file
-    x$fakedata.data.bed_0.0.3.RData
+    x$fakedata.data.bed_0.0.3.RData   
+    
     ## now it *should* exist here:
     path <- hubResource(x)    
     ## so we should not be able to test if the file exists here or not.

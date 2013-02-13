@@ -81,7 +81,7 @@
 .getFilesThatMatchFilters <- function(x, filters) {    
     ## get the ResourcePath for each. item that comes back from .getMetadata
     meta <- metadata(x, filters, cols="RDataPath")
-    res <- unlist(meta)
+    res <- as.character(unlist(meta))
     setNames(res, make.names(res))
 }
 

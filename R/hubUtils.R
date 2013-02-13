@@ -4,7 +4,9 @@
 ## TODO: make this work and then replace all fromJSON calls with it.
 .parseJSON <- function(url){
     tryCatch({
-        fromJSON(url)
+        tmp <- tempfile()
+        download.file(url, tmp, quiet=TRUE)
+        fromJSON(paste0(readLines(tmp), collapse=""))
     }, error=function(err){
         stop("An error occured when parsing the JSON: ", err)
     } )
@@ -15,12 +17,12 @@
 ## .parseJSON("http://foo/bar")
 
 
-.parseJSON_file <- function(url)
-{
-    tmp <- tempfile()
-    download.file(url, tmp, quiet=TRUE)
-    .parseJSON(paste0(readLines(tmp), collapse=""))
-}
+## .parseJSON_file <- function(url)
+## {
+##     tmp <- tempfile()
+##     download.file(url, tmp, quiet=TRUE)
+##     .parseJSON(paste0(readLines(tmp), collapse=""))
+## }
 
 ## queries
 
@@ -75,7 +77,7 @@
         paste(snapshotUrl(), "query", cols, sep="/")
     }
     ## get the metadata
-    meta <- .parseJSON_file(url) ## list form (by row)
+    meta <- .parseJSON(url) ## list form (by row)
     
     ## make a data.frame (remove this later)
     if(class(meta)=="list"){
