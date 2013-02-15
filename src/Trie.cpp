@@ -1,40 +1,26 @@
 #include "Trie.h"
+#include <stdexcept>
 
-using namespace std;
+using namespace Rcpp;
 
-SEXP Trie::printTrie()
+// **************************************
+// build
+// **************************************
+void Trie::buildTrie(SEXP x)
 {
-    string_vec res;
-    string_vec *res_ptr;
-    res_ptr = &res;
+    string_vec args = Rcpp::as< string_vec >(x);
     Node* current = root;
-    current->printNodeDFS("", res_ptr);
-    return(Rcpp::wrap(res));
+    current->setParent(NULL);
+    std::vector<std::string>::const_iterator itr;
+    for(itr = args.begin(); itr != args.end(); itr++)
+        addWord(*itr);
+    compressTrie();
 }
 
-SEXP Trie::printTrie(SEXP x, int max)
-{
-    BEGIN_RCPP
-    if (max < 0)
-        throw std::range_error("'max' must be >= 0");
-
-    std::string s = Rcpp::as< std::string >(x);
-    string_vec res;
-    string_vec *res_ptr;
-    res_ptr = &res;
-    Node* current = root;
-    current = getPrefixNode(s);
-    if (current != 0)
-        current->printNodeBFS(s, res_ptr, max);
-    return(Rcpp::wrap(res));
-    END_RCPP
-}
-
-Node* Trie::getPrefixNode(std::string s)
+Node* Trie::findNode(std::string s)
 {
     Node* current = root;
-    for (unsigned int i = 0; i < s.length(); i++)
-    {
+    for (unsigned int i = 0; i < s.length(); i++) {
         Node* tmp = current->findChild(s[i]);
         if (tmp == NULL)
             return tmp;
@@ -55,24 +41,70 @@ void Trie::addWord(std::string s)
             current = child;
         } else {
             Node* tmp = new Node();
-            tmp->setValue(s[i]);
+            tmp->setValue(s.substr(i, 1));
             tmp->setParent(current);
             current->appendChild(tmp);
             current = tmp;
         }
-        if (i == s.length() - 1)
-            current->setWordMarker();
+        if (i == s.length() - 1) {
+            current->setCumwords(1);
+            current->setWord(true);
+        }
     }
 }
 
-void Trie::buildTrie(SEXP x)
+// **************************************
+// compression
+// **************************************
+void Trie::compressTrie()
 {
-    string_vec args = Rcpp::as< string_vec >(x);
     Node* current = root;
-    current->setParent(NULL);
-    std::vector<std::string>::const_iterator itr;
-    for(itr = args.begin(); itr != args.end(); itr++)
-        addWord(*itr);
+    if (current != NULL)
+        for (unsigned int i = 0; i < current->getChildren().size(); i++) {
+            Node* tmp = current->getChildren().at(i);
+            tmp->compressNode();
+        }
+}
+
+// **************************************
+// print
+// **************************************
+// print all words in trie
+SEXP Trie::printTrie()
+{
+    string_vec res;
+    string_vec *res_ptr;
+    res_ptr = &res;
+    Node* current = root;
+    current->printNodeDFS("", res_ptr);
+    return(Rcpp::wrap(res));
+}
+
+// print by prefix search 
+SEXP Trie::printTrie(SEXP x, unsigned int max)
+{
+    BEGIN_RCPP
+    if (max <= 0)
+        throw std::range_error("max must be >= 0");
+    std::string s = Rcpp::as< std::string >(x);
+    string_vec res;
+    string_vec *res_ptr;
+    res_ptr = &res;
+
+    Node* current = root;
+    // check the first level of children before full search
+    bool found = false;
+    for (unsigned int i = 0; i < current->getChildren().size(); i++) {
+        Node* tmp = current->getChildren().at(i);
+        if ((tmp->getValue().find(s) != std::string::npos) ||
+            (s.find(tmp->getValue()) != std::string::npos))
+            found = true;
+    }
+    // full search
+    if (found)
+        current->findPrefixNode(s)->printNodeBFS(s, res_ptr, max);
+    return(Rcpp::wrap(res));
+    END_RCPP
 }
 
 RCPP_MODULE(TrieModule){
@@ -82,7 +114,7 @@ RCPP_MODULE(TrieModule){
     .constructor()
     .method("buildTrie", &Trie::buildTrie,
         "Construct a Trie from a vector of strings")
-    .method("printTrie", (SEXP (Trie::*)(SEXP, int))(&Trie::printTrie))
+    .method("printTrie", (SEXP (Trie::*)(SEXP, unsigned int))(&Trie::printTrie))
     .method("printTrie", (SEXP (Trie::*)())(&Trie::printTrie))
     ;
 }

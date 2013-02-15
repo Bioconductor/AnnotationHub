@@ -6,7 +6,7 @@ using namespace Rcpp;
 class Trie {
 public:
     // constructor, destructor
-    Trie() {root = new Node();}
+    Trie() { root = new Node(); }
     ~Trie() 
     {
         Node* current = root;
@@ -16,12 +16,15 @@ public:
 
     // build
     void buildTrie(SEXP x);
-    void addWord(std::string s);
-    // search
-    Node* getPrefixNode(std::string s);
+    void addWord(std::string word);
+    Node* findNode(std::string s);
+
+    // compress
+    void compressTrie();
+
     // print
     SEXP printTrie();
-    SEXP printTrie(SEXP x, int max);
+    SEXP printTrie(SEXP x, unsigned int max);
 
 private:
     Node* root;
