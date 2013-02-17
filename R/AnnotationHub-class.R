@@ -12,7 +12,9 @@ setOldClass("package_version")          # needed for AnnotationHub definition
                                           snapshotDate="POSIXlt",
                                           snapshotPaths="character",
                                           filters="list"),
-                           prototype(hubCache = NA_character_))
+                           prototype(hubCache = NA_character_,
+                                     snapshotVersion=package_version("0.0"),
+                                     snapshotDate=as.POSIXlt("2012-01-01")))
 
 ## FIXME: validity -- filters
 
@@ -188,7 +190,10 @@ setMethod("metadata", "AnnotationHub", function(x, cols, ...) {
 ### tab completion and retrieval
 ###
 
-.DollarNames.AnnotationHub <- function(x, pattern="") {
+.DollarNames.AnnotationHub <- function(x, pattern="")
+{
+    ## match <- grep(pattern, names(x), value=TRUE)
+    ## .completion(pattern, match)
     grep(pattern, names(x), value=TRUE)
 }
 
