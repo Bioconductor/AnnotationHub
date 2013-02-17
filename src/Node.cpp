@@ -135,9 +135,9 @@ void Node::recordResult(string_vec* res_ptr)
         current = current->getParent();
     }
     if (word)
-        (*res_ptr).push_back("    " + newstring);
+        (*res_ptr).push_back(newstring);
     else
-        (*res_ptr).push_back("(" + nwords + ") " + newstring + "...");
+        (*res_ptr).push_back(newstring + "...[" + nwords + "]");
 }
 
 // **************************************
