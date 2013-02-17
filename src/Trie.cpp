@@ -6,9 +6,9 @@ using namespace Rcpp;
 // **************************************
 // build
 // **************************************
-void Trie::buildTrie(SEXP x)
+void Trie::buildTrie(CharacterVector x)
 {
-    string_vec args = Rcpp::as< string_vec >(x);
+    string_vec args = as< string_vec >(x);
     Node* current = root;
     current->setParent(NULL);
     std::vector<std::string>::const_iterator itr;
@@ -70,7 +70,7 @@ void Trie::compressTrie()
 // print
 // **************************************
 // print all words in trie
-SEXP Trie::printTrie()
+CharacterVector Trie::printTrie()
 {
     string_vec res;
     string_vec *res_ptr;
@@ -81,12 +81,12 @@ SEXP Trie::printTrie()
 }
 
 // print by prefix search 
-SEXP Trie::printTrie(SEXP x, unsigned int max)
+CharacterVector Trie::printTrie(CharacterVector x, unsigned int max)
 {
     BEGIN_RCPP
     if (max <= 0)
         throw std::range_error("max must be >= 0");
-    std::string s = Rcpp::as< std::string >(x);
+    std::string s = as< std::string >(x);
     string_vec res;
     string_vec *res_ptr;
     res_ptr = &res;
@@ -103,7 +103,7 @@ SEXP Trie::printTrie(SEXP x, unsigned int max)
     // full search
     if (found)
         current->findPrefixNode(s)->printNodeBFS(s, res_ptr, max);
-    return(Rcpp::wrap(res));
+    return wrap(res);
     END_RCPP
 }
 
@@ -111,10 +111,15 @@ RCPP_MODULE(TrieModule){
     using namespace Rcpp;
 
     class_<Trie>("Trie")
+
     .constructor()
+    .constructor<CharacterVector>()
+
     .method("buildTrie", &Trie::buildTrie,
         "Construct a Trie from a vector of strings")
-    .method("printTrie", (SEXP (Trie::*)(SEXP, unsigned int))(&Trie::printTrie))
-    .method("printTrie", (SEXP (Trie::*)())(&Trie::printTrie))
+    .method("printTrie",
+        (CharacterVector (Trie::*)(CharacterVector, unsigned int))
+            (&Trie::printTrie))
+    .method("printTrie", (CharacterVector (Trie::*)())(&Trie::printTrie))
     ;
 }

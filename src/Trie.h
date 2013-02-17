@@ -7,6 +7,10 @@ class Trie {
 public:
     // constructor, destructor
     Trie() { root = new Node(); }
+    Trie(SEXP x) {
+	root = new Node();
+	buildTrie(x);
+    }
     ~Trie() 
     {
         Node* current = root;
@@ -15,7 +19,7 @@ public:
     }
 
     // build
-    void buildTrie(SEXP x);
+    void buildTrie(CharacterVector x);
     void addWord(std::string word);
     Node* findNode(std::string s);
 
@@ -23,8 +27,8 @@ public:
     void compressTrie();
 
     // print
-    SEXP printTrie();
-    SEXP printTrie(SEXP x, unsigned int max);
+    CharacterVector printTrie();
+    CharacterVector printTrie(CharacterVector x, unsigned int max);
 
 private:
     Node* root;
