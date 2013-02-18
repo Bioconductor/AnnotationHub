@@ -60,7 +60,7 @@ setMethod("hubCache", "AnnotationHub", function(x, ...) {
         withCallingHandlers({
             normalizePath(value)
         }, warning = function(w) {
-            if (!file.exists(value) || !file.info(value)$is.dir) {
+            if (!isTRUE(file.info(value)$isdir)) {
                 msg <- "'value' does not exist or is not a directory, see ?hubCache"
                 warning(msg)
             } else warning(w)
@@ -109,8 +109,9 @@ setMethod("possibleDates", "AnnotationHub", function(x, ...) {
     if (!snapshotDate %in% possibleDates)
         stop("'value' is not in possibleDates(x)")
 
-    paths <- metadata(x)$RDataPath
-    snapshotPaths <- setNames(urls, make.names(paths))
+    snapshotUrl <- .snapshotUrl(.hubUrl(), snapshotVersion(x),
+                                snapshotDate)
+    snapshotPaths <- .snapshotPaths(snapshotUrl)
     if (0L == length(snapshotPaths))
         stop("no 'snapshotPaths' for 'snapshotDate' and 'filters'")
 

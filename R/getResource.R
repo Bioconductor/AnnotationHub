@@ -57,7 +57,7 @@
 
     ## get
     localPath <- hubResource(x, path, cached=TRUE)
-    FaFile(localPath)
+    Rsamtools::FaFile(localPath)
 }
 
 ## $ is called on enter; this gets the data

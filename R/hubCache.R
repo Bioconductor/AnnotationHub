@@ -3,7 +3,7 @@
 }
 
 .hubCacheExists <- function(filePath) {
-    !is.na(filePath) && file.exists(filePath) && is.dir(filePath)
+    !is.na(filePath) && isTRUE(file.info(filePath)$isdir)
 }
 
 setMethod("hubCache", "missing", function(x, ...) .hubCache())

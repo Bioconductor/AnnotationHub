@@ -2,10 +2,9 @@ Package: AnnotationHub
 Type: Package
 Title: A client for retrieving Bioconductor objects from AnnotationHub
 Version: 0.0.29
-Depends: Biobase
 Imports: methods, stats, utils, rjson, BiocGenerics, BiocInstaller,
     IRanges, AnnotationDbi
-Suggests: RUnit, RCurl
+Suggests: RUnit, RCurl, Rsamtools
 Author: Marc Carlson 
 Maintainer: Marc Carlson <mcarlson@fhcrc.org>
 Description: A client for retrieving data from the Bioconductor
