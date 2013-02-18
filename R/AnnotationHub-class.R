@@ -190,11 +190,12 @@ setMethod("metadata", "AnnotationHub", function(x, cols, ...) {
 ### tab completion and retrieval
 ###
 
-.DollarNames.AnnotationHub <- function(x, pattern="")
+.DollarNames.AnnotationHub <-
+    function(x, pattern="")
 {
-    ## match <- grep(pattern, names(x), value=TRUE)
-    ## .completion(pattern, match)
-    grep(pattern, names(x), value=TRUE)
+    pattern <- sub(" ... \\[\\d+\\]$", "", pattern)
+    values <- grep(pattern, names(x), value=TRUE)
+    .complete(values)
 }
 
 setMethod("$", "AnnotationHub", .getResource)

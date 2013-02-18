@@ -1,13 +1,11 @@
 Package: AnnotationHub
 Type: Package
 Title: A client for retrieving Bioconductor objects from AnnotationHub
-Version: 0.0.28
-Depends: Rcpp (>= 0.10.1), Biobase
-Imports: methods, stats, utils, BiocGenerics, IRanges, rjson, AnnotationDbi, 
-	 IRanges, BiocInstaller
+Version: 0.0.29
+Depends: Biobase
+Imports: methods, stats, utils, rjson, BiocGenerics, BiocInstaller,
+    IRanges, AnnotationDbi
 Suggests: RUnit, RCurl
-LinkingTo: Rcpp
-RcppModules: TrieModule 
 Author: Marc Carlson 
 Maintainer: Marc Carlson <mcarlson@fhcrc.org>
 Description: A client for retrieving data from the Bioconductor
@@ -16,6 +14,7 @@ Collate: AllGenerics.R
     hubUtils.R
     hubCache.R
     filter.R
+    completion.R
     getResource.R
     AnnotationHub-class.R
     test_AnnotationHub_package.R

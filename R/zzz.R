@@ -13,8 +13,3 @@
         options(AnnotationHub.Cache=cache)
     }
 }
-
-
-## Load cpp Trie module
-loadModule("TrieModule", TRUE)
-
