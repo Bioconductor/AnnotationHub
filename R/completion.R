@@ -1,18 +1,19 @@
 .longestCommonPrefix <-
     function(x)
 {
-    ## find longest common prefix shared by elements of character
-    ## vector x
+    n <- length(x)
     if (length(x) > 1L) {
-        for (i in seq_len(min(nchar(x))))
-            if (length(unique(substring(x, 1, i))) != 1L)
-                break
-        x <- substring(x, 1L, i - 1L)
+        x <- sort(x)
+        x1 <- strsplit(x[[1]], "")[[1L]]
+        xN <- strsplit(x[[length(x)]], "")[[1L]]
+        idx <- seq_len(min(length(x1), length(xN)))
+        i <- which.min(c(x1[idx] == xN[idx], FALSE)) # 'FALSE' protects x1 == xN
+        x <- substring(x[[1L]], 1L, i - 1L)
     }
-    table(x)
+    setNames(n, x)
 }
 
-.complete <-
+.completion <-
     function(hubNames)
 {
     ## shared prefix

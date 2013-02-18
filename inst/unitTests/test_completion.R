@@ -1,4 +1,4 @@
-test_completions <- function()
+test_completion <- function()
 {
     fun <- AnnotationHub:::.DollarNames.AnnotationHub
     x <- setNames(1:3, c("abc", "acd", "ade"))
@@ -11,4 +11,8 @@ test_completions <- function()
     checkIdentical(exp, fun(x, "^"))
     checkIdentical(exp, fun(x, "^a"))
     checkIdentical("ade", fun(x, "^ad"))
+
+    x <- c("aaa", "aaa")
+    fun1 <- AnnotationHub:::.longestCommonPrefix
+    checkIdentical(setNames(length(x), x[[1]]), fun1(x))
 }

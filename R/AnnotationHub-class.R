@@ -196,7 +196,7 @@ setMethod("metadata", "AnnotationHub", function(x, cols, ...) {
 {
     pattern <- sub(" ... \\[\\d+\\]$", "", pattern)
     values <- grep(pattern, names(x), value=TRUE)
-    .complete(values)
+    .completion(values)
 }
 
 setMethod("$", "AnnotationHub", .getResource)
