@@ -1,11 +1,14 @@
+.strsplit0 <- function(x)
+    strsplit(x, "", fixed=TRUE)
+
 .longestCommonPrefix <-
     function(x)
 {
     n <- length(x)
     if (length(x) > 1L) {
         x <- sort(x)
-        x1 <- strsplit(x[[1]], "")[[1L]]
-        xN <- strsplit(x[[length(x)]], "")[[1L]]
+        x1 <- .strsplit0(x[[1]])[[1L]]
+        xN <- .strsplit0(x[[length(x)]])[[1L]]
         idx <- seq_len(min(length(x1), length(xN)))
         i <- which.min(c(x1[idx] == xN[idx], FALSE)) # 'FALSE' protects x1 == xN
         x <- substring(x[[1L]], 1L, i - 1L)
