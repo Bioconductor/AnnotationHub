@@ -199,7 +199,14 @@ setMethod("metadata", "AnnotationHub", function(x, cols, ...) {
     .completion(values)
 }
 
-setMethod("$", "AnnotationHub", .getResource)
+setMethod("$", "AnnotationHub", function(x, name){.getResource(x,name)})
+
+setMethod("[[", "AnnotationHub",
+          function(x, i, j, ...){
+              if (nargs() >= 3) stop("too many subscripts")
+              .getResource(x, name=i)
+          }
+)
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### The "show" method.

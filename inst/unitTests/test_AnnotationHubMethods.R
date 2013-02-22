@@ -39,6 +39,11 @@ test_getResource <- function(){
     name <- "goldenpath.hg19.encodeDCC.wgEncodeRikenCage.wgEncodeRikenCage"
     suppressWarnings(res2 <- AnnotationHub:::.getResource(x, name))
     checkTrue(class(res2) == "character")
+
+    ## check the two accessor methods
+    foo <- x$fakedata.data.bed_0.0.3.RData
+    bar <- x[["fakedata.data.bed_0.0.3.RData"]]
+    checkTrue(identical(foo, bar))
 }
 
 
