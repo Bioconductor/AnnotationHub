@@ -6,6 +6,17 @@
 
 x <- AnnotationHub()
 
+sampleFile <- paste("goldenpath/hg19/encodeDCC/wgEncodeUwTfbs",
+                   "wgEncodeUwTfbsMcf7CtcfStdPkRep1.narrowPeak_0.0.1.RData",
+                  sep="/")
+sampleFileDot <- paste("goldenpath.hg19.encodeDCC.wgEncodeUwTfbs",
+                   "wgEncodeUwTfbsMcf7CtcfStdPkRep1.narrowPeak_0.0.1.RData",
+                  sep=".")
+
+sampleSource <- paste("pub/databases/ensembl/encode/supplementary",
+    "integration_data_jan2011/byDataType/footprints/jan2011/all.footprints.gz",
+    sep="/")
+
 ## m <- metadata(x, cols="Title")
 
 ##  What is the shortest example to DL? A: stamH3K4me3ProfilePromoters.RData
@@ -17,8 +28,7 @@ test_filters <- function(){
     checkTrue(length(filters(x))==0)
     ## then add a filter
     filters(x) <- list(TaxonomyId="9606",
-        SourceFile=
-        "pub/databases/ensembl/encode/supplementary/integration_data_jan2011/byDataType/footprints/jan2011/all.footprints.gz")
+        SourceFile=sampleSource)
     checkTrue(length(filters(x))==2)
     ## can we set them back to nothing?
     filters(x) <- NULL
@@ -31,8 +41,7 @@ test_filters <- function(){
 test_getResource <- function(){
     ## try a specific name
 #    name <- "pub.databases.ensembl.encode.supplementary.integration_data_jan2011.byDataType.openchrom.jan2011.promoter_predictions.master_known.bed_0.0.1.RData"
-    altName <- "fakedata.data.bed_0.0.3.RData" 
-    res <- AnnotationHub:::.getResource(x, altName)
+    res <- AnnotationHub:::.getResource(x, sampleFileDot)
     checkTrue(class(res) == "GRanges")
     
     ## try a less specific name    
@@ -41,8 +50,8 @@ test_getResource <- function(){
     checkTrue(class(res2) == "character")
 
     ## check the two accessor methods
-    foo <- x$fakedata.data.bed_0.0.3.RData
-    bar <- x[["fakedata.data.bed_0.0.3.RData"]]
+    foo <- x$goldenpath.hg19.encodeDCC.wgEncodeUwTfbs.wgEncodeUwTfbsMcf7CtcfStdPkRep1.narrowPeak_0.0.1.RData
+    bar <- x[[sampleFileDot]]
     checkTrue(identical(foo, bar))
 }
 
@@ -117,11 +126,13 @@ test_metadata <- function(){
     resPartial3 <- metadata(x, cols=c("Title","TaxonomyId"))
     checkTrue(dim(resPartial3)[2] == 2)
 
-    ## spot check that fakeData has correct metadata values
+    ## spot check that a data file has correct metadata values
     filters(x) <- NULL
-    filters(x) <- list(RDataPath="fakedata/data.bed_0.0.3.RData")
+    filters(x) <- list(RDataPath=sampleFile)
     resPartial4 <- metadata(x)
-    checkTrue(as.character(resPartial4$Tags) == "fake") 
+
+    ## this will change soon:
+    checkEquals(resPartial4$Tags[[1]], "CTCF|MCF-7|wgEncodeUwTfbs|std|wgEncodeEH000968|ChipSeq|ENCODE Mar 2012 Freeze|2011-07-29|2012-04-28|wgEncodeEH002057|GSM1022658|Stam|UW|DS16200|lmax-v1.0|f2e1890897b03a2fd59a60948dbba044|hg19|wgEncode|1|exp|991000|4677|wgEncodeUwTfbsMcf7CtcfStdPkRep1|None|narrowPeak|Peaks|wgEncodeUwTfbs")
     checkTrue(as.character(resPartial4$Species) == "Homo sapiens")    
 }
 
@@ -149,16 +160,15 @@ test_metadata <- function(){
 
 ## 
 test_caching <- function(){
-    file <- "fakedata/data.bed_0.0.3.RData"
     ## set to just the one file
-    filters(x) <- list(RDataPath=file)
+    filters(x) <- list(RDataPath=sampleFile)
     ## now "get" the file
-    x$fakedata.data.bed_0.0.3.RData   
+    x[[sampleFileDot]]
     
     ## now it *should* exist here:
     path <- hubResource(x)    
     ## so we should not be able to test if the file exists here or not.
-    checkTrue(file.exists(file.path(path, file)))
+    checkTrue(file.exists(file.path(path, sampleFile)))
 }
 
 
@@ -200,3 +210,4 @@ test_caching <- function(){
 ## But this one DOES work (maybe because of whitespace?)
 ## filters(x) <- list(RDataPath="fakedata/data.bed_0.0.3.RData")
 
+## NOTE: fakeData is being removed.
