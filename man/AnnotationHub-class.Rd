@@ -175,43 +175,43 @@
 }
 
 \examples{
-## look at the object
-AnnotationHub
+% ## look at the object
+% AnnotationHub
 
-## get the current species
-species(AnnotationHub)
+% ## get the current species
+% species(AnnotationHub)
 
-## look up available species with their tax ids
-availableUniprotSpecies("musculus")
+% ## look up available species with their tax ids
+% availableUniprotSpecies("musculus")
 
-## get the current taxId
-taxId(AnnotationHub)
+% ## get the current taxId
+% taxId(AnnotationHub)
 
-## look up the species that goes with a tax id
-lookupUniprotSpeciesFromTaxId(9606)
+% ## look up the species that goes with a tax id
+% lookupUniprotSpeciesFromTaxId(9606)
 
-## set the taxId to something else
-taxId(AnnotationHub) <- 10090
-AnnotationHub
+% ## set the taxId to something else
+% taxId(AnnotationHub) <- 10090
+% AnnotationHub
 
-## list the possible key types
-head(keytypes(AnnotationHub))
+% ## list the possible key types
+% head(keytypes(AnnotationHub))
 
-## list the cols that can be retreived
-head(cols(AnnotationHub))
+% ## list the cols that can be retreived
+% head(cols(AnnotationHub))
 
-## list all possible keys of type entrez gene ID.
-## (this process is not instantaneous)
-if(interactive()){
-  egs = keys(AnnotationHub, "ENTREZ_GENE")
-}
+% ## list all possible keys of type entrez gene ID.
+% ## (this process is not instantaneous)
+% if(interactive()){
+%   egs = keys(AnnotationHub, "ENTREZ_GENE")
+% }
 
-## use select to extract some data
-  keys <- c('1','2')
-  cols <- c("PDB","UNIGENE","SEQUENCE")
-  kt <- "ENTREZ_GENE"
-  res <- select(AnnotationHub, keys, cols, kt)
-  head(res)
+% ## use select to extract some data
+%   keys <- c('1','2')
+%   cols <- c("PDB","UNIGENE","SEQUENCE")
+%   kt <- "ENTREZ_GENE"
+%   res <- select(AnnotationHub, keys, cols, kt)
+%   head(res)
 }
 
 
