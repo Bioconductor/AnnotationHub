@@ -31,7 +31,7 @@
 \alias{hubCache<-,AnnotationHub, character-method}
 
 
-\alias{hubResource} 
+\alias{hubResource}   % Do we really want to export this?
 \alias{hubResource,AnnotationHub-method}
 \alias{hubResource,missing-method}
 
@@ -85,59 +85,23 @@
   class and then apply filters on it in order to narrow down their
   annotation options to an amount that a human can reasonably look at.
 
+  Once an \code{AnnotationHub} is created, the user can see what
+  resources are available by tab completion using the \code{$}
+  argument.  But before doing that, it is usually a good idea to use the
+  \code{filters} method to set some restrictions.
 
-  
+  What kind of restrictions?  Well those can be listed by using the
+  \code{cols} and \code{keys} methods to list them.  Possible values for
+  those can be found by using \code{keys}.
 
-%   In much the same way as an \code{AnnotationDb} object allows acces to
-%   select for many other annotation packages, \code{AnnotationHub} is meant
-%   to allow usage of \code{select} methods and other supporting methods
-%   to enable the easy extraction of data from the Uniprot web services.
+  Once this is determined, a list object can be assigned using
+  \code{filters<-}.  The list needs to be named after values returned by
+  the \code{cols} and \code{keys} methods, and to contain character
+  vectors that contain results from the matching \code{keys} method.
 
-%   \code{select}, \code{cols} and \code{keys} are used together to
-%   extract data via an \code{AnnotationHub} object. 
-
-%   \code{cols} shows which kinds of data can be returned for the
-%   \code{AnnotationHub} object.
-  
-%   \code{keytypes} allows the user to discover which keytypes can be
-%   passed in to \code{select} or \code{keys} via the \code{keytype}
-%   argument.
-  
-%   \code{keys} returns keys for the database contained in the
-%   \code{AnnotationHub} object .  By default it will return the primary keys
-%   for the database, which are UNIPROTKB keys, but if used with the
-%   \code{keytype} argument, it will return the keys from that keytype.
-  
-%   \code{select} will retrieve the data as a data.frame based on
-%   parameters for selected \code{keys} and \code{cols} and \code{keytype}
-%   arguments.
-  
-%   The \code{AnnotationHub} will be loaded whenever you load the
-%   \code{AnnotationHub} package.  This object will be set up to retrieve
-%   information from Homo sapiens by default, but this value can be
-%   changed to any of the species supported by Uniprot.  The
-%   \code{species} and \code{taxId} methods allow users to see what
-%   species is currently being accessed, and \code{taxId<-} allows them to
-%   change this value.
-  
-%   \code{species} shows the genus and species label currently attached to
-%   the \code{AnnotationHub} objects database.
-  
-%   \code{taxId} shows the NCBI taxonomy ID currently attached to
-%   the \code{AnnotationDb} objects database.  Using the equivalently
-%   names replace method (\code{taxId<-}) allows the user to change the
-%   taxon ID, and the species represented along with it.
-  
-%   \code{availableUniprotSpecies} is a helper function to list out the
-%   available Species along with their official taxonomy IDs that are
-%   available by Uniprot.  Because there are so many species represented
-%   at UniProt, there is also a pattern argument that can be used to
-%   restrict the range of things returned to be only those whose species
-%   names match the searth term.  Please remember when using this argument
-%   that the Genus is always capitalized and the species never is.
-  
-%   \code{lookupUniprotSpeciesFromTaxId} is another helper that will look
-%   up the species of any tax ID that is supported by Uniprot.
+  All \code{AnnotationHub} have a snapshot date that by default is set
+  to the most recent one.  The \code{snapshotDate} method indicates
+  which one is in use, but this value can also be set to previous dates.
   
 }
 
@@ -179,48 +143,52 @@
 
 \author{Marc Carlson}
 
-\seealso{
-  \code{select}
-}
 
 \examples{
-% ## look at the object
-% AnnotationHub
+  ## create an AnnotationHub object
+  library(AnnotationHub)
+  ah = AnnotationHub()
 
-% ## get the current species
-% species(AnnotationHub)
+  ## what is the version of this snapshot?
+  snapshotVersion(ah)
 
-% ## look up available species with their tax ids
-% availableUniprotSpecies("musculus")
+  ## and what is the date we are using?
+  snapshotDate(ah)
 
-% ## get the current taxId
-% taxId(AnnotationHub)
+  ## how many resources?
+  length(ah)
 
-% ## look up the species that goes with a tax id
-% lookupUniprotSpeciesFromTaxId(9606)
+  ## list currently active filters
+  filters(ah)
 
-% ## set the taxId to something else
-% taxId(AnnotationHub) <- 10090
-% AnnotationHub
+  ## list values that can be used to filter on:
+  cols(ah)
+  keytypes(ah)
 
-% ## list the possible key types
-% head(keytypes(AnnotationHub))
+  ## list possible values for one of these filter types
+  head(keys(ah, keytype="Species"))
 
-% ## list the cols that can be retreived
-% head(cols(AnnotationHub))
+  ## create and apply a new filter to only include mice and men
+  filters(ah) <- list(Species=c("Homo sapiens","Mus musculus"))
 
-% ## list all possible keys of type entrez gene ID.
-% ## (this process is not instantaneous)
-% if(interactive()){
-%   egs = keys(AnnotationHub, "ENTREZ_GENE")
-% }
+  ## how many resources now?
+  length(ah)
 
-% ## use select to extract some data
-%   keys <- c('1','2')
-%   cols <- c("PDB","UNIGENE","SEQUENCE")
-%   kt <- "ENTREZ_GENE"
-%   res <- select(AnnotationHub, keys, cols, kt)
-%   head(res)
+  ## what are the names for these resources?
+  head(names(ah))
+
+  ## and where are they online?
+  head(snapshotUrls(ah))
+
+  ## what web service is this AnnotationHub pointing to?
+  hubUrl()
+  ## and more explicitly
+  snapshotUrl()
+
+  ## Where are the files that get downloaded being cached?
+  ## (there is also a setter if you wish to change this to another location)
+  hubCache(ah)
+
 }
 
 
