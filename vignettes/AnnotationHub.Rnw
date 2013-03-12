@@ -1,0 +1,181 @@
+%\VignetteIndexEntry{AnnotationHub: A client package for retrieving data from the AnnotationHub web service}
+%\VignetteDepends{AnnotationHub}
+
+\documentclass[11pt]{article}
+
+\usepackage{Sweave}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{graphics}
+\usepackage{latexsym, amsmath, amssymb}
+\usepackage{authblk}
+\usepackage[colorlinks=true, linkcolor=Blue, urlcolor=Blue,
+  citecolor=Blue]{hyperref}
+
+%% Simple macros
+
+\newcommand{\code}[1]{{\texttt{#1}}}
+\newcommand{\file}[1]{{\texttt{#1}}}
+
+\newcommand{\software}[1]{\textsl{#1}}
+\newcommand\R{\textsl{R}}
+\newcommand\Bioconductor{\textsl{Bioconductor}}
+\newcommand\Rpackage[1]{{\textsl{#1}\index{#1 (package)}}}
+\newcommand\Biocpkg[1]{%
+  {\href{http://bioconductor.org/packages/devel/bioc/html/#1.html}%
+    {\textsl{#1}}}%
+  \index{#1 (package)}}
+\newcommand\Rpkg[1]{%
+  {\href{http://cran.fhcrc.org/web/devel/#1/index.html}%
+    {\textsl{#1}}}%
+  \index{#1 (package)}}
+\newcommand\Biocdatapkg[1]{%
+  {\href{http://bioconductor.org/packages/devel/data/experiment/html/#1.html}%
+    {\textsl{#1}}}%
+  \index{#1 (package)}}
+\newcommand\Robject[1]{{\small\texttt{#1}}}
+\newcommand\Rclass[1]{{\textit{#1}\index{#1 (class)}}}
+\newcommand\Rfunction[1]{{{\small\texttt{#1}}\index{#1 (function)}}}
+\newcommand\Rmethod[1]{{\texttt{#1}}}
+\newcommand\Rfunarg[1]{{\small\texttt{#1}}}
+\newcommand\Rcode[1]{{\small\texttt{#1}}}
+
+%% Question, Exercise, Solution
+\usepackage{theorem}
+\theoremstyle{break}
+\newtheorem{Ext}{Exercise}
+\newtheorem{Question}{Question}
+
+
+\newenvironment{Exercise}{
+  \renewcommand{\labelenumi}{\alph{enumi}.}\begin{Ext}%
+}{\end{Ext}}
+\newenvironment{Solution}{%
+  \noindent\textbf{Solution:}\renewcommand{\labelenumi}{\alph{enumi}.}%
+}{\bigskip}
+
+
+
+
+\title{AnnotationHub: A client package for retrieving data from the
+  AnnotationHub web service}
+\author{Marc Carlson}
+
+\SweaveOpts{keep.source=TRUE}
+\begin{document}
+
+\maketitle
+
+\section{Configuring  \Robject{AnnotationHub}}
+
+The \Rpackage{AnnotationHub} package provides a client interface to
+resources stored at the AnnotationHub web service.
+
+<<loadPkg>>=
+library(AnnotationHub)
+@ 
+
+The \Rpackage{AnnotationHub} package is straightforward to use.  The
+1st thing you need to do to make use of it is to create an
+\Robject{AnnotationHub} object like this:
+
+<<makeObject>>=
+ah = AnnotationHub()
+@ 
+
+When you create the \Robject{AnnotationHub} object, it will set up the
+object for you with some default settings.  If you look at the object
+you will see some helpful information about it.
+
+<<show>>=
+AnnotationHub
+@ 
+
+By default, you can see that the \Robject{AnnotationHub} object is set
+to the latest snapshotData and a snapshot version that matches the
+version of Bioconductor that you are using.  You can also learn about
+these data with the appropriate methods.
+
+<<snapshot>>=
+snapshotVersion(ah)
+snapshotDate(ah)
+@ 
+
+If you are interested in using an older version of a snapshot, you can
+list previous versions with the \Rmethod{possibleDates} like this:
+
+<<possibleDates>>=
+possibleDates(ah)
+@ 
+
+And then you can set the dates like this:
+
+<<setdate>>=
+snapshotDate(ah) <- "2013-01-22"
+@ 
+
+
+\section{exploring and setting filters for  \Robject{AnnotationHub}}
+
+If you are interested in how many annotation resources are currently
+available for your \Robject{AnnotationHub} object, you can just take
+the length like this:
+
+<<length>>=
+length(ah)
+@ 
+
+Similarly, there are also methods to show the resource names, or even
+the full set of resource URLs for available resources.
+
+<<listResources>>=
+head(names(ah))
+head(snapshotUrls(ah))
+@ 
+
+But for most users, the number of resources available is going to be
+simply overwhelming.  How should we cut this data set down to size?
+For this task, we introduce filters.  Every \Robject{AnnotationHub}
+object contains a list of filters that can be configured to control
+which resources it can return. By defauly this list is empty, which
+means you get everything.
+
+<<baseFilters>>=
+filters(ah)
+@ 
+
+How can we learn which things are available for filtering?  For this
+we have defined \Rmethod{cols} and \Rmethod{keytypes} methods, which
+will list all the kinds of data that can be filtered on.
+
+<<colsAndKeytypes>>=
+cols(ah)
+keytypes(ah)
+@ 
+
+Once we know which things can be used to filter on, we can extract
+values that these things can be required to match.  For this task, we
+have defined a \Rmethod{key} method.
+
+<<keys>>=
+head(keys(ah, keytype="Species"))
+@ 
+
+Now we are able to construct and assign a filter to our \Robject{AnnotationHub}
+object.
+
+<<filtersSet>>=
+filters(ah) <- list(Species=c("Homo sapiens","Mus musculus"))
+@ 
+
+
+
+\section{Using \Robject{AnnotationHub} to retrieve data}
+
+
+
+
+\end{document}
+
+
+
+
