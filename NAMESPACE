@@ -41,3 +41,4 @@ exportMethods("$",
               )
 
 export(AnnotationHub)
+
