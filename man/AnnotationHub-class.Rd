@@ -1,4 +1,4 @@
-\name{AnnoationHub-objects}
+\name{AnnotationHub-objects}
 \docType{class}
 
 % Classes
@@ -20,139 +20,148 @@
 
 \alias{hubUrl} 
 \alias{hubUrl,AnnotationHub-method}
+\alias{hubUrl,missing-method}
 
 \alias{hubCache}
 \alias{hubCache,AnnotationHub-method}
+\alias{hubCache,missing-method}
 \alias{hubCache<-}
 \alias{hubCache<-,AnnotationHub-method}
+\alias{hubCache<-,missing-method}
+\alias{hubCache<-,AnnotationHub, character-method}
+
 
 \alias{hubResource} 
 \alias{hubResource,AnnotationHub-method}
+\alias{hubResource,missing-method}
 
-\alias{keys,AnnotationHub-method}
+\alias{cols,AnnotationHub-method}
 
 \alias{keytypes,AnnotationHub-method}
 
-\alias{cols,AnnotationHub-method}
+\alias{keys,AnnotationHub-method}
 
 \alias{length,AnnotationHub-method}
 
 \alias{metadata,AnnotationHub-method}
+\alias{metadata,missing-method}
 
 \alias{names,AnnotationHub-method}
 
 \alias{possibleDates}
 \alias{possibleDates,AnnotationHub-method}
+\alias{possibleDates,missing-method}
 
 \alias{snapshotDate}
 \alias{snapshotDate,AnnotationHub-method}
+\alias{snapshotDate,missing-method}
 \alias{snapshotDate<-}
 \alias{snapshotDate<-,AnnotationHub-method}
 
 \alias{snapshotPaths}
 \alias{snapshotPaths,AnnotationHub-method}
+\alias{snapshotPaths,missing-method}
 
 \alias{snapshotUrl}
 \alias{snapshotUrl,AnnotationHub-method}
+\alias{snapshotUrl,missing-method}
 
 \alias{snapshotUrls}
 \alias{snapshotUrls,AnnotationHub-method}
 
 \alias{snapshotVersion}
 \alias{snapshotVersion,AnnotationHub-method}
+\alias{snapshotVersion,missing-method}
 
 
-
-% supporting functions
-\alias{availableUniprotSpecies}
-\alias{lookupUniprotSpeciesFromTaxId}
 
 
 \title{AnnotationHub objects and their related methods and functions}
 
 \description{
-  \code{AnnotationHub} is the base class for interacting with the Uniprot
-  web services from Bioconductor.
+  \code{AnnotationHub} is the base class for interacting with the
+  AnnotationHub services using Bioconductor.  When using the
+  \code{AnnotationHub} package, users will create an instance of this
+  class and then apply filters on it in order to narrow down their
+  annotation options to an amount that a human can reasonably look at.
 
-  In much the same way as an \code{AnnotationDb} object allows acces to
-  select for many other annotation packages, \code{AnnotationHub} is meant
-  to allow usage of \code{select} methods and other supporting methods
-  to enable the easy extraction of data from the Uniprot web services.
 
-  \code{select}, \code{cols} and \code{keys} are used together to
-  extract data via an \code{AnnotationHub} object. 
+  
 
-  \code{cols} shows which kinds of data can be returned for the
-  \code{AnnotationHub} object.
+%   In much the same way as an \code{AnnotationDb} object allows acces to
+%   select for many other annotation packages, \code{AnnotationHub} is meant
+%   to allow usage of \code{select} methods and other supporting methods
+%   to enable the easy extraction of data from the Uniprot web services.
+
+%   \code{select}, \code{cols} and \code{keys} are used together to
+%   extract data via an \code{AnnotationHub} object. 
+
+%   \code{cols} shows which kinds of data can be returned for the
+%   \code{AnnotationHub} object.
   
-  \code{keytypes} allows the user to discover which keytypes can be
-  passed in to \code{select} or \code{keys} via the \code{keytype}
-  argument.
+%   \code{keytypes} allows the user to discover which keytypes can be
+%   passed in to \code{select} or \code{keys} via the \code{keytype}
+%   argument.
   
-  \code{keys} returns keys for the database contained in the
-  \code{AnnotationHub} object .  By default it will return the primary keys
-  for the database, which are UNIPROTKB keys, but if used with the
-  \code{keytype} argument, it will return the keys from that keytype.
+%   \code{keys} returns keys for the database contained in the
+%   \code{AnnotationHub} object .  By default it will return the primary keys
+%   for the database, which are UNIPROTKB keys, but if used with the
+%   \code{keytype} argument, it will return the keys from that keytype.
   
-  \code{select} will retrieve the data as a data.frame based on
-  parameters for selected \code{keys} and \code{cols} and \code{keytype}
-  arguments.
+%   \code{select} will retrieve the data as a data.frame based on
+%   parameters for selected \code{keys} and \code{cols} and \code{keytype}
+%   arguments.
   
-  The \code{AnnotationHub} will be loaded whenever you load the
-  \code{AnnotationHub} package.  This object will be set up to retrieve
-  information from Homo sapiens by default, but this value can be
-  changed to any of the species supported by Uniprot.  The
-  \code{species} and \code{taxId} methods allow users to see what
-  species is currently being accessed, and \code{taxId<-} allows them to
-  change this value.
+%   The \code{AnnotationHub} will be loaded whenever you load the
+%   \code{AnnotationHub} package.  This object will be set up to retrieve
+%   information from Homo sapiens by default, but this value can be
+%   changed to any of the species supported by Uniprot.  The
+%   \code{species} and \code{taxId} methods allow users to see what
+%   species is currently being accessed, and \code{taxId<-} allows them to
+%   change this value.
   
-  \code{species} shows the genus and species label currently attached to
-  the \code{AnnotationHub} objects database.
+%   \code{species} shows the genus and species label currently attached to
+%   the \code{AnnotationHub} objects database.
   
-  \code{taxId} shows the NCBI taxonomy ID currently attached to
-  the \code{AnnotationDb} objects database.  Using the equivalently
-  names replace method (\code{taxId<-}) allows the user to change the
-  taxon ID, and the species represented along with it.
+%   \code{taxId} shows the NCBI taxonomy ID currently attached to
+%   the \code{AnnotationDb} objects database.  Using the equivalently
+%   names replace method (\code{taxId<-}) allows the user to change the
+%   taxon ID, and the species represented along with it.
   
-  \code{availableUniprotSpecies} is a helper function to list out the
-  available Species along with their official taxonomy IDs that are
-  available by Uniprot.  Because there are so many species represented
-  at UniProt, there is also a pattern argument that can be used to
-  restrict the range of things returned to be only those whose species
-  names match the searth term.  Please remember when using this argument
-  that the Genus is always capitalized and the species never is.
+%   \code{availableUniprotSpecies} is a helper function to list out the
+%   available Species along with their official taxonomy IDs that are
+%   available by Uniprot.  Because there are so many species represented
+%   at UniProt, there is also a pattern argument that can be used to
+%   restrict the range of things returned to be only those whose species
+%   names match the searth term.  Please remember when using this argument
+%   that the Genus is always capitalized and the species never is.
   
-  \code{lookupUniprotSpeciesFromTaxId} is another helper that will look
-  up the species of any tax ID that is supported by Uniprot.
+%   \code{lookupUniprotSpeciesFromTaxId} is another helper that will look
+%   up the species of any tax ID that is supported by Uniprot.
   
 }
 
 \usage{
-  cols(x)
-  keytypes(x)
-  select(x, keys, cols, keytype, ...)
-  species(x)
-  taxId(x)
-
-  availableUniprotSpecies(pattern, n=Inf)
-  lookupUniprotSpeciesFromTaxId(id)
+  filters(x, ...)
+  filters(x, ...) <- value
+  hubUrl(x, ...)
+  hubCache(x, ...)
+  hubCache(x, ...) <- value
+  hubResource(x, path = character(), ...)
+  possibleDates(x, ...)
+  snapshotDate(x, ...)
+  snapshotDate(x, ...) <- value
+  snapshotUrl(x, ...)
+  snapshotUrls(x, ...)
+  snapshotVersion(x, ...)
 }
 
 \arguments{
   \item{x}{the \code{AnnotationHub} object. }
-  \item{keys}{the keys to select records for from the database.  All possible 
-    keys are returned by using the \code{keys} method.}
-  \item{cols}{the cols or kinds of things that can be retrieved from the 
-    database.  As with \code{keys}, all possible cols are returned by using the
-    \code{cols} method.}
-  \item{keytype}{the keytype that matches the keys used.  For the
-    \code{select} methods, this is used to indicate the kind of ID being used
-    with the keys argument. For the \code{keys} method this is used to
-    indicate which kind of keys are desired from \code{keys}
-  }
-  \item{pattern}{A string passed in to limit the results}
-  \item{n}{the maximim number of results to return.}
-  \item{id}{a taxonomy id}
+  \item{value}{the value to be assigned.  For filters method, this is a
+  named list where the names are the kind of filters, and the values are
+  character vectors of acceptable values}
+  \item{path}{the (optional) path string. }
   \item{...}{other arguments}
 }
 
