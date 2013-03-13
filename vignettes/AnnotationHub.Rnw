@@ -161,12 +161,11 @@ head(keys(ah, keytype="Species"))
 @ 
 
 Now we are able to construct and assign a filter to our \Robject{AnnotationHub}
-object.
+object.  Lets set it up to only find resources from humans.
 
 <<filtersSet>>=
-filters(ah) <- list(Species=c("Homo sapiens","Mus musculus"))
+filters(ah) <- list(Species="Homo sapiens")
 @ 
-
 
 
 \section{Using \Robject{AnnotationHub} to retrieve data}

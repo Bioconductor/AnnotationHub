@@ -158,6 +158,9 @@
   ## how many resources?
   length(ah)
 
+  ## what are the names for these resources?
+  head(names(ah))
+
   ## list currently active filters
   filters(ah)
 
@@ -168,16 +171,10 @@
   ## list possible values for one of these filter types
   head(keys(ah, keytype="Species"))
 
-  ## create and apply a new filter to only include mice and men
-  filters(ah) <- list(Species=c("Homo sapiens","Mus musculus"))
+  ## create and apply a new filter to only include people
+  filters(ah) <- list(Species="Homo sapiens")
 
-  ## how many resources now?
-  length(ah)
-
-  ## what are the names for these resources?
-  head(names(ah))
-
-  ## and where are they online?
+  ## What are the URLs for these resources?
   head(snapshotUrls(ah))
 
   ## what web service is this AnnotationHub pointing to?
