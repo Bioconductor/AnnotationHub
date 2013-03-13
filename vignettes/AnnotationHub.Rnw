@@ -87,7 +87,7 @@ object for you with some default settings.  If you look at the object
 you will see some helpful information about it.
 
 <<show>>=
-AnnotationHub
+ah
 @ 
 
 By default, you can see that the \Robject{AnnotationHub} object is set
