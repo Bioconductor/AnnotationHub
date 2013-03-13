@@ -80,10 +80,14 @@
 ## get character vector of ResourcePath values that match the keys/keytypes
 .getFilesThatMatchFilters <- function(x, filters) {    
     ## get the ResourcePath for each. item that comes back from .getMetadata
-    meta <- metadata(x, filters, cols="RDataPath")
+    meta <- metadata(x, filters, cols="RDataPath") ## BOOM - comes back empty?
     res <- as.character(unlist(meta))
     setNames(res, make.names(res))
 }
+
+## and yet this works?
+## dim(metadata(ah, list(Species="Homo sapiens"), cols="RDataPath"))
+## So there are "issues" with metadata...
 
 ## This function gets new @paths values based new values for @filters
 ## It can't just check the object for @filters though because it is needed in
