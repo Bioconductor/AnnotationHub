@@ -167,11 +167,28 @@ object.  Lets set it up to only find resources from humans.
 filters(ah) <- list(Species="Homo sapiens")
 @ 
 
+And now if we look we will see that our \Robject{AnnotationHub} object
+is only exposing resources from Homo sapiens.
+
+<<listResources2>>=
+length(ah)
+head(names(ah))
+head(snapshotUrls(ah))
+@ 
+
+
 
 \section{Using \Robject{AnnotationHub} to retrieve data}
 
+So now that we have our \Robject{AnnotationHub} object configured to
+expose only the data for humans how would we go about getting that
+data downloaded?  Very simply, we use the \Rmethod{\$} operator and tab
+completion to pull down a data source of interest like this.
 
-
+<<download>>=
+res <- ah$goldenpath.hg19.encodeDCC.wgEncodeUwTfbs.wgEncodeUwTfbsMcf7CtcfStdPkRep1.narrowPeak_0.0.1.RData
+res
+@ 
 
 \end{document}
 

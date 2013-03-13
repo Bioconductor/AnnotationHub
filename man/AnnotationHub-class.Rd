@@ -158,9 +158,6 @@
   ## how many resources?
   length(ah)
 
-  ## what are the names for these resources?
-  head(names(ah))
-
   ## list currently active filters
   filters(ah)
 
@@ -174,6 +171,12 @@
   ## create and apply a new filter to only include people
   filters(ah) <- list(Species="Homo sapiens")
 
+  ## now how many resources are there?
+  length(ah)
+
+  ## what are the names for these resources?
+  head(names(ah))
+
   ## What are the URLs for these resources?
   head(snapshotUrls(ah))
 
@@ -183,7 +186,7 @@
   snapshotUrl()
 
   ## Where are the files that get downloaded being cached?
-  ## (there is also a setter if you wish to change this to another location)
+  ## (there is also a setter if you wish to assign this to another location)
   hubCache(ah)
 
 }

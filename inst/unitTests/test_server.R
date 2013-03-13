@@ -90,4 +90,10 @@ test_queryPathResults <- function(){
     checkTrue(nchar(res) > 1000)  
 }
 
-
+## Does the URL used by metadata return values?
+test_metadataResults <- function(){
+    url <- 'http://annotationhub.bioconductor.org/ah/2.12/2013-01-22/query/Species/Homo sapiens/cols/RDataPath'
+    ## just attempts to DL this file and then call fromJSON()
+    res <- AnnotationHub:::.parseJSON(url) 
+    checkTrue(length(res[[1]]) > 1)
+}

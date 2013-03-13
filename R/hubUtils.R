@@ -3,6 +3,9 @@
 ## helper to add some error handling for when the server is throwing errors.
 ## TODO: make this work and then replace all fromJSON calls with it.
 .parseJSON <- function(url){
+    ## process url to get rid of any spaces.
+    url <- gsub(" ", "%20", url)
+    
     tryCatch({
         tmp <- tempfile()
         download.file(url, tmp, quiet=TRUE)
@@ -77,7 +80,7 @@
         paste(snapshotUrl(), "query", cols, sep="/")
     }
     ## get the metadata
-    meta <- .parseJSON(url) ## list form (by row)
+    meta <- .parseJSON(url) ## list form (by row)   ## BOOM
     
     ## make a data.frame (remove this later)
     if(class(meta)=="list"){
