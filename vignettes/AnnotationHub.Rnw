@@ -190,6 +190,13 @@ res <- ah$goldenpath.hg19.encodeDCC.wgEncodeUwTfbs.wgEncodeUwTfbsMcf7CtcfStdPkRe
 res
 @ 
 
+
+\section{Session Information}
+
+<<SessionInfo, echo=FALSE>>=
+sessionInfo()
+@
+
 \end{document}
 
 

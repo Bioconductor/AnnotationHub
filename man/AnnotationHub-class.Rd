@@ -28,7 +28,7 @@
 \alias{hubCache<-}
 \alias{hubCache<-,AnnotationHub-method}
 \alias{hubCache<-,missing-method}
-\alias{hubCache<-,AnnotationHub, character-method}
+\alias{hubCache<-,AnnotationHub,character-method}
 
 
 \alias{hubResource}   % Do we really want to export this?
