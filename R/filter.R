@@ -85,7 +85,7 @@
     setNames(res, make.names(res))
 }
 
-## and yet this works?
+## and yet this works? (but didn't filter at all!)
 ## dim(metadata(ah, list(Species="Homo sapiens"), cols="RDataPath"))
 ## So there are "issues" with metadata...
 
