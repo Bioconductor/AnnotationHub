@@ -1,4 +1,5 @@
 ## JSON utilities
+.printf <- function(...) print(noquote(sprintf(...)))
 
 ## helper to add some error handling for when the server is throwing errors.
 ## TODO: make this work and then replace all fromJSON calls with it.
@@ -8,6 +9,8 @@
     
     tryCatch({
         tmp <- tempfile()
+        if (getOption("AnnotationHub.debug", FALSE))
+            .printf("Visiting %s", url)
         download.file(url, tmp, quiet=TRUE)
         fromJSON(paste0(readLines(tmp), collapse=""))
     }, error=function(err){
