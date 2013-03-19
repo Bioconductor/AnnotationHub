@@ -8,7 +8,7 @@
 \usepackage{graphics}
 \usepackage{latexsym, amsmath, amssymb}
 \usepackage{authblk}
-\usepackage[colorlinks=true, linkcolor=Blue, urlcolor=Blue,
+\usepackage[colorlinks=true, linkcolor=Blue, urlcolor=Black,
   citecolor=Blue]{hyperref}
 
 %% Simple macros
@@ -85,13 +85,24 @@ ah = AnnotationHub()
 Now at this point you have already done everything you need in order
 to get annotations. If you know exactly what the resource you want is
 called (and where it can be found), you could get it right now by just
-tab completing to it using the \Rmethod{\$} operator.  The following
-command will actually retrieve an object and then assigns it to a
-local variable called res.
+tab completing to it using the \Rmethod{\$} operator.  
 
-<<download1>>=
+<<download1, echo=FALSE>>=
+path <- "ah$goldenpath.hg19.encodeDCC.wgEncodeUwTfbs.wgEncodeUwTfbsMcf7CtcfStdPkRep1.narrowPeak_0.0.1.RData"
+@ 
+
+Lets suppose that you knowd the following is the path to your data:
+
+\url{\Sexpr{path}}
+
+Simply tab completing to the above path (followed by hitting enter),
+as demonstrated below will actually retrieve an object and then assign
+its contents to a local variable called res.
+
+<<download2>>=
 res <- ah$goldenpath.hg19.encodeDCC.wgEncodeUwTfbs.wgEncodeUwTfbsMcf7CtcfStdPkRep1.narrowPeak_0.0.1.RData
 @ 
+
 
 As you can see it's pretty easy to get data out using
 \Robject{AnnotationHub} objects.  The rest of this vignette is mostly
@@ -149,16 +160,29 @@ Similarly, there are also methods to show the resource names, or even
 the full set of resource URLs for available resources.
 
 <<listResources>>=
-head(names(ah))
-head(snapshotUrls(ah))
+names <- head(names(ah),n=1)
 @ 
+<<namesShow1,eval=FALSE>>=
+names
+@ 
+\url{\Sexpr{names}}
 
-But for most users, the number of resources available is going to be
-simply overwhelming.  How should we cut this data set down to size?
-For this task, we introduce filters.  Every \Robject{AnnotationHub}
-object contains a list of filters that can be configured to control
-which resources it can return. By defauly this list is empty, which
-means you get everything.
+<<listResources2>>=
+urls <- head(snapshotUrls(ah),n=1)
+@ 
+<<urlsShow1,eval=FALSE>>=
+urls
+@ 
+\url{\Sexpr{urls}}
+
+
+
+For humans, the number of resources available is going to be
+overwhelming.  How should we cut this data set down to size?  For this
+task, we introduce filters.  Every \Robject{AnnotationHub} object
+contains a list of filters that can be configured to control which
+resources it can return. By default this list is empty, which means
+you get everything.
 
 <<baseFilters>>=
 filters(ah)
@@ -191,12 +215,24 @@ filters(ah) <- list(Species="Homo sapiens")
 And now if we look we will see that our \Robject{AnnotationHub} object
 is only exposing resources from Homo sapiens.
 
-<<listResources2>>=
+<<listResources3>>=
 length(ah)
-head(names(ah))
-head(snapshotUrls(ah))
+names <- head(names(ah),n=1)
+@ 
+<<namesShow2,eval=FALSE>>=
+names
 @ 
 
+\url{\Sexpr{names}}
+
+<<listResources4>>=
+urls <- head(snapshotUrls(ah),n=1)
+@ 
+<<urlsShow2,eval=FALSE>>=
+urls
+@ 
+
+\url{\Sexpr{urls}}
 
 
 \section{Using \Robject{AnnotationHub} to retrieve data}
@@ -207,13 +243,23 @@ data downloaded?  As mentioned above, we can use the \Rmethod{\$}
 operator and tab completion to pull down a data source of interest
 like this.
 
-<<download2>>=
+
+<<download3,echo=FALSE>>=
+path <- "ah$goldenpath.hg19.encodeDCC.wgEncodeUwTfbs.wgEncodeUwTfbsMcf7CtcfStdPkRep1.narrowPeak_0.0.1.RData"
+@ 
+
+\url{\Sexpr{path}}
+
+
+Just by using tab completion like this:
+
+<<download4>>=
 res <- ah$goldenpath.hg19.encodeDCC.wgEncodeUwTfbs.wgEncodeUwTfbsMcf7CtcfStdPkRep1.narrowPeak_0.0.1.RData
 @ 
 
-And once you have done this, you can look at the object and use it etc..
-Any dependencies that you need to use this kind of object should load
-at this time.
+And once you have done this, you can look at the object stored in res
+and use it etc..  Any dependencies that you need to use this kind of
+object should automatically try to load at this time.
 
 <<download3>>=
 res
@@ -224,15 +270,15 @@ this vignette, the 2nd time it should pull this object from a local
 cache that \Rpackage{AnnotationHub} will have created for you.  This
 is a feature of \Rpackage{AnnotationHub} that is meant to provide
 better performance by removing the need to pull a large amount of data
-from the server every time.  However, this does not mean that once you
-have used \Robject{AnnotationHub} to retrieve data that you no longer
-need to have internet access.  This is because whenever you create a
-\Robject{AnnotationHub} object, it needs to talk to the metadata
-server to learn about things like the latest available version etc.
-So if you intend to access your objects on the plane you will need to
-either save them to a convenient location or else take note of where
-your local cache is located so that you can load them up manually
-later.
+from a distant server every time.  However, this does not mean that
+once you have used \Robject{AnnotationHub} to retrieve data that you
+no longer need to have internet access.  This is because whenever you
+create a \Robject{AnnotationHub} object, it needs to talk to the
+metadata server to learn about things like the latest available
+version etc.  So if you intend to access your objects on the plane you
+will need to either save them to a convenient location or else take
+note of where your local cache is located so that you can load them up
+manually later.
 
 
 
