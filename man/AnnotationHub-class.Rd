@@ -102,7 +102,13 @@
   All \code{AnnotationHub} have a snapshot date that by default is set
   to the most recent one.  The \code{snapshotDate} method indicates
   which one is in use, but this value can also be set to previous dates.
-  
+
+  Whenever you download a file from \code{AnnotationHub} it will
+  automatically put the data in a local cache for future reference. The
+  location of this cache can be found and even changed with the
+  \code{hubCache} setters and getters.  This cache provides a performance
+  boost for users but it does not mean that you can use this on a plane
+  without needing wireless access.  
 }
 
 \usage{
@@ -188,6 +194,10 @@
   ## Where are the files that get downloaded being cached?
   ## (there is also a setter if you wish to assign this to another location)
   hubCache(ah)
+
+
+  ## Download a resource (using tab completion) and put it into "res"
+  res <- ah$goldenpath.hg19.encodeDCC.wgEncodeUwTfbs.wgEncodeUwTfbsMcf7CtcfStdPkRep1.narrowPeak_0.0.1.RData
 
 }
 

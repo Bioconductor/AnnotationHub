@@ -77,7 +77,7 @@ setReplaceMethod("hubCache", c("AnnotationHub", "character"),
                  .replaceHubCache)
 
 setMethod("snapshotVersion", "AnnotationHub", function(x, ...) {
-    x@snapshotVersion
+    as.character(x@snapshotVersion)
 })
 
 setMethod("snapshotDate", "AnnotationHub", function(x, ...) {

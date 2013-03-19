@@ -113,7 +113,7 @@
 }
 
 setMethod("snapshotVersion", "missing", function(x, ...) {
-    .snapshotVersion()
+    as.character(.snapshotVersion())
 })
 
 setMethod("hubUrl", "missing", function(x, ...) {

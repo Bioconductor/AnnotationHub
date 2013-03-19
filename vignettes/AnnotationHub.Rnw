@@ -65,7 +65,7 @@
 
 \maketitle
 
-\section{Configuring  \Robject{AnnotationHub}}
+\section{\Robject{AnnotationHub} Objects}
 
 The \Rpackage{AnnotationHub} package provides a client interface to
 resources stored at the AnnotationHub web service.
@@ -81,6 +81,27 @@ The \Rpackage{AnnotationHub} package is straightforward to use.  The
 <<makeObject>>=
 ah = AnnotationHub()
 @ 
+
+Now at this point you have already done everything you need in order
+to get annotations. If you know exactly what the resource you want is
+called (and where it can be found), you could get it right now by just
+tab completing to it using the \Rmethod{\$} operator.  The following
+command will actually retrieve an object and then assigns it to a
+local variable called res.
+
+<<download1>>=
+res <- ah$goldenpath.hg19.encodeDCC.wgEncodeUwTfbs.wgEncodeUwTfbsMcf7CtcfStdPkRep1.narrowPeak_0.0.1.RData
+@ 
+
+As you can see it's pretty easy to get data out using
+\Robject{AnnotationHub} objects.  The rest of this vignette is mostly
+about helping you to make sure you are accessing the version of
+\Robject{AnnotationHub} objects that you intend to use and also about
+making sure that you can filter down the huge number of objects to the
+few that you are really interested in.
+
+
+\section{Configuring  \Robject{AnnotationHub} objects}
 
 When you create the \Robject{AnnotationHub} object, it will set up the
 object for you with some default settings.  If you look at the object
@@ -114,7 +135,7 @@ snapshotDate(ah) <- "2013-01-22"
 @ 
 
 
-\section{exploring and setting filters for  \Robject{AnnotationHub}}
+\section{Exploring and setting filters for  \Robject{AnnotationHub}}
 
 If you are interested in how many annotation resources are currently
 available for your \Robject{AnnotationHub} object, you can just take
@@ -182,13 +203,37 @@ head(snapshotUrls(ah))
 
 So now that we have our \Robject{AnnotationHub} object configured to
 expose only the data for humans how would we go about getting that
-data downloaded?  Very simply, we use the \Rmethod{\$} operator and tab
-completion to pull down a data source of interest like this.
+data downloaded?  As mentioned above, we can use the \Rmethod{\$}
+operator and tab completion to pull down a data source of interest
+like this.
 
-<<download>>=
+<<download2>>=
 res <- ah$goldenpath.hg19.encodeDCC.wgEncodeUwTfbs.wgEncodeUwTfbsMcf7CtcfStdPkRep1.narrowPeak_0.0.1.RData
+@ 
+
+And once you have done this, you can look at the object and use it etc..
+Any dependencies that you need to use this kind of object should load
+at this time.
+
+<<download3>>=
 res
 @ 
+
+Also, since you have previously downloaded this object at the start of
+this vignette, the 2nd time it should pull this object from a local
+cache that \Rpackage{AnnotationHub} will have created for you.  This
+is a feature of \Rpackage{AnnotationHub} that is meant to provide
+better performance by removing the need to pull a large amount of data
+from the server every time.  However, this does not mean that once you
+have used \Robject{AnnotationHub} to retrieve data that you no longer
+need to have internet access.  This is because whenever you create a
+\Robject{AnnotationHub} object, it needs to talk to the metadata
+server to learn about things like the latest available version etc.
+So if you intend to access your objects on the plane you will need to
+either save them to a convenient location or else take note of where
+your local cache is located so that you can load them up manually
+later.
+
 
 
 \section{Session Information}
