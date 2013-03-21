@@ -148,7 +148,7 @@ setMethod("possibleDates", "missing", function(x, ...) {
     file <- paste(hubUrl, "resources", sep="/")
     if (length(path))
         file <- paste(file, path, sep="/")
-    url(file)
+    file
 }
 
 setMethod("hubResource", "missing", function(x, path=character(), ...) {
