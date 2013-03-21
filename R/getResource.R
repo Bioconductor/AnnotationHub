@@ -73,6 +73,6 @@
                                 cols="RDataClass")))
 
     ## Call correct function based on the results of the metadata
-    FUN <- switch(m, fasta=.getFasta, .getRda)
+    FUN <- switch(m, FaFile=.getFasta, .getRda)
     FUN(x, path)
 }
