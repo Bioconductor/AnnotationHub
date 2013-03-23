@@ -6,7 +6,7 @@
 
 ## testObject
 x <- AnnotationHub()
-BiocVersion <- biocVersion()
+BiocVersion <- BiocInstaller::biocVersion()
 RDataDateAdded <- as.character(possibleDates(x)[1])
 
 
