@@ -13,8 +13,8 @@ sampleFileDot <- paste("goldenpath.hg19.encodeDCC.wgEncodeUwTfbs",
                    "wgEncodeUwTfbsMcf7CtcfStdPkRep1.narrowPeak_0.0.1.RData",
                   sep=".")
 
-sampleSource <- paste("pub/databases/ensembl/encode/supplementary",
-    "integration_data_jan2011/byDataType/footprints/jan2011/all.footprints.gz",
+sampleSource <- paste("goldenpath/hg19/encodeDCC/wgEncodeUchicagoTfbs",
+    "wgEncodeUchicagoTfbsK562Enr4a1ControlPk.narrowPeak.gz",
     sep="/")
 
 ## m <- metadata(x, cols="Title")
@@ -75,8 +75,7 @@ test_getMetadata <- function(){
     checkTrue(dim(res)[1] > 1) ## should give multiple records 
     ## check that we can get filtered metadata
     filters <- list(TaxonomyId="9606",
-        SourceFile=
-        "pub/databases/ensembl/encode/supplementary/integration_data_jan2011/byDataType/footprints/jan2011/all.footprints.gz")
+        SourceFile=sampleSource)
     res <- AnnotationHub:::.metadata(x,filters)
     checkTrue(dim(res)[1] == 1)  ## should only match one record
 }
@@ -99,8 +98,7 @@ test_replaceFilter <- function(){
     checkTrue(length(filters(x))==1)
     ## now place a bigger filter on there
     filters <- list(TaxonomyId="9606",
-        SourceFile=
-        "pub/databases/ensembl/encode/supplementary/integration_data_jan2011/byDataType/footprints/jan2011/all.footprints.gz")
+        SourceFile=sampleSource)
     x <- AnnotationHub:::.replaceFilter(x,filters)
     checkTrue(length(filters(x))==2)  ## TaxonomyId should not repeat.
 }
@@ -113,8 +111,7 @@ test_metadata <- function(){
     resFull <- metadata(x)
     ## Now apply filters
     filters(x) <- list(TaxonomyId="9606",
-        SourceFile=
-        "pub/databases/ensembl/encode/supplementary/integration_data_jan2011/byDataType/footprints/jan2011/all.footprints.gz")
+        SourceFile=sampleSource)
     resPartial <- metadata(x)
     checkTrue(dim(resFull)[2] == dim(resPartial)[2])
     checkTrue(dim(resFull)[1] != dim(resPartial)[1])
@@ -132,7 +129,7 @@ test_metadata <- function(){
     resPartial4 <- metadata(x)
 
     ## this will change soon:
-    checkEquals(resPartial4$Tags[[1]], "CTCF|MCF-7|wgEncodeUwTfbs|std|wgEncodeEH000968|ChipSeq|ENCODE Mar 2012 Freeze|2011-07-29|2012-04-28|wgEncodeEH002057|GSM1022658|Stam|UW|DS16200|lmax-v1.0|f2e1890897b03a2fd59a60948dbba044|hg19|wgEncode|1|exp|991000|4677|wgEncodeUwTfbsMcf7CtcfStdPkRep1|None|narrowPeak|Peaks|wgEncodeUwTfbs")
+    checkEquals(resPartial4$Tags[[1]][11], "GSM1022658")
     checkTrue(as.character(resPartial4$Species) == "Homo sapiens")    
 }
 

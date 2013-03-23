@@ -178,7 +178,7 @@ setMethod("keys", "AnnotationHub", function(x, keytype) {
 setMethod("metadata", "AnnotationHub", function(x, cols, ...) {
     if(missing(cols)){
         cols <- c("Title","Species","TaxonomyId","Genome",
-                      "Description","Tags","RDataClass","Notes")
+                      "Description","Tags","RDataClass")
     }
     ## check cols to avoid user error (can't live in .metadata b/c of usage)
     if(!all(cols %in% cols(x))){

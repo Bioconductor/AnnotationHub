@@ -136,13 +136,14 @@ If you are interested in using an older version of a snapshot, you can
 list previous versions with the \Rmethod{possibleDates} like this:
 
 <<possibleDates>>=
-possibleDates(ah)
+pd <- possibleDates(ah)
+pd
 @ 
 
 And then you can set the dates like this:
 
-<<setdate>>=
-snapshotDate(ah) <- "2013-01-22"
+<<setdate, eval=FALSE>>=
+snapshotDate(ah) <- pd[1]
 @ 
 
 

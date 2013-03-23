@@ -1,4 +1,4 @@
-import(methods)
+import(methods, GenomicRanges)
 
 importFrom(AnnotationDbi, exists, keys, keytypes, cols)
 

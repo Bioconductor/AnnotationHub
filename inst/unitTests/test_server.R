@@ -6,6 +6,8 @@
 
 ## testObject
 x <- AnnotationHub()
+BiocVersion <- biocVersion()
+RDataDateAdded <- as.character(possibleDates(x)[1])
 
 
 ## Helper for getting headers into easily grep-able format
@@ -82,7 +84,9 @@ test_keysFunctionality <- function(){
 ## but this test is JUST for whether the server is serving up answers
 test_queryPathResults <- function(){ 
 ##     url <- "http://wilson2.fhcrc.org/cgi-bin/R/query?Organism=9606"
-    url <- "http://annotationhub.bioconductor.org/ah/2.12/2013-01-22/query/TaxonomyId/9606"
+    url <- 
+        sprintf("http://annotationhub.bioconductor.org/ah/%s/%s/query/TaxonomyId/9606",
+        BiocVersion, RDataDateAdded)
     res <- RCurl:::getURLContent(url)
     emptyVal <- "[]\n"
     checkTrue(res != emptyVal) ## should not just be the empty braces.
@@ -92,7 +96,9 @@ test_queryPathResults <- function(){
 
 ## Does the URL used by metadata return values?
 test_metadataResults <- function(){
-    url <- 'http://annotationhub.bioconductor.org/ah/2.12/2013-01-22/query/Species/Homo sapiens/cols/RDataPath'
+    url <- 
+        sprintf('http://annotationhub.bioconductor.org/ah/%s/%s/query/Species/Homo sapiens/cols/RDataPath',
+        BiocVersion, RDataDateAdded)
     ## just attempts to DL this file and then call fromJSON()
     res <- AnnotationHub:::.parseJSON(url) 
     checkTrue(length(res[[1]]) > 1)
