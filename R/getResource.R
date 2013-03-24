@@ -31,7 +31,10 @@
 .getRda <- function(x, path) {
     message("Retrieving ", sQuote(path))
     obj <- local({
-        .objName <- load(file=hubResource(x, path))
+        rsrc <- hubResource(x, path)
+        if (grepl("^http:", rsrc, TRUE))
+            rsrc <- url(rsrc)
+        .objName <- load(rsrc)
         get(.objName)
     })
 
