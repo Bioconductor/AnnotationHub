@@ -7,7 +7,7 @@
         basePath <- switch(os,
                            "unix" = path.expand("~"),
                            "windows"= file.path(Sys.getenv("HOME")),
-                             "AppData"))
+                             "AppData")
         cache <- file.path(basePath, ".AnnotationHub")
         suppressWarnings(dir.create(cache, recursive=TRUE))
         options(AnnotationHub.Cache=cache)

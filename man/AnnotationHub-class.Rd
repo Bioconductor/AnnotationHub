@@ -12,6 +12,7 @@
 \alias{$,AnnotationHub-method}
 
 \alias{[[,AnnotationHub-method}
+\alias{[[,AnnotationHub,ANY,ANY-method}
 
 \alias{filters} % only if we have the generic here do we do this
 \alias{filters,AnnotationHub-method}
