@@ -6,7 +6,7 @@
         os <- .Platform$OS.type
         basePath <- switch(os,
                            "unix" = path.expand("~"),
-                           "windows"= file.path(dirname(path.expand("~")),
+                           "windows"= file.path(Sys.getenv("HOME")),
                              "AppData"))
         cache <- file.path(basePath, ".AnnotationHub")
         suppressWarnings(dir.create(cache, recursive=TRUE))
