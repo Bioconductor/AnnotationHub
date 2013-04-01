@@ -175,6 +175,10 @@
   ## list possible values for one of these filter types
   head(keys(ah, keytype="Species"))
 
+  ## OR retrieve metadata values about several keys at once
+  ## (This approach may not always scale the way you want it to)
+  metadata(ah, cols = c("Species","RDataPath"))
+
   ## create and apply a new filter to only include people
   filters(ah) <- list(Species="Homo sapiens")
 
