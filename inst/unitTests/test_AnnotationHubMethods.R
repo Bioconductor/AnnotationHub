@@ -71,12 +71,13 @@ test_validFilterValues <- function(){
 ## Both methods of access should work.
 test_getMetadata <- function(){
     filters <- NULL ## IOW: no filters
-    res <- AnnotationHub:::.metadata(x,filters)
+    snapUrl <- snapshotUrl()
+    res <- AnnotationHub:::.metadata(snapUrl,filters)
     checkTrue(dim(res)[1] > 1) ## should give multiple records 
     ## check that we can get filtered metadata
     filters <- list(TaxonomyId="9606",
         SourceFile=sampleSource)
-    res <- AnnotationHub:::.metadata(x,filters)
+    res <- AnnotationHub:::.metadata(snapUrl,filters)
     checkTrue(dim(res)[1] == 1)  ## should only match one record
 }
 

@@ -83,7 +83,7 @@
         paste(snapshotUrl, "query", cols, sep="/")
     }
     ## get the metadata
-    meta <- .parseJSON(url) ## list form (by row)   ## BOOM
+    meta <- .parseJSON(url) ## list form (by row)  (USUALLY)
     
     ## make a data.frame (remove this later)
     if(class(meta)=="list"){
