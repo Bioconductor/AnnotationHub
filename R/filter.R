@@ -96,7 +96,7 @@
     if (length(value) > 0) {
         .getFilesThatMatchFilters(x, value)
     } else {                            # there are no filters
-        snapshotPaths(x)
+        snapshotPaths() ## MUST use the "missing" version here!
     }
 }
 
