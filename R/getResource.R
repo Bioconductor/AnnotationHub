@@ -72,8 +72,9 @@
     }
 
     ## Get the metadata
-    m <- as.character(unlist(.metadata(x, filters=list(RDataPath=path),
-                                cols="RDataClass")))
+    m <- as.character(unlist(.metadata(snapshotUrl(x),
+                                 filters=list(RDataPath=path),
+                                 cols="RDataClass")))
 
     ## Call correct function based on the results of the metadata
     FUN <- switch(m, FaFile=.getFasta, .getRda)

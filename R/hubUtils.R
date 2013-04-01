@@ -68,7 +68,7 @@
 
 
 ## metadata takes a filter list and cols and returns a DataFrame
-.metadata <- function(x, filters=list(), cols=c("Title","Species",
+.metadata <- function(snapshotUrl, filters=list(), cols=c("Title","Species",
                                            "TaxonomyId","Genome","Description",
                                            "Tags","RDataClass","RDataPath")) {  
     ## format cols
@@ -78,17 +78,18 @@
                !is.null(filters)) { ## get some
         ## URL must be specific
         filters <- .makeURLFilters(filters)
-        paste(snapshotUrl(), "query", filters, cols, sep="/") ##vectorized?
+        paste(snapshotUrl, "query", filters, cols, sep="/") ##vectorized?
     } else {## get all of them
-        paste(snapshotUrl(), "query", cols, sep="/")
+        paste(snapshotUrl, "query", cols, sep="/")
     }
     ## get the metadata
     meta <- .parseJSON(url) ## list form (by row)   ## BOOM
     
     ## make a data.frame (remove this later)
     if(class(meta)=="list"){
-        ls <- lapply(meta, as, "List") ##Converting to "List" allows compression
-        DataFrame(ls)
+        idx <- sapply(meta, is, "list")
+        meta[idx] <- lapply(meta[idx], as, "List")
+        DataFrame(meta)
     }else{
         ## double cast so label is the colname, and return val is consistent.
         DataFrame(as.list(meta))
