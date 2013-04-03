@@ -1,7 +1,7 @@
 Package: AnnotationHub
 Type: Package
 Title: A client for retrieving Bioconductor objects from AnnotationHub
-Version: 1.0.0
+Version: 1.1.0
 Depends: IRanges
 Imports: methods, stats, utils, rjson, BiocGenerics, BiocInstaller,
     AnnotationDbi, GenomicRanges
