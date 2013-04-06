@@ -74,7 +74,9 @@
 \alias{snapshotVersion,AnnotationHub-method}
 \alias{snapshotVersion,missing-method}
 
-
+% help
+\alias{ahinfo}
+  
 
 
 \title{AnnotationHub objects and their related methods and functions}
@@ -203,6 +205,8 @@
 
   ## Download a resource (using tab completion) and put it into "res"
   res <- ah$goldenpath.hg19.encodeDCC.wgEncodeUwTfbs.wgEncodeUwTfbsMcf7CtcfStdPkRep1.narrowPeak_0.0.1.RData
+
+  ahinfo(ah,"goldenpath.hg19.encodeDCC.wgEncodeUwTfbs.wgEncodeUwTfbsMcf7CtcfStdPkRep1.narrowPeak_0.0.1.RData")
 
 }
 

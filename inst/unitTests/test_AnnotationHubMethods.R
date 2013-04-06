@@ -209,3 +209,13 @@ test_caching <- function(){
 ## filters(x) <- list(RDataPath="fakedata/data.bed_0.0.3.RData")
 
 ## NOTE: fakeData is being removed.
+
+
+
+## this one just runs this to make sure we can run the help display.
+## would be nice if I could trap the output...
+test_info <- function(){
+    path = "goldenpath.hg19.encodeDCC.wgEncodeUwTfbs.wgEncodeUwTfbsMcf7CtcfStdPkRep1.narrowPeak_0.0.1.RData"
+    res <- ahinfo(x, path)  ## this is the real reason for this test
+    checkTrue(is.null(res)) ## just verify that it ran...
+}

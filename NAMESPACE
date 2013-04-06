@@ -40,5 +40,6 @@ exportMethods("$",
               snapshotVersion
               )
 
-export(AnnotationHub)
+export(AnnotationHub,
+       ahinfo)
 

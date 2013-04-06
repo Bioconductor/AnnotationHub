@@ -18,6 +18,7 @@ Collate: AllGenerics.R
     getResource.R
     AnnotationHub-class.R
     test_AnnotationHub_package.R
+    dynObjHelp.R
     zzz.R
 License: Artistic-2.0
 biocViews: Annotation, Infrastructure
