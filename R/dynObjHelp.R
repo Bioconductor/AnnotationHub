@@ -44,7 +44,8 @@ ahinfo <- function(hub, path){
                  "Description:",m$Description,"\n",
                  "Genus and Species:",m$Species,"\n",
                  "Genome:",m$Genome,"\n",
-                 "BiocVersion:",m$BiocVersion,"\n",
+                 "BiocVersion:",
+                 paste(unlist(m$BiocVersion), collapse=", "),"\n",
                  "Tags:",paste(unlist(m$Tags), collapse=", "),"\n"
                  )
 
