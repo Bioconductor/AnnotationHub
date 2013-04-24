@@ -192,9 +192,18 @@ setMethod("metadata", "AnnotationHub", function(x, cols, ...) {
 .DollarNames.AnnotationHub <-
     function(x, pattern="")
 {
+    p0 <- pattern
     pattern <- sub(" ... \\[\\d+\\]$", "", pattern)
     values <- grep(pattern, names(x), value=TRUE)
-    .completion(values)
+    if (length(values)) {
+        .completion(values)
+    } else {                            # handle invalid completions
+        from <- c("\\\\", "\\(", "\\*", "\\+", "\\?", "\\[", "\\{", "\\.")
+        to <- sub("\\", "", from, fixed=TRUE)
+        for (i in seq_along(from))
+            p0 <- gsub(from[i], to[i], p0, fixed=TRUE)
+        gsub("\\^", "", p0)
+    }
 }
 
 setMethod("$", "AnnotationHub", function(x, name){.getResource(x,name)})
