@@ -63,6 +63,20 @@
     Rsamtools::FaFile(localPath)
 }
 
+## Downloads tabix files and makes a TabixFile handle
+.getTabix <- function(x, path){
+    require(Rsamtools)
+
+    if (!.isCached(hubCache(x), path)) {
+        indexPath <- paste(path, ".tbi", sep="")
+        .downloadFile(x, indexPath)    # index
+        .downloadFile(x, path)         # file
+    }
+
+    localPath <- hubResource(x, path, cached=TRUE)
+    Rsamtools::TabixFile(localPath)
+}
+
 ## $ is called on enter; this gets the data
 .getResource <- function(x, name) {
     path <- snapshotPaths(x)[name]   
@@ -77,6 +91,6 @@
                                  cols="RDataClass")))
 
     ## Call correct function based on the results of the metadata
-    FUN <- switch(m, FaFile=.getFasta, .getRda)
+    FUN <- switch(m, FaFile=.getFasta, TabixFile=.getTabix, .getRda)
     FUN(x, path)
 }
