@@ -29,11 +29,12 @@
 
 ## Helper for getting rda files.
 .getRda <- function(x, path) {
-    message("Retrieving ", sQuote(path))
     obj <- local({
         rsrc <- hubResource(x, path)
-        if (grepl("^http:", rsrc, TRUE))
+        if (grepl("^http:", rsrc, TRUE)) {
+            message("Retrieving ", sQuote(path))
             rsrc <- url(rsrc)
+        }
         .objName <- load(rsrc)
         get(.objName)
     })
@@ -42,6 +43,20 @@
         localPath <- hubResource(x, path, cached=TRUE)
         .dirCreate(dirname(localPath))
         save(obj, file=localPath)
+    }
+
+    if (isS4(obj)) {
+        pkg <- getClassDef(class(obj))@package
+        withCallingHandlers({
+            require(pkg, quietly=TRUE, character.only=TRUE)
+        }, warning=function(w) {
+            msg <- sprintf("%s is from package %s,
+                             but \"require('%s')\" said: %s",
+                           sQuote(path), sQuote(pkg), pkg,
+                           conditionMessage(w))
+            warning(paste(strwrap(msg), collapse="\n"), call.=FALSE)
+            invokeRestart("muffleWarning")
+        })
     }
 
     obj
