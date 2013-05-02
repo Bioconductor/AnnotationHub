@@ -88,6 +88,12 @@
     ## make a data.frame (remove this later)
     if(class(meta)=="list"){
         idx <- sapply(meta, is, "list")
+        meta[idx] <- lapply(meta[idx], function(elt) {
+            ## named character vectors come from json as named lists
+            subidx <- sapply(elt, is, "list")
+            elt[subidx] <- lapply(elt[subidx], unlist)
+            elt
+        })
         meta[idx] <- lapply(meta[idx], as, "List")
         DataFrame(meta)
     }else{

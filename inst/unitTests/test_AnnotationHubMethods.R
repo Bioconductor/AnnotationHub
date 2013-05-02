@@ -216,6 +216,7 @@ test_caching <- function(){
 ## would be nice if I could trap the output...
 test_info <- function(){
     path = "goldenpath.hg19.encodeDCC.wgEncodeUwTfbs.wgEncodeUwTfbsMcf7CtcfStdPkRep1.narrowPeak_0.0.1.RData"
-    res <- ahinfo(x, path)  ## this is the real reason for this test
+    ## this is the real reason for this test
+    res <- suppressMessages(ahinfo(x, path))
     checkTrue(is.null(res)) ## just verify that it ran...
 }
