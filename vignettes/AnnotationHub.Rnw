@@ -190,11 +190,11 @@ filters(ah)
 @ 
 
 How can we learn which things are available for filtering?  For this
-we have defined \Rmethod{cols} and \Rmethod{keytypes} methods, which
+we have defined \Rmethod{columns} and \Rmethod{keytypes} methods, which
 will list all the kinds of data that can be filtered on.
 
-<<colsAndKeytypes>>=
-cols(ah)
+<<columnsAndKeytypes>>=
+columns(ah)
 keytypes(ah)
 @ 
 

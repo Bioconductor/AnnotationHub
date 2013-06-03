@@ -1,6 +1,6 @@
 import(methods, GenomicRanges)
 
-importFrom(AnnotationDbi, exists, keys, keytypes, cols)
+importFrom(AnnotationDbi, exists, keys, keytypes, columns)
 
 importFrom(IRanges, DataFrame)
 
@@ -27,7 +27,7 @@ exportMethods("$",
               hubResource,
               keys,
               keytypes,
-              cols,
+              columns,
               length,
               metadata,
               names,

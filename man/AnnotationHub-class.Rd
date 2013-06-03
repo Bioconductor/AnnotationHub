@@ -36,7 +36,7 @@
 \alias{hubResource,AnnotationHub-method}
 \alias{hubResource,missing-method}
 
-\alias{cols,AnnotationHub-method}
+\alias{columns,AnnotationHub-method}
 
 \alias{keytypes,AnnotationHub-method}
 
@@ -94,12 +94,12 @@
   \code{filters} method to set some restrictions.
 
   What kind of restrictions?  Well those can be listed by using the
-  \code{cols} and \code{keys} methods to list them.  Possible values for
+  \code{columns} and \code{keys} methods to list them.  Possible values for
   those can be found by using \code{keys}.
 
   Once this is determined, a list object can be assigned using
   \code{filters<-}.  The list needs to be named after values returned by
-  the \code{cols} and \code{keys} methods, and to contain character
+  the \code{columns} and \code{keys} methods, and to contain character
   vectors that contain results from the matching \code{keys} method.
 
   All \code{AnnotationHub} have a snapshot date that by default is set
@@ -139,7 +139,7 @@
 }
 
 \value{
-  \code{keys},\code{cols},\code{keytypes}, \code{species} and
+  \code{keys},\code{columns},\code{keytypes}, \code{species} and
   \code{lookupUniprotSpeciesFromTaxId} each return a character vector of
   possible values.
   
@@ -171,7 +171,7 @@
   filters(ah)
 
   ## list values that can be used to filter on:
-  cols(ah)
+  columns(ah)
   keytypes(ah)
 
   ## list possible values for one of these filter types
@@ -179,7 +179,7 @@
 
   ## OR retrieve metadata values about several keys at once
   ## (This approach may not always scale the way you want it to)
-  metadata(ah, cols = c("Species","RDataPath"))
+  metadata(ah, columns = c("Species","RDataPath"))
 
   ## create and apply a new filter to only include people
   filters(ah) <- list(Species="Homo sapiens")

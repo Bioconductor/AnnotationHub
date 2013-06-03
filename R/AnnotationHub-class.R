@@ -163,8 +163,8 @@ setMethod("keytypes", "AnnotationHub", function(x) {
     .keytypes(snapshotUrl(x))
 })
 
-## For this cols does the same thing as keytypes
-setMethod("cols", "AnnotationHub", function(x) {
+## For this columns does the same thing as keytypes
+setMethod("columns", "AnnotationHub", function(x) {
     .keytypes(snapshotUrl(x))
 })
 
@@ -178,9 +178,9 @@ setMethod("metadata", "AnnotationHub", function(x, cols, ...) {
     if(missing(cols)){
         cols <- c("Title","Species","TaxonomyId","Genome",
                       "Description","Tags","RDataClass","RDataPath")
-    } else if(!all(cols %in% cols(x))){
+    } else if(!all(cols %in% columns(x))){
         ## check cols to avoid user error (can't live in .metadata b/c of usage)
-        stop("All cols arguments must be values returned by the cols method.")
+        stop("All cols arguments must be values returned by the columns method.")
     }
     .metadata(snapshotUrl(x), filters(x), cols)
 })
