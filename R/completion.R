@@ -29,6 +29,8 @@
     prefix <- unname(sapply(result, names))
     counts <- sapply(result, unname)
     idx <- counts != 1L
+    if (identical(.Platform$GUI, "RStudio"))
+        return(prefix)
     prefix[idx] <- sprintf("%s ... [%d]", prefix[idx], counts[idx])
     prefix
 }
