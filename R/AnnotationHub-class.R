@@ -206,6 +206,9 @@ setMethod("metadata", "AnnotationHub", function(x, cols, ...) {
     }
 }
 
+setMethod("getResource", "AnnotationHub",
+          function(x, path, ...){.getResource(x, path)})
+
 setMethod("$", "AnnotationHub", function(x, name){.getResource(x,name)})
 
 setMethod("[[", "AnnotationHub",

@@ -77,6 +77,10 @@
 \alias{snapshotVersion,AnnotationHub-method}
 \alias{snapshotVersion,missing-method}
 
+% another way to DL
+\alias{getResource}
+\alias{getResource,AnnotationHub-method}
+
 
 % help
 \alias{ahinfo}
@@ -134,6 +138,8 @@
   keys(x, keytype, ...)
   columns(x)
   keytypes(x)
+  getResource(x, path, ...)
+  ahinfo(x, path, returnMeta=FALSE)
 }
 
 \arguments{
@@ -141,8 +147,10 @@
   \item{value}{the value to be assigned.  For filters method, this is a
   named list where the names are the kind of filters, and the values are
   character vectors of acceptable values}
-  \item{path}{the (optional) path string. }
-  \item{keytype}{ the type of key you want to look up possible values for. }
+  \item{path}{a path string}
+  \item{keytype}{the type of key you want to look up possible values
+    for}
+  \item{returnMeta}{return metadata as DataFrame (instead of printing it)}
   \item{...}{other arguments}
 }
 
@@ -203,6 +211,10 @@
   ## Download a resource (using tab completion) and put it into "res"
   res <- ah$goldenpath.hg19.encodeDCC.wgEncodeUwTfbs.wgEncodeUwTfbsMcf7CtcfStdPkRep1.narrowPeak_0.0.1.RData
 
+  ## extract paths another way:
+  res <- getResource(ah, "goldenpath.hg19.encodeDCC.wgEncodeUwTfbs.wgEncodeUwTfbsMcf7CtcfStdPkRep1.narrowPeak_0.0.1.RData")
+
+  ## Get metadata information about a resource.
   ahinfo(ah,"goldenpath.hg19.encodeDCC.wgEncodeUwTfbs.wgEncodeUwTfbsMcf7CtcfStdPkRep1.narrowPeak_0.0.1.RData")
 
 }

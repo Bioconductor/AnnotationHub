@@ -19,16 +19,16 @@
 ## arguments. (and name it something intuitive)
 
 
-ahinfo <- function(hub, path){
+ahinfo <- function(x, path, returnMeta=FALSE){
     ## 1st translate path to RDataPath style
-    srcUrls <- snapshotUrls(hub)
+    srcUrls <- snapshotUrls(x)
     path <- srcUrls[names(srcUrls) %in% path]
-    path <- sub(paste(hubUrl(hub),"/",sep=""), "", path)
+    path <- sub(paste(hubUrl(x),"/",sep=""), "", path)
     
     ## get metadata based on the hub and path
     cols <- c('BiocVersion','DataProvider','Description','Genome',
              'Tags','SourceUrl','SourceVersion','Species')
-    m <- .metadata(snapshotUrl(hub),
+    m <- .metadata(snapshotUrl(x),
                    filters=list(RDataPath=path),
                    cols=cols)
     
@@ -48,9 +48,12 @@ ahinfo <- function(hub, path){
                  paste(unlist(m$BiocVersion), collapse=", "),"\n",
                  "Tags:",paste(unlist(m$Tags), collapse=", "),"\n"
                  )
-
-
-    message(txt)
+    ## returnMeta is really just for internal use...
+    if(returnMeta==TRUE){
+        return(m)
+    }else{
+        message(txt)
+    }    
 }
 
 

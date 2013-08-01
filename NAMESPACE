@@ -37,7 +37,8 @@ exportMethods("$",
               snapshotPaths,
               snapshotUrl,
               snapshotUrls,
-              snapshotVersion
+              snapshotVersion,
+              getResource
               )
 
 export(AnnotationHub,
