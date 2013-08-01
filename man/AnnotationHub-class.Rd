@@ -36,10 +36,13 @@
 \alias{hubResource,AnnotationHub-method}
 \alias{hubResource,missing-method}
 
+\alias{columns}
 \alias{columns,AnnotationHub-method}
 
+\alias{keytypes}
 \alias{keytypes,AnnotationHub-method}
 
+\alias{keys}
 \alias{keys,AnnotationHub-method}
 
 \alias{length,AnnotationHub-method}
@@ -73,6 +76,7 @@
 \alias{snapshotVersion}
 \alias{snapshotVersion,AnnotationHub-method}
 \alias{snapshotVersion,missing-method}
+
 
 % help
 \alias{ahinfo}
@@ -127,6 +131,9 @@
   snapshotUrl(x, ...)
   snapshotUrls(x, ...)
   snapshotVersion(x, ...)
+  keys(x, keytype, ...)
+  columns(x)
+  keytypes(x)
 }
 
 \arguments{
@@ -135,20 +142,10 @@
   named list where the names are the kind of filters, and the values are
   character vectors of acceptable values}
   \item{path}{the (optional) path string. }
+  \item{keytype}{ the type of key you want to look up possible values for. }
   \item{...}{other arguments}
 }
 
-\value{
-  \code{keys},\code{columns},\code{keytypes}, \code{species} and
-  \code{lookupUniprotSpeciesFromTaxId} each return a character vector of
-  possible values.
-  
-  \code{taxId} returns a numeric value that corresponds to the taxonomy
-  ID.
-
-  \code{select} and \code{availableUniprotSpecies} each return a
-  data.frame.
-}
 
 \author{Marc Carlson}
 
