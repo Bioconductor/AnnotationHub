@@ -77,9 +77,9 @@
 \alias{snapshotVersion,AnnotationHub-method}
 \alias{snapshotVersion,missing-method}
 
-% another way to DL
-\alias{getResource}
-\alias{getResource,AnnotationHub-method}
+% % another way to DL
+% \alias{getResource}
+% \alias{getResource,AnnotationHub-method}
 
 
 % help
@@ -138,7 +138,6 @@
   keys(x, keytype, ...)
   columns(x)
   keytypes(x)
-  getResource(x, path, ...)
   ahinfo(x, path, returnMeta=FALSE)
 }
 
@@ -211,8 +210,8 @@
   ## Download a resource (using tab completion) and put it into "res"
   res <- ah$goldenpath.hg19.encodeDCC.wgEncodeUwTfbs.wgEncodeUwTfbsMcf7CtcfStdPkRep1.narrowPeak_0.0.1.RData
 
-  ## extract paths another way:
-  res <- getResource(ah, "goldenpath.hg19.encodeDCC.wgEncodeUwTfbs.wgEncodeUwTfbsMcf7CtcfStdPkRep1.narrowPeak_0.0.1.RData")
+  ## extract paths another way (more friendly for programming):
+  res <- ah[["goldenpath.hg19.encodeDCC.wgEncodeUwTfbs.wgEncodeUwTfbsMcf7CtcfStdPkRep1.narrowPeak_0.0.1.RData"]]
 
   ## Get metadata information about a resource.
   ahinfo(ah,"goldenpath.hg19.encodeDCC.wgEncodeUwTfbs.wgEncodeUwTfbsMcf7CtcfStdPkRep1.narrowPeak_0.0.1.RData")

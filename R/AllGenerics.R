@@ -33,5 +33,5 @@ setGeneric("filters", function(x, ...) standardGeneric("filters"))
 setGeneric("filters<-", signature=c("x", "value"),
            function(x, ..., value) standardGeneric("filters<-"))
 
-setGeneric("getResource", signature="x",
-           function(x, path=character(), ...) standardGeneric("getResource"))
+## setGeneric("getResource", signature="x",
+##            function(x, path=character(), ...) standardGeneric("getResource"))
