@@ -135,9 +135,9 @@
   snapshotUrl(x, ...)
   snapshotUrls(x, ...)
   snapshotVersion(x, ...)
-  keys(x, keytype, ...)
   columns(x)
   keytypes(x)
+  keys(x, keytype, ...)
   ahinfo(x, path, returnMeta=FALSE)
 }
 
@@ -153,6 +153,59 @@
   \item{...}{other arguments}
 }
 
+
+\section{Methods}{
+  In the code snippets below, \code{x} is an AnnotationHub object.
+
+  \describe{
+    \item{}{
+      \code{filters(x, ...)} and \code{filters(x, ...) <- value}:
+      Methods for listing and setting a list of filters for the AnnotationHub.
+    }
+    \item{}{
+      \code{hubUrl(x, ...)}:
+      Gets the URL for the main hub.
+    }      
+    \item{}{
+      \code{hubCache(x, ...)} and \code{hubCache(x, ...) <- value}:
+      Gets or sets the hub cache location.
+    }      
+    \item{}{
+      \code{possibleDates(x, ...)}:
+      Lists dates for snapshots that the hub could potentially use.
+    }
+    \item{}{
+      \code{snapshotDate(x)} and \code{snapshotDate(x, ...) <- value}:
+      Gets or sets the date for the snapshot in use.
+    }
+    \item{}{
+      \code{snapshotUrl(x, ...)}:
+      Gives the base URL for this current snapshot.
+    }
+    \item{}{
+      \code{snapshotUrls(x, ...)}:
+      Gives the individual URLS for all the snapshot resources.
+    }    
+    \item{}{
+      \code{snapshotVersion(x, ...)}:
+      shows the snapshot version in use.
+    }      
+    \item{}{
+      \code{columns(x)} and \code{keytypes(x)}:
+      shows which kinds of filters can be set for an
+      \code{AnnotationHub} object.
+    }  
+    \item{}{
+      \code{keys(x, keytype, ...)}:
+      Lists potential values for the filters of an \code{AnnotationHub}
+      object.  Use the keytype argument to specify which kind of filter.
+    }
+    \item{}{
+      \code{ahinfo(x, path, returnMeta=FALSE)}:
+      shows metadata about an AnnotationHub resource.
+    }
+}
+}
 
 \author{Marc Carlson}
 
