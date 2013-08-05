@@ -19,7 +19,7 @@
 ## arguments. (and name it something intuitive)
 
 
-ahinfo <- function(x, path, returnMeta=FALSE){
+ahinfo <- function(x, path){
     ## 1st translate path to RDataPath style
     srcUrls <- snapshotUrls(x)
     path <- srcUrls[names(srcUrls) %in% path]
@@ -49,11 +49,8 @@ ahinfo <- function(x, path, returnMeta=FALSE){
                  "Tags:",paste(unlist(m$Tags), collapse=", "),"\n"
                  )
     ## returnMeta is really just for internal use...
-    if(returnMeta==TRUE){
-        return(m)
-    }else{
-        message(txt)
-    }    
+    message(txt)
+    invisible(m)
 }
 
 

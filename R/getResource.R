@@ -61,7 +61,7 @@
 
     if (is(obj,"GRanges") || is(obj,"GRangesList")){
         len <- length(metadata(obj))
-        meta <- ahinfo(x, names(path), returnMeta=TRUE)
+        meta <- ahinfo(x, names(path))
         ## its expected that usually this will be put into spot 1, but
         ## just in case...
         metadata(obj)[[len+1]] <- as.list(meta) 

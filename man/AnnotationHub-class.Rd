@@ -138,7 +138,7 @@
   columns(x)
   keytypes(x)
   keys(x, keytype, ...)
-  ahinfo(x, path, returnMeta=FALSE)
+  ahinfo(x, path)
 }
 
 \arguments{
@@ -149,7 +149,6 @@
   \item{path}{a path string}
   \item{keytype}{the type of key you want to look up possible values
     for}
-  \item{returnMeta}{return metadata as DataFrame (instead of printing it)}
   \item{...}{other arguments}
 }
 
@@ -201,8 +200,9 @@
       object.  Use the keytype argument to specify which kind of filter.
     }
     \item{}{
-      \code{ahinfo(x, path, returnMeta=FALSE)}:
-      shows metadata about an AnnotationHub resource.
+      \code{ahinfo(x, path)}:
+      Shows metadata about an AnnotationHub resource and returns a DataFrame
+      with that data.
     }
 }
 }
