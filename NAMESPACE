@@ -21,6 +21,8 @@ S3method(.DollarNames, AnnotationHub)
 
 exportMethods("$",
               "[[",
+              "[",
+              as.list,
               filters, "filters<-",
               hubUrl,
               hubCache, "hubCache<-",

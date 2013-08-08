@@ -209,6 +209,8 @@ setMethod("metadata", "AnnotationHub", function(x, cols, ...) {
 ## setMethod("getResource", "AnnotationHub",
 ##           function(x, path, ...){.getResource(x, path)})
 
+
+## These operators get a named resource
 setMethod("$", "AnnotationHub", function(x, name){.getResource(x,name)})
 
 setMethod("[[", "AnnotationHub",
@@ -217,6 +219,47 @@ setMethod("[[", "AnnotationHub",
               .getResource(x, name=i)
           }
 )
+
+## This operator just limits the namespace
+setMethod("[", "AnnotationHub",
+          function(x, i, j, ..., drop){
+              if (nargs() >= 3) stop("too many subscripts")
+              if (is.character(i)) {
+                  paths <- names(x@snapshotPaths)
+                  x@snapshotPaths <- x@snapshotPaths[paths %in% i]
+              }else{
+                  x@snapshotPaths <- x@snapshotPaths[i]
+              }
+              x
+          }
+)
+
+
+## TESTs:
+## library(AnnotationHub); x<-AnnotationHub(); head(snapshotUrls(x[1:3]))
+## head(snapshotUrls(x["goldenpath.hg19.encodeDCC.wgEncodeUwTfbs.wgEncodeUwTfbsMcf7CtcfStdPkRep1.narrowPeak_0.0.1.RData"]))
+## head(snapshotUrls(x[c("goldenpath.hg19.encodeDCC.wgEncodeUwTfbs.wgEncodeUwTfbsMcf7CtcfStdPkRep1.narrowPeak_0.0.1.RData","dbSNP.organisms.human_9606.VCF.ByChromosome.01.12158.CHD.RData")]))
+
+
+
+## this just returns results for each in a list object.
+setMethod("as.list", "AnnotationHub",
+    function(x, ...)
+    {
+        res <- list(length(x))
+        if(length(x) >= 6){
+            message("Downloading this many resources may take a while...")
+        }
+        for(i in seq_along(snapshotUrls(x))){
+            res[[i]] <- x[[i]]
+        }
+        res
+    }
+)
+
+## TEST:
+## library(AnnotationHub); x<-AnnotationHub(); y <- x[2:3]; res <- as.list(y)
+## y <- x[1:10];  res <- as.list(y)  ## should warn users
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### The "show" method.

@@ -14,6 +14,10 @@
 \alias{[[,AnnotationHub-method}
 \alias{[[,AnnotationHub,ANY,ANY-method}
 
+\alias{[,AnnotationHub-method}
+\alias{as.list}
+\alias{as.list,AnnotationHub-method}
+
 \alias{filters} % only if we have the generic here do we do this
 \alias{filters,AnnotationHub-method}
 \alias{filters<-}
@@ -204,6 +208,11 @@
       Shows metadata about an AnnotationHub resource and returns a DataFrame
       with that data.
     }
+    \item{}{
+      \code{as.list(x, ...)}:
+      Returns all the resources in the \code{AnnotationHub} as elements
+      in a list object.
+    }
 }
 }
 
@@ -259,15 +268,37 @@
   ## (there is also a setter if you wish to assign this to another location)
   hubCache(ah)
 
-
   ## Download a resource (using tab completion) and put it into "res"
   res <- ah$goldenpath.hg19.encodeDCC.wgEncodeUwTfbs.wgEncodeUwTfbsMcf7CtcfStdPkRep1.narrowPeak_0.0.1.RData
 
-  ## extract paths another way (more friendly for programming):
-  res <- ah[["goldenpath.hg19.encodeDCC.wgEncodeUwTfbs.wgEncodeUwTfbsMcf7CtcfStdPkRep1.narrowPeak_0.0.1.RData"]]
 
-  ## Get metadata information about a resource.
-  ahinfo(ah,"goldenpath.hg19.encodeDCC.wgEncodeUwTfbs.wgEncodeUwTfbsMcf7CtcfStdPkRep1.narrowPeak_0.0.1.RData")
+  ## For brevity, lets define a resource pathname we are interested in 
+  pathName <- "goldenpath.hg19.encodeDCC.wgEncodeUwTfbs.wgEncodeUwTfbsMcf7CtcfStdPkRep1.narrowPeak_0.0.1.RData"
+
+  ## We can get metadata information about that resource:
+  ahinfo(ah, pathName)
+
+  ## Or we can extract it by name like this (using a list semantic):
+  res <- ah[[pathName]]
+
+  ## And we can also use "[" restrict the things that are in the
+  ## AnnotationHub object.  Either by position:
+  subHub <- ah[1:3]
+
+  ## Or by name
+  subHub <- ah[pathName]
+
+  ## So if I have many things to extract, I could do something like this:
+  pathNames <- c(pathName, "goldenpath.hg19.database.oreganno_0.0.1.RData")
+  res <- list()
+  for(i in pathNames){
+    res[[i]] <- ah[[i]]
+  }
+
+  ## OR those values can be extracted to a list like this (we recommend
+  ## that you only download what you need)
+  subHub <- ah[pathNames]
+  res <- as.list(subHub)
 
 }
 
