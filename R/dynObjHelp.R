@@ -29,8 +29,7 @@ setMethod(show, "ahinfoList", function(object) {
     cat(txt)
 })
 
-## This function is not vectorized, because .metadata is not vectorized.
-ahinfo <- function(x, path){
+.getOnePathObject <- function(x, path){
     if(length(path) >1) stop("Only one resource at a time please.")
     ## 1st translate path to RDataPath style
     srcUrls <- snapshotUrls(x)
@@ -47,6 +46,11 @@ ahinfo <- function(x, path){
     m$RDataPath <- paste0(hubUrl(x),"/",m$RDataPath)
     m$RDataName <- names(snapshotUrls(x))[snapshotUrls(x) %in% m$RDataPath]
     ahinfoList(as(m,"SimpleList"))
+}
+
+## This function is not vectorized, because .metadata is not vectorized.
+ahinfo <- function(x, paths){
+    sapply(paths, FUN=.getOnePathObject, x=x)
 }
 
 
