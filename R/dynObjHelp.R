@@ -1,25 +1,37 @@
 ## This file contains code to generate man pages based on the objects
 ## dynamically from the metadata.
 
-## Eventually, we want to be able to do it like this:
+## Eventually, we would like to be able to do somethign more like this:
 ## hub?path ## returns help
 
+## little object to come back from ahinfo
+setClass("ahinfoList", contains="SimpleList")
+## constructor:
+ahinfoList <- function(list){
+    if(missing(list)) stop("No list to create an ahinfoList from")
+    new("ahinfoList", list)
+}
+## show method
+setMethod(show, "ahinfoList", function(object) {
+    txt <- paste(
+                 " $DataProvider ",object$DataProvider,"\n",
+                 "$SourceVersion ",object$SourceVersion,"\n",
+                 "$Description ",object$Description,"\n",
+                 "$Species ",object$Species,"\n",
+                 "$Genome ",object$Genome,"\n",
+                 "$BiocVersion ",
+                 paste(unlist(object$BiocVersion), collapse=", "),"\n",
+                 "$Tags ",paste(unlist(object$Tags), collapse=", "),"\n",
+                 "$SourceUrl ",object$SourceUrl,"\n",
+                 "$RDataPath ",object$RDataPath,"\n",
+                 "$RDataName ",object$RDataName,"\n"
+                 )
+    cat(txt)
+})
 
-## But for now we will live with this:
-## AHHelp(hub, path)
-
-
-## the .metadata function is pretty great for finding stuff.  For this
-## example, we are just going to restrict the output to when
-## filter=list(RDataPath="PATH")
-
-
-## TODO: We could also easily make a helper that exposes more of the
-## power of .metadata() So we could give the user access to more
-## arguments. (and name it something intuitive)
-
-
+## This function is not vectorized, because .metadata is not vectorized.
 ahinfo <- function(x, path){
+    if(length(path) >1) stop("Only one resource at a time please.")
     ## 1st translate path to RDataPath style
     srcUrls <- snapshotUrls(x)
     path <- srcUrls[names(srcUrls) %in% path]
@@ -27,31 +39,17 @@ ahinfo <- function(x, path){
     
     ## get metadata based on the hub and path
     cols <- c('BiocVersion','DataProvider','Description','Genome',
-             'Tags','SourceUrl','SourceVersion','Species')
+             'Tags','SourceUrl','SourceVersion','Species','RDataPath')
     m <- .metadata(snapshotUrl(x),
                    filters=list(RDataPath=path),
                    cols=cols)
     
-    ## PROBLEM: what to do when values are missing???
-    ## So for my example, I ask for 8 things and I only get 7...
-    ## This is a case where the base service needs to return NAs (it
-    ## currently returns no indication when something is not there)
-    
-    ## then output that into a dynamic help page.
-    txt <- paste(
-                 " From:",m$DataProvider,"\n",
-                 "Version:",m$SourceVersion,"\n",
-                 "Description:",m$Description,"\n",
-                 "Genus and Species:",m$Species,"\n",
-                 "Genome:",m$Genome,"\n",
-                 "BiocVersion:",
-                 paste(unlist(m$BiocVersion), collapse=", "),"\n",
-                 "Tags:",paste(unlist(m$Tags), collapse=", "),"\n"
-                 )
-    ## returnMeta is really just for internal use...
-    message(txt)
-    invisible(m)
+    m$RDataPath <- paste0(hubUrl(x),"/",m$RDataPath)
+    m$RDataName <- names(snapshotUrls(x))[snapshotUrls(x) %in% m$RDataPath]
+    ahinfoList(as(m,"SimpleList"))
 }
+
+
 
 
 ## path = "goldenpath.hg19.encodeDCC.wgEncodeUwTfbs.wgEncodeUwTfbsMcf7CtcfStdPkRep1.narrowPeak_0.0.1.RData"; library(AnnotationHub); hub = AnnotationHub(); ahinfo(hub, path)

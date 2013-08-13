@@ -217,6 +217,6 @@ test_caching <- function(){
 test_info <- function(){
     path = "goldenpath.hg19.encodeDCC.wgEncodeUwTfbs.wgEncodeUwTfbsMcf7CtcfStdPkRep1.narrowPeak_0.0.1.RData"
     ## this is the real reason for this test
-    res <- suppressMessages(ahinfo(x, path)) ## should return a list
-    checkTrue(is(res,"DataFrame")) ## just verify that it ran
+    res <- ahinfo(x, path) ## should return a list
+    checkTrue(is(res,"ahinfoList")) ## just verify that it ran
 }

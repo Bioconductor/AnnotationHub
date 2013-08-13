@@ -8,6 +8,7 @@
 
 % Accessor-like methods
 \alias{show,AnnotationHub-method}
+\alias{show,ahinfoList-method}
 
 \alias{$,AnnotationHub-method}
 
