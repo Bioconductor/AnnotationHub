@@ -64,7 +64,7 @@
         meta <- ahinfo(x, names(path))
         ## its expected that usually this will be put into spot 1, but
         ## just in case...
-        metadata(obj)[[len+1]] <- as.list(meta) 
+        metadata(obj)[[len+1]] <- as.list(meta[[1]]) ## always just 1st one 
     }
     
     obj
