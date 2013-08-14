@@ -49,8 +49,8 @@ setMethod(show, "ahinfoList", function(object) {
 }
 
 ## This function is not vectorized, because .metadata is not vectorized.
-ahinfo <- function(x, paths){
-    sapply(paths, FUN=.getOnePathObject, x=x)
+ahinfo <- function(x, path){
+    sapply(path, FUN=.getOnePathObject, x=x)
 }
 
 
