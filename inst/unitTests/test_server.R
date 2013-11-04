@@ -7,7 +7,7 @@
 ## testObject
 x <- AnnotationHub()
 BiocVersion <- BiocInstaller::biocVersion()
-RDataDateAdded <- as.character(possibleDates(x)[1])
+RDataDateAdded <- as.character(possibleDates(x)[length(possibleDates(x))])
 
 
 ## Helper for getting headers into easily grep-able format
@@ -94,6 +94,14 @@ test_queryPathResults <- function(){
     checkTrue(nchar(res) > 1000)  
 }
 
+## busted url:  http://annotationhub.bioconductor.org/ah/2.14/2013-03-19/query/TaxonomyId/9606
+## broken because 1) wrong server and 2) wrong date - and otherwise it's fine
+
+## This works 
+## mhuman = AnnotationHub:::.metadata(snapshotUrl(ah),filter=list(TaxonomyId='9606'), cols='RDataPath')
+## http://gamay/ah/2.14/2013-06-28/query/TaxonomyId/9606/cols/RDataPath
+
+
 ## Does the URL used by metadata return values?
 test_metadataResults <- function(){
     url <- 
@@ -103,3 +111,5 @@ test_metadataResults <- function(){
     res <- AnnotationHub:::.parseJSON(url) 
     checkTrue(length(res[[1]]) > 1)
 }
+
+## same as above (wrong date)

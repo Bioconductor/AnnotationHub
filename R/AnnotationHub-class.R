@@ -3,17 +3,17 @@
 ## because sometimes there may be multiple acceptable values for a
 ## given keytype.
 
-setOldClass("package_version")          # needed for AnnotationHub definition
+######setOldClass("package_version")          # needed for AnnotationHub definition
 
 .AnnotationHub <- setClass("AnnotationHub",
                            representation(hubUrl="character",
                                           hubCache="character",
-                                          snapshotVersion="package_version",
+                                          snapshotVersion="character",
                                           snapshotDate="POSIXlt",
                                           snapshotPaths="character",
                                           filters="list"),
                            prototype(hubCache = NA_character_,
-                                     snapshotVersion=package_version("0.0"),
+                                     snapshotVersion="0.0",
                                      snapshotDate=as.POSIXlt("2012-01-01")))
 
 ## FIXME: validity -- filters
@@ -26,17 +26,37 @@ AnnotationHub <-
     function(hubUrl=.hubUrl(), hubCache = .hubCache(),
              snapshotVersion, snapshotDate, ...)
 {
+
     snapshotVersion <-
         if (missing(snapshotVersion)) .snapshotVersion()
-        else as.package_version(snapshotVersion)
+        else as.character(snapshotVersion)
     snapshotDate <-
         if (missing(snapshotDate)) .snapshotDate(hubUrl, snapshotVersion)
         else as.POSIXlt(snapshotDate)
+
+
     snapshotUrl <- .snapshotUrl(hubUrl, snapshotVersion, snapshotDate)
+
+    pingurl <- paste(snapshotUrl, "ping", sep="/")
+    result <- .parseJSON(pingurl)
+    if (!result$status == "OK")
+    {
+        if (result$status == "WARNING")
+          message(result$message)
+        else if (result$status == "ERROR")
+          stop(result$message)
+    } else {
+        if (getOption("AnnotationHub.debug", FALSE))
+            print(paste("Ping Status:", result$message))
+    }
+
+
     snapshotPaths <- .snapshotPaths(snapshotUrl)
 
+
+
     .AnnotationHub(hubUrl=hubUrl, hubCache=hubCache,
-                   snapshotVersion=snapshotVersion,
+                   snapshotVersion=as.character(snapshotVersion),
                    snapshotDate=snapshotDate,
                    snapshotPaths=snapshotPaths, ...)
 }

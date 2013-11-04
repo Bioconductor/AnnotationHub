@@ -24,6 +24,8 @@
     url <- hubResource(x, path, cached=FALSE)
     destfile <- hubResource(x, path, cached=TRUE)
     .dirCreate(dirname(destfile)) 
+    if (getOption("AnnotationHub.debug", FALSE))
+        print(paste("Downloading", url))
     download.file(url=url, destfile=destfile, quiet=TRUE)
 }
 
@@ -35,6 +37,9 @@
             message("Retrieving ", sQuote(path))
             rsrc <- url(rsrc)
         }
+        if (getOption("AnnotationHub.debug", FALSE))
+            print(paste("Downloading", hubResource(x, path)))
+
         .objName <- load(rsrc)
         get(.objName)
     })
