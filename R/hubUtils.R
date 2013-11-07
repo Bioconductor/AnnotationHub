@@ -43,7 +43,20 @@
     ## process url to get rid of any spaces.
     url <- gsub(" ", "%20", url)
     ## then parse the JSON
-    j <- fromJSON(file=url)
+    if (getOption("AnnotationHub.debug", FALSE))
+        .printf("Visiting %s", url)
+    ## It turns out that if you give fromJSON a file= argument that is a URL,
+    ## it does not always succesfully retrieve the file. For example, on 
+    ## Nov 7, 2013, trying to do this:
+    ## fromJSON(file="http://annotationhub.bioconductor.org/ah/2.14/1.3.1/2013-10-30/query/cols/Title/cols/Species/cols/TaxonomyId/cols/Genome/cols/Description/cols/Tags/cols/RDataClass/cols/RDataPath")
+    ## ...returns an error. We can work around this by downloading to a tempfile and 
+    ## then calling fromJSON() on that. We need to use the "curl"  method for downloading.
+    ## (using the default method produces the same error).
+    ## The real problem is probably that it takes too long for the request to be fulfilled, 
+    ## so it's really a matter of optimizing the server performance.
+    t <- tempfile()
+    download.file(url, destfile=t, method="curl", quiet=TRUE)
+    j <- fromJSON(file=t)
     #lapply(j, function(x){lapply(x, .na2na)})
     rapply(j, .na2na, how="replace")
 }
