@@ -233,9 +233,14 @@ setMethod("possibleDates", "missing", function(x, ...) {
 }
 
 .hubResource <- function(hubUrl, path=character()) {
-    file <- paste(hubUrl, .snapshotVersion(), "resources", sep="/")
+    bucketname <- getOption("ANNOTATION_HUB_BUCKET_NAME", "annotationhub")
+    s3url <- getOption("ANNOTATION_HUB_S3_URL",
+        paste0("http://", bucketname,".s3.amazonaws.com/"))
+    file <- s3url
+    path <- gsub("//", "/", path, fixed=TRUE)
+    path <- sub("^\\/", "", path)
     if (length(path))
-        file <- paste(file, path, sep="/")
+        file <- paste0(file, path)
     file
 }
 
