@@ -2,6 +2,8 @@
 
 .onLoad <- function(libname, pkgname)
 {
+    if (tolower(Sys.getenv("ANNOTATIONHUB_USE_DISK")) == "true") 
+        options("AnnotationHub_Use_Disk"=TRUE) # use disk instead of S3
     if (is.na(hubCache())) {
         os <- .Platform$OS.type
         basePath <- switch(os,
