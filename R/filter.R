@@ -51,15 +51,16 @@
     res <- character()
     for (i in seq_along(filter)) {
         if (any(grepl("/", filter[i]))) {
-            res[i] <- paste(filterName, paste0('%22', filter, '%22'),
+            res[i] <- paste(filterName, paste0('%22', filter[i], '%22'),
                             sep='/')
         } else {
-            res[i] <- paste(filterName, filter, sep='/')
+            res[i] <- paste(filterName, filter[i], sep='/')
         }
     }
     paste(res, collapse="/")
 }
 
+## Helper used by metadata to turn filters into URIs
 .makeURLFilters <- function(filters){
     filters <- unlist(Map(.processFilter, filters,
                               names(filters)))
