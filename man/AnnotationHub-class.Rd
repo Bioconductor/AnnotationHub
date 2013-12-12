@@ -82,10 +82,11 @@
 \alias{snapshotVersion,AnnotationHub-method}
 \alias{snapshotVersion,missing-method}
 
+\alias{display,AnnotationHub-method}
+
 % % another way to DL
 % \alias{getResource}
 % \alias{getResource,AnnotationHub-method}
-
 
 % help
 \alias{ahinfo}
@@ -144,10 +145,12 @@
   keytypes(x)
   keys(x, keytype, ...)
   ahinfo(x, path)
+  display(object,...)
 }
 
 \arguments{
   \item{x}{the \code{AnnotationHub} object. }
+  \item{object}{the \code{AnnotationHub} object. }
   \item{value}{the value to be assigned.  For filters method, this is a
   named list where the names are the kind of filters, and the values are
   character vectors of acceptable values}
@@ -213,6 +216,13 @@
       \code{as.list(x, ...)}:
       Returns all the resources in the \code{AnnotationHub} as elements
       in a list object.
+    }
+    \item{}{
+      \code{display(object, ...)}:
+      Implements the display generic from interactiveDisplay package.
+    Users can select metadata rows from a web interface, the values in
+    the rows selected by the user become filters applied to the
+    AnnotationHub object.
     }
 }
 }

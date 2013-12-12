@@ -16,6 +16,8 @@ importFrom(rjson, fromJSON)
 
 importFrom(stats, setNames)
 
+importFrom(interactiveDisplay, display)
+
 ## export our S3 method.
 S3method(.DollarNames, AnnotationHub)
 
@@ -39,7 +41,8 @@ exportMethods("$",
               snapshotPaths,
               snapshotUrl,
               snapshotUrls,
-              snapshotVersion
+              snapshotVersion,
+              display
               )
 
 export(AnnotationHub,

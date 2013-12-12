@@ -4,9 +4,9 @@ Title: A client for retrieving Bioconductor objects from AnnotationHub
 Version: 1.3.5
 Depends: IRanges
 Imports: methods, stats, utils, rjson, BiocGenerics,
-    BiocInstaller (>= 1.11.0), AnnotationDbi, GenomicRanges
+    BiocInstaller (>= 1.11.0), AnnotationDbi, GenomicRanges, interactiveDisplay
 Suggests: RUnit, RCurl, Rsamtools
-Author: Marc Carlson 
+Author: Marc Carlson
 Maintainer: Marc Carlson <mcarlson@fhcrc.org>
 Description: A client for retrieving data from the Bioconductor
     AnnotationHub online services.
@@ -19,6 +19,7 @@ Collate: AllGenerics.R
     AnnotationHub-class.R
     test_AnnotationHub_package.R
     dynObjHelp.R
+    display.R
     zzz.R
 License: Artistic-2.0
 biocViews: Annotation, Infrastructure
