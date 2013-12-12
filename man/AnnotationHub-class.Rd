@@ -16,6 +16,7 @@
 \alias{[[,AnnotationHub,ANY,ANY-method}
 
 \alias{[,AnnotationHub-method}
+\alias{[,AnnotationHub,ANY,ANY,ANY-method} 
 \alias{as.list}
 \alias{as.list,AnnotationHub-method}
 
@@ -82,6 +83,7 @@
 \alias{snapshotVersion,AnnotationHub-method}
 \alias{snapshotVersion,missing-method}
 
+\alias{display}
 \alias{display,AnnotationHub-method}
 
 % % another way to DL
