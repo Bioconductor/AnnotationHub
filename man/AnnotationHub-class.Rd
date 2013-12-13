@@ -86,14 +86,13 @@
 \alias{display}
 \alias{display,AnnotationHub-method}
 
+
 % % another way to DL
 % \alias{getResource}
 % \alias{getResource,AnnotationHub-method}
 
 % help
 \alias{ahinfo}
-  
-
 
 \title{AnnotationHub objects and their related methods and functions}
 
@@ -313,7 +312,12 @@
   subHub <- ah[pathNames]
   res <- as.list(subHub)
 
+  if(interactive()) {
+    ## Display method involves user interaction through web interface
+    ah2 <- display(ah)
+  }
 }
+
 
 
 \keyword{classes}
