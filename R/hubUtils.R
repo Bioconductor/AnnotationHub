@@ -141,10 +141,47 @@
 }
 
 
+##############################################################################
+## helper for quickly getting the max date (want this to be fast as possible)
+.latestDates <- function(x) {
+    hubUrl <- hubUrl(x)
+    snapshotVersion <- snapshotVersion(x)
+    url <- paste(hubUrl, snapshotVersion, "getSnapshotDates",
+                  sep="/")
+    max(as.POSIXlt(.parseJSON(url)))
+}
+## usage: system.time(AnnotationHub:::.latestDates(ah))
+## time comparison
+## system.time(replicate(100, AnnotationHub:::.latestDates(ah), simplify=FALSE))
+## system.time(replicate(100, max(possibleDates()), simplify=FALSE))
+## So I do save a very TINY amount of time with my helper (so lets use it).
+
+##############################################################################
+## helper to get latest SnapshotDate from cache. (only works if
+## caching is enabled)
+.getLastSnapShotDate <- function(x) {
+    snapshotLoc <- file.path(hubCache(),"snapshotDate.Rda")    
+    if(file.exists(snapshotLoc)){
+        load(snapshotLoc)
+        return(snapshotDate)
+    }else{
+        snapshotDate <- snapshotDate(x)
+        save(snapshotDate, file=snapshotLoc)
+        return(snapshotDate)
+    }
+}
+## helper to save snapShotdate to cache
+.saveLatestSnapShotDate <- function(date) {
+    snapshotLoc <- file.path(hubCache(),"snapshotDate.Rda")
+    save(date, file=snapshotLoc)
+}
+
+
 ## metadata takes a filter list and cols and returns a DataFrame
-.metadata <- function(snapshotUrl, filters=list(), cols=c("Title","Species",
-                                           "TaxonomyId","Genome","Description",
-                                           "Tags","RDataClass","RDataPath")) {  
+.metadataRemote <- function(snapshotUrl, filters=list(),
+                            cols=c("Title","Species",
+                              "TaxonomyId","Genome","Description",
+                              "Tags","RDataClass","RDataPath")) {  
     ## format cols
     cols <- paste("cols",cols, sep="/", collapse="/")
     ## then make a url
@@ -155,34 +192,46 @@
         paste(snapshotUrl, "query", filters, cols, sep="/") ##vectorized?
     } else {## get all of them
         paste(snapshotUrl, "query", cols, sep="/")
-    }
-
-    
+    }   
     ## get the metadata
     ## meta <- .parseJSON(url) ## list form (by row)  (USUALLY)
     meta <- .parseJSONMetadataList(url)
     ## make a DataFrame (remove this later)
     .toDataFrame(meta)
-
-
-    
-    ## ## make a data.frame (remove this later)
-    ## if(class(meta)=="list"){
-    ##     idx <- sapply(meta, is, "list")
-    ##     meta[idx] <- lapply(meta[idx], function(elt) {
-    ##         ## named character vectors come from json as named lists
-    ##         subidx <- sapply(elt, is, "list")
-    ##         elt[subidx] <- lapply(elt[subidx], unlist)
-    ##         elt
-    ##     })
-    ##     meta[idx] <- lapply(meta[idx], as, "List")
-    ##     DataFrame(meta)
-    ## }else{
-    ##     ## double cast so label is the colname, and return val is consistent.
-    ##     DataFrame(as.list(meta))
-    ## }
 }
 
+## This is what we will call when we pull data only from the cache.
+.metadataLocal <- function(snapshotUrl, filters=list(),
+                           cols=c("Title","Species",
+                             "TaxonomyId","Genome","Description",
+                             "Tags","RDataClass","RDataPath")) {
+    metadataLoc <- file.path(hubCache(),"metadata.Rda")
+
+    ## get metadata from local cache - ALL fields will be present so I
+    ## need to remove fields that I are not in the list of cols
+    ## requested.
+    
+}
+
+.metadata <- function(x, snapshotUrl=snapshotUrl(x), filters=list(),
+                      cols=c("Title","Species",
+                        "TaxonomyId","Genome","Description",
+                        "Tags","RDataClass","RDataPath")) {
+    if(FALSE){##.getLastSnapShotDate(x)){
+        
+    }else{ ## the dates don't match...
+        ## TEMPORARILY, this will just do what it did before
+        .metadataRemote(snapshotUrl, filters=filters, cols=cols)
+
+        ##############################################################
+        ## BUT I need to make it smarter and have it do this too:
+        ## Start by getting ALL the data paths
+        ## compare paths to locally extracted metadata() & setdiff() these paths
+        ## get all the data for the paths we don't have yet and update
+        ## the local metadata by appending it.
+        ## update (save) local snapshotDate file (.saveLatestSnapShotDate())
+    }
+}
 
 .keytypes <-function(snapshotUrl) {
     url <- paste(snapshotUrl, 'getAllKeytypes', sep="/")

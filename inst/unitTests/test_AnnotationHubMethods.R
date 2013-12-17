@@ -1,8 +1,7 @@
 ## Unit tests for methods and helpers that are used to set and use
 ## filters on an AnnotationHub object.
 
-## require(AnnotationHub)
-## debug(AnnotationHub:::.metadata)
+## require(AnnotationHub); debug(AnnotationHub:::.metadata); debug(AnnotationHub:::.metadataRemote)
 
 x <- AnnotationHub()
 
@@ -72,12 +71,12 @@ test_validFilterValues <- function(){
 test_getMetadata <- function(){
     filters <- NULL ## IOW: no filters
     snapUrl <- snapshotUrl()
-    res <- AnnotationHub:::.metadata(snapUrl,filters)
+    res <- AnnotationHub:::.metadata(x, snapUrl,filters)
     checkTrue(dim(res)[1] > 1) ## should give multiple records 
     ## check that we can get filtered metadata
     filters <- list(TaxonomyId="9606",
         SourceFile=sampleSource)
-    res <- AnnotationHub:::.metadata(snapUrl,filters)
+    res <- AnnotationHub:::.metadata(x, snapUrl,filters)
     checkTrue(dim(res)[1] == 1)  ## should only match one record
 }
 

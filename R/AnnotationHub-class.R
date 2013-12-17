@@ -202,7 +202,7 @@ setMethod("metadata", "AnnotationHub", function(x, cols, ...) {
         ## check cols to avoid user error (can't live in .metadata b/c of usage)
         stop("All cols arguments must be values returned by the columns method.")
     }
-    .metadata(snapshotUrl(x), filters(x), cols)
+    .metadata(x, snapshotUrl(x), filters(x), cols)
 })
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

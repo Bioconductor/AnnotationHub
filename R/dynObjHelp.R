@@ -39,7 +39,8 @@ setMethod(show, "ahinfoList", function(object) {
     ## get metadata based on the hub and path
     cols <- c('BiocVersion','DataProvider','Description','Genome',
              'Tags','SourceUrl','SourceVersion','Species','RDataPath')
-    m <- .metadata(snapshotUrl(x),
+    m <- .metadata(x,
+                   snapshotUrl(x),
                    filters=list(RDataPath=path),
                    cols=cols)
     
@@ -62,7 +63,7 @@ ahinfo <- function(x, path){
 
 ## OTHER issue???
 ## debug(AnnotationHub:::.metadata)
-## AnnotationHub:::.metadata(snapshotUrl(hub),filters=list(RDataPath=path), cols=c('BiocVersion','DataProvider','Description','Genome','Tags','SourceUrl','SourceVersion','Species'))
+## AnnotationHub:::.metadata(hub, snapshotUrl(hub),filters=list(RDataPath=path), cols=c('BiocVersion','DataProvider','Description','Genome','Tags','SourceUrl','SourceVersion','Species'))
 
 ## ahinfo(hub,"ensembl.release.69.fasta.equus_caballus.dna.Equus_caballus.EquCab2.69.dna.toplevel.fa.gz")
 
