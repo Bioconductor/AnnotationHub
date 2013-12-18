@@ -16,6 +16,7 @@ sampleSource <- paste("goldenpath/hg19/encodeDCC/wgEncodeUchicagoTfbs",
     "wgEncodeUchicagoTfbsK562Enr4a1ControlPk.narrowPeak.gz",
     sep="/")
 
+
 ## m <- metadata(x, cols="Title")
 
 ##  What is the shortest example to DL? A: stamH3K4me3ProfilePromoters.RData
