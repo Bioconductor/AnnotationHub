@@ -143,16 +143,16 @@
 
 ##############################################################################
 ## helper for quickly getting the max date (want this to be fast as possible)
-.latestDates <- function(x) {
+.latestDate <- function(x) {
     hubUrl <- hubUrl(x)
     snapshotVersion <- snapshotVersion(x)
     url <- paste(hubUrl, snapshotVersion, "getSnapshotDates",
                   sep="/")
     max(as.POSIXlt(.parseJSON(url)))
 }
-## usage: system.time(AnnotationHub:::.latestDates(ah))
+## usage: system.time(AnnotationHub:::.latestDate(ah))
 ## time comparison
-## system.time(replicate(100, AnnotationHub:::.latestDates(ah), simplify=FALSE))
+## system.time(replicate(100, AnnotationHub:::.latestDate(ah), simplify=FALSE))
 ## system.time(replicate(100, max(possibleDates()), simplify=FALSE))
 ## So I do save a very TINY amount of time with my helper (so lets use it).
 
@@ -220,6 +220,19 @@
 ## cols = c("Species", "TaxonomyId", "Genome", "RDataClass", "Tags")
 
 
+## TEMP list of all cols we can extract...
+extractCols <- c("BiocVersion","DataProvider","Title","SourceFile",
+                 "Species","SourceUrl","SourceVersion",
+                 "TaxonomyId","Genome","Description",
+                 "Tags","RDataClass","RDataPath")
+## What I want is just call the remote metadata (and get EVERYTHING)
+## extractCols <- keytypes(ah)
+## Or failing that be able to do this:
+## extractCols <- extractCols[!(extractCols %in% "RecipeArgs")]
+## TODO: work out why I can't get everything and fix that!
+## For now lets press on...
+
+
 ## This is what we will call when we pull data only from the cache.
 ## It gets metadata from local cache - ALL fields will be present so I
 ## need to remove fields that I are not in the list of cols requested.
@@ -233,25 +246,35 @@
         ## then load it etc.
         load(metadataLoc)
         ## then filter it
-        meta <- .filterMeta(meta, filters, cols)
-        return(meta)
+        .filterMeta(meta, filters, cols)
     }else{ ## 1st time case where there isn't any local data yet.
-        ## otherwise, call the remote metadata (and get EVERYTHING)
-        ## kts <- keytypes(ah)
-        ## kts <- kts[!(kts %in% "RecipeArgs")]
-        ## TODO: work out why I can't get everything and fix that!
-        ## For now lets press on...
-        kts <- c("BiocVersion","DataProvider","Title","SourceFile",
-                             "Species","SourceUrl","SourceVersion",
-                             "TaxonomyId","Genome","Description",
-                             "Tags","RDataClass","RDataPath")
-        meta <- .metadataRemote(snapshotUrl, cols=kts)
+        meta <- .metadataRemote(snapshotUrl, cols=extractCols)
         ## then save it
         save(meta, file=metadataLoc)
-        meta <- .filterMeta(meta, filters, cols)
-        return(meta)
+        .filterMeta(meta, filters, cols)
     }
 }
+
+
+## Called when we need to update the LocalMetadata Cache
+.updateLocalMetadata <- function(x, snapshotUrl, filters=filters, cols=cols){
+    remotePaths <- .metadataRemote(snapshotUrl, cols="RDataPath")
+    localPaths <- .metadataLocal(snapshotUrl, cols="RDataPath")
+    missingPaths <- setdiff(remotePaths, localPaths)
+    ## get all the data for the paths we don't have yet and update
+    missingData <- .metadataRemote(snapshotUrl,
+                                   filters=list(RDataPath=missingPaths),
+                                   cols=extractCols)
+    metadataLoc <- file.path(hubCache(),"metadata.Rda")
+    load(metadataLoc)
+    meta <- rbind(meta,missingData)
+    save(meta, file=metadataLoc)
+    meta <- .filterMeta(meta, filters, cols)
+    ## Don't forget to also update (save) local snapshotDate as well
+    .saveLatestSnapShotDate(.latestDate(x))
+    meta
+}
+
 
 .metadata <- function(x, snapshotUrl=snapshotUrl(x), filters=list(),
                       cols=c("Title","Species",
@@ -259,18 +282,10 @@
                         "Tags","RDataClass","RDataPath")) {
     ## For TEMPORARY disable of metadata caching
     ## if(FALSE){
-    if(.getLastSnapShotDate(x) == .latestDates(x)){
+    if(.getLastSnapShotDate(x) == .latestDate(x)){
         .metadataLocal(snapshotUrl, filters=filters, cols=cols)
-    }else{ ## the dates don't match...
-        ## TEMPORARILY, this will just do what it did before
-        .metadataRemote(snapshotUrl, filters=filters, cols=cols)
-        ##############################################################
-        ## BUT I need to make it smarter and have it do this too:
-        ## Start by getting ALL the data paths from online (metadataRemote)
-        ## compare paths to locally extracted metadata() & setdiff() these paths
-        ## get all the data for the paths we don't have yet and update
-        ## the local metadata by appending it. .updateLocalMetadata()
-        ## update (save) local snapshotDate file (.saveLatestSnapShotDate())
+    }else{ ## the dates don't match... So update!
+        .updateLocalMetadata(x, snapshotUrl, filters=filters, cols=cols)
     }
 }
 ## tests
