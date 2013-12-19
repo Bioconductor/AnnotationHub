@@ -220,17 +220,28 @@
 ## cols = c("Species", "TaxonomyId", "Genome", "RDataClass", "Tags")
 
 
+#############################################################################
 ## TEMP list of all cols we can extract...
 extractCols <- c("BiocVersion","DataProvider","Title","SourceFile",
                  "Species","SourceUrl","SourceVersion",
                  "TaxonomyId","Genome","Description",
-                 "Tags","RDataClass","RDataPath")
+                 "Tags","RDataClass","RDataPath", ## new stuff follows
+                 "Coordinate_1_based","Maintainer",
+                 "RDataVersion","RDataDateAdded","Recipe")
+
+## trouble when included with certain others?: "SourceSize"
+## IOW, if I drop the last 6 or so above, I can get SourceSize, but
+## not at the same time..
+## "Toxic" fields: "RDataSize", "RDataLastModifiedDate", "RecipeArgs", 
+
+
 ## What I want is just call the remote metadata (and get EVERYTHING)
 ## extractCols <- keytypes(ah)
 ## Or failing that be able to do this:
 ## extractCols <- extractCols[!(extractCols %in% "RecipeArgs")]
 ## TODO: work out why I can't get everything and fix that!
 ## For now lets press on...
+#############################################################################
 
 
 ## This is what we will call when we pull data only from the cache.
@@ -279,18 +290,23 @@ extractCols <- c("BiocVersion","DataProvider","Title","SourceFile",
 .metadata <- function(x, snapshotUrl=snapshotUrl(x), filters=list(),
                       cols=c("Title","Species",
                         "TaxonomyId","Genome","Description",
-                        "Tags","RDataClass","RDataPath")) {
-    ## For TEMPORARY disable of metadata caching
-    ## if(FALSE){
-    if(.getLastSnapShotDate(x) == .latestDate(x)){
-        .metadataLocal(snapshotUrl, filters=filters, cols=cols)
-    }else{ ## the dates don't match... So update!
-        .updateLocalMetadata(x, snapshotUrl, filters=filters, cols=cols)
+                        "Tags","RDataClass","RDataPath"), useWebOnly=FALSE) {
+    if(useWebOnly==TRUE){## For internal testing only
+        .metadataRemote(snapshotUrl, filters, cols)
+    }else{
+        if(.getLastSnapShotDate(x) == .latestDate(x)){
+            .metadataLocal(snapshotUrl, filters=filters, cols=cols)
+        }else{ ## the dates don't match... So update!
+            .updateLocalMetadata(x, snapshotUrl, filters=filters, cols=cols)
+        }
     }
 }
-## tests
+## some tests
 ## library(AnnotationHub);ah = AnnotationHub(); system.time(m <- metadata(ah))
 ## res <- ah$goldenpath.hg19.encodeDCC.wgEncodeUwTfbs.wgEncodeUwTfbsMcf7CtcfStdPkRep1.narrowPeak_0.0.1.RData
+##
+## web only:
+## library(AnnotationHub);ah = AnnotationHub(); system.time(m <- AnnotationHub:::.metadata(ah, snapshotUrl(ah), useWebOnly=TRUE))
 
 
 .keytypes <-function(snapshotUrl) {
