@@ -1,16 +1,11 @@
-
-
 setMethod("display", signature(object="AnnotationHub"),
-          function(object, ...) {
+    function(object, ...) 
+{
     md <- metadata(object)
-    d <- display(as.data.frame(md)) # cast as dataframe to display in browser
-
-    ## f <- apply(d,2, unique) 
-
-    # drop the element named "Tags"
-    ## f2 <- f[-which(names(f) %in% c("Tags"))]
-
+    drops <-c("Title", "TaxonomyId")
+    md <- md[,!(names(md) %in% drops)]
+    #Concatenate a string with show(object) and pass to the next line..
+    d <- display(as.data.frame(md)) 
     filters(object) <- as.list(d['RDataPath'])
-
     return(object)
 })
