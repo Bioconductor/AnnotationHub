@@ -55,7 +55,7 @@
     ## The real problem is probably that it takes too long for the request to be fulfilled, 
     ## so it's really a matter of optimizing the server performance.
     t <- tempfile()
-    download.file(url, destfile=t, method="curl", quiet=TRUE)
+    download.file(url, destfile=t, quiet=TRUE)
     j <- fromJSON(file=t)
     #lapply(j, function(x){lapply(x, .na2na)})
     rapply(j, .na2na, how="replace")
