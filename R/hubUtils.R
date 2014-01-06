@@ -266,20 +266,40 @@ extractCols <- c("BiocVersion","DataProvider","Title","SourceFile",
     }
 }
 
+##library(AnnotationHub); ah = AnnotationHub(); debug(AnnotationHub:::.updateLocalMetadata); debug(AnnotationHub:::.parseJSONMetadataList); metadata(ah)
 
 ## Called when we need to update the LocalMetadata Cache
 .updateLocalMetadata <- function(x, snapshotUrl, filters=filters, cols=cols){
-    remotePaths <- .metadataRemote(snapshotUrl, cols="RDataPath")
-    localPaths <- .metadataLocal(snapshotUrl, cols="RDataPath")
-    missingPaths <- setdiff(remotePaths, localPaths)
-    ## get all the data for the paths we don't have yet and update
-    missingData <- .metadataRemote(snapshotUrl,
-                                   filters=list(RDataPath=missingPaths),
-                                   cols=extractCols)
+
+    ## TODO: work out why the following fails to work (why we can't
+    ## just get the records that we want using the RDataPath filter) -
+    ## and why we have to instead get ALL the records to replace them
+    ## instead of being able to increment them.
+    
+    ## remotePaths <- as.character(t(as.data.frame(.metadataRemote(snapshotUrl,
+    ##                                                  cols="RDataPath"))))
+    ## localPaths <- as.character(t(as.data.frame(.metadataLocal(snapshotUrl,
+    ##                                                 cols="RDataPath"))))
+    ## missingPaths <- setdiff(remotePaths, localPaths)
+    ## 
+    ## ##Then get all the data for the paths we don't have yet and update
+    ## missingData <- .metadataRemote(snapshotUrl,
+    ##                                filters=list(RDataPath=missingPaths),
+    ##                                cols=extractCols)
+    ## metadataLoc <- file.path(hubCache(),"metadata.Rda")
+    ## load(metadataLoc)
+    ## meta <- rbind(meta,missingData)
+    ## save(meta, file=metadataLoc)
+    
+    ## OK so for now, just get ALL the data, and then just replace it.
+    meta <- .metadataRemote(snapshotUrl,
+                               cols=extractCols)
     metadataLoc <- file.path(hubCache(),"metadata.Rda")
-    load(metadataLoc)
-    meta <- rbind(meta,missingData)
     save(meta, file=metadataLoc)
+
+    
+    ## Continuing on:
+    ## Then filter so that what comes back is properly subsetted
     meta <- .filterMeta(meta, filters, cols)
     ## Don't forget to also update (save) local snapshotDate as well
     .saveLatestSnapShotDate(.latestDate(x))
@@ -310,8 +330,10 @@ extractCols <- c("BiocVersion","DataProvider","Title","SourceFile",
 
 
 .keytypes <-function(snapshotUrl) {
-    url <- paste(snapshotUrl, 'getAllKeytypes', sep="/")
-    .parseJSON(url)
+    ## url <- paste(snapshotUrl, 'getAllKeytypes', sep="/")
+    ## .parseJSON(url)
+    ## TEMP use the extractCols (for consistency)
+    extractCols
 }
 
 
