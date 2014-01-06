@@ -163,11 +163,11 @@
     snapshotLoc <- file.path(hubCache(),"snapshotDate.Rda")    
     if(file.exists(snapshotLoc)){
         load(snapshotLoc)
-        return(snapshotDate)
+        return(date)
     }else{
-        snapshotDate <- snapshotDate(x)
-        save(snapshotDate, file=snapshotLoc)
-        return(snapshotDate)
+        date <- snapshotDate(x)
+        save(date, file=snapshotLoc)
+        return(date)
     }
 }
 ## helper to save snapShotdate to cache
