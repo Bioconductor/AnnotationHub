@@ -175,7 +175,7 @@
     if(file.exists(snapshotLoc)){
         ## Filename shenanigans! (in case the file gets renamed on us)
         load(snapshotLoc)
-        objName <- print(load(snapshotLoc))
+        objName <- load(snapshotLoc)
         date <- eval(parse(text=objName))
         return(date)
     }else{
