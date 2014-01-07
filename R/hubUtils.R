@@ -157,25 +157,33 @@
 ## So I do save a very TINY amount of time with my helper (so lets use it).
 
 ##############################################################################
-## helper to get latest SnapshotDate from cache. (only works if
-## caching is enabled)
-.getLastSnapShotDate <- function(x) {
-    snapshotLoc <- file.path(hubCache(),"snapshotDate.Rda")    
-    if(file.exists(snapshotLoc)){
-        load(snapshotLoc)
-        return(date)
-    }else{
-        date <- snapshotDate(x)
-        save(date, file=snapshotLoc)
-        return(date)
-    }
+## helper to standardize snapshotLoc
+.snapshotLoc <- function(){
+    file.path(hubCache(),"snapshotDate.Rda")
 }
+
 ## helper to save snapShotdate to cache
 .saveLatestSnapShotDate <- function(date) {
-    snapshotLoc <- file.path(hubCache(),"snapshotDate.Rda")
+    snapshotLoc <- .snapshotLoc() 
     save(date, file=snapshotLoc)
 }
 
+## helper to get latest SnapshotDate from cache. (only works if
+## caching is enabled)
+.getLastSnapShotDate <- function(x) {
+    snapshotLoc <- .snapshotLoc()    
+    if(file.exists(snapshotLoc)){
+        ## Filename shenanigans! (in case the file gets renamed on us)
+        load(snapshotLoc)
+        objName <- print(load(snapshotLoc))
+        date <- eval(parse(text=objName))
+        return(date)
+    }else{
+        date <- snapshotDate(x)
+        .saveLatestSnapShotDate(date)
+        return(date)
+    }
+}
 
 ## metadata takes a filter list and cols and returns a DataFrame
 .metadataRemote <- function(snapshotUrl, filters=list(),
