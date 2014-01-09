@@ -136,7 +136,7 @@ setMethod("possibleDates", "AnnotationHub", function(x, ...) {
         stop("no 'snapshotPaths' for 'snapshotDate' and 'filters'")
 
     initialize(x, snapshotDate=snapshotDate,
-               snapshotPaths=snapshotPaths)
+               snapshotPaths=snapshotPaths) ##TODO: is it a BUG that we put ALL paths back in?
 }
 
 setReplaceMethod("snapshotDate", "AnnotationHub",
@@ -202,7 +202,7 @@ setMethod("metadata", "AnnotationHub", function(x, cols, ...) {
         ## check cols to avoid user error (can't live in .metadata b/c of usage)
         stop("All cols arguments must be values returned by the columns method.")
     }
-    .metadata(x, snapshotUrl(x), filters(x), cols)
+    .metadata(snapshotUrl(), filters(x), cols)
 })
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -295,3 +295,36 @@ setMethod(show, "AnnotationHub", function(object) {
         sep="")
     cat("hubCache:", hubCache(object), "\n")
 })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+###############################################3
+## Testing:
+## library(AnnotationHub); ah = AnnotationHub(); x = ah; snapshotUrl <- AnnotationHub:::.snapshotUrl(AnnotationHub:::.hubUrl(), snapshotVersion(x),snapshotDate());
+
+## Testing .snapshotPaths
+##  system.time(sps <- AnnotationHub:::.snapshotPaths(snapshotUrl))
+
+
+## Testing .metadata
+## system.time(rdp <- unlist(AnnotationHub:::.metadataRemote(snapshotUrl, cols="RDataPath")))
+
+
+
+## library(AnnotationHub); ah = AnnotationHub(); x = ah; m = metadata()
+
+## m2 = metadata(x)
+

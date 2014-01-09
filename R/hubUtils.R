@@ -91,8 +91,9 @@
 }
 
 .snapshotPaths <- function(snapshotUrl) {
-    url <- paste(snapshotUrl, "getAllResourcePaths", sep="/")
-    urls <- .parseJSON(url)
+    ## url <- paste(snapshotUrl, "getAllResourcePaths", sep="/")
+    ## urls <- .parseJSON(url)
+    urls <- unlist(.metadata(snapshotUrl, cols="RDataPath"))
     setNames(urls, make.names(urls))
 }
 
@@ -144,8 +145,8 @@
 ##############################################################################
 ## helper for quickly getting the max date (want this to be fast as possible)
 .latestDate <- function(x) {
-    hubUrl <- hubUrl(x)
-    snapshotVersion <- snapshotVersion(x)
+    hubUrl <- hubUrl()
+    snapshotVersion <- snapshotVersion()
     url <- paste(hubUrl, snapshotVersion, "getSnapshotDates",
                   sep="/")
     max(as.POSIXlt(.parseJSON(url)))
@@ -170,7 +171,7 @@
 
 ## helper to get latest SnapshotDate from cache. (only works if
 ## caching is enabled)
-.getLastSnapShotDate <- function(x) {
+.getLastSnapShotDate <- function() {
     snapshotLoc <- .snapshotLoc()    
     if(file.exists(snapshotLoc)){
         ## Filename shenanigans! (in case the file gets renamed on us)
@@ -179,7 +180,7 @@
         date <- eval(parse(text=objName))
         return(date)
     }else{
-        date <- snapshotDate(x)
+        date <- snapshotDate()
         .saveLatestSnapShotDate(date)
         return(date)
     }
@@ -277,7 +278,7 @@ extractCols <- c("BiocVersion","DataProvider","Title","SourceFile",
 ##library(AnnotationHub); ah = AnnotationHub(); debug(AnnotationHub:::.updateLocalMetadata); debug(AnnotationHub:::.parseJSONMetadataList); metadata(ah)
 
 ## Called when we need to update the LocalMetadata Cache
-.updateLocalMetadata <- function(x, snapshotUrl, filters=filters, cols=cols){
+.updateLocalMetadata <- function(snapshotUrl, filters=filters, cols=cols){
 
     ## TODO: work out why the following fails to work (why we can't
     ## just get the records that we want using the RDataPath filter) -
@@ -310,22 +311,22 @@ extractCols <- c("BiocVersion","DataProvider","Title","SourceFile",
     ## Then filter so that what comes back is properly subsetted
     meta <- .filterMeta(meta, filters, cols)
     ## Don't forget to also update (save) local snapshotDate as well
-    .saveLatestSnapShotDate(.latestDate(x))
+    .saveLatestSnapShotDate(.latestDate())
     meta
 }
 
 
-.metadata <- function(x, snapshotUrl=snapshotUrl(x), filters=list(),
+.metadata <- function(snapshotUrl=snapshotUrl(), filters=list(),
                       cols=c("Title","Species",
                         "TaxonomyId","Genome","Description",
                         "Tags","RDataClass","RDataPath"), useWebOnly=FALSE) {
     if(useWebOnly==TRUE){## For internal testing only
         .metadataRemote(snapshotUrl, filters, cols)
     }else{
-        if(.getLastSnapShotDate(x) == .latestDate(x)){
+        if(.getLastSnapShotDate() == .latestDate()){
             .metadataLocal(snapshotUrl, filters=filters, cols=cols)
         }else{ ## the dates don't match... So update!
-            .updateLocalMetadata(x, snapshotUrl, filters=filters, cols=cols)
+            .updateLocalMetadata(snapshotUrl, filters=filters, cols=cols)
         }
     }
 }
@@ -334,7 +335,7 @@ extractCols <- c("BiocVersion","DataProvider","Title","SourceFile",
 ## res <- ah$goldenpath.hg19.encodeDCC.wgEncodeUwTfbs.wgEncodeUwTfbsMcf7CtcfStdPkRep1.narrowPeak_0.0.1.RData
 ##
 ## web only:
-## library(AnnotationHub);ah = AnnotationHub(); system.time(m <- AnnotationHub:::.metadata(ah, snapshotUrl(ah), useWebOnly=TRUE))
+## library(AnnotationHub);ah = AnnotationHub(); system.time(m <- AnnotationHub:::.metadata(snapshotUrl(ah), useWebOnly=TRUE))
 
 
 .keytypes <-function(snapshotUrl) {
@@ -413,12 +414,59 @@ setMethod("hubResource", "missing", function(x, path=character(), ...) {
 })
 
 setMethod("metadata", "missing", function(x, ...) {
-    .metadata(snapshotUrl(), list())
+    .metadata(snapshotUrl(), ...)
 })
 
- 
+
 
 
 
 ## TODO: work out why I can't get all the metadata types back from the
 ## DB when calling .metadataRemote()
+
+## this doesn't work (requires old metadata to attempt):
+## snapshotUrl <- "http://annotationhub.bioconductor.org/ah/2.14/1.3.13/2013-12-27"
+## remotePaths <- as.character(t(as.data.frame(AnnotationHub:::.metadataRemote(snapshotUrl, cols="RDataPath"))))
+## localPaths <- as.character(t(as.data.frame(AnnotationHub:::.metadataLocal(snapshotUrl, cols="RDataPath"))))
+## missingPaths <- setdiff(remotePaths, localPaths)
+
+##  m <- AnnotationHub:::.metadataRemote(snapshotUrl, filters=list(RDataPath=missingPaths), cols=extractCols)
+
+
+##########################################################
+## Strangely enough the following seems to work:
+## filters(ah) <- list(RDataPath=r)
+
+## So does this work?  -- YES
+## r2 = head(missingPaths); filters(ah) <- list(RDataPath=r2)
+
+## AND THIS WORKS ALSO:
+## m <- AnnotationHub:::.metadataRemote(snapshotUrl, filters=list(RDataPath=r2), cols=extractCols)
+
+## But this doesn't work:
+## m <- AnnotationHub:::.metadataRemote(snapshotUrl, filters=list(RDataPath=missingPaths), cols=extractCols)
+
+## which suggests that either I have 1) bad data, 2) limits on how many things can be in a URL OR 3) some other limitation on how many things can be returned...
+
+## Does this fail?
+## filters(ah) <- list(RDataPath=missingPaths)
+## NO - forehead smack - This is because by the time I run this, we have already updated the metadata? - this test is suspect, try doing it after replacing metadata and date info.
+
+## So this should work (with defaults)? - NO IT DOES NOT...  Hmmm...
+## m <- AnnotationHub:::.metadataRemote(snapshotUrl, filters=list(RDataPath=missingPaths))
+
+
+
+## What if I limit the cols returned to only one thing?
+## m <- AnnotationHub:::.metadataRemote(snapshotUrl, filters=list(RDataPath=missingPaths, cols="RDataPath"))
+
+## This still fails (just more quickly)
+
+
+
+
+
+
+
+
+

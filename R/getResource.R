@@ -114,7 +114,7 @@
     }
 
     ## Get the metadata
-    m <- as.character(unlist(.metadata(x, snapshotUrl(x),
+    m <- as.character(unlist(.metadata(snapshotUrl(x),
                                  filters=list(RDataPath=path),
                                  cols="RDataClass")))
 
