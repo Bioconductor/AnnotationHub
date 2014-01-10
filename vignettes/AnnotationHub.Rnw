@@ -62,6 +62,7 @@
 
 \SweaveOpts{keep.source=TRUE}
 \begin{document}
+\SweaveOpts{concordance=TRUE}
 
 \maketitle
 
@@ -235,6 +236,31 @@ urls
 
 \url{\Sexpr{urls}}
 
+We can also look at the \Robject{AnnotationHub} object in a broswer
+using the display function. We can then  filter the \Robject{AnnotationHub} 
+object for "Homo sapiens" by either using the Global search field 
+on the top right corner of the page or the in-column search field for 
+"Species".
+
+<<displayfunc,eval=FALSE>>=
+d <- display(ah)
+@
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\textwidth]{display.pdf}
+\caption{Displaying and filtering the Annnotation Hub object in a browser}
+\label{fig:dbtypes}
+\end{figure}
+
+By default 1000 entries are displayed per page, we can change this using
+the filter on the top of the page or navigate through different pages
+using the page scrolling feature at the bottom of the page.
+
+We can also select the rows of interest to us and send them back to 
+the R session using 'Send Rows' button ; 
+this sets a filter internally which filters the 
+\Robject{AnnotationHub} object.
 
 \section{Using \Robject{AnnotationHub} to retrieve data}
 
