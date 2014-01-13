@@ -456,11 +456,17 @@ setMethod("metadata", "missing", function(x, ...) {
 ## m <- AnnotationHub:::.metadataRemote(snapshotUrl, filters=list(RDataPath=missingPaths))
 
 
-
+######################################################################
 ## What if I limit the cols returned to only one thing?
-## m <- AnnotationHub:::.metadataRemote(snapshotUrl, filters=list(RDataPath=missingPaths, cols="RDataPath"))
+## library(AnnotationHub); load('metaTestVars.Rda'); ah = AnnotationHub(); debug(AnnotationHub:::.metadataRemote)
 
-## This still fails (just more quickly)
+## There was some interest in the fact that his does not fail.
+## #filters(ah) <- list(RDataPath=missingPaths)
+## BUT, this bug will NEVER be hit this way (as long as caching is in place), because the cache will always be updated BEFORE you hit this bug...
+
+## m <- AnnotationHub:::.metadataRemote(snapshotUrl, filters=list(RDataPath=missingPaths, cols="RDataPath"))
+## This still fails (just much more quickly)
+
 
 
 
