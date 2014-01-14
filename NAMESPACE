@@ -4,6 +4,8 @@ importFrom(AnnotationDbi, exists, keys, keytypes, columns)
 
 importFrom(IRanges, DataFrame)
 
+importFrom(httr, POST, content)
+
 import(BiocGenerics)
 
 importFrom(BiocInstaller, biocVersion)

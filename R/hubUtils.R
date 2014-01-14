@@ -39,7 +39,7 @@
 }
 
 ## This one just cleans the big list object that comes back from metadata.
-.parseJSONMetadataList <- function(url){
+.parseJSONMetadataListViaGET <- function(url){
     ## process url to get rid of any spaces.
     url <- gsub(" ", "%20", url)
     ## then parse the JSON
@@ -60,6 +60,21 @@
     #lapply(j, function(x){lapply(x, .na2na)})
     rapply(j, .na2na, how="replace")
 }
+
+
+## make this more general, filters will be a list...
+.parseJSONMetadataListViaPOST <- function(filters){
+    url <- "http://annotationhub.bioconductor.org/cgi-bin/R/query"
+    BiocVersion=unlist(strsplit(snapshotVersion(), "/"))[1]
+    RDataDateAdded=as.character(.getLastSnapShotDate())    
+    res <- content(POST(url,
+                        body=c(BiocVersion=BiocVersion,
+                          RDataDateAdded=RDataDateAdded,
+                          filters)), as="text")
+    j <- fromJSON(res)
+    rapply(j, .na2na, how="replace")
+}
+
 
 
 
@@ -192,20 +207,23 @@
                               "TaxonomyId","Genome","Description",
                               "Tags","RDataClass","RDataPath")) {  
     ## format cols
-    cols <- paste("cols",cols, sep="/", collapse="/")
+    colsVec <- paste("cols",cols, sep="/", collapse="/")
     ## then make a url
-    url <- if (length(filters)>0 && filters!="" &&
-               !is.null(filters)) { ## get some
+    if (length(filters)>0 && filters!="" &&
+        !is.null(filters)) { ## get some
         ## URL must be specific
-        filters <- .makeURLFilters(filters)
-        paste(snapshotUrl, "query", filters, cols, sep="/") ##vectorized?
-    } else {## get all of them
-        paste(snapshotUrl, "query", cols, sep="/")
+        filters <- lapply(filters,paste,collapse=",")
+
+        ## Append the cols as one more list element
+        filters <- c(filters,cols=paste(cols, collapse=","))
+        
+        ## make url and body
+        meta <- .parseJSONMetadataListViaPOST(filters)
+    } else {## get all of them (use get method)
+        url <- paste(snapshotUrl, "query", colsVec, sep="/")
+        meta <- .parseJSONMetadataListViaGET(url)
     }   
-    ## get the metadata
-    ## meta <- .parseJSON(url) ## list form (by row)  (USUALLY)
-    meta <- .parseJSONMetadataList(url)
-    ## make a DataFrame (remove this later)
+    ## make a DataFrame
     .toDataFrame(meta)
 }
 
@@ -455,21 +473,66 @@ setMethod("metadata", "missing", function(x, ...) {
 ## So this should work (with defaults)? - NO IT DOES NOT...  Hmmm...
 ## m <- AnnotationHub:::.metadataRemote(snapshotUrl, filters=list(RDataPath=missingPaths))
 
-
-######################################################################
-## What if I limit the cols returned to only one thing?
-## library(AnnotationHub); load('metaTestVars.Rda'); ah = AnnotationHub(); debug(AnnotationHub:::.metadataRemote)
-
 ## There was some interest in the fact that his does not fail.
 ## #filters(ah) <- list(RDataPath=missingPaths)
 ## BUT, this bug will NEVER be hit this way (as long as caching is in place), because the cache will always be updated BEFORE you hit this bug...
 
-## m <- AnnotationHub:::.metadataRemote(snapshotUrl, filters=list(RDataPath=missingPaths, cols="RDataPath"))
-## This still fails (just much more quickly)
+
+
+############################################################################
+## Old .metadataRemote would fail like this (when the request was too big):
+## cannot open: HTTP status was '414 Request-URI Too Large'
+############################################################################
+
+############################################################################
+## Example of something that we should expect should work (by calling
+## the other helper)
+##  m <- AnnotationHub:::.metadataRemote(snapshotUrl, cols=c("RDataPath","Species"))
+## And that works out OK as long as I don't include "Notes" - "Notes
+## is actually NOT a real field that can come back (according to
+## columns).
+
+
+######################################################################
+## What if I limit the cols returned to only one thing?
+## library(AnnotationHub); load('metaTestVars.Rda'); ah = AnnotationHub(); debug(AnnotationHub:::.metadataRemote); debug(AnnotationHub:::.toDataFrame); debug(AnnotationHub:::.parseJSONMetadataListViaPOST)
+
+## pathStr <- missingPaths[1:2]
+## m <- AnnotationHub:::.metadataRemote(snapshotUrl, filters=list(RDataPath=pathStr), cols="RDataPath")
+## Seems to work OK now, but now I seem to be missing some rows (rows dissappear on the server side?) - and this seems to be a real problem.  That is:
+
+
+## table(missingPaths %in% m$RDataPath) ## TWO false values!
+## fasta files for  erinaceus_europaeus and pan_troglodytes:
+##[1] "ensembl/release-74/fasta/erinaceus_europaeus/dna/Erinaceus_europaeus.HEDGEHOG.74.dna_rm.toplevel.fa.rz"
+##[2] "ensembl/release-74/fasta/pan_troglodytes/pep/Pan_troglodytes.CHIMP2.1.4.74.pep.all.fa.rz"              
+
+## definitely these two are lost on server side only...
+## AND they are also ON the server side (they come back if I query a
+## different way)
+## Hmmm.  The problem might be the contents of missingPaths are
+## somehow goofy for those records.  Because if I call the above for
+## the custom pathStr below it retrieves them fine...
 
 
 
 
+
+
+
+
+########################################
+## Lets look more closely at the bug that I just found
+
+## pathStr <- paste("ensembl/release-69/fasta/ailuropoda_melanoleuca/cdna/Ailuropoda_melanoleuca.ailMel1.69.cdna.all.fa.rz","ensembl/release-69/fasta/ailuropoda_melanoleuca/dna/Ailuropoda_melanoleuca.ailMel1.69.dna.toplevel.fa.rz", sep=",")
+## pathStr <- paste(pathStr,"ensembl/release-74/fasta/erinaceus_europaeus/dna/Erinaceus_europaeus.HEDGEHOG.74.dna_rm.toplevel.fa.rz","ensembl/release-74/gtf/anas_platyrhynchos/Anas_platyrhynchos.BGI_duck_1.0.74.gtf_0.0.1.RData", sep=",")
+
+## And then re-run it like:
+
+## library(httr); library(rjson); res <- content(POST("http://annotationhub.bioconductor.org/cgi-bin/R/query", body=list(BiocVersion="2.14", RDataDateAdded="2013-12-27", RDataPath=pathStr, cols="RDataPath,Species")), as="text")
+## fromJSON(res)
+
+## And that TOTALLY works.  So I am doing something wrong?
 
 
 
