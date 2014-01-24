@@ -238,9 +238,9 @@ urls
 
 We can also look at the \Robject{AnnotationHub} object in a broswer
 using the display function. We can then  filter the \Robject{AnnotationHub} 
-object for "Homo sapiens" by either using the Global search field 
+object for `Homo sapiens' by either using the Global search field 
 on the top right corner of the page or the in-column search field for 
-"Species".
+`Species'.
 
 <<displayfunc,eval=FALSE>>=
 d <- display(ah)
