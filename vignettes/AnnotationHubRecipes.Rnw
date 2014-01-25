@@ -1,0 +1,213 @@
+%\VignetteIndexEntry{How to write recipes for new resources for the AnnotationHub}
+%\VignetteDepends{AnnotationHub}
+
+\documentclass[11pt]{article}
+
+\usepackage{Sweave}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{graphics}
+\usepackage{latexsym, amsmath, amssymb}
+\usepackage{authblk}
+\usepackage[colorlinks=true, linkcolor=Blue, urlcolor=Black,
+  citecolor=Blue]{hyperref}
+
+%% Simple macros
+
+\newcommand{\code}[1]{{\texttt{#1}}}
+\newcommand{\file}[1]{{\texttt{#1}}}
+
+\newcommand{\software}[1]{\textsl{#1}}
+\newcommand\R{\textsl{R}}
+\newcommand\Bioconductor{\textsl{Bioconductor}}
+\newcommand\Rpackage[1]{{\textsl{#1}\index{#1 (package)}}}
+\newcommand\Biocpkg[1]{%
+  {\href{http://bioconductor.org/packages/devel/bioc/html/#1.html}%
+    {\textsl{#1}}}%
+  \index{#1 (package)}}
+\newcommand\Rpkg[1]{%
+  {\href{http://cran.fhcrc.org/web/devel/#1/index.html}%
+    {\textsl{#1}}}%
+  \index{#1 (package)}}
+\newcommand\Biocdatapkg[1]{%
+  {\href{http://bioconductor.org/packages/devel/data/experiment/html/#1.html}%
+    {\textsl{#1}}}%
+  \index{#1 (package)}}
+\newcommand\Robject[1]{{\small\texttt{#1}}}
+\newcommand\Rclass[1]{{\textit{#1}\index{#1 (class)}}}
+\newcommand\Rfunction[1]{{{\small\texttt{#1}}\index{#1 (function)}}}
+\newcommand\Rmethod[1]{{\texttt{#1}}}
+\newcommand\Rfunarg[1]{{\small\texttt{#1}}}
+\newcommand\Rcode[1]{{\small\texttt{#1}}}
+
+%% Question, Exercise, Solution
+\usepackage{theorem}
+\theoremstyle{break}
+\newtheorem{Ext}{Exercise}
+\newtheorem{Question}{Question}
+
+
+\newenvironment{Exercise}{
+  \renewcommand{\labelenumi}{\alph{enumi}.}\begin{Ext}%
+}{\end{Ext}}
+\newenvironment{Solution}{%
+  \noindent\textbf{Solution:}\renewcommand{\labelenumi}{\alph{enumi}.}%
+}{\bigskip}
+
+
+
+
+\title{Adding new resources to AnnotationHub.}
+\author{Marc Carlson}
+
+\SweaveOpts{keep.source=TRUE}
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+
+\maketitle
+
+
+\section{Overview of the process}
+
+If you are reading this it is (hopefully) because you intend to write
+some code that will allow the processing of some online resources to
+become available via that the \Rpackage{AnnotationHub} package.  In
+order to do this you will have to do three basic steps (outlined
+below).  These steps will have you writing two functions and then
+calling a third function to do some set up for you.  The 1st function
+will contain instructions on how to process data that is stored online
+into metadata for describing your new R resources for the
+AnnotationHub.  And the 2nd function is for describing how to take
+these online resources and transform them into an R object that is
+useful to end users.
+
+\section{Introducing \Robject{AnnotationHubMetadata} and \Robject{AnnotationHubRecipe} Objects}
+
+The \Rpackage{AnnotationHubData} package is a complementary package to
+the \Rpackage{AnnotationHub} package that provides a place where we
+can store code that processes online resources into R objects suitable
+for access through the \Rpackage{AnnotationHub} package.  But before
+you can understand the requirements for this package it is important
+that you 1st learn about a pair of objects that are used as
+intermediaries between the hub and its web based repository behind the
+scenes.  The 1st object you need to know about is the
+\Robject{AnnotationHubMetadata} object.  These objects store the
+metadata that describes an online resource.  And if you want to see a
+set of online resources added to the repository and maintained, then
+it will be necessary to become familiar with the
+\Rfunction{AnnotationHubMetadata} constructor.  For each online
+resource that you want to process into the AnnotationHub, you will
+have to be able to construct an \Rfunction{AnnotationHubMetadata}
+object that describes it in detail and that specifies where the recipe
+function lives.
+
+The second type of object you need to know about is the
+\Robject{AnnotationHubRecipe} object. This object is actually created
+from an \Robject{AnnotationHubMetadata} object, so you don't need to
+be able to make one.  But it offers a few conveniences for accessing
+certain fields while hiding some other things so you will have to know
+about this when writing your recipe function.
+
+
+
+\section{Step 1: Writing your \Robject{AnnotationHubMetadata} generating function}
+  
+The 1st function you need to provide is one that processes some online
+resources into \Robject{AnnotationHubMetadata} objects.  This function
+MUST return a list of \Robject{AnnotationHubMetadata} objects and it
+can take NO arguments.  It can rely on other helper functions, but
+ultimately it needs to know how to find resources and what to do with
+those resources on it's own.  The following example function takes GTF
+files from Ensembl and processes them into
+\Robject{AnnotationHubMetadata} objects using Map.  Notice how one of
+the fields specified by this function is the Recipe, which indicates
+both the name and location of the recipe function.  We expect most
+people will want to submit their recipe to the same package as they
+are submitting their metadata processing function.
+
+<<exampleGTFProcessing>>=
+makeEnsemblGTFsToAHMs <- function(){
+    baseUrl <- .ensemblBaseUrl
+    sourceUrl <- .ensemblGtfSourceUrls(.ensemblBaseUrl)
+    
+    sourceFile <- .ensemblSourcePathFromUrl(baseUrl, sourceUrl)
+    meta <- .ensemblMetadataFromUrl(sourceUrl)
+    rdata <- sub(".gz$", ".RData", sourceFile)
+    description <- paste("Gene Annotation for", meta$species)
+
+    Map(AnnotationHubMetadata,
+        AnnotationHubRoot=meta$annotationHubRoot,
+        Description=description, Genome=meta$genome,
+        SourceFile=sourceFile, SourceUrl=sourceUrl,
+        SourceVersion=meta$sourceVersion, Species=meta$species,
+        TaxonomyId=meta$taxonomyId, Title=meta$title,
+        MoreArgs=list(
+          Coordinate_1_based = TRUE,
+          DataProvider = "ftp.ensembl.org",
+          Maintainer = "Martin Morgan <mtmorgan@fhcrc.org>",
+          RDataClass = "GRanges",
+          RDataDateAdded = Sys.time(),
+          RDataVersion = "0.0.1",
+          Recipe = c("ensemblGtfToGRangesRecipe", package="AnnotationHubData"),
+          Tags = c("GTF", "ensembl", "Gene", "Transcript", "Annotation")))
+}
+@ 
+
+\section{Step 2: Writing your recipe} 
+
+The 2nd kind of function you need to write is called a recipe
+function.  It always must take an single argument called recipe, which
+is an \Robject{AnnotationHubRecipe} object.  This object allows for
+some conveniences by letting you access some of the data in the
+original AnnotationHubMetadata object that was created for this
+resource by the function above.  Below is a recipe function that takes
+an Ensembl GTF file and then processes it into a GRanges object by
+using the import method from the rtracklayer package.  Along the way,
+the \Rmethod{inputFiles} and \Rmethod{outputFile} accessors are used
+to extract the files/filenames that are needed from the metadata in
+the \Robject{AnnotationHubRecipe} object.
+
+<<exampleRecipe>>=
+ensemblGTFToGRangesRecipe <- function(recipe){
+     require(rtracklayer)
+    gz.inputFile <- inputFiles(recipe)[1]
+    con <- gzfile(gz.inputFile)
+    on.exit(close(con))
+    gr <- import(con, "gtf", asRangedData=FALSE)
+    save(gr, file=outputFile(recipe))
+    outputFile(recipe)
+}
+@ 
+
+
+\section{Step 3: Calling the \Rfunction{makeAnnotationHubResource} helper}
+
+Finally you will need to call the
+\Rfunction{makeAnnotationHubResource} function to do some setup.  This
+function only has two arguments.  The 1st is basically the name of a
+class that describes the kind of resource you are writing code to
+import.  It just needs to be a unique name.  The 2nd argument is the
+name of your metadata processing function from step one.  Once you
+have finished this, the only step left is to export the class name in
+the NAMESPACE (this is that string you are providing as your 1st
+argument), and then add this code to the \Rpackage{AnnotationHubData}
+repository.  We are going to set up a bridge to github so that you can
+give us a pull request.
+
+<<makeAnnotationHubResource, eval=FALSE>>=
+makeAnnotationHubResource("EnsemblGtfImportPreparer",
+                          makeEnsemblGTFsToAHMs)
+
+@ 
+
+
+\section{Session Information}
+
+<<SessionInfo, echo=FALSE>>=
+sessionInfo()
+@
+
+\end{document}
+
+
+
+

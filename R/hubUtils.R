@@ -537,5 +537,7 @@ setMethod("metadata", "missing", function(x, ...) {
 
 
 
+########################################################################
+## Lets build a way to test this on the server:
 
-
+## load('metaTestVars.Rda');
