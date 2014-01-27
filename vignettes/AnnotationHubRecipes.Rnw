@@ -69,16 +69,16 @@
 \section{Overview of the process}
 
 If you are reading this it is (hopefully) because you intend to write
-some code that will allow the processing of some online resources to
-become available via that the \Rpackage{AnnotationHub} package.  In
-order to do this you will have to do three basic steps (outlined
-below).  These steps will have you writing two functions and then
-calling a third function to do some set up for you.  The 1st function
-will contain instructions on how to process data that is stored online
-into metadata for describing your new R resources for the
-AnnotationHub.  And the 2nd function is for describing how to take
-these online resources and transform them into an R object that is
-useful to end users.
+some code that will allow the processing of online resources into R
+objects that are to be made available via that the
+\Rpackage{AnnotationHub} package.  In order to do this you will have
+to do three basic steps (outlined below).  These steps will have you
+writing two functions and then calling a third function to do some
+automatic set up for you.  The 1st function will contain instructions
+on how to process data that is stored online into metadata for
+describing your new R resources for the AnnotationHub.  And the 2nd
+function is for describing how to take these online resources and
+transform them into an R object that is useful to end users.
 
 \section{Introducing \Robject{AnnotationHubMetadata} and \Robject{AnnotationHubRecipe} Objects}
 
@@ -105,7 +105,10 @@ The second type of object you need to know about is the
 from an \Robject{AnnotationHubMetadata} object, so you don't need to
 be able to make one.  But it offers a few conveniences for accessing
 certain fields while hiding some other things so you will have to know
-about this when writing your recipe function.
+about this when writing your recipe function.  In particular the
+\Rfunction{inputFiles} and \Rfunction{outputFiles} methods allow for
+convenient extraction of relevant filenames needed to process a recipe
+function into it's AnnotationHub based representation.
 
 
 
@@ -114,15 +117,17 @@ about this when writing your recipe function.
 The 1st function you need to provide is one that processes some online
 resources into \Robject{AnnotationHubMetadata} objects.  This function
 MUST return a list of \Robject{AnnotationHubMetadata} objects and it
-can take NO arguments.  It can rely on other helper functions, but
-ultimately it needs to know how to find resources and what to do with
-those resources on it's own.  The following example function takes GTF
-files from Ensembl and processes them into
-\Robject{AnnotationHubMetadata} objects using Map.  Notice how one of
-the fields specified by this function is the Recipe, which indicates
-both the name and location of the recipe function.  We expect most
-people will want to submit their recipe to the same package as they
-are submitting their metadata processing function.
+can take NO arguments as input.  It can rely on other helper
+functions, but ultimately it (and it's helpers need to know how to
+find resources and how to process those resources into
+\Robject{AnnotationHubMetadata} objects on it's own.  
+
+The following example function takes GTF files from Ensembl and
+processes them into \Robject{AnnotationHubMetadata} objects using Map.
+Notice how one of the fields specified by this function is the Recipe,
+which indicates both the name and location of the recipe function.  We
+expect most people will want to submit their recipe to the same
+package as they are submitting their metadata processing function.
 
 <<exampleGTFProcessing>>=
 makeEnsemblGTFsToAHMs <- function(){
