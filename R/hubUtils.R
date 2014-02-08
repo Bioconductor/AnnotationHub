@@ -127,7 +127,11 @@
 .possibleDates <- function(hubUrl, snapshotVersion) {
     url <- paste(hubUrl, snapshotVersion, "getSnapshotDates",
                   sep="/")
-    sort(as.POSIXlt(.parseJSON(url)))
+    sort(as.POSIXlt(.parseJSON(url), tz = "GMT"))
+}
+
+.convertDatesToStandard <- function(dates){
+    as.POSIXlt(as.numeric(dates), origin='1970-01-01 00:00.00 UTC', tz="GMT")
 }
 
 .toDataFrame <- function(lst)
@@ -152,8 +156,12 @@
          }
     }
     cols <- mapply(.makeVecs, lst, whichMulti, SIMPLIFY=FALSE)
-    DataFrame(cols)
-    
+    meta <- DataFrame(cols)
+    ## clean up for WHEN the a col is RDataDateAdded
+    if('RDataDateAdded' %in% colnames(meta)){
+        meta$RDataDateAdded <- .convertDatesToStandard(meta$RDataDateAdded)
+    }
+    meta
 }
 
 
@@ -201,7 +209,7 @@
     }
 }
 
-## metadata takes a filter list and cols and returns a DataFrame
+## metadataRemote takes a filter list and cols and returns a DataFrame
 .metadataRemote <- function(snapshotUrl, filters=list(),
                             cols=c("Title","Species",
                               "TaxonomyId","Genome","Description",
@@ -213,16 +221,19 @@
         !is.null(filters)) { ## get some
         ## URL must be specific
         filters <- lapply(filters,paste,collapse=",")
-
         ## Append the cols as one more list element
         filters <- c(filters,cols=paste(cols, collapse=","))
-        
         ## make url and body
         meta <- .parseJSONMetadataListViaPOST(filters)
+
+        ## filterVec <- mapply(FUN=paste,names(filters), filters, sep="/")
+        ## url <- paste(snapshotUrl, "query", filterVec, colsVec, sep="/")
+        ## meta <- .parseJSONMetadataListViaGET(url)
+
     } else {## get all of them (use get method)
         url <- paste(snapshotUrl, "query", colsVec, sep="/")
         meta <- .parseJSONMetadataListViaGET(url)
-    }   
+    }
     ## make a DataFrame
     .toDataFrame(meta)
 }
@@ -295,37 +306,46 @@ extractCols <- c("BiocVersion","DataProvider","Title","SourceFile",
 
 ##library(AnnotationHub); ah = AnnotationHub(); debug(AnnotationHub:::.updateLocalMetadata); debug(AnnotationHub:::.parseJSONMetadataList); metadata(ah)
 
+## helper to get dates that already exist:
+.getLocallyExistingDates <- function(){
+    metadataLoc <- file.path(hubCache(),"metadata.Rda")
+    load(metadataLoc)
+    unique(meta$RDataDateAdded)
+}
+
+
 ## Called when we need to update the LocalMetadata Cache
 .updateLocalMetadata <- function(snapshotUrl, filters=filters, cols=cols){
+    ## NEW PLAN: filter on missing dates.  Right now I can't get more
+    ## than one date from the server at a time.  :( But we are going
+    ## to fix that soon.
+    ## ALSO, only the most recent date is worth gettting since it
+    ## returns ALL the stuff before it as well...
 
-    ## TODO: work out why the following fails to work (why we can't
-    ## just get the records that we want using the RDataPath filter) -
-    ## and why we have to instead get ALL the records to replace them
-    ## instead of being able to increment them.
+    ## 1st get missing dates:
+    rddts <- .getLocallyExistingDates()
+    missingDates <- possibleDates()[!possibleDates() %in% rddts]
     
-    ## remotePaths <- as.character(t(as.data.frame(.metadataRemote(snapshotUrl,
-    ##                                                  cols="RDataPath"))))
-    ## localPaths <- as.character(t(as.data.frame(.metadataLocal(snapshotUrl,
-    ##                                                 cols="RDataPath"))))
-    ## missingPaths <- setdiff(remotePaths, localPaths)
-    ## 
-    ## ##Then get all the data for the paths we don't have yet and update
-    ## missingData <- .metadataRemote(snapshotUrl,
-    ##                                filters=list(RDataPath=missingPaths),
-    ##                                cols=extractCols)
-    ## metadataLoc <- file.path(hubCache(),"metadata.Rda")
-    ## load(metadataLoc)
-    ## meta <- rbind(meta,missingData)
-    ## save(meta, file=metadataLoc)
-    
-    ## OK so for now, just get ALL the data, and then just replace it.
-    meta <- .metadataRemote(snapshotUrl,
-                               cols=extractCols)
+    ## ## Then loop over dates to get missing records
+    ## metas <- list()
+    ## ## get each one
+    ## for(i in seq_along(missingDates)){
+    ##     metas[i] <- .metadataRemote(snapshotUrl(),
+    ##                     filters=list(RDataDateAdded=missingDates[i]),
+    ##                     cols=extractCols)
+    ## }    
+    ## missingData <- unique(do.call('rbind', metas))     
     metadataLoc <- file.path(hubCache(),"metadata.Rda")
-    save(meta, file=metadataLoc)
+    ## load(metadataLoc)
+    ## meta <- unique(rbind(meta, missingData))
 
+    meta <- .metadataRemote(snapshotUrl(),
+                            filters=list(RDataDateAdded=max(missingDates)),
+                            cols=extractCols)
+    save(meta, file=metadataLoc)    
     
-    ## Continuing on:
+    #################################################################
+    ## Continuing on after updating the local cache:
     ## Then filter so that what comes back is properly subsetted
     meta <- .filterMeta(meta, filters, cols)
     ## Don't forget to also update (save) local snapshotDate as well
@@ -371,7 +391,11 @@ extractCols <- c("BiocVersion","DataProvider","Title","SourceFile",
         stop("'keytype' must be a character vector of length 1")
     ## then retrieve values from host
     url <- paste(snapshotUrl, "getAllKeys", "keytype", keytype, sep="/")
-    unique(.parseJSON(url))
+    keys <- unique(.parseJSON(url))
+    if(keytype == 'RDataDateAdded'){
+        keys <- .convertDatesToStandard(keys)
+    }
+    keys
 }
 
 setMethod("snapshotVersion", "missing", function(x, ...) {
