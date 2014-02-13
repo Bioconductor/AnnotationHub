@@ -116,14 +116,19 @@ function into it's AnnotationHub based representation.
   
 The 1st function you need to provide is one that processes some online
 resources into \Robject{AnnotationHubMetadata} objects.  This function
-MUST return a list of \Robject{AnnotationHubMetadata} objects and it
-can take NO arguments as input.  It can rely on other helper
-functions, but ultimately it (and it's helpers need to know how to
-find resources and how to process those resources into
-\Robject{AnnotationHubMetadata} objects on it's own.  
+MUST return a list of \Robject{AnnotationHubMetadata} object.  It can
+rely on other helper functions, but ultimately it (and it's helpers
+need to know how to find resources and how to process those resources
+into \Robject{AnnotationHubMetadata} objects on it's own.
 
 The following example function takes GTF files from Ensembl and
 processes them into \Robject{AnnotationHubMetadata} objects using Map.
+The calling of the Map function is really the important part of this
+function, as it shows the function creating a series of
+\Robject{AnnotationHubMetadata} objects.  Prior to that, the function
+was just calling out to other helper functions in order to process the
+metadata so that it could be passed to the
+\Robject{AnnotationHubMetadata} constructor using Map.
 Notice how one of the fields specified by this function is the Recipe,
 which indicates both the name and location of the recipe function.  We
 expect most people will want to submit their recipe to the same
@@ -157,6 +162,12 @@ makeEnsemblGTFsToAHMs <- function(){
 }
 @ 
 
+The typical case when writing a \Robject{AnnotationHubMetadata}
+generating function like the one above, is to not have it take no
+arguments.  However, if you need this function to take arguments, you
+can still do so, but you will have to pass them in separately to the
+helper function described in step 3.
+
 \section{Step 2: Writing your recipe} 
 
 The 2nd kind of function you need to write is called a recipe
@@ -188,15 +199,18 @@ ensemblGTFToGRangesRecipe <- function(recipe){
 
 Finally you will need to call the
 \Rfunction{makeAnnotationHubResource} function to do some setup.  This
-function only has two arguments.  The 1st is basically the name of a
-class that describes the kind of resource you are writing code to
-import.  It just needs to be a unique name.  The 2nd argument is the
-name of your metadata processing function from step one.  Once you
-have finished this, the only step left is to export the class name in
-the NAMESPACE (this is that string you are providing as your 1st
+function only has two required arguments.  The 1st is basically the
+name of a class that describes the kind of resource you are writing
+code to import.  It just needs to be a unique name.  The 2nd argument
+is the name of your metadata processing function from step one.  Once
+you have finished this, the only step left is to export the class name
+in the NAMESPACE (this is that string you are providing as your 1st
 argument), and then add this code to the \Rpackage{AnnotationHubData}
 repository.  We are going to set up a bridge to github so that you can
-give us a pull request.
+give us a pull request.  If you have arguments that you need to get
+passed down to the Robject{AnnotationHubMetadata} generating function
+that you defined in step 1, you can pass those in after the 1st two
+arguemnts.
 
 <<makeAnnotationHubResource, eval=FALSE>>=
 makeAnnotationHubResource("EnsemblGtfImportPreparer",
