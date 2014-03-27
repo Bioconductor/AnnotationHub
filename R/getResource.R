@@ -91,6 +91,20 @@
     Rsamtools::FaFile(localPath)
 }
 
+## Gets sqlite files downloaded and then uses loadDb to handle them
+.getSQLite <- function(x, path){
+    require(AnnotationDbi)  ## only needed here
+
+    ## download, if needed
+    if (!.isCached(hubCache(x), path)) {
+        .downloadFile(x, path)         # file
+    }
+
+    ## get
+    localPath <- hubResource(x, path, cached=TRUE)
+    AnnotationDbi::loadDb(localPath)
+}
+
 ## Downloads tabix files and makes a TabixFile handle
 .getTabix <- function(x, path){
     require(Rsamtools)
@@ -119,6 +133,10 @@
                                  cols="RDataClass")))
 
     ## Call correct function based on the results of the metadata
-    FUN <- switch(m, FaFile=.getFasta, TabixFile=.getTabix, .getRda)
+    FUN <- switch(m,
+                  FaFile=.getFasta,
+                  TabixFile=.getTabix,
+                  SQLiteFile=.getSQLite,
+                  .getRda)
     FUN(x, path)
 }

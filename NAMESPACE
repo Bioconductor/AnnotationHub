@@ -1,6 +1,6 @@
 import(methods, GenomicRanges)
 
-importFrom(AnnotationDbi, exists, keys, keytypes, columns)
+importFrom(AnnotationDbi, exists, keys, keytypes, columns, loadDb)
 
 importFrom(IRanges, DataFrame)
 
