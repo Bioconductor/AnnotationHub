@@ -448,11 +448,6 @@ setMethod("hubResource", "missing", function(x, path=character(), ...) {
     .hubResource(hubUrl(), ...)
 })
 
-setMethod("metadata", "missing", function(x, ...) {
-    .metadata(snapshotUrl(), ...)
-})
-
-
 
 
 

@@ -54,7 +54,6 @@
 \alias{length,AnnotationHub-method}
 
 \alias{metadata,AnnotationHub-method}
-\alias{metadata,missing-method}
 
 \alias{names,AnnotationHub-method}
 
@@ -130,32 +129,35 @@
 }
 
 \usage{
-  filters(x, ...)
-  filters(x, ...) <- value
-  hubUrl(x, ...)
-  hubCache(x, ...)
-  hubCache(x, ...) <- value
-  hubResource(x, path = character(), ...)
-  possibleDates(x, ...)
-  snapshotDate(x, ...)
-  snapshotDate(x, ...) <- value
-  snapshotUrl(x, ...)
-  snapshotUrls(x, ...)
-  snapshotVersion(x, ...)
-  columns(x)
-  keytypes(x)
-  keys(x, keytype, ...)
-  ahinfo(x, path)
-  display(object,...)
+filters(x, ...)
+filters(x, ...) <- value
+hubUrl(x, ...)
+hubCache(x, ...)
+hubCache(x, ...) <- value
+hubResource(x, path = character(), ...)
+possibleDates(x, ...)
+snapshotDate(x, ...)
+snapshotDate(x, ...) <- value
+snapshotUrl(x, ...)
+snapshotUrls(x, ...)
+snapshotVersion(x, ...)
+columns(x)
+\S4method{metadata}{AnnotationHub}(x, columns, ..., cols)
+keytypes(x)
+keys(x, keytype, ...)
+ahinfo(x, path)
+display(object,...)
 }
 
 \arguments{
   \item{x}{the \code{AnnotationHub} object. }
   \item{object}{the \code{AnnotationHub} object. }
   \item{value}{the value to be assigned.  For filters method, this is a
-  named list where the names are the kind of filters, and the values are
-  character vectors of acceptable values}
+    named list where the names are the kind of filters, and the values are
+    character vectors of acceptable values}
   \item{path}{a path string}
+  \item{columns, cols}{character vector of desired columns. \code{cols}
+    is deprecated; use \code{columns} instead.}
   \item{keytype}{the type of key you want to look up possible values
     for}
   \item{...}{other arguments}
@@ -202,7 +204,14 @@
       \code{columns(x)} and \code{keytypes(x)}:
       shows which kinds of filters can be set for an
       \code{AnnotationHub} object.
-    }  
+    }
+    \item{}{
+      \code{metadata(x, columns, ..., cols)}:
+      Retrieve metadata about all resources in the AnnotationHub
+      \code{x}. The optional \code{columns} argument is a subset of
+      values returned by \code{columns(x)}; \code{cols} is deprecated and
+      should not be used.
+    }
     \item{}{
       \code{keys(x, keytype, ...)}:
       Lists potential values for the filters of an \code{AnnotationHub}
