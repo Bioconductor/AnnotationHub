@@ -194,15 +194,23 @@ setMethod("keys", "AnnotationHub", function(x, keytype) {
     .keys(snapshotUrl(x), keytype)
 })
 
-setMethod("metadata", "AnnotationHub", function(x, cols, ...) {
-    if(missing(cols)){
-        cols <- c("Title","Species","TaxonomyId","Genome",
-                      "Description","Tags","RDataClass","RDataPath")
-    } else if(!all(cols %in% columns(x))){
-        ## check cols to avoid user error (can't live in .metadata b/c of usage)
-        stop("All cols arguments must be values returned by the columns method.")
+setMethod("metadata", "AnnotationHub", function(x, columns, ..., cols) {
+    if (!missing(cols)) {
+        .Deprecated("columns",
+                    msg="'cols' is deprecated, use 'columns' instead")
+        if (!missing(columns))
+            warning("using 'columns' instead of 'cols'")
+        else columns <- cols
+    } else if (missing(columns)) {
+        columns <- .DEFAULT_COLUMNS
     }
-    .metadata(snapshotUrl(), filters(x), cols)
+    if (!all(columns %in% columns(x))){
+        bad <- paste(sQuote(columns[!columns %in% columns(x)]), collapse=", ")
+        txt <- sprintf("'columns' argument values not in columns(): %s",
+                       bad)
+        stop(paste(strwrap(txt, exdent=2), collapse="\n"))
+    }
+    .metadata(snapshotUrl(), filters(x), columns)
 })
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

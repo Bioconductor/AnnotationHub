@@ -117,11 +117,11 @@ test_metadata <- function(){
     checkTrue(dim(resFull)[2] == dim(resPartial)[2])
     checkTrue(dim(resFull)[1] != dim(resPartial)[1])
 
-    ## does cols argument work?
-    resPartial2 <- metadata(x, cols="TaxonomyId")
+    ## does columns argument work?
+    resPartial2 <- metadata(x, columns="TaxonomyId")
     checkTrue(dim(resPartial2)[2] == 1)
     
-    resPartial3 <- metadata(x, cols=c("Title","TaxonomyId"))
+    resPartial3 <- metadata(x, columns=c("Title","TaxonomyId"))
     checkTrue(dim(resPartial3)[2] == 2)
 
     ## spot check that a data file has correct metadata values

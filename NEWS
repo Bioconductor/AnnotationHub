@@ -5,6 +5,10 @@ NEW FEATURES
 
     o Add display,AnnotationHub-method using shiny
 
+SIGNIFICANT USER VISIBLE CHANGES
+
+    o metadata argument 'columns' replaces deprecated 'cols'
+
 CHANGES IN VERSION 1.2.0
 ------------------------
 

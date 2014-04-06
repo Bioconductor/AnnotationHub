@@ -108,7 +108,7 @@
 .snapshotPaths <- function(snapshotUrl) {
     ## url <- paste(snapshotUrl, "getAllResourcePaths", sep="/")
     ## urls <- .parseJSON(url)
-    urls <- unlist(.metadata(snapshotUrl, cols="RDataPath"))
+    urls <- unlist(.metadata(snapshotUrl, columns="RDataPath"))
     setNames(urls, make.names(urls))
 }
 
@@ -155,8 +155,8 @@
              as.character(l[[1]])
          }
     }
-    cols <- mapply(.makeVecs, lst, whichMulti, SIMPLIFY=FALSE)
-    meta <- DataFrame(cols)
+    columns <- mapply(.makeVecs, lst, whichMulti, SIMPLIFY=FALSE)
+    meta <- DataFrame(columns)
     ## clean up for WHEN the a col is RDataDateAdded
     if('RDataDateAdded' %in% colnames(meta)){
         meta$RDataDateAdded <- .convertDatesToStandard(meta$RDataDateAdded)
@@ -210,19 +210,19 @@
 }
 
 ## metadataRemote takes a filter list and cols and returns a DataFrame
-.metadataRemote <- function(snapshotUrl, filters=list(),
-                            cols=c("Title","Species",
-                              "TaxonomyId","Genome","Description",
-                              "Tags","RDataClass","RDataPath")) {  
-    ## format cols
-    colsVec <- paste("cols",cols, sep="/", collapse="/")
+.metadataRemote <-
+    function(snapshotUrl, filters=list(),
+             columns=.DEFAULT_COLUMNS)
+{
+    ## format columns
+    colsVec <- paste("cols", columns, sep="/", collapse="/")
     ## then make a url
     if (length(filters)>0 && filters!="" &&
         !is.null(filters)) { ## get some
         ## URL must be specific
         filters <- lapply(filters,paste,collapse=",")
         ## Append the cols as one more list element
-        filters <- c(filters,cols=paste(cols, collapse=","))
+        filters <- c(filters, columns=paste(columns, collapse=","))
         ## make url and body
         meta <- .parseJSONMetadataListViaPOST(filters)
 
@@ -239,7 +239,8 @@
 }
 
 ## helper for filtering a Data.frame locally
-.filterMeta <- function(meta, filters, cols){
+.filterMeta <- function(meta, filters, columns)
+{
     .subset <- function(meta, cname, fval){
         meta[meta[[cname]] %in% fval,]
     }
@@ -251,7 +252,7 @@
         meta <- .subset(meta, cname, fval)
     }
     ## always drop cols AFTER we drop rows...
-    meta[,cols,drop=FALSE]
+    meta[, columns, drop=FALSE]
 }
 ## example test filter and cols:
 ## filters = list(Species=c("Homo sapiens","Mus musculus"), RDataClass="FaFile")
@@ -259,13 +260,6 @@
 
 
 #############################################################################
-## TEMP list of all cols we can extract...
-extractCols <- c("BiocVersion","DataProvider","Title","SourceFile",
-                 "Species","SourceUrl","SourceVersion",
-                 "TaxonomyId","Genome","Description",
-                 "Tags","RDataClass","RDataPath", ## new stuff follows
-                 "Coordinate_1_based","Maintainer",
-                 "RDataVersion","RDataDateAdded","Recipe")
 
 ## trouble when included with certain others?: "SourceSize"
 ## IOW, if I drop the last 6 or so above, I can get SourceSize, but
@@ -285,22 +279,20 @@ extractCols <- c("BiocVersion","DataProvider","Title","SourceFile",
 ## This is what we will call when we pull data only from the cache.
 ## It gets metadata from local cache - ALL fields will be present so I
 ## need to remove fields that I are not in the list of cols requested.
-.metadataLocal <- function(snapshotUrl,
-                           filters=list(),
-                           cols=c("Title","Species",
-                             "TaxonomyId","Genome","Description",
-                             "Tags","RDataClass","RDataPath")){
+.metadataLocal <-
+    function(snapshotUrl, filters=list(), columns=.DEFAULT_COLUMNS)
+{
     metadataLoc <- file.path(hubCache(),"metadata.Rda")
-    if(file.exists(metadataLoc)){
+    if (file.exists(metadataLoc)) {
         ## then load it etc.
         load(metadataLoc)
         ## then filter it
-        .filterMeta(meta, filters, cols)
-    }else{ ## 1st time case where there isn't any local data yet.
-        meta <- .metadataRemote(snapshotUrl, cols=extractCols)
+        .filterMeta(meta, filters, columns)
+    } else { ## 1st time case where there isn't any local data yet.
+        meta <- .metadataRemote(snapshotUrl, columns=.ALL_COLUMNS)
         ## then save it
         save(meta, file=metadataLoc)
-        .filterMeta(meta, filters, cols)
+        .filterMeta(meta, filters, columns)
     }
 }
 
@@ -309,13 +301,14 @@ extractCols <- c("BiocVersion","DataProvider","Title","SourceFile",
 ## helper to get dates that already exist:
 .getLocallyExistingDates <- function(){
     metadataLoc <- file.path(hubCache(),"metadata.Rda")
-    load(metadataLoc)
-    unique(meta$RDataDateAdded)
+    env <- new.env(parent=emptyenv())
+    obj <- load(metadataLoc, env)
+    unique(env[[obj]]$RDataDateAdded)
 }
 
 
 ## Called when we need to update the LocalMetadata Cache
-.updateLocalMetadata <- function(snapshotUrl, filters=filters, cols=cols){
+.updateLocalMetadata <- function(snapshotUrl, filters, columns){
     ## NEW PLAN: filter on missing dates.  Right now I can't get more
     ## than one date from the server at a time.  :( But we are going
     ## to fix that soon.
@@ -332,7 +325,7 @@ extractCols <- c("BiocVersion","DataProvider","Title","SourceFile",
     ## for(i in seq_along(missingDates)){
     ##     metas[i] <- .metadataRemote(snapshotUrl(),
     ##                     filters=list(RDataDateAdded=missingDates[i]),
-    ##                     cols=extractCols)
+    ##                     cols=.ALL_COLUMNS)
     ## }    
     ## missingData <- unique(do.call('rbind', metas))     
     metadataLoc <- file.path(hubCache(),"metadata.Rda")
@@ -341,30 +334,30 @@ extractCols <- c("BiocVersion","DataProvider","Title","SourceFile",
 
     meta <- .metadataRemote(snapshotUrl(),
                             filters=list(RDataDateAdded=max(missingDates)),
-                            cols=extractCols)
+                            columns=.ALL_COLUMNS)
     save(meta, file=metadataLoc)    
     
     #################################################################
     ## Continuing on after updating the local cache:
     ## Then filter so that what comes back is properly subsetted
-    meta <- .filterMeta(meta, filters, cols)
+    meta <- .filterMeta(meta, filters, columns)
     ## Don't forget to also update (save) local snapshotDate as well
     .saveLatestSnapShotDate(.latestDate())
     meta
 }
 
 
-.metadata <- function(snapshotUrl=snapshotUrl(), filters=list(),
-                      cols=c("Title","Species",
-                        "TaxonomyId","Genome","Description",
-                        "Tags","RDataClass","RDataPath"), useWebOnly=FALSE) {
+.metadata <-
+    function(snapshotUrl=snapshotUrl(), filters=list(),
+             columns=.DEFAULT_COLUMNS, useWebOnly=FALSE)
+{
     if(useWebOnly==TRUE){## For internal testing only
-        .metadataRemote(snapshotUrl, filters, cols)
+        .metadataRemote(snapshotUrl, filters, columns)
     }else{
         if(.getLastSnapShotDate() == .latestDate()){
-            .metadataLocal(snapshotUrl, filters=filters, cols=cols)
+            .metadataLocal(snapshotUrl, filters=filters, columns=columns)
         }else{ ## the dates don't match... So update!
-            .updateLocalMetadata(snapshotUrl, filters=filters, cols=cols)
+            .updateLocalMetadata(snapshotUrl, filters=filters, columns=columns)
         }
     }
 }
@@ -379,8 +372,8 @@ extractCols <- c("BiocVersion","DataProvider","Title","SourceFile",
 .keytypes <-function(snapshotUrl) {
     ## url <- paste(snapshotUrl, 'getAllKeytypes', sep="/")
     ## .parseJSON(url)
-    ## TEMP use the extractCols (for consistency)
-    extractCols
+    ## TEMP use the .ALL_COLUMNS (for consistency)
+    .ALL_COLUMNS
 }
 
 

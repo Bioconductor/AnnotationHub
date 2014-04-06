@@ -129,8 +129,8 @@
 
     ## Get the metadata
     m <- as.character(unlist(.metadata(snapshotUrl(x),
-                                 filters=list(RDataPath=path),
-                                 cols="RDataClass")))
+                                       filters=list(RDataPath=path),
+                                       columns="RDataClass")))
 
     ## Call correct function based on the results of the metadata
     FUN <- switch(m,
