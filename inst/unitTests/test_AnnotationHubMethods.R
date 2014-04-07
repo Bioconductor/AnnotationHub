@@ -104,10 +104,8 @@ test_replaceFilter <- function(){
     checkTrue(length(filters(x))==2)  ## TaxonomyId should not repeat.
 }
 
-
-
 ## does this work as expected?  (it should respect the filter values)
-test_metadata <- function(){
+test_metadata_filters <- function(){
     filters(x) <- NULL ## null out filters
     resFull <- metadata(x)
     ## Now apply filters
