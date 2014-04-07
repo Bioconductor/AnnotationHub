@@ -93,8 +93,6 @@
 
 ## Gets sqlite files downloaded and then uses loadDb to handle them
 .getSQLite <- function(x, path){
-    require(AnnotationDbi)  ## only needed here
-
     ## download, if needed
     if (!.isCached(hubCache(x), path)) {
         .downloadFile(x, path)         # file
@@ -102,7 +100,7 @@
 
     ## get
     localPath <- hubResource(x, path, cached=TRUE)
-    AnnotationDbi::loadDb(localPath)
+    loadDb(localPath)
 }
 
 ## Downloads tabix files and makes a TabixFile handle
