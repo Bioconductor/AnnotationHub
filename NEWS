@@ -9,6 +9,10 @@ SIGNIFICANT USER VISIBLE CHANGES
 
     o metadata argument 'columns' replaces deprecated 'cols'
 
+BUG FIXES
+
+    o metadata() returns only information on current hub elements
+
 CHANGES IN VERSION 1.2.0
 ------------------------
 

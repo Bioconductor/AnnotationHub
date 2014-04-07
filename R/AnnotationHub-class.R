@@ -210,7 +210,10 @@ setMethod("metadata", "AnnotationHub", function(x, columns, ..., cols) {
                        bad)
         stop(paste(strwrap(txt, exdent=2), collapse="\n"))
     }
-    .metadata(snapshotUrl(), filters(x), columns)
+
+    result <- .metadata(snapshotUrl(x), filters(x), union(columns, "RDataPath"))
+    ridx <- Filter(Negate(is.na), match(snapshotPaths(x), result$RDataPath))
+    result[ridx, columns, drop=FALSE]
 })
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -239,28 +242,28 @@ setMethod("metadata", "AnnotationHub", function(x, columns, ..., cols) {
 
 
 ## These operators get a named resource
-setMethod("$", "AnnotationHub", function(x, name){.getResource(x,name)})
+setMethod("$", "AnnotationHub", .getResource)
 
-setMethod("[[", "AnnotationHub",
-          function(x, i, j, ...){
-              if (nargs() >= 3) stop("too many subscripts")
-              .getResource(x, name=i)
-          }
-)
+setMethod("[[", "AnnotationHub", function(x, i, j, ...){
+    if (!missing(j) || length(list(...)) > 0L) 
+        stop("invalid subsetting")
+    .getResource(x, name=i)
+})
 
-## This operator just limits the namespace
-setMethod("[", "AnnotationHub",
-          function(x, i, j, ..., drop){
-              if (nargs() >= 3) stop("too many subscripts")
-              if (is.character(i)) {
-                  paths <- names(x@snapshotPaths)
-                  x@snapshotPaths <- x@snapshotPaths[paths %in% i]
-              }else{
-                  x@snapshotPaths <- x@snapshotPaths[i]
-              }
-              x
-          }
-)
+setMethod("[", "AnnotationHub", function(x, i, j, ..., drop) {
+    if (!missing(j) || length(list(...)) > 0L) 
+        stop("invalid subsetting")
+    if (missing(i))
+        return(x)
+
+    if (is.character(i)) {
+        idx <- i %in% names(snapshotPaths(x))
+        if (!all(idx))
+            stop("unknown index", paste(sQuote(i[!idx]), collapse=", "))
+    }
+    x@snapshotPaths <- x@snapshotPaths[i]
+    x
+})
 
 
 ## TESTs:
