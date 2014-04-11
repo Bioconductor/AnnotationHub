@@ -62,22 +62,6 @@
 }
 
 
-## make this more general, filters will be a list...
-.parseJSONMetadataListViaPOST <- function(filters){
-    url <- "http://annotationhub.bioconductor.org/cgi-bin/R/query"
-    BiocVersion=unlist(strsplit(snapshotVersion(), "/"))[1]
-    RDataDateAdded=as.character(.getLastSnapShotDate())    
-    res <- content(POST(url,
-                        body=c(BiocVersion=BiocVersion,
-                          RDataDateAdded=RDataDateAdded,
-                          filters)), as="text")
-    j <- fromJSON(res)
-    rapply(j, .na2na, how="replace")
-}
-
-
-
-
 ## .parseJSON("http://annotationhub.bioconductor.org/ah/2.12/2013-01-22/getAllResourcePaths")
 ## VS a bad URL:
 ## .parseJSON("http://foo/bar")
@@ -181,65 +165,44 @@
 ## So I do save a very TINY amount of time with my helper (so lets use it).
 
 ##############################################################################
-## helper to standardize snapshotLoc
-.snapshotLoc <- function(){
-    file.path(hubCache(),"snapshotDate.Rda")
-}
-
 ## helper to save snapShotdate to cache
-.saveLatestSnapShotDate <- function(date) {
-    snapshotLoc <- .snapshotLoc() 
-    save(date, file=snapshotLoc)
-}
+.snapshotDateFile <- function()
+    file.path(hubCache(), "snapshotDate.Rda")
+
+.updateSnapshotDateFile <- function(date)
+    save(date, file=.snapshotDateFile())
 
 ## helper to get latest SnapshotDate from cache. (only works if
 ## caching is enabled)
-.getLastSnapShotDate <- function() {
-    snapshotLoc <- .snapshotLoc()    
+.lastSnapshotDate <- function() {
+    snapshotLoc <- .snapshotDateFile()    
     if(file.exists(snapshotLoc)){
         ## Filename shenanigans! (in case the file gets renamed on us)
-        load(snapshotLoc)
         objName <- load(snapshotLoc)
         date <- eval(parse(text=objName))
-        return(date)
     }else{
         date <- snapshotDate()
-        .saveLatestSnapShotDate(date)
-        return(date)
+        .updateSnapshotDateFile(date)
     }
+    date
 }
 
-## metadataRemote takes a filter list and cols and returns a DataFrame
+## .metadataRemote returns a DataFrame
 .metadataRemote <-
-    function(snapshotUrl, filters=list(),
-             columns=.DEFAULT_COLUMNS)
+    function(snapshotUrl, columns=.DEFAULT_COLUMNS)
 {
+    message("updating metadata from server...")
     ## format columns
     colsVec <- paste("cols", columns, sep="/", collapse="/")
     ## then make a url
-    if (length(filters)>0 && filters!="" &&
-        !is.null(filters)) { ## get some
-        ## URL must be specific
-        filters <- lapply(filters,paste,collapse=",")
-        ## Append the cols as one more list element
-        filters <- c(filters, columns=paste(columns, collapse=","))
-        ## make url and body
-        meta <- .parseJSONMetadataListViaPOST(filters)
-
-        ## filterVec <- mapply(FUN=paste,names(filters), filters, sep="/")
-        ## url <- paste(snapshotUrl, "query", filterVec, colsVec, sep="/")
-        ## meta <- .parseJSONMetadataListViaGET(url)
-
-    } else {## get all of them (use get method)
-        url <- paste(snapshotUrl, "query", colsVec, sep="/")
-        meta <- .parseJSONMetadataListViaGET(url)
-    }
+    url <- paste(snapshotUrl, "query", colsVec, sep="/")
+    meta <- .parseJSONMetadataListViaGET(url)
     ## make a DataFrame
     .toDataFrame(meta)
 }
 
 ## helper for filtering a Data.frame locally
-.filterMeta <- function(meta, filters, columns)
+.filterMetadata <- function(meta, filters, columns)
 {
     .subset <- function(meta, cname, fval){
         meta[meta[[cname]] %in% fval,]
@@ -275,99 +238,42 @@
 ## For now lets press on...
 #############################################################################
 
+.metadataCache <- new.env(parent=emptyenv())
 
-## This is what we will call when we pull data only from the cache.
-## It gets metadata from local cache - ALL fields will be present so I
-## need to remove fields that I are not in the list of cols requested.
-.metadataLocal <-
-    function(snapshotUrl, filters=list(), columns=.DEFAULT_COLUMNS)
+.metadataFile <- function()
+    file.path(hubCache(), "metadata.Rda")
+
+.metadataFromCache <- function()
 {
-    metadataLoc <- file.path(hubCache(),"metadata.Rda")
-    if (file.exists(metadataLoc)) {
-        ## then load it etc.
-        load(metadataLoc)
-        ## then filter it
-        .filterMeta(meta, filters, columns)
-    } else { ## 1st time case where there isn't any local data yet.
-        meta <- .metadataRemote(snapshotUrl, columns=.ALL_COLUMNS)
-        ## then save it
-        save(meta, file=metadataLoc)
-        .filterMeta(meta, filters, columns)
-    }
+    if (!exists("meta", envir=.metadataCache))
+        load(.metadataFile(), .metadataCache)
+    .metadataCache[["meta"]]
 }
 
-##library(AnnotationHub); ah = AnnotationHub(); debug(AnnotationHub:::.updateLocalMetadata); debug(AnnotationHub:::.parseJSONMetadataList); metadata(ah)
-
-## helper to get dates that already exist:
-.getLocallyExistingDates <- function(){
-    metadataLoc <- file.path(hubCache(),"metadata.Rda")
-    env <- new.env(parent=emptyenv())
-    obj <- load(metadataLoc, env)
-    unique(env[[obj]]$RDataDateAdded)
+.updateMetadata <- function(snapshotUrl) {
+    ## FIXME: This could be an incremental update, but instead simply
+    ## replaces the current cache.
+    meta <- .metadataRemote(snapshotUrl(), columns=.ALL_COLUMNS)
+    save(meta, file=.metadataFile())
+    .updateSnapshotDateFile(.latestDate())
+    load(.metadataFile(), .metadataCache)
 }
-
-
-## Called when we need to update the LocalMetadata Cache
-.updateLocalMetadata <- function(snapshotUrl, filters, columns){
-    ## NEW PLAN: filter on missing dates.  Right now I can't get more
-    ## than one date from the server at a time.  :( But we are going
-    ## to fix that soon.
-    ## ALSO, only the most recent date is worth gettting since it
-    ## returns ALL the stuff before it as well...
-
-    ## 1st get missing dates:
-    rddts <- .getLocallyExistingDates()
-    missingDates <- possibleDates()[!possibleDates() %in% rddts]
-    
-    ## ## Then loop over dates to get missing records
-    ## metas <- list()
-    ## ## get each one
-    ## for(i in seq_along(missingDates)){
-    ##     metas[i] <- .metadataRemote(snapshotUrl(),
-    ##                     filters=list(RDataDateAdded=missingDates[i]),
-    ##                     cols=.ALL_COLUMNS)
-    ## }    
-    ## missingData <- unique(do.call('rbind', metas))     
-    metadataLoc <- file.path(hubCache(),"metadata.Rda")
-    ## load(metadataLoc)
-    ## meta <- unique(rbind(meta, missingData))
-
-    meta <- .metadataRemote(snapshotUrl(),
-                            filters=list(RDataDateAdded=max(missingDates)),
-                            columns=.ALL_COLUMNS)
-    save(meta, file=metadataLoc)    
-    
-    #################################################################
-    ## Continuing on after updating the local cache:
-    ## Then filter so that what comes back is properly subsetted
-    meta <- .filterMeta(meta, filters, columns)
-    ## Don't forget to also update (save) local snapshotDate as well
-    .saveLatestSnapShotDate(.latestDate())
-    meta
-}
-
 
 .metadata <-
     function(snapshotUrl=snapshotUrl(), filters=list(),
-             columns=.DEFAULT_COLUMNS, useWebOnly=FALSE)
+             columns=.DEFAULT_COLUMNS)
 {
-    if(useWebOnly==TRUE){## For internal testing only
-        .metadataRemote(snapshotUrl, filters, columns)
-    }else{
-        if(.getLastSnapShotDate() == .latestDate()){
-            .metadataLocal(snapshotUrl, filters=filters, columns=columns)
-        }else{ ## the dates don't match... So update!
-            .updateLocalMetadata(snapshotUrl, filters=filters, columns=columns)
-        }
-    }
+    if (!file.exists(.metadataFile()) ||
+            (.lastSnapshotDate() != .latestDate()))
+        .updateMetadata(snapshotUrl)
+
+    metadata <- .metadataFromCache()
+    .filterMetadata(metadata, filters, columns)
 }
 ## some tests
 ## library(AnnotationHub);ah = AnnotationHub(); system.time(m <- metadata(ah))
 ## res <- ah$goldenpath.hg19.encodeDCC.wgEncodeUwTfbs.wgEncodeUwTfbsMcf7CtcfStdPkRep1.narrowPeak_0.0.1.RData
 ##
-## web only:
-## library(AnnotationHub);ah = AnnotationHub(); system.time(m <- AnnotationHub:::.metadata(snapshotUrl(ah), useWebOnly=TRUE))
-
 
 .keytypes <-function(snapshotUrl) {
     ## url <- paste(snapshotUrl, 'getAllKeytypes', sep="/")
@@ -449,20 +355,6 @@ setMethod("hubResource", "missing", function(x, path=character(), ...) {
 })
 
 
-
-
-## TODO: work out why I can't get all the metadata types back from the
-## DB when calling .metadataRemote()
-
-## this doesn't work (requires old metadata to attempt):
-## snapshotUrl <- "http://annotationhub.bioconductor.org/ah/2.14/1.3.13/2013-12-27"
-## remotePaths <- as.character(t(as.data.frame(AnnotationHub:::.metadataRemote(snapshotUrl, cols="RDataPath"))))
-## localPaths <- as.character(t(as.data.frame(AnnotationHub:::.metadataLocal(snapshotUrl, cols="RDataPath"))))
-## missingPaths <- setdiff(remotePaths, localPaths)
-
-##  m <- AnnotationHub:::.metadataRemote(snapshotUrl, filters=list(RDataPath=missingPaths), cols=extractCols)
-
-
 ##########################################################
 ## Strangely enough the following seems to work:
 ## filters(ah) <- list(RDataPath=r)
@@ -470,20 +362,11 @@ setMethod("hubResource", "missing", function(x, path=character(), ...) {
 ## So does this work?  -- YES
 ## r2 = head(missingPaths); filters(ah) <- list(RDataPath=r2)
 
-## AND THIS WORKS ALSO:
-## m <- AnnotationHub:::.metadataRemote(snapshotUrl, filters=list(RDataPath=r2), cols=extractCols)
-
-## But this doesn't work:
-## m <- AnnotationHub:::.metadataRemote(snapshotUrl, filters=list(RDataPath=missingPaths), cols=extractCols)
-
 ## which suggests that either I have 1) bad data, 2) limits on how many things can be in a URL OR 3) some other limitation on how many things can be returned...
 
 ## Does this fail?
 ## filters(ah) <- list(RDataPath=missingPaths)
 ## NO - forehead smack - This is because by the time I run this, we have already updated the metadata? - this test is suspect, try doing it after replacing metadata and date info.
-
-## So this should work (with defaults)? - NO IT DOES NOT...  Hmmm...
-## m <- AnnotationHub:::.metadataRemote(snapshotUrl, filters=list(RDataPath=missingPaths))
 
 ## There was some interest in the fact that his does not fail.
 ## #filters(ah) <- list(RDataPath=missingPaths)
@@ -507,12 +390,6 @@ setMethod("hubResource", "missing", function(x, path=character(), ...) {
 
 ######################################################################
 ## What if I limit the cols returned to only one thing?
-## library(AnnotationHub); load('metaTestVars.Rda'); ah = AnnotationHub(); debug(AnnotationHub:::.metadataRemote); debug(AnnotationHub:::.toDataFrame); debug(AnnotationHub:::.parseJSONMetadataListViaPOST)
-
-## pathStr <- missingPaths[1:2]
-## m <- AnnotationHub:::.metadataRemote(snapshotUrl, filters=list(RDataPath=pathStr), cols="RDataPath")
-## Seems to work OK now, but now I seem to be missing some rows (rows dissappear on the server side?) - and this seems to be a real problem.  That is:
-
 
 ## table(missingPaths %in% m$RDataPath) ## TWO false values!
 ## fasta files for  erinaceus_europaeus and pan_troglodytes:
