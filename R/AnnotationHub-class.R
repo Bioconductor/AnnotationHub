@@ -293,6 +293,30 @@ setMethod("as.list", "AnnotationHub",
 ## y <- x[1:10];  res <- as.list(y)  ## should warn users
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### The "query" method.
+###
+setMethod("subset", "AnnotationHub", function(x, subset, ...) {
+    i <- IRanges:::evalqForSubset(subset, metadata(x), ...)
+    x[i]
+})
+
+setMethod("query", "AnnotationHub",
+    function(x, pattern, ...)
+{
+    if (missing(pattern) || !is(pattern, "character") ||
+        length(pattern) != 1L)
+        stop("'pattern' must be character(1)")
+
+    idx <- Reduce(`|`, Map(function(pattern, x, ...) {
+        if (is(x, "List"))
+            any(relist(grepl(pattern, as.character(unlist(x)), ...), x))
+        else
+            grepl(pattern, as.character(x))
+    }, metadata(x), MoreArgs=list(pattern=pattern, ...)))
+    x[idx]
+})
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### The "show" method.
 ###
 setMethod(show, "AnnotationHub", function(object) {

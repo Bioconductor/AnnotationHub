@@ -51,6 +51,11 @@
 \alias{keys}
 \alias{keys,AnnotationHub-method}
 
+\alias{subset,AnnotationHub-method}
+
+\alias{query}
+\alias{query,AnnotationHub-method}
+
 \alias{length,AnnotationHub-method}
 
 \alias{metadata,AnnotationHub-method}
@@ -141,10 +146,13 @@ snapshotDate(x, ...) <- value
 snapshotUrl(x, ...)
 snapshotUrls(x, ...)
 snapshotVersion(x, ...)
+
 columns(x)
-\S4method{metadata}{AnnotationHub}(x, columns, ..., cols)
 keytypes(x)
 keys(x, keytype, ...)
+\S4method{metadata}{AnnotationHub}(x, columns, ..., cols)
+\S4method{query}{AnnotationHub}(x, pattern, ...)
+\S4method{subset}{AnnotationHub}(x, subset, ...)
 ahinfo(x, path)
 display(object,...)
 }
@@ -159,7 +167,11 @@ display(object,...)
   \item{columns, cols}{character vector of desired columns. \code{cols}
     is deprecated; use \code{columns} instead.}
   \item{keytype}{the type of key you want to look up possible values
-    for}
+    for.}
+  \item{pattern}{A character(1) regular expression to query metadata of
+    \code{x}.}
+  \item{subset}{An expression refering to columns of
+    \code{metadata(x)}. See Methods for additional detail.}
   \item{...}{other arguments}
 }
 
@@ -206,6 +218,11 @@ display(object,...)
       \code{AnnotationHub} object.
     }
     \item{}{
+      \code{keys(x, keytype, ...)}:
+      Lists potential values for the filters of an \code{AnnotationHub}
+      object.  Use the keytype argument to specify which kind of filter.
+    }
+    \item{}{
       \code{metadata(x, columns, ..., cols)}:
       Retrieve metadata about all resources in the AnnotationHub
       \code{x}. The optional \code{columns} argument is a subset of
@@ -213,10 +230,20 @@ display(object,...)
       should not be used.
     }
     \item{}{
-      \code{keys(x, keytype, ...)}:
-      Lists potential values for the filters of an \code{AnnotationHub}
-      object.  Use the keytype argument to specify which kind of filter.
-    }
+      \code{query(x, pattern, ...)}:
+      Return an AnnotationHub subset containing only those elements
+      whose metadata matches \code{pattern}. Matching uses
+      \code{pattern} as in \code{\link{grepl}} to search the
+      \code{as.character} representation of each column, performing a
+      logical \code{OR} across columns. Arguments \code{...} are passed
+      to \code{grepl} for within-column matching.}
+    \item{}{
+      \code{subset(x, subset, ...)}:
+      Return an AnnotationHub subset containing only those elements
+      whose metadata satisfies the \emph{expression} in
+      \code{subset}. The expression can reference columns of
+      \code{metadata(x)}, and should return a logical vector of length
+      \code{lenght(x)}.}
     \item{}{
       \code{ahinfo(x, path)}:
       Shows metadata about an AnnotationHub resource and returns a DataFrame
@@ -292,6 +319,9 @@ display(object,...)
   ## Download a resource (using tab completion) and put it into "res"
   res <- ah$goldenpath.hg19.encodeDCC.wgEncodeUwTfbs.wgEncodeUwTfbsMcf7CtcfStdPkRep1.narrowPeak_0.0.1.RData
 
+  ## query and subset
+  query(ah, "GRCh37")    # 'GRCh37' anywhere in the metadata
+  subset(ah, Species == "Homo sapiens" & any(Tags == "FASTA"))
 
   ## For brevity, lets define a resource pathname we are interested in 
   pathName <- "goldenpath.hg19.encodeDCC.wgEncodeUwTfbs.wgEncodeUwTfbsMcf7CtcfStdPkRep1.narrowPeak_0.0.1.RData"
