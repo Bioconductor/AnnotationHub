@@ -296,7 +296,7 @@ setMethod("as.list", "AnnotationHub",
 ### The "query" method.
 ###
 setMethod("subset", "AnnotationHub", function(x, subset, ...) {
-    i <- IRanges:::evalqForSubset(subset, metadata(x), ...)
+    i <- S4Vectors:::evalqForSubset(subset, metadata(x), ...)
     x[i]
 })
 
