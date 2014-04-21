@@ -293,7 +293,7 @@ setMethod("as.list", "AnnotationHub",
 ## y <- x[1:10];  res <- as.list(y)  ## should warn users
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### The "query" method.
+### The "subset" and "query" methods.
 ###
 setMethod("subset", "AnnotationHub", function(x, subset, ...) {
     i <- S4Vectors:::evalqForSubset(subset, metadata(x), ...)
@@ -311,7 +311,7 @@ setMethod("query", "AnnotationHub",
         if (is(x, "List"))
             any(relist(grepl(pattern, as.character(unlist(x)), ...), x))
         else
-            grepl(pattern, as.character(x))
+            grepl(pattern, as.character(x), ...)
     }, metadata(x), MoreArgs=list(pattern=pattern, ...)))
     x[idx]
 })
