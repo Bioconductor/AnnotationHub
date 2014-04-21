@@ -12,7 +12,7 @@ importFrom(BiocInstaller, biocVersion)
 
 importFrom(utils, .DollarNames)
 
-importFrom(IRanges, metadata)
+importFrom(S4Vectors, metadata)
 
 importFrom(rjson, fromJSON)
 
