@@ -80,17 +80,17 @@ describing your new R resources for the AnnotationHub.  And the 2nd
 function is for describing how to take these online resources and
 transform them into an R object that is useful to end users.
 
-\section{Introducing \Robject{AnnotationHubMetadata} and \Robject{AnnotationHubRecipe} Objects}
+\section{Introducing \Robject{AnnotationHubMetadata} Objects}
 
 The \Rpackage{AnnotationHubData} package is a complementary package to
 the \Rpackage{AnnotationHub} package that provides a place where we
 can store code that processes online resources into R objects suitable
 for access through the \Rpackage{AnnotationHub} package.  But before
 you can understand the requirements for this package it is important
-that you 1st learn about a pair of objects that are used as
+that you 1st learn about the objects that are used as
 intermediaries between the hub and its web based repository behind the
-scenes.  The 1st object you need to know about is the
-\Robject{AnnotationHubMetadata} object.  These objects store the
+scenes.  That means that you need to know about
+\Robject{AnnotationHubMetadata} objects.  These objects store the
 metadata that describes an online resource.  And if you want to see a
 set of online resources added to the repository and maintained, then
 it will be necessary to become familiar with the
@@ -100,29 +100,16 @@ have to be able to construct an \Rfunction{AnnotationHubMetadata}
 object that describes it in detail and that specifies where the recipe
 function lives.
 
-The second type of object you need to know about is the
-\Robject{AnnotationHubRecipe} object. This object is actually created
-from an \Robject{AnnotationHubMetadata} object, so you don't need to
-be able to make one.  But it offers a few conveniences for accessing
-certain fields while hiding some other things so you will have to know
-about this when writing your recipe function.  In particular the
-\Rfunction{inputFiles} and \Rfunction{outputFiles} methods allow for
-convenient extraction of relevant filenames needed to process a recipe
-function into it's AnnotationHub based representation.
-
 
 
 \section{Step 1: Writing your \Robject{AnnotationHubMetadata} generating function}
   
 The 1st function you need to provide is one that processes some online
 resources into \Robject{AnnotationHubMetadata} objects.  This function
-MUST return a list of \Robject{AnnotationHubMetadata} object.  It can
-rely on other helper functions, but ultimately it (and it's helpers
-need to know how to find resources and how to process those resources
-into \Robject{AnnotationHubMetadata} objects on it's own.
+MUST return a list of \Robject{AnnotationHubMetadata} objects.  It can
+rely on other helper functions that you define, but ultimately it (and it's helpers) need to contain all of the instructions needed to find resources and process those resources into \Robject{AnnotationHubMetadata} objects.
 
-The following example function takes GTF files from Ensembl and
-processes them into \Robject{AnnotationHubMetadata} objects using Map.
+The following example function takes files from the latest release of inparanoid and processes them into \Robject{AnnotationHubMetadata} objects using Map.
 The calling of the Map function is really the important part of this
 function, as it shows the function creating a series of
 \Robject{AnnotationHubMetadata} objects.  Prior to that, the function
@@ -134,63 +121,52 @@ which indicates both the name and location of the recipe function.  We
 expect most people will want to submit their recipe to the same
 package as they are submitting their metadata processing function.
 
-<<exampleGTFProcessing>>=
-makeEnsemblGTFsToAHMs <- function(){
-    baseUrl <- .ensemblBaseUrl
-    sourceUrl <- .ensemblGtfSourceUrls(.ensemblBaseUrl)
-    
-    sourceFile <- .ensemblSourcePathFromUrl(baseUrl, sourceUrl)
-    meta <- .ensemblMetadataFromUrl(sourceUrl)
-    rdata <- sub(".gz$", ".RData", sourceFile)
-    description <- paste("Gene Annotation for", meta$species)
-
+<<exampleInpProcessing>>=
+makeinparanoid8ToAHMs <- function(currentMetadata){
+    baseUrl <- 'http://inparanoid.sbc.su.se/download/current/Orthologs'
+    ## Make list of metadata in a helper function
+    meta <- .inparanoidMetadataFromUrl(baseUrl)
+    ## then make AnnotationHubMetadata objects.
     Map(AnnotationHubMetadata,
-        AnnotationHubRoot=meta$annotationHubRoot,
-        Description=description, Genome=meta$genome,
-        SourceFile=sourceFile, SourceUrl=sourceUrl,
-        SourceVersion=meta$sourceVersion, Species=meta$species,
-        TaxonomyId=meta$taxonomyId, Title=meta$title,
+        Description=meta$description,
+        Genome=meta$genome,
+        SourceFile=meta$sourceFile, 
+        SourceUrl=meta$sourceUrl,
+        SourceVersion=meta$sourceVersion,
+        Species=meta$species,
+        TaxonomyId=meta$taxonomyId,
+        Title=meta$title,
+        RDataPath=meta$rDataPath,
         MoreArgs=list(
           Coordinate_1_based = TRUE,
-          DataProvider = "ftp.ensembl.org",
-          Maintainer = "Martin Morgan <mtmorgan@fhcrc.org>",
-          RDataClass = "GRanges",
+          DataProvider = baseUrl,
+          Maintainer = "Marc Carlson <mcarlson@fhcrc.org>",
+          RDataClass = "SQLiteFile",
           RDataDateAdded = Sys.time(),
           RDataVersion = "0.0.1",
-          Recipe = c("ensemblGtfToGRangesRecipe", package="AnnotationHubData"),
-          Tags = c("GTF", "ensembl", "Gene", "Transcript", "Annotation")))
+          Recipe = c("inparanoid8ToDbsRecipe", 
+                     package="AnnotationHubData"),
+          Tags = c("Inparanoid", "Gene", "Homology", "Annotation")))
 }
 @ 
 
-The typical case when writing a \Robject{AnnotationHubMetadata}
-generating function like the one above, is to not have it take no
-arguments.  However, if you need this function to take arguments, you
-can still do so, but you will have to pass them in separately to the
-helper function described in step 3.
 
 \section{Step 2: Writing your recipe} 
 
 The 2nd kind of function you need to write is called a recipe
-function.  It always must take an single argument called recipe, which
-is an \Robject{AnnotationHubRecipe} object.  This object allows for
-some conveniences by letting you access some of the data in the
-original AnnotationHubMetadata object that was created for this
-resource by the function above.  Below is a recipe function that takes
-an Ensembl GTF file and then processes it into a GRanges object by
-using the import method from the rtracklayer package.  Along the way,
-the \Rmethod{inputFiles} and \Rmethod{outputFile} accessors are used
-to extract the files/filenames that are needed from the metadata in
-the \Robject{AnnotationHubRecipe} object.
+function.  It always must take an single argument that must be an \Robject{AnnotationHubMetadata} object.  The job of a recipe function is to use the metadata from an \Robject{AnnotationHubMetadata} object to produce an R object or data file that will be retrievable from the AnnotationHub service later on.  Below is a recipe function that calls some helper functions to generate an inparanoid database object from the metadata stored in it's \Robject{AnnotationHubMetadata} object.
 
 <<exampleRecipe>>=
-ensemblGTFToGRangesRecipe <- function(recipe){
-     require(rtracklayer)
-    gz.inputFile <- inputFiles(recipe)[1]
-    con <- gzfile(gz.inputFile)
-    on.exit(close(con))
-    gr <- import(con, "gtf", asRangedData=FALSE)
-    save(gr, file=outputFile(recipe))
-    outputFile(recipe)
+inparanoid8ToDbsRecipe <- function(ahm){
+    require(AnnotationForge)
+    inputFiles <- metadata(ahm)$SourceFile
+    dbname <- makeInpDb(dir=file.path(inputFiles,""),
+                        dataDir=tempdir())
+    db <- loadDb(file=dbname)
+    outputPath <- file.path(metadata(ahm)$AnnotationHubRoot,
+                            metadata(ahm)$RDataPath)
+    saveDb(db, file=outputPath) 
+    outputFile(ahm)
 }
 @ 
 
@@ -201,22 +177,15 @@ Finally you will need to call the
 \Rfunction{makeAnnotationHubResource} function to do some setup.  This
 function only has two required arguments.  The 1st is basically the
 name of a class that describes the kind of resource you are writing
-code to import.  It just needs to be a unique name.  The 2nd argument
+code to import.  It just needs to be a unique name and will be used internally to create a class for dispatch.  The 2nd argument
 is the name of your metadata processing function from step one.  Once
 you have finished this, the only step left is to export the class name
-in the NAMESPACE (this is that string you are providing as your 1st
-argument), and then add this code to the \Rpackage{AnnotationHubData}
-repository.  We are going to set up a bridge to github so that you can
-give us a pull request.  If you have arguments that you need to get
-passed down to the Robject{AnnotationHubMetadata} generating function
-that you defined in step 1, you can pass those in after the 1st two
-arguemnts.
+into the NAMESPACE (rememeber that this is that string you are providing as your 1st argument), and then add this code to the \Rpackage{AnnotationHubData} repository.  We are planning to set up a bridge to github so that you can give us a pull request.  
 
 <<makeAnnotationHubResource, eval=FALSE>>=
-makeAnnotationHubResource("EnsemblGtfImportPreparer",
-                          makeEnsemblGTFsToAHMs)
-
-@ 
+makeAnnotationHubResource("Inparanoid8ImportPreparer",
+                          makeinparanoid8ToAHMs)
+@
 
 
 \section{Session Information}
