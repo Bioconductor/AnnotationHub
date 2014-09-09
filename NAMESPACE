@@ -2,8 +2,6 @@ import(methods, GenomicRanges)
 
 importFrom(AnnotationDbi, exists, keys, keytypes, columns, loadDb)
 
-importFrom(IRanges, DataFrame)
-
 importFrom(httr, POST, content)
 
 import(BiocGenerics)
@@ -12,7 +10,7 @@ importFrom(BiocInstaller, biocVersion)
 
 importFrom(utils, .DollarNames)
 
-importFrom(S4Vectors, metadata)
+importFrom(S4Vectors, metadata, DataFrame)
 
 importFrom(rjson, fromJSON)
 

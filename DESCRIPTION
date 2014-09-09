@@ -1,8 +1,8 @@
 Package: AnnotationHub
 Type: Package
 Title: A client for retrieving Bioconductor objects from AnnotationHub
-Version: 1.5.5
-Depends: S4Vectors (>= 0.0.1), IRanges (>= 1.99.1)
+Version: 1.5.6
+Depends: S4Vectors (>= 0.2.3), IRanges (>= 1.99.28)
 Imports: methods, stats, utils, rjson, BiocGenerics, httr,
         BiocInstaller (>= 1.11.0), AnnotationDbi, GenomicRanges,
         interactiveDisplay (>= 1.0.23)
