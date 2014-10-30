@@ -1,0 +1,170 @@
+<!--
+% \VignetteIndexEntry{AnnotationHub: Access the AnnotationHub Web Service}
+% \VignetteDepends{AnnotationHub}
+% \VignetteEngine{knitr::knitr}
+-->
+
+```{r style, echo = FALSE, results = 'asis'}
+BiocStyle::markdown()
+```
+
+# AnnotationHub: Access the AnnotationHub Web Service
+
+**Package**: `r Biocpkg("AnnotationHub")`<br />
+**Authors**: `r packageDescription("AnnotationHub")[["Author"]] `<br />
+**Modified**: 11 October, 2014<br />
+**Compiled**: `r date()`
+
+The `AnnotationHub` server provides easy _R / Bioconductor_ access to
+large collections of publicly available whole genome resources,
+e.g,. ENSEMBL genome fasta or gtf files, UCSC chain resources, ENCODE
+data tracks at UCSC, etc.
+
+## AnnotationHub objects
+
+The `r Biocpkg("AnnotationHub")` package provides a client interface
+to resources stored at the AnnotationHub web service.
+
+```{r library, message=FALSE}
+library(AnnotationHub)
+```
+
+The `r Biocpkg("AnnotationHub")` package is straightforward to use.
+Create an `AnnotationHub` object
+
+```{r AnnotationHub}
+ah = AnnotationHub()
+```
+
+Now at this point you have already done everything you need in order
+to start retrieving annotations.  For most operations, using the
+`AnnotationHub` object should feel a lot like working with a familiar
+`list` or `data.frame`. For example you can simply retrieve the data
+from the first record in the hub by doing the following:
+
+```{r subset2}
+res <- ah[[1]]
+res
+```
+
+This retrieves the first row of the `AnnotationHub` obect and copies
+it into the local variable `res`.  The object is retrieved from the
+AnnotationHub server. The object is also cache locally, so that the
+next time you need to retrieve it, it should download much more
+quickly.
+
+Now if you look at the `AnnotationHub` again, you will notice that it
+also looks a lot like a `data.frame` object.  This is intentional as
+the data displayed represents metadata that can be used to choose
+which item you want to retrieve.
+
+```{r show}
+ah
+```
+
+By default the show method will only display the first 3 rows of
+records.  There are already thousands of records present in the hub.
+
+```{r length}
+length(ah)
+```
+
+Use the query and subset methods to selectively pare down the hub
+based on specific criteria. The query method lets you search rows for
+specific strings, returning an `AnnotationHub` instance with just the
+rows matching the query.
+
+```{r query}
+ahs <- query(ah, 'inparanoid8')
+length(ahs)
+```
+
+Similarly, subset lets use a more specific criteria from the object to
+return a smaller base object (here we are finding cases where the
+genome column is set to panda).
+
+```{r subset}
+ahs <- subset(ah, ah$genome=='ailMel1')
+length(ahs)
+```
+
+We can also look at the `AnnotationHub` object in a broswer using the
+`display()` function. We can then filter the `AnnotationHub` object
+for _Homo sapiens_ by either using the Global search field on the top
+right corner of the page or the in-column search field for `Species'.
+
+```{r display, eval=FALSE}
+d <- display(ah)
+```
+
+![](display.png)
+Displaying and filtering the Annnotation Hub object in a browser
+
+By default 1000 entries are displayed per page, we can change this using
+the filter on the top of the page or navigate through different pages
+using the page scrolling feature at the bottom of the page.
+
+We can also select the rows of interest to us and send them back to
+the R session using 'Send Rows' button ; this sets a filter internally
+which filters the `AnnotationHub` object.
+
+## Using `AnnotationHub` to retrieve data
+
+So now that we have our `AnnotationHub` object configured to expose
+only the data for humans how would we go about getting that data
+downloaded?  As mentioned above, we can use the `[[]]` operator to
+pull down records of interest on our new smaller `AnnotationHub`
+object
+
+```{r subset2-2, eval=FALSE}
+res <- d[[1]]
+```
+
+And once you have done this, you can look at the object stored in res
+and use it etc..  Any dependencies that you need to use this kind of
+object should have automatically tried to load at this time.
+
+## Configuring `AnnotationHub` objects
+
+When you create the `AnnotationHub` object, it will set up the object
+for you with some default settings.  See `?AnnotationHub` for ways to
+customize the hub source, the local cache, and other instance-specific
+options, and `?hubOption` to set package-global options for use across
+sessions. 
+
+If you look at the object you will see some helpful information about
+it such as where the data is cached and where online the hub server is
+set to.
+
+```{r show-2}
+ah
+```
+
+By default the `AnnotationHub` object is set to the latest
+`snapshotData` and a snapshot version that matches the version of
+_Bioconductor_ that you are using. You can also learn about these data
+with the appropriate methods.
+
+```{r snapshot}
+snapshotDate(ah)
+```
+
+If you are interested in using an older version of a snapshot, you can
+list previous versions with the `possibleDates()` like this:
+
+```{r possibleDates}
+pd <- possibleDates(ah)
+pd
+```
+
+Set the dates like this:
+
+```{r setdate, eval=FALSE}
+snapshotDate(ah) <- pd[1]
+```
+
+# Session info
+
+```{r sessionInfo}
+sessionInfo()
+```
