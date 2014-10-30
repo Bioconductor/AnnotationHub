@@ -1,0 +1,19 @@
+Package: AnnotationHub
+Type: Package
+Title: Light-weight AnnotationHub 3.0 Client
+Version: 1.99.0
+Authors@R:
+    c(person("Martin", "Morgan", email="mtmorgan@fhcrc.org", role="cre"),
+      person("Marc", "Carlson", role="ctb"),
+      person("Dan", "Tenenbaum", role="ctb"),
+      person("Sonali", "Arora", role="ctb"))
+Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
+Description: Client for AnnotationHub 3.0
+License: Artistic-2.0
+Imports: utils, methods, RSQLite, RCurl, BiocInstaller, BiocGenerics,
+    S4Vectors, interactiveDisplayBase
+Suggests: GenomicRanges, VariantAnnotation, Rsamtools, rtracklayer,
+    AnnotationDbi, BiocStyle, knitr, AnnotationForge
+Collate: AnnotationHub-class.R  AnnotationHubResource-class.R  utilities.R  
+    option.R sql.R hub.R cache.R display.R curl_writer.R zzz.R
+VignetteBuilder: knitr

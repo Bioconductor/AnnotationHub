@@ -1,0 +1,27 @@
+useDynLib(AnnotationHub,.registration=TRUE)
+
+import(methods)
+
+importFrom(stats, setNames)
+
+importFrom(utils, capture.output, head, .DollarNames)
+
+importFrom(RCurl, curlPerform)
+
+import(RSQLite)
+
+importFrom(interactiveDisplayBase, display)
+
+importFrom(BiocInstaller, biocVersion)
+
+import(S4Vectors)
+
+exportClasses(AnnotationHub) 
+
+export(AnnotationHub, cache, "cache<-", display, hubUrl, hubCache,
+    hubOption, setHubOption, possibleDates)
+
+S3method(.DollarNames, AnnotationHub)
+
+exportMethods(names, length, "$", "[", query, subset, "[[", show,
+    snapshotDate, "snapshotDate<-", display)

@@ -1,0 +1,301 @@
+## Definition and constructor
+
+.AnnotationHub <- setClass("AnnotationHub",
+    representation(hub="character", cache="character", date="character",
+                   .db_connection="SQLiteConnection", .db_uid="integer")
+)
+
+## Add code to check : https://annotationhub.bioconductor.org/metadata/highest_id
+## And compare to the highest ID locally (to see if we have the latest DB)
+## And if not, delete the DB so it will be re-downloaded...
+AnnotationHub <-
+    function(..., hub=hubOption("URL"), cache=hubOption("CACHE"),
+             max.downloads=hubOption("MAX_DOWNLOADS"))
+{
+    if (!isSingleString(hub))
+        stop("'hub' must be a single string (url)")
+    if (!isSingleString(cache))
+        stop("'cache' must be a single string (file path)")
+    if (!isSingleInteger(max.downloads)) {
+        msg <- "'max.downloads' must be a single integer
+                (resource download throttle)"
+        stop(paste(strwrap(msg), collapse="\n"))
+    }
+
+    db_path <- .cache_create(cache)
+
+    tryCatch({
+        if (!file.exists(db_path))
+            .hub_resource(.hub_metadata_path(hub), basename(db_path), db_path)
+    }, error=function(err) {
+        stop("'AnnotationHub failed to create local data base",
+             "\n  database: ", sQuote(db_path),
+             "\n  reason: ", conditionMessage(err),
+             call.=FALSE)
+    })
+    
+    .db_connection <- tryCatch({
+        dbConnect(SQLite(), db_path)
+    }, error=function(err) {
+        stop("'AnnotationHub' failed to open local data base",
+             "\n  database: ", sQuote(db_path),
+             "\n  reason: ", conditionMessage(err),
+             call.=FALSE)
+    })
+
+    date <- max(.possibleDates(conn = .db_connection))    
+    
+    .db_uid <- tryCatch({
+        uid <- .uid0(.db_connection, date)
+        sort(uid)
+    }, error=function(err) {
+        stop("'AnnotationHub' failed to connect to local data base ",
+             "\n  database: ", sQuote(db_path),
+             "\n  reason: ", conditionMessage(err),
+             call.=FALSE)
+    })
+        
+    .AnnotationHub(cache=cache, hub=hub, date=date, .db_connection=.db_connection,
+           .db_uid=.db_uid)
+}
+
+## accessors
+
+.cache <- function(x) slot(x, "cache")
+
+.hub <- function(x) slot(x, "hub")
+
+.db_connection <- function(x) slot(x, ".db_connection")
+
+.db_uid <- function(x) slot(x, ".db_uid")
+
+`.db_uid<-` <- function(x, ..., value)
+{
+    bad <- value[!value %in% .db_uid(x)]
+    if (any(bad))
+        stop("invalid subscripts: ",
+             paste(sQuote(BiocGenerics:::selectSome(bad)), collapse=", "))
+    slot(x, ".db_uid") <- value
+    x
+}
+
+.snapshotDate <- function(x) slot(x, "date")
+
+## TODO: This isn't working yet!  Not only does the date not get swapped yet, 
+## but I also have to update the uids (reset those) when I do this step... 
+## (uid0)
+.replaceSnapshotDate <- function(x, value) {
+ #   snapshotDate <- as.POSIXlt(value) ## TODO: use this class to store dates.
+    snapshotDate <- value
+    if (snapshotDate == snapshotDate(x))
+        return (x)
+    possibleDates <- possibleDates(x)
+    if (!snapshotDate %in% possibleDates){
+        stop("'value' is not in possibleDates(x)")
+    }else{## Changing the date is two step process.
+        ## 1st we update the x@.db_uid
+        conn <- .db_connection(x)
+        x@.db_uid <- .uid0(conn, snapshotDate)
+        ## then we update the date slot    
+        x@date <- snapshotDate
+        x
+    }
+}
+
+
+## snapshotDate (setter and getter and then the code to filter based on this...)
+## max(possibleDates(mh)) is the default
+setGeneric("snapshotDate", function(x, ...) standardGeneric("snapshotDate"))
+
+setGeneric("snapshotDate<-", signature="x",
+           function(x, value) standardGeneric("snapshotDate<-"))
+
+
+setMethod("snapshotDate", "AnnotationHub", function(x){.snapshotDate(x)} )
+
+setReplaceMethod("snapshotDate", "AnnotationHub", 
+                 function(x, value){.replaceSnapshotDate(x,value)})
+
+
+## 
+## API
+##
+
+## list-like
+
+setMethod("names", "AnnotationHub",
+    function(x)
+{
+    as.character(names(.db_uid(x)))
+})
+
+setMethod("length", "AnnotationHub",
+    function(x)
+{
+    length(.db_uid(x))
+})
+
+setMethod("[", c("AnnotationHub", "numeric", "missing"),
+    function(x, i, j, ..., drop=TRUE) 
+{
+    idx <- na.omit(match(i, seq_along(.db_uid(x)))) 
+    ## seq_along creates a special problem for show()...
+    .db_uid(x) <- .db_uid(x)[idx]
+    x
+})
+
+setMethod("[", c("AnnotationHub", "logical", "missing"),
+    function(x, i, j, ..., drop=TRUE)
+{
+    .db_uid(x) <- .db_uid(x)[i]
+    x
+})
+
+setMethod("[", c("AnnotationHub", "character", "missing"),
+    function(x, i, j, ..., drop=TRUE) 
+{
+    idx <- na.omit(match(i, names(.db_uid(x))))
+    .db_uid(x) <- .db_uid(x)[idx]
+    x
+})
+
+setReplaceMethod("[", c("AnnotationHub", "numeric", "missing", "AnnotationHub"),
+    function(x, i, j, ..., value)
+{
+    .db_uid(x)[i] <- .db_uid(value)
+    x
+})
+
+setReplaceMethod("[", c("AnnotationHub", "logical", "missing", "AnnotationHub"),
+    function(x, i, j, ..., value)
+{
+    .db_uid(x)[i] <- .db_uid(value)
+    x
+})
+
+setReplaceMethod("[", c("AnnotationHub", "character", "missing", "AnnotationHub"),
+    function(x, i, j, ..., value)
+{
+    idx <- match(i, names(.db_uid(x)))
+    isNA <- is.na(idx)
+    .db_uid(x)[idx[!isNA]] <- .db_uid(value)[!isNA]
+    x
+})
+
+## $, query / subset
+
+setMethod("$", "AnnotationHub",
+    function(x, name)
+{
+    if (name == "tags") {
+        unname(.tags_as_collapsed_string(x))
+    } else {
+        .resource_column(x, name)
+    }
+})
+
+.DollarNames.AnnotationHub <-
+    function(x, pattern="")
+{
+    values <- c(.resource_columns(), "tags")
+    grep(pattern, values, value=TRUE)
+}
+
+setGeneric("query", function(x, pattern, ...) standardGeneric("query"),
+    signature="x")
+
+setMethod("query", "AnnotationHub",
+    function(x, pattern, ...)
+{
+    tbl <- .resource_table(x)
+    idx0 <- Reduce(`|`,
+                   Map(grepl, x=tbl, MoreArgs=list(pattern=pattern, ...)))
+
+    tags <- .tags(x)
+    idx1 <- rownames(tbl) %in% unique(tags$id[grepl(pattern, tags$tag)])
+
+    x[idx0 | idx1]
+})
+
+setMethod("subset", "AnnotationHub",
+    function(x, resource_table, tags, ...)
+{
+    i <- S4Vectors:::evalqForSubset(resource_table, .resource_table(x), ...)
+    tbl <- .tags(x)
+    j <- as.integer(.db_uid(x)) %in% 
+            tbl$id[S4Vectors:::evalqForSubset(tags, tbl)]
+    x[i & j]
+})
+
+## data
+
+.AnnotationHub_get1 <-
+    function(x)
+{
+    if (length(x) != 1L)
+        stop("'i' must be length 1")
+
+    tryCatch({
+        class <- new(sprintf("%sResource", .dataclass(x)), hub=x)
+    }, error=function(err) {
+        msg <- sprintf("failed to create a 'AnnotationHubResource'
+            instance for hub resource %s of class %s; reason: %s",
+            sQuote(x$title), .dataclass(x), conditionMessage(err))
+        stop(paste(strwrap(msg, exdent=4), collapse="\n"))
+    })
+
+    tryCatch({
+        .get1(class)
+    }, error=function(err) {
+        msg <- sprintf(
+            "failed to load hub resource %s of class %s; reason: %s",
+            sQuote(x$title), .dataclass(x), conditionMessage(err))
+        stop(paste0(strwrap(msg, exdent=4), collapse="\n"))
+    })
+}
+
+setMethod("[[", c("AnnotationHub", "numeric", "missing"),
+    function(x, i, j, ...)
+{
+    .AnnotationHub_get1(x[i])
+})
+
+setMethod("[[", c("AnnotationHub", "character", "missing"),
+    function(x, i, j, ...)
+{
+    idx <- match(i, names(.db_uid(x)))
+    .AnnotationHub_get1(x[idx])
+})
+
+## show
+.show <-
+    function(x, ..., n=6)
+{ 
+    x0 <- x[head(seq_along(.db_uid(x)), n)]  ## This line is the problem?
+    ## (it results in an empty uid slot)
+    cat("display()ing ", length(x0), " of ", length(x), "\n", sep="")
+    tbl <- .resource_table(x0)
+    tags <- .tags_as_collapsed_string(x0)
+    df <- cbind(tbl, tags, stringsAsFactors=FALSE)
+    if (length(x0) != length(x)) {
+        df <- rbind(df, "...")
+        rownames(df) <- c(rownames(df)[-nrow(df)], "...")
+    }
+    print(df)
+}
+
+setMethod(show, "AnnotationHub", function(object) {
+    cat("class:", class(object), "\n")
+    cat("hub:", .hub(object), "\n")
+    cat("cache:", .cache(object), "\n")
+    .show(object, n=3)
+})
+
+
+## helpers used in the constructor as well as elsehwere
+
+.possibleDates <- function(conn){
+    query <- 'SELECT DISTINCT rdatadateadded FROM resources'
+    dbGetQuery(conn, query)[[1]]
+}
+
