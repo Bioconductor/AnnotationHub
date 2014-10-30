@@ -30,13 +30,19 @@
 
     idx <- gsub(" ","",as.vector(d[,'Id']))
 
-    ## trap the initial rownames like this:
-    finalMd <- data.frame(md, db_uid= rownames(md))
-    ## remove rownames from finalMd
-    rownames(finalMd) <- NULL
-    ## now subset out the rows and then modify the object
-    finalMd <- finalMd[idx,]
-    .db_uid(object) <- as.integer(as.character(finalMd[,'db_uid']))
+#     ## trap the initial rownames like this:
+#     finalMd <- data.frame(md, db_uid= rownames(md))
+#     ## remove rownames from finalMd
+#     rownames(finalMd) <- NULL
+#     ## now subset out the rows and then modify the object
+#     finalMd <- finalMd[idx,]
+#     .db_uid(object) <- as.integer(as.character(finalMd[,'db_uid']))
+
+#     new_db_uid <- as.integer(idx)
+#     names(new_db_uid) <- rownames(md)[as.integer(idx)]
+#     .db_uid(object) <- rownames(md)[as.integer(idx)]
+
+    .db_uid(object) <- .db_uid(object)[as.integer(idx)]
     object
 }
 
