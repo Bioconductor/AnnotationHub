@@ -1,5 +1,5 @@
 Package: AnnotationHub
-Type: Package
+Type: Package 
 Title: Light-weight AnnotationHub 3.0 Client
 Version: 1.99.0
 Authors@R:
