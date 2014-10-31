@@ -105,11 +105,11 @@ possibleDates(x)
   \item{pattern}{A character regular expression to query metadata of
     \code{x}.}
 
-  \item{subset}{An expression refering to columns of
+  \item{subset}{An expression referring to columns of
     \code{metadata(x)}. See Methods for additional detail.}
 
   \item{resource_table}{An expression that indicates which part of the
-    dataset you want to keep indicated as a subset expression.}
+    data set you want to keep indicated as a subset expression.}
 
   \item{hub}{The URI where the online hub metadata is stored.}
 
@@ -117,7 +117,7 @@ possibleDates(x)
     downloaded or updated.}
 
   \item{max.downloads}{The maximum number of items to try and download
-    without promptiing.  Used as a safety net to prevent users from
+    without prompting.  Used as a safety net to prevent users from
     trying to cache the entire hub.}
 
   \item{tags}{Tags used to label the initial object.}
@@ -169,7 +169,7 @@ possibleDates(x)
       whose metadata satisfies the \emph{expression} in
       \code{subset}. The expression can reference columns of
       \code{metadata(x)}, and should return a logical vector of length
-      \code{lenght(x)}.}
+      \code{length(x)}.}
     \item{}{
       \code{display(object, ...)}:
       Implements the display generic from interactiveDisplay package.
@@ -211,7 +211,7 @@ possibleDates(x)
   res <- ahs[["AH2"]]
 
   ## And we can also use "[" to restrict the things that are in the
-  ## AnnotationHub object (by position, name or boolean).  
+  ## AnnotationHub object (by position, character, or logical vector).
   ## Here is a demo of position:
   subHub <- ah[1:3]
 
