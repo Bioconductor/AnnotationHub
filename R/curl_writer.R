@@ -27,7 +27,8 @@
 {
     ext <- .curl_writer_open(filename)
     on.exit(.curl_writer_close(ext))
-    status <- curlPerform(URL=url, writefunction=.curl_writer,
+    status <- curlPerform(URL=url, .opts=list(ssl.verifypeer=FALSE),
+                          writefunction=.curl_writer,
                           writedata=ext, sslversion=3, followlocation=TRUE,
                           failonerror=TRUE)
     if (0L != status)
