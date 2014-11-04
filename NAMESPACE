@@ -19,7 +19,7 @@ import(S4Vectors)
 exportClasses(AnnotationHub) 
 
 export(AnnotationHub, cache, "cache<-", display, hubUrl, hubCache,
-    hubOption, setHubOption, possibleDates)
+    hubOption, setHubOption, possibleDates, mcols)
 
 S3method(.DollarNames, AnnotationHub)
 

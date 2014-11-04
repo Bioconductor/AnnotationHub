@@ -135,3 +135,7 @@
         .id_as_single_string(x))
     .query_as_data.frame(x, query)[[1]]
 }
+
+mcols <- function(x){
+    DataFrame(.resource_table(x))
+}
