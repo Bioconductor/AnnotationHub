@@ -24,4 +24,4 @@ export(AnnotationHub, cache, "cache<-", display, hubUrl, hubCache,
 S3method(.DollarNames, AnnotationHub)
 
 exportMethods(names, length, "$", "[", query, subset, "[[", show,
-    snapshotDate, "snapshotDate<-", display)
+    snapshotDate, "snapshotDate<-", display, mcols)

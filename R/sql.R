@@ -136,6 +136,9 @@
     .query_as_data.frame(x, query)[[1]]
 }
 
-mcols <- function(x){
+## mcols
+.mcols <- function(x){
     DataFrame(.resource_table(x))
 }
+## mcols method
+setMethod("mcols", "AnnotationHub", function(x){ .mcols(x)} )

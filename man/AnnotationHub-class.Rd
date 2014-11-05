@@ -24,7 +24,7 @@
 \alias{[<-,AnnotationHub,logical,missing,AnnotationHub-method} 
 \alias{[<-,AnnotationHub,numeric,missing,AnnotationHub-method} 
 
-\alias{mcols} 
+\alias{mcols, AnnotationHub-method} 
 
 \alias{cache}
 \alias{cache<-}
