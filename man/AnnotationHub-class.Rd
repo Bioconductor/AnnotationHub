@@ -24,7 +24,8 @@
 \alias{[<-,AnnotationHub,logical,missing,AnnotationHub-method} 
 \alias{[<-,AnnotationHub,numeric,missing,AnnotationHub-method} 
 
-\alias{mcols, AnnotationHub-method} 
+
+\alias{mcols,AnnotationHub-method} 
 
 \alias{cache}
 \alias{cache<-}
@@ -91,7 +92,7 @@ cache(x, ...) <- value
 hubUrl(x)
 hubCache(x)
 possibleDates(x)
-mcols(x)
+\S4method{mcols}{AnnotationHub}(x)
 \S4method{snapshotDate}{AnnotationHub}(x)
 \S4method{snapshotDate}{AnnotationHub}(x) <- value
 \S4method{query}{AnnotationHub}(x, pattern, ...)
@@ -124,7 +125,7 @@ mcols(x)
     trying to cache the entire hub.}
 
   \item{tags}{Tags used to label the initial object.}
-
+  
   \item{...}{Additional arguments.}
 }
 
