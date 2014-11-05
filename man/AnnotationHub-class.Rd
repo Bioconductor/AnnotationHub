@@ -24,6 +24,8 @@
 \alias{[<-,AnnotationHub,logical,missing,AnnotationHub-method} 
 \alias{[<-,AnnotationHub,numeric,missing,AnnotationHub-method} 
 
+\alias{mcols} 
+
 \alias{cache}
 \alias{cache<-}
 
@@ -89,6 +91,7 @@ cache(x, ...) <- value
 hubUrl(x)
 hubCache(x)
 possibleDates(x)
+mcols(x)
 \S4method{snapshotDate}{AnnotationHub}(x)
 \S4method{snapshotDate}{AnnotationHub}(x) <- value
 \S4method{query}{AnnotationHub}(x, pattern, ...)
@@ -177,6 +180,10 @@ possibleDates(x)
       the rows selected by the user become filters applied to the
       AnnotationHub object.
     }
+    \item{}{
+      \code{mcols(x)}:
+      returns a DataFrame with metadata for the \code{AnnotationHub} object.
+    }      
 }
 }
 
