@@ -95,6 +95,17 @@ setMethod(".get1", "ChainFileResource",
     rtracklayer::import.chain(chain)
 })
 
+setClass("TwoBitFileResource", contains="AnnotationHubResource")
+
+setMethod(".get1", "TwoBitFileResource",
+    function(x, ...)      
+{
+    bit <- cache(.hub(x))
+    .require("rtracklayer")
+    twobit <- rtracklayer::TwoBitFile(bit)
+    rtracklayer::import(twobit)    
+})
+
 ## SQLiteFile
 
 setClass("SQLiteFileResource", contains="AnnotationHubResource")
