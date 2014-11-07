@@ -88,29 +88,10 @@ setClass("ChainFileResource", contains="AnnotationHubResource")
 ## TODO: chain files won't work till you tap into the sourceurl in input_sources
 ## and the location_prefix from location_prefixes in the metadata.
 
-## trace(".get1", browser, signature ="AnnotationHubResource")
+## trace(AnnotationHub:::.get1, tracer=browser, signature ="ChainFileResource")
 setMethod(".get1", "ChainFileResource",
     function(x, ...)
 {
-#     conn <- .db_connection(x)
-#     id <- .db_uid(x)[[1]]
-# #    SQL <- "SELECT r.ah_id, i.sourceurl, l.location_prefix FROM resources AS r, 
-# #input_sources AS i, location_prefixes AS l WHERE r.location_prefix_id=l.id 
-# #AND r.id=i.resource_id  AND r.ah_id = 'AH15100' limit 3;"
-#     query <- sprintf('SELECT r.id, i.sourceurl, l.location_prefix 
-#                     FROM resources AS r, input_sources AS i, 
-#                     location_prefixes AS l 
-#                     WHERE r.location_prefix_id=l.id
-#                     AND r.id=i.resource_id  
-#                     AND r.id = "%s"', id)
-#     dbpaths <- dbGetQuery(conn, query)
-#     url <- paste0(dbpaths[3],dbpaths[2])
-# ## TODO: now make this work better with cache()
-# ## might want an alternative to cache for internal use?
-# ## 
-# #    chain <- cache(url)
-
-        
     chain <- cache(.hub(x))
     .require("rtracklayer")
     rtracklayer::import.chain(chain)
