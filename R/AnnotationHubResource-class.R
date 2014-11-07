@@ -84,7 +84,7 @@ setMethod(".get1", "VCFResource",
 })
 
 ## UCSC chain file
-
+## TODO: chain files won't work till you tap into the sourceurl in input_sources and the location_prefix from location_prefixes in the metadata.
 setClass("ChainFileResource", contains="AnnotationHubResource")
 
 setMethod(".get1", "ChainFileResource",
