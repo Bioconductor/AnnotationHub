@@ -85,8 +85,7 @@ setMethod(".get1", "VCFResource",
 
 ## UCSC chain file
 setClass("ChainFileResource", contains="AnnotationHubResource")
-## TODO: chain files won't work till you tap into the sourceurl in input_sources
-## and the location_prefix from location_prefixes in the metadata.
+
 
 ## trace(AnnotationHub:::.get1, tracer=browser, signature ="ChainFileResource")
 setMethod(".get1", "ChainFileResource",
@@ -115,20 +114,16 @@ setMethod(".get1", "TwoBitFileResource",
 
 setClass("EpigenomeRoadmapFileResource", contains="AnnotationHubResource")
 
-# setMethod(".get1", "EpigenomeRoadmapFileResource",
-#     function(x, ...)      
-# {
-#     er <- cache(.hub(x))
-#     .require("rtracklayer")
-#     rtracklayer::import(er, format="bed", 
-#         extraCols=c(signalValue="numeric", pValue="numeric", qValue="numeric", 
-#         peak="numeric"))
-# })
-# 
-# 
-# rtracklayer::import("E004-H3K79me2.narrowPeak.gz", format="bed", 
-# extraCols=c(signalValue="numeric", pValue="numeric", 
-#                                 qValue="numeric", peak="numeric"))
+setMethod(".get1", "EpigenomeRoadmapFileResource",
+    function(x, ...)      
+{
+    er <- cache(.hub(x))
+    .require("rtracklayer")
+    rtracklayer::import(er, format="bed", 
+        extraCols=c(signalValue="numeric", pValue="numeric", qValue="numeric", 
+        peak="numeric"))
+})
+
 
 ## SQLiteFile
 
