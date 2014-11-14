@@ -115,20 +115,20 @@ setMethod(".get1", "TwoBitFileResource",
 
 setClass("EpigenomeRoadmapFileResource", contains="AnnotationHubResource")
 
-setMethod(".get1", "EpigenomeRoadmapFileResource",
-    function(x, ...)      
-{
-    er <- cache(.hub(x))
-    .require("rtracklayer")
-    rtracklayer::import(er, format="bed", 
-        extraCols=c(signalValue="numeric", pValue="numeric", qValue="numeric", 
-        peak="numeric"))
-})
-
-
-rtracklayer::import("E004-H3K79me2.narrowPeak.gz", format="bed", 
-extraCols=c(signalValue="numeric", pValue="numeric", 
-                                qValue="numeric", peak="numeric"))
+# setMethod(".get1", "EpigenomeRoadmapFileResource",
+#     function(x, ...)      
+# {
+#     er <- cache(.hub(x))
+#     .require("rtracklayer")
+#     rtracklayer::import(er, format="bed", 
+#         extraCols=c(signalValue="numeric", pValue="numeric", qValue="numeric", 
+#         peak="numeric"))
+# })
+# 
+# 
+# rtracklayer::import("E004-H3K79me2.narrowPeak.gz", format="bed", 
+# extraCols=c(signalValue="numeric", pValue="numeric", 
+#                                 qValue="numeric", peak="numeric"))
 
 ## SQLiteFile
 

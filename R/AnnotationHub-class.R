@@ -22,18 +22,21 @@ AnnotationHub <-
         stop(paste(strwrap(msg), collapse="\n"))
     }
 
-    db_path <- .cache_create(cache)
+    .db_path <- .cache_create(cache)
+        
+    .db_connection <- .makeDBConn(.db_path)
 
-    tryCatch({
-        if (!file.exists(db_path))
-            .hub_resource(.hub_metadata_path(hub), basename(db_path), db_path)
-    }, error=function(err) {
-        stop("'AnnotationHub failed to create local data base",
-             "\n  database: ", sQuote(db_path),
-             "\n  reason: ", conditionMessage(err),
-             call.=FALSE)
-    })
+    .date <- max(.possibleDates(conn = .db_connection))    
     
+    .db_uid <- .makeDBCache(.db_path, hub, .db_connection, .date)
+    
+    .AnnotationHub(cache=cache, hub=hub, date=.date, .db_connection=.db_connection,
+           .db_uid=.db_uid)
+}
+
+
+## Helpers to make the metadata DB cache
+.makeDBConn <- function(db_path){    
     .db_connection <- tryCatch({
         dbConnect(SQLite(), db_path)
     }, error=function(err) {
@@ -42,11 +45,21 @@ AnnotationHub <-
              "\n  reason: ", conditionMessage(err),
              call.=FALSE)
     })
+    .db_connection
+}
 
-    date <- max(.possibleDates(conn = .db_connection))    
-    
+.makeDBCache <- function(db_path, hub, .db_connection, .date){
+    tryCatch({
+        if (!file.exists(db_path))
+            .hub_resource(.hub_metadata_path(hub), basename(db_path), db_path)
+    }, error=function(err) {
+        stop("'AnnotationHub failed to create local data base",
+             "\n  database: ", sQuote(db_path),
+             "\n  reason: ", conditionMessage(err),
+             call.=FALSE)
+    })            
     .db_uid <- tryCatch({
-        uid <- .uid0(.db_connection, date)
+        uid <- .uid0(.db_connection, .date)
         sort(uid)
     }, error=function(err) {
         stop("'AnnotationHub' failed to connect to local data base ",
@@ -54,10 +67,9 @@ AnnotationHub <-
              "\n  reason: ", conditionMessage(err),
              call.=FALSE)
     })
-        
-    .AnnotationHub(cache=cache, hub=hub, date=date, .db_connection=.db_connection,
-           .db_uid=.db_uid)
+    .db_uid
 }
+
 
 ## accessors
 

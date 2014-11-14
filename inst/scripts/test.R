@@ -226,3 +226,19 @@ ah[[c('AH3','AH4')]]
 ah[[2]]
 
 
+##########################################################
+## Issue with chain files.
+## trace(AnnotationHub:::.get1, tracer=browser, signature ="ChainFileResource")
+library(AnnotationHub)
+ah <- AnnotationHub()
+ahs <- subset(ah, ah$genome=='hg38')
+ahs <- ahs[1]
+ahs[[1]]
+
+## URL generated: 
+chain <- "/home/mcarlson/.AnnotationHub/18058"
+## trace(AnnotationHub:::.get1, tracer=browser, signature ="ChainFileResource")
+## Things I tried:
+## rtracklayer::import.chain(chain)
+## rtracklayer::import.chain(path=chain, format='chain')
+
