@@ -94,9 +94,9 @@ setMethod(".get1", "ChainFileResource",
 {
     chain <- cache(.hub(x))
     zippedChain <- sprintf("%s.chain", chain)
-    if(!file.exists(zippedChain)){
+    if(!file.exists(zippedChain)) {
         .require("R.utils")
-        gunzip(chain,destname=zippedChain, remove=FALSE)
+        gunzip(chain, destname=zippedChain, remove=FALSE)
     }
     .require("rtracklayer")
     rtracklayer::import.chain(zippedChain)
