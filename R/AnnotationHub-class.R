@@ -24,19 +24,19 @@ AnnotationHub <-
 
     .db_path <- .cache_create(cache)
         
-    .db_connection <- .makeDBConn(.db_path)
+    .db_connection <- .makeDbConn(.db_path)
 
     .date <- max(.possibleDates(conn = .db_connection))    
     
-    .db_uid <- .makeDBCache(.db_path, hub, .db_connection, .date)
+    .db_uid <- .makeDbUid(.db_path, hub, .db_connection, .date)
     
     .AnnotationHub(cache=cache, hub=hub, date=.date, .db_connection=.db_connection,
            .db_uid=.db_uid)
 }
 
 
-## Helpers to make the metadata DB cache
-.makeDBConn <- function(db_path){    
+## Helper to make the metadata DB connection
+.makeDbConn <- function(db_path){    
     .db_connection <- tryCatch({
         dbConnect(SQLite(), db_path)
     }, error=function(err) {
@@ -47,8 +47,8 @@ AnnotationHub <-
     })
     .db_connection
 }
-
-.makeDBCache <- function(db_path, hub, .db_connection, .date){
+## Helper to get relevant .uids for the object
+.makeDbUid <- function(db_path, hub, .db_connection, .date){
     tryCatch({
         if (!file.exists(db_path))
             .hub_resource(.hub_metadata_path(hub), basename(db_path), db_path)
