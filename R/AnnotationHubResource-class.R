@@ -93,8 +93,13 @@ setMethod(".get1", "ChainFileResource",
     function(x, ...)
 {
     chain <- cache(.hub(x))
+    zippedChain <- sprintf("%s.chain", chain)
+    if(!file.exists(zippedChain)){
+        .require("R.utils")
+        gunzip(chain,destname=zippedChain, remove=FALSE)
+    }
     .require("rtracklayer")
-    rtracklayer::import.chain(chain)
+    rtracklayer::import.chain(zippedChain)
 })
 
 setClass("TwoBitFileResource", contains="AnnotationHubResource")
