@@ -92,13 +92,11 @@ setMethod(".get1", "ChainFileResource",
     function(x, ...)
 {
     chain <- cache(.hub(x))
-    zippedChain <- sprintf("%s.chain", chain)
-    if(!file.exists(zippedChain)) {
-        .require("R.utils")
-        gunzip(chain, destname=zippedChain, remove=FALSE)
-    }
+    tf <- tempfile()
+    .require("R.utils")
+    gunzip(chain, destname=tf, remove=FALSE)
     .require("rtracklayer")
-    rtracklayer::import.chain(zippedChain)
+    rtracklayer::import.chain(tf)
 })
 
 setClass("TwoBitFileResource", contains="AnnotationHubResource")
@@ -127,7 +125,7 @@ setMethod(".get1", "EpigenomeRoadmapFileResource",
 
 ## SQLiteFile
 
-setClass("SQLiteFileResource", contains="AnnotationHubResource")
+setClass("SQLiteFileResource", contains="AnnotationHubResource") 
 
 setMethod(".get1", "SQLiteFileResource",
     function(x, ...)

@@ -1,7 +1,7 @@
 Package: AnnotationHub
 Type: Package 
 Title: Light-weight AnnotationHub 3.0 Client
-Version: 1.99.17
+Version: 1.99.18
 Authors@R:
     c(person("Martin", "Morgan", email="mtmorgan@fhcrc.org", role="cre"),
       person("Marc", "Carlson", role="ctb"),
