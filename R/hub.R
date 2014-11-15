@@ -54,6 +54,7 @@ hubUrl <- function(x) {
     })
 }
 
+## This is the function that gets stuff (metadata AND files) from S3
 .hub_resource <-
     function(hub, resource, cachepath, overwrite=FALSE)
 {

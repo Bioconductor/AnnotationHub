@@ -24,27 +24,21 @@ AnnotationHub <-
 
     .db_path <- .cache_create(cache)
         
-    .db_connection <- .makeDbConn(.db_path, hub)
+    .db_connection <- .getDbConn(.db_path, hub)
 
     .date <- max(.possibleDates(conn = .db_connection))    
     
-    .db_uid <- .makeDbUid(.db_path, .db_connection, .date)
+    .db_uid <- .getDbUid(.db_path, .db_connection, .date)
     
     .AnnotationHub(cache=cache, hub=hub, date=.date, .db_connection=.db_connection,
            .db_uid=.db_uid)
 }
 
+
 ## Helper to make the metadata DB connection
-.makeDbConn <- function(db_path, hub){    
-    tryCatch({
-        if (!file.exists(db_path))
-            .hub_resource(.hub_metadata_path(hub), basename(db_path), db_path)
-    }, error=function(err) {
-        stop("'AnnotationHub failed to create local data base",
-             "\n  database: ", sQuote(db_path),
-             "\n  reason: ", conditionMessage(err),
-             call.=FALSE)
-    })            
+.getDbConn <- function(db_path, hub){    
+    if(!file.exists(db_path)){ .getMetadataDb(db_path, hub) }
+    ## This just gets a formal DB connection object
     .db_connection <- tryCatch({
         dbConnect(SQLite(), db_path)
     }, error=function(err) {
@@ -53,18 +47,29 @@ AnnotationHub <-
              "\n  reason: ", conditionMessage(err),
              call.=FALSE)
     })
-    ## TODO: find where this check really belongs 
-    ## (DB is empty at this point in time)
 #     ## Here I need to test the DB that I have to make sure its current.
 #     if(.isDbStale(con)){ ## get another one
 #         message("The local metadata DB is stale so we are updating it.")
-#         ## TODO: delete the existing one  ## file.remove(db_path)
-#         
+#         ## TODO: delete the existing one  
+#         file.remove(db_path)
 #         ## AND replace it with a new one
-#         
+#         .getMetadataDb(db_path, hub)
 #     }
     ## always return a good connection
     .db_connection
+}
+
+## Helper to just get a fresh the metadata DB connection
+.getMetadataDb <- function(db_path, hub){
+    ## This makes the DB (if it's absent)
+    tryCatch({
+            .hub_resource(.hub_metadata_path(hub), basename(db_path), db_path)
+    }, error=function(err) {
+        stop("'AnnotationHub failed to create local data base",
+             "\n  database: ", sQuote(db_path),
+             "\n  reason: ", conditionMessage(err),
+             call.=FALSE)
+    })
 }
 
 ## Helper checks if local Db is stale, returns TRUE if it needs an update.
@@ -74,7 +79,7 @@ AnnotationHub <-
 
 
 ## Helper to get relevant .uids for the object
-.makeDbUid <- function(db_path, .db_connection, .date){
+.getDbUid <- function(db_path, .db_connection, .date){
     .db_uid <- tryCatch({
         uid <- .uid0(.db_connection, .date)
         sort(uid)
