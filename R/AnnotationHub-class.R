@@ -47,14 +47,14 @@ AnnotationHub <-
              "\n  reason: ", conditionMessage(err),
              call.=FALSE)
     })
-#     ## Here I need to test the DB that I have to make sure its current.
-#     if(.isDbStale(con)){ ## get another one
-#         message("The local metadata DB is stale so we are updating it.")
-#         ## TODO: delete the existing one  
-#         file.remove(db_path)
-#         ## AND replace it with a new one
-#         .getMetadataDb(db_path, hub)
-#     }
+    ## Here I need to test the DB that I have to make sure its current.
+    if(.isDbStale(.db_connection)){ ## get another one
+        message("The local metadata DB is stale so we are updating it.")
+        ## TODO: delete the existing one  
+        file.remove(db_path)
+        ## AND replace it with a new one
+        .getMetadataDb(db_path, hub)
+    }
     ## always return a good connection
     .db_connection
 }
@@ -74,7 +74,18 @@ AnnotationHub <-
 
 ## Helper checks if local Db is stale, returns TRUE if it needs an update.
 .isDbStale <- function(con){
-    
+    ## 1st question is: are we up to date?  
+    ## To do that compare the highest online assigned unique ID
+    url <- 'https://annotationhub.bioconductor.org/metadata/highest_id'
+    latestOnlineID <- as.integer(content(GET(url)))
+    ## To the latest local assigned ID
+    sql <- "SELECT max(id) FROM resources"
+    highestLocalOnlineID <- dbGetQuery(con, sql)[[1]]
+    if(latestOnlineID > highestLocalOnlineID){
+        return(TRUE)
+    }else{
+        return(FALSE)
+    }
 }
 
 

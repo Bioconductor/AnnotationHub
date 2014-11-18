@@ -4,6 +4,8 @@ import(methods)
 
 importFrom(stats, setNames)
 
+importFrom(httr, GET, content)
+
 importFrom(utils, capture.output, head, .DollarNames)
 
 importFrom(RCurl, curlPerform)

@@ -40,7 +40,7 @@ hubUrl <- function(x) {
         .curl_writer_download(hubpath, tmp)
         if (!file.exists(dirname(cachepath)))
             dir.create(dirname(cachepath), recursive=TRUE)
-##        file.rename(tmp, cachepath)
+##        file.rename(tmp, cachepath) ## file.rename is not portable :()
         file.copy(from=tmp, to=cachepath)
         file.remove(tmp)
         TRUE
