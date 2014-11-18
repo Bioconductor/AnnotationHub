@@ -343,7 +343,8 @@ setMethod("[[", c("AnnotationHub", "character", "missing"),
 { 
     x0 <- x[head(seq_along(.db_uid(x)), n)]  ## This line is the problem?
     ## (it results in an empty uid slot)
-    cat("display()ing ", length(x0), " of ", length(x), "\n", sep="")
+    cat("display()ing ", length(x0), " of ", length(x), " records on 6 mcols()",
+        "\n", sep="")
     tbl <- .resource_table(x0)
     tags <- .tags_as_collapsed_string(x0)
     df <- cbind(tbl, tags, stringsAsFactors=FALSE)
