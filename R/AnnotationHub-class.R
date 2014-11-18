@@ -47,6 +47,10 @@ AnnotationHub <-
              "\n  reason: ", conditionMessage(err),
              call.=FALSE)
     })
+    ## Before we try to connect to the DB and check for staleness, 
+    ## lets 1st check that the DB we have is valid
+    .checkDBIsValid(.db_connection)
+    
     ## Here I need to test the DB that I have to make sure its current.
     if(.isDbStale(.db_connection)){ ## get another one
         message("The local metadata DB is stale so we are updating it.")
@@ -58,6 +62,27 @@ AnnotationHub <-
     ## always return a good connection
     .db_connection
 }
+
+## Some very minor testing to make sure metadata DB is intact.
+.checkDBIsValid <- function(con){
+    ## are required tables present?
+    expected <- c("biocversions","input_sources","location_prefixes","rdatapaths",
+                  "recipes","resources","sqlite_sequence","statuses","tags",
+                  "timestamp")
+    tables <- dbListTables(con)
+    if(!all(expected %in% tables)){
+        stop(wmsg(paste0("Some tables are missing from the locally cached ",
+            "database.  Please remove it and try again.")))
+    }
+    ## are there values for resources?
+    sql <- "SELECT count(id) FROM resources"
+    numResources <- dbGetQuery(con, sql)[[1]]
+    if(numResources < 1){
+        stop(wmsg(paste0("The locally cached metadata database has no ",
+                         "resources. Please remove it and try again.")))
+    }
+}
+
 
 ## Helper to just get a fresh the metadata DB connection
 .getMetadataDb <- function(db_path, hub){
