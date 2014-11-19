@@ -53,7 +53,6 @@ AnnotationHub <-
     
     ## Here I need to test the DB that I have to make sure its current.
     if(.isDbStale(.db_connection)){ ## get another one
-        message("The local metadata DB is stale so we are updating it.")
         ## TODO: delete the existing one  
         file.remove(db_path)
         ## AND replace it with a new one
