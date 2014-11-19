@@ -86,17 +86,14 @@ setMethod(".get1", "VCFResource",
 ## UCSC chain file
 setClass("ChainFileResource", contains="AnnotationHubResource")
 
-
 ## trace(AnnotationHub:::.get1, tracer=browser, signature ="ChainFileResource")
 setMethod(".get1", "ChainFileResource",
     function(x, ...)
 {
     chain <- cache(.hub(x))
-    tf <- tempfile()
-    .require("R.utils")
-    gunzip(chain, destname=tf, remove=FALSE)
-    .require("rtracklayer")
-    rtracklayer::import.chain(tf)
+    tf <- .gunzip(chain, tempfile())
+    tf <- rtracklayer::import.chain(tf)
+    tf[GenomeInfoDb::sortSeqlevels(names(tf))]
 })
 
 setClass("TwoBitFileResource", contains="AnnotationHubResource")
@@ -105,9 +102,7 @@ setMethod(".get1", "TwoBitFileResource",
     function(x, ...)      
 {
     bit <- cache(.hub(x))
-    .require("rtracklayer")
-    twobit <- rtracklayer::TwoBitFile(bit)
-    rtracklayer::import(twobit)    
+    rtracklayer::TwoBitFile(bit)
 })
 
 setClass("EpigenomeRoadmapFileResource", contains="AnnotationHubResource")
