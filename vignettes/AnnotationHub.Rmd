@@ -47,7 +47,7 @@ res <- ah[[1]]
 res
 ```
 
-This retrieves the first row of the `AnnotationHub` obect and copies
+This retrieves the first row of the `AnnotationHub` object and copies
 it into the local variable `res`.  The object is retrieved from the
 AnnotationHub server. The object is also cache locally, so that the
 next time you need to retrieve it, it should download much more
@@ -88,7 +88,7 @@ ahs <- subset(ah, ah$genome=='ailMel1')
 length(ahs)
 ```
 
-We can also look at the `AnnotationHub` object in a broswer using the
+We can also look at the `AnnotationHub` object in a browser using the
 `display()` function. We can then filter the `AnnotationHub` object
 for _Homo sapiens_ by either using the Global search field on the top
 right corner of the page or the in-column search field for `Species'.
@@ -98,7 +98,7 @@ d <- display(ah)
 ```
 
 ![](display.png)
-Displaying and filtering the Annnotation Hub object in a browser
+Displaying and filtering the Annotation Hub object in a browser
 
 By default 1000 entries are displayed per page, we can change this using
 the filter on the top of the page or navigate through different pages

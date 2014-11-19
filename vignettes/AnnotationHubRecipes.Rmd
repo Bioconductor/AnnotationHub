@@ -129,7 +129,7 @@ name of a class that describes the kind of resource you are writing
 code to import.  It just needs to be a unique name and will be used internally to create a class for dispatch.  The 2nd argument
 is the name of your metadata processing function from step one.  Once
 you have finished this, the only step left is to export the class name
-into the NAMESPACE (rememeber that this is that string you are providing as your 1st argument), and then add this code to the AnnotationHubData repository.  We are planning to set up a bridge to github so that you can give us a pull request.  
+into the NAMESPACE (remember that this is that string you are providing as your 1st argument), and then add this code to the AnnotationHubData repository.  We are planning to set up a bridge to github so that you can give us a pull request.  
 
 ```{r, makeAnnotationHubResource, eval=FALSE}
 makeAnnotationHubResource("Inparanoid8ImportPreparer",
