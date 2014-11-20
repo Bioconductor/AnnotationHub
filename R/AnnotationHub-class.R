@@ -110,7 +110,10 @@ AnnotationHub <-
     ## To do that compare the highest online assigned unique ID
     baseUrl <- hubOption('URL')
     url <- paste0(baseUrl, '/metadata/highest_id')
-    latestOnlineID <- as.integer(content(GET(url)))
+    t <- tempfile()
+    .curl_writer_download(url, t)
+    latestOnlineID <- as.integer(readLines(t, warn=FALSE))
+    unlink(t)
     ## To the latest local assigned ID
     sql <- "SELECT max(id) FROM resources"
     highestLocalOnlineID <- dbGetQuery(con, sql)[[1]]
