@@ -35,18 +35,22 @@ AnnotationHub <-
 }
 
 
-## Helper to make the metadata DB connection
-.getDbConn <- function(db_path, hub){    
-    if(!file.exists(db_path)){ .getMetadataDb(db_path, hub) }
-    ## This just gets a formal DB connection object
-    .db_connection <- tryCatch({
+.makeConnection <- function(db_path){
+    tryCatch({
         dbConnect(SQLite(), db_path)
     }, error=function(err) {
         stop("'AnnotationHub' failed to open local data base",
              "\n  database: ", sQuote(db_path),
              "\n  reason: ", conditionMessage(err),
              call.=FALSE)
-    })
+    })    
+}
+
+## Helper to make the metadata DB connection
+.getDbConn <- function(db_path, hub){    
+    if(!file.exists(db_path)){ .getMetadataDb(db_path, hub) }
+    ## This just gets a formal DB connection object
+    .db_connection <- .makeConnection(db_path)
     ## Before we try to connect to the DB and check for staleness, 
     ## lets 1st check that the DB we have is valid
     .checkDBIsValid(.db_connection)
@@ -57,6 +61,10 @@ AnnotationHub <-
         file.remove(db_path)
         ## AND replace it with a new one
         .getMetadataDb(db_path, hub)
+        ## Then disconnect from the old DB
+        dbDisconnect(.db_connection)
+        ## And then reconnect to the updated DB 
+        .db_connection <- .makeConnection(db_path)
     }
     ## always return a good connection
     .db_connection
