@@ -57,14 +57,16 @@ AnnotationHub <-
     
     ## Here I need to test the DB that I have to make sure its current.
     if(.isDbStale(.db_connection)){ ## get another one
+        ## Then disconnect from the old DB
+        dbDisconnect(.db_connection)
         ## TODO: delete the existing one  
         file.remove(db_path)
         ## AND replace it with a new one
         .getMetadataDb(db_path, hub)
-        ## Then disconnect from the old DB
-        dbDisconnect(.db_connection)
         ## And then reconnect to the updated DB 
         .db_connection <- .makeConnection(db_path)
+        ## New DB?  So make sure the new one is valid as well.
+        .checkDBIsValid(.db_connection)
     }
     ## always return a good connection
     .db_connection
