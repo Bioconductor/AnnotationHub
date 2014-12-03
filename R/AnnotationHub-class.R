@@ -23,15 +23,11 @@ AnnotationHub <-
     }
 
     .db_path <- .cache_create(cache)
-        
     .db_connection <- .getDbConn(.db_path, hub)
-
     .date <- max(.possibleDates(conn = .db_connection))    
-    
     .db_uid <- .getDbUid(.db_path, .db_connection, .date)
-    
-    .AnnotationHub(cache=cache, hub=hub, date=.date, .db_connection=.db_connection,
-           .db_uid=.db_uid)
+    .AnnotationHub(cache=cache, hub=hub, date=.date,
+                   .db_connection=.db_connection, .db_uid=.db_uid)
 }
 
 
@@ -75,21 +71,24 @@ AnnotationHub <-
 ## Some very minor testing to make sure metadata DB is intact.
 .checkDBIsValid <- function(con){
     ## are required tables present?
-    expected <- c("biocversions","input_sources","location_prefixes","rdatapaths",
-                  "recipes","resources","sqlite_sequence","statuses","tags",
-                  "timestamp")
+    expected <- c("biocversions","input_sources","location_prefixes",
+                  "rdatapaths", "recipes","resources","sqlite_sequence",
+                  "statuses","tags", "timestamp")
     tables <- dbListTables(con)
-    if(!all(expected %in% tables)){
-        stop(wmsg(paste0("Some tables are missing from the locally cached ",
-            "database.  Please remove it and try again.")))
-    }
+    if (!all(expected %in% tables))
+        stop("'AnnotationHub' database corrupt; remove it and try again",
+             "\n  database: ", sQuote(con@dbname),
+             "\n  reason: missing tables",
+             call.=FALSE)
     ## are there values for resources?
     sql <- "SELECT count(id) FROM resources"
     numResources <- dbGetQuery(con, sql)[[1]]
-    if(numResources < 1){
-        stop(wmsg(paste0("The locally cached metadata database has no ",
-                         "resources. Please remove it and try again.")))
-    }
+    if (numResources < 1L)
+        stop("'AnnotationHub' database corrupt; remove it and try again",
+             "\n  database: ", sQuote(con@dbname),
+             "\n  reason: database empty",
+             call.=FALSE)
+    TRUE
 }
 
 
@@ -99,7 +98,7 @@ AnnotationHub <-
     tryCatch({
             .hub_resource(.hub_metadata_path(hub), basename(db_path), db_path)
     }, error=function(err) {
-        stop("'AnnotationHub failed to create local data base",
+        stop("'AnnotationHub' failed to create local data base",
              "\n  database: ", sQuote(db_path),
              "\n  reason: ", conditionMessage(err),
              call.=FALSE)
@@ -115,9 +114,10 @@ AnnotationHub <-
         sql <- "SELECT max(id) FROM resources"
         latestOnlineID > dbGetQuery(con, sql)[[1]]
     }, error=function(e) {
-        msg <- sprintf("cached data base may not be current:\n  reason: %s",
-                       conditionMessage(e))
-        warning(msg, call.=FALSE)
+        warning("'AnnotationHub' database may not be current",
+                "\n  database: ", sQuote(con@dbname),
+                "\n  reason: ", conditionMessage(e),
+                call.=FALSE)
         FALSE
     })
 }
@@ -252,7 +252,8 @@ setReplaceMethod("[", c("AnnotationHub", "logical", "missing", "AnnotationHub"),
     x
 })
 
-setReplaceMethod("[", c("AnnotationHub", "character", "missing", "AnnotationHub"),
+setReplaceMethod("[", 
+    c("AnnotationHub", "character", "missing", "AnnotationHub"),
     function(x, i, j, ..., value)
 {
     idx <- match(i, names(.db_uid(x)))
@@ -378,4 +379,3 @@ setMethod(show, "AnnotationHub", function(object) {
     query <- 'SELECT DISTINCT rdatadateadded FROM resources'
     dbGetQuery(conn, query)[[1]]
 }
-
