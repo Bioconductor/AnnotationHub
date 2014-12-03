@@ -108,22 +108,18 @@ AnnotationHub <-
 
 ## Helper checks if local Db is stale, returns TRUE if it needs an update.
 .isDbStale <- function(con){
-    ## 1st question is: are we up to date?  
-    ## To do that compare the highest online assigned unique ID
-    baseUrl <- hubOption('URL')
-    url <- paste0(baseUrl, '/metadata/highest_id')
-    t <- tempfile()
-    .curl_writer_download(url, t)
-    latestOnlineID <- as.integer(readLines(t, warn=FALSE))
-    unlink(t)
-    ## To the latest local assigned ID
-    sql <- "SELECT max(id) FROM resources"
-    highestLocalOnlineID <- dbGetQuery(con, sql)[[1]]
-    if(latestOnlineID > highestLocalOnlineID){
-        return(TRUE)
-    }else{
-        return(FALSE)
-    }
+    ## Compare the highest online assigned unique ID to database id
+    url <- paste0(hubOption('URL'), '/metadata/highest_id')
+    tryCatch({
+        latestOnlineID <- as.integer(getURL(url))
+        sql <- "SELECT max(id) FROM resources"
+        latestOnlineID > dbGetQuery(con, sql)[[1]]
+    }, error=function(e) {
+        msg <- sprintf("cached data base may not be current:\n  reason: %s",
+                       conditionMessage(e))
+        warning(msg, call.=FALSE)
+        FALSE
+    })
 }
 
 

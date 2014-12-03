@@ -8,7 +8,7 @@ importFrom(httr, GET, content)
 
 importFrom(utils, capture.output, head, .DollarNames)
 
-importFrom(RCurl, curlPerform)
+importFrom(RCurl, curlPerform, getURL)
 
 import(RSQLite)
 
