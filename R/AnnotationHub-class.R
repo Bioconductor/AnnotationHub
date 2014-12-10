@@ -111,6 +111,9 @@ AnnotationHub <-
     url <- paste0(hubOption('URL'), '/metadata/highest_id')
     tryCatch({
         latestOnlineID <- as.integer(getURL(url))
+        if(is.na(latestOnlineID)){
+            stop(wmsg("Back end is not currently displaying the highest ID"))
+        }
         sql <- "SELECT max(id) FROM resources"
         latestOnlineID > dbGetQuery(con, sql)[[1]]
     }, error=function(e) {
