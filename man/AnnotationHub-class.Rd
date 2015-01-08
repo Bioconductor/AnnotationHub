@@ -216,7 +216,7 @@ possibleDates(x)
   ## We can extract a result by name like this (using a list semantic):
   res <- ahs[[1]]
   ## And we can also extract it by the names like this:
-  res <- ahs[["AH2"]]
+  res <- ahs[["AH6298"]]
 
   ## And we can also use "[" to restrict the things that are in the
   ## AnnotationHub object (by position, character, or logical vector).

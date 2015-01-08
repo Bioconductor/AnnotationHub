@@ -128,3 +128,16 @@ setMethod(".get1", "SQLiteFileResource",
     .require("AnnotationDbi")
     AnnotationDbi::loadDb(cache(.hub(x)))
 })
+
+
+## GRASP2 SQLiteFile
+
+setClass("GRASPResource", contains="SQLiteFileResource")
+
+setMethod(".get1", "GRASPResource",
+    function(x, ...)
+{
+    .require("RSQLite")
+    RSQLite::dbConnect(RSQLite::SQLite(), cache(.hub(x)),
+                       flags=RSQLite::SQLITE_RO)
+}) 
