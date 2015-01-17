@@ -110,7 +110,7 @@ AnnotationHub <-
     ## Compare the highest online assigned unique ID to database id
     url <- paste0(hubOption('URL'), '/metadata/highest_id')
     tryCatch({
-        latestOnlineID <- as.integer(getURL(url))
+        latestOnlineID <- as.integer(content(GET(url)))
         if(is.na(latestOnlineID)){
             stop(wmsg("Back end is not currently displaying the highest ID"))
         }
