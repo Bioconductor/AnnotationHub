@@ -37,10 +37,10 @@ hubUrl <- function(x) {
     tryCatch({
         tmp <- tempfile()
         ## Download the resource in a way that supports https
-        .curl_writer_download(hubpath, tmp)
+        response <- GET(hubpath, progress(), write_disk(tmp))
+        stop_for_status(response)
         if (!file.exists(dirname(cachepath)))
             dir.create(dirname(cachepath), recursive=TRUE)
-##        file.rename(tmp, cachepath) ## file.rename is not portable :()
         file.copy(from=tmp, to=cachepath)
         file.remove(tmp)
         TRUE

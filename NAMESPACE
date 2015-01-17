@@ -1,14 +1,10 @@
-useDynLib(AnnotationHub,.registration=TRUE)
-
 import(methods)
 
 importFrom(stats, setNames)
 
-importFrom(httr, GET, content)
+importFrom(httr, GET, content, progress, write_disk, stop_for_status)
 
 importFrom(utils, capture.output, head, .DollarNames)
-
-importFrom(RCurl, curlPerform, getURL)
 
 import(RSQLite)
 

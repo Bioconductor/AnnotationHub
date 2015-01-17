@@ -7,10 +7,6 @@
       "description"))
 
 .onLoad <- function(libname, pkgname, ...) {
-    ## Stuff for downloading
-    .curl_writer <-
-        getNativeSymbolInfo("_writer_write", PACKAGE="AnnotationHub")$address
-    
     ## options from getOption or Sys.env or default, in that order
     if (is.null(hubOption("MAX_DOWNLOADS"))) {
         opt <- getOption("ANNOTATION_HUB_MAX_DOWNLOADS", 10L)
