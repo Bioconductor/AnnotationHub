@@ -93,8 +93,7 @@ makeinparanoid8ToAHMs <- function(currentMetadata){
           RDataClass = "SQLiteFile",
           RDataDateAdded = Sys.time(),
           RDataVersion = "0.0.1",
-          Recipe = c("inparanoid8ToDbsRecipe", 
-                     package="AnnotationHubData"),
+          Recipe = "AnnotationHubData:::inparanoid8ToDbsRecipe",
           Tags = c("Inparanoid", "Gene", "Homology", "Annotation")))
 }
 ```
@@ -120,40 +119,41 @@ inparanoid8ToDbsRecipe <- function(ahm){
 ```
 
 
-## Step 3: Calling the makeAnnotationHubResource helper
+## Step 3: Calling the makeAnnotationHubResource helper 
 
 Finally you will need to call the
-makeAnnotationHubResource function to do some setup.  This
+makeAnnotationHubResource function to do some automatic setup.  This
 function only has two required arguments.  The 1st is basically the
 name of a class that describes the kind of resource you are writing
 code to import.  It just needs to be a unique name and will be used internally to create a class for dispatch.  The 2nd argument
 is the name of your metadata processing function from step one.  Once
 you have finished this, the only step left is to export the class name
-into the NAMESPACE (remember that this is that string you are providing as your 1st argument), and then add this code to the AnnotationHubData repository.  We are planning to set up a bridge to github so that you can give us a pull request.  
+into the NAMESPACE (remember that this is that string you are providing as your 1st argument), and then add this code to the AnnotationHubData repository.  
 
 ```{r, makeAnnotationHubResource, eval=FALSE}
+require(AnnotationHubData)
 makeAnnotationHubResource("Inparanoid8ImportPreparer",
                           makeinparanoid8ToAHMs)
 ```
 
+Later when we run your recipe, we will add a call like this (along with a new class name export to the NAMESPACE file) to AnnotationHubData.  But for now you just need to have called this function in order to test your recipe.
+
 
 ## Step 4: Testing your new recipe
 
-At this point you are probably wondering if this recipe will even work.  Well there is a way to test it.  You can call the function that will try to update the resources for your recipe.  That function is called updateResources(). The updateResources() function takes several arguments.  These are:
+At this point you are probably wondering if this recipe will even work.  Well there is a way to test it here.  You can call the function that will try to update the resources for your recipe.  That function is called updateResources(). The updateResources() function takes several arguments.  These are:
 
 * ahroot: represents the place where you would like any generated files go.
 * BiocVersion: character vector for versions of Bioc your objects will be compatible with
 * preparerClasses: vector of which classes you want to process recipes for.
-* insert: try to insert metadata into the DB? You don't get to do this.  So it should be FALSE when you call this or you will get an error.
+* insert: try to insert metadata into the DB? As a recipe author, you don't get to do this.  So it should be FALSE when you call this or you will get an error.
 * metadataOnly: should the recipes be run to create the processed files?
 
 ```{r, updateResources, eval=FALSE}
-library(AnnotationHubData)
-ahroot <- getwd()
-BiocVersion <- c("3.0")  
+library(AnnotationHubData)  
 
-mdinp = updateResources(ahroot, 
-                        BiocVersion,
+mdinp = updateResources(ahroot=getwd(), 
+                        BiocVersion=biocVersion(),
                         preparerClasses = "Inparanoid8ImportPreparer",
                         insert = FALSE,
                         metadataOnly=TRUE)     
