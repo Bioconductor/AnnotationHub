@@ -29,7 +29,7 @@ AnnotationHubMetadata(AnnotationHubRoot, SourceFile, SourceUrl,
                  Recipe, RecipeArgs = list(), RDataClass, RDataVersion,
                  RDataDateAdded, RDataPath, Maintainer, ...,
                  BiocVersion = biocVersion(), Coordinate_1_based =
-                 TRUE, Notes = NA_character_)
+                 TRUE, Notes = NA_character_, Location_Prefix)
 }
 
 \arguments{
@@ -68,7 +68,11 @@ AnnotationHubMetadata(AnnotationHubRoot, SourceFile, SourceUrl,
     \item{...}{Additional arguments, passed directly to the class
       initialize method.}
     \item{BiocVersion}{\code{character(1)} Under which resource was built}
-
+    \item{Location_Prefix}{This was added for resources where the
+    metadata only is stored and the resource itself comes from a third
+    party web site.  The location prefix says the base path where the
+    resource is coming from, and the default value will be from our own site.}
+    
     \item{Coordinate_1_based}{\code{logical(1)} Do coordinates start
         with 1 or 0?}
     \item{Notes}{\code{character()} Notes about the resource.}
@@ -79,11 +83,9 @@ AnnotationHubMetadata(AnnotationHubRoot, SourceFile, SourceUrl,
   \code{AnnotationHubMetadata} returns an instance of the class.
 }
 
-\author{Dan Tenenbaum}
+\author{Dan Tenenbaum and Marc Carlson}
 
-\seealso{
-\code{\linkS4class{AnnotationHubRecipe}}
-}
+
 \examples{
 getClass("AnnotationHubMetadata")
 }
