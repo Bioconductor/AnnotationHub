@@ -117,7 +117,15 @@ setMethod(".get1", "EpigenomeRoadmapFileResource",
         peak="numeric"))
 })
 
+setClass("dbSNPVCFFileResource", contains="AnnotationHubResource")
 
+setMethod(".get1", "dbSNPVCFFileResource",
+    function(x, ...)      
+{
+      er <- cache(.hub(x))
+      .require("Rsamtools")
+      Rsamtools::TabixFile(file=er[1],index=er[2])      
+})
 ## SQLiteFile
 
 setClass("SQLiteFileResource", contains="AnnotationHubResource") 
