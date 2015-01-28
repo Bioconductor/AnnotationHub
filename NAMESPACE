@@ -2,7 +2,7 @@ import(methods)
 
 importFrom(stats, setNames)
 
-importFrom(httr, GET, content, progress, write_disk, stop_for_status)
+importFrom(httr, GET, content, progress, write_disk, stop_for_status, status_code)
 
 importFrom(utils, capture.output, head, .DollarNames)
 

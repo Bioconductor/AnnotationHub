@@ -38,7 +38,13 @@ hubUrl <- function(x) {
         tmp <- tempfile()
         ## Download the resource in a way that supports https
         response <- GET(hubpath, progress(), write_disk(tmp))
-        stop_for_status(response)
+        if (length(status_code(response)))  
+        {
+            # FTP requests return empty status code, see
+            # https://github.com/hadley/httr/issues/190
+            if (status_code(response) != 302L)
+                stop_for_status(response)
+        }
         if (!file.exists(dirname(cachepath)))
             dir.create(dirname(cachepath), recursive=TRUE)
         file.copy(from=tmp, to=cachepath)
