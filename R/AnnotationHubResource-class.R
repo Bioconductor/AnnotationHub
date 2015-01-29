@@ -123,8 +123,8 @@ setMethod(".get1", "dbSNPVCFFileResource",
     function(x, ...)      
 {
       er <- cache(.hub(x))
-      .require("Rsamtools")
-      Rsamtools::TabixFile(file=er[1],index=er[2])      
+      .require("VariantAnnotation")
+      VariantAnnotation::vcfFile(file=er[1],index=er[2])      
 })
 ## SQLiteFile
 
