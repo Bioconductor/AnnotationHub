@@ -49,7 +49,6 @@ setMethod(".get1", "FaFileResource",
     function(x, ...)
 {
     fa <- cache(.hub(x))
-    .require("Rsamtools")
     Rsamtools::FaFile(file=fa[1],index=fa[2])
 })
 
@@ -111,7 +110,6 @@ setMethod(".get1", "EpigenomeRoadmapFileResource",
     function(x, ...)      
 {
     er <- cache(.hub(x))
-    .require("rtracklayer")
     rtracklayer::import(er, format="bed", 
         extraCols=c(signalValue="numeric", pValue="numeric", qValue="numeric", 
         peak="numeric"))
@@ -123,8 +121,7 @@ setMethod(".get1", "dbSNPVCFFileResource",
     function(x, ...)      
 {
       er <- cache(.hub(x))
-      .require("VariantAnnotation")
-      VariantAnnotation::vcfFile(file=er[1],index=er[2])      
+      VariantAnnotation::VcfFile(file=er[1],index=er[2])      
 })
 ## SQLiteFile
 
@@ -133,7 +130,6 @@ setClass("SQLiteFileResource", contains="AnnotationHubResource")
 setMethod(".get1", "SQLiteFileResource",
     function(x, ...)
 {
-    .require("AnnotationDbi")
     AnnotationDbi::loadDb(cache(.hub(x)))
 })
 
@@ -145,7 +141,6 @@ setClass("GRASPResource", contains="SQLiteFileResource")
 setMethod(".get1", "GRASPResource",
     function(x, ...)
 {
-    .require("RSQLite")
     RSQLite::dbConnect(RSQLite::SQLite(), cache(.hub(x)),
                        flags=RSQLite::SQLITE_RO)
 }) 
