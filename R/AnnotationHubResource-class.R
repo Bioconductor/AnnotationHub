@@ -121,6 +121,7 @@ setMethod(".get1", "dbSNPVCFFileResource",
     function(x, ...)      
 {
       er <- cache(.hub(x))
+      .require("VariantAnnotation")
       VariantAnnotation::VcfFile(file=er[1],index=er[2])      
 })
 ## SQLiteFile
@@ -142,5 +143,5 @@ setMethod(".get1", "GRASPResource",
     function(x, ...)
 {
     RSQLite::dbConnect(RSQLite::SQLite(), cache(.hub(x)),
-                       flags=RSQLite::SQLITE_RO)
+        flags=RSQLite::SQLITE_RO)
 }) 
