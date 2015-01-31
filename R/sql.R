@@ -54,7 +54,7 @@
 
 .tags <- function(x) {
     query <- sprintf(
-        'SELECT tag, resource_id AS id FROM tags
+        'SELECT DISTINCT tag, resource_id AS id FROM tags
          WHERE resource_id IN (%s)',
         .id_as_single_string(x))
     dbGetQuery(.db_connection(x), query)
