@@ -72,7 +72,7 @@ AnnotationHub <-
 .checkDBIsValid <- function(con){
     ## are required tables present?
     expected <- c("biocversions","input_sources","location_prefixes",
-                  "rdatapaths", "recipes","resources","sqlite_sequence",
+                  "rdatapaths", "recipes","resources", 
                   "statuses","tags", "timestamp")
     tables <- dbListTables(con)
     if (!all(expected %in% tables))
