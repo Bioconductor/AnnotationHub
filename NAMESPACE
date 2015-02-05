@@ -6,6 +6,8 @@ importFrom(httr, GET, content, progress, write_disk, stop_for_status, status_cod
 
 importFrom(utils, capture.output, head, .DollarNames)
 
+importFrom(AnnotationDbi, dbconn, dbfile)
+
 import(RSQLite)
 
 importFrom(interactiveDisplayBase, display)
@@ -22,4 +24,4 @@ export(AnnotationHub, cache, "cache<-", display, hubUrl, hubCache,
 S3method(.DollarNames, AnnotationHub)
 
 exportMethods(names, length, "$", "[", query, subset, "[[", show,
-    snapshotDate, "snapshotDate<-", display, mcols)
+    snapshotDate, "snapshotDate<-", display, mcols, dbconn, dbfile)

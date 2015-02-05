@@ -382,3 +382,20 @@ setMethod(show, "AnnotationHub", function(object) {
     query <- 'SELECT DISTINCT rdatadateadded FROM resources'
     dbGetQuery(conn, query)[[1]]
 }
+
+
+
+## methods for dbconn and dbfile
+.dbconn <- function(x){
+    con <- x@.db_connection
+    ## CANNOT name a connection object. :(
+    con
+}
+setMethod("dbconn", "AnnotationHub", function(x){.dbconn(x)})
+
+.dbfile <- function(x){
+    file <- x@.db_connection@dbname
+    ## So (for now) I am not using names here either)
+    file
+}
+setMethod("dbfile", "AnnotationHub", function(x){.dbfile(x)})

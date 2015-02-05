@@ -53,6 +53,10 @@
 \alias{display,AnnotationHub-method}
 
 
+\alias{dbconn}
+\alias{dbfile}
+
+
 
 \title{AnnotationHub objects and their related methods and functions}
 
@@ -98,6 +102,8 @@ possibleDates(x)
 \S4method{query}{AnnotationHub}(x, pattern, ...)
 \S4method{subset}{AnnotationHub}(x, resource_table, tags, ...)
 \S4method{display}{AnnotationHub}(object)
+\S4method{dbfile}{AnnotationHub}(x)
+\S4method{dbconn}{AnnotationHub}(x)
 }
 
 \arguments{
@@ -185,7 +191,17 @@ possibleDates(x)
       \code{mcols(x)}:
       returns a DataFrame with metadata for the \code{AnnotationHub} object.
     }      
-}
+    \item{}{
+      \code{dbfile(x)}:
+      returns the file path to the \code{AnnotationHub} objects metadata
+      database cache.
+    }
+    \item{}{
+      \code{dbconn(x)}:
+      returns a database connection for the \code{AnnotationHub} objects
+      metadata cache.
+    }          
+  }
 }
 
 \author{Martin Morgan, Marc Carlson and Dan Tenenbaum}
@@ -228,6 +244,10 @@ possibleDates(x)
     ## Display method involves user interaction through web interface
     ah2 <- display(ah)
   }
+
+  ## get the file to the metadata dabase cache or a DBI db connection.
+  dbfile(ah)
+  dbconn(ah)
 }
 
 
