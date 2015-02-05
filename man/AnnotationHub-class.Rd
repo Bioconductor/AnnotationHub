@@ -53,8 +53,8 @@
 \alias{display,AnnotationHub-method}
 
 
-\alias{dbconn}
-\alias{dbfile}
+\alias{dbconn,AnnotationHub-method}
+\alias{dbfile,AnnotationHub-method}
 
 
 

@@ -68,6 +68,44 @@
     setNames(tags, .db_uid(x))            # allows for x with no tags
 }
 
+
+## Then do this for rdataclass
+.rdataclass <- function(x) {
+    query <- sprintf(
+        'SELECT DISTINCT rdataclass, resource_id AS id FROM rdatapaths
+         WHERE resource_id IN (%s)',
+        .id_as_single_string(x))
+    dbGetQuery(.db_connection(x), query)
+}
+.rdataclass_as_collapsed_string <- function(x)
+{
+    tbl <- .rdataclass(x)
+    rdataclass <- sapply(split(tbl$rdataclass, tbl$id), paste, collapse=", ")
+    rdataclass <- rdataclass[match(.db_uid(x), names(rdataclass))]
+    setNames(rdataclass, .db_uid(x))         # allows for x with no rdataclass
+}
+
+## And again for sourceUrls
+.sourceurl <- function(x) {
+    query <- sprintf(
+        'SELECT DISTINCT sourceurl, resource_id AS id FROM input_sources
+         WHERE resource_id IN (%s)',
+        .id_as_single_string(x))
+    dbGetQuery(.db_connection(x), query)
+}
+.sourceurl_as_collapsed_string <- function(x)
+{
+    tbl <- .sourceurl(x)
+    sourceurl <- sapply(split(tbl$sourceurl, tbl$id), paste, collapse=", ")
+    sourceurl <- sourceurl[match(.db_uid(x), names(sourceurl))]
+    setNames(sourceurl, .db_uid(x))         # allows for x with no sourceurl
+}
+
+
+## And do it again for recipes? - shouldn't this one just come from the initial query? - I think it really should...
+
+
+
 .resource_table <- function(x)
 {
     query <- sprintf(
@@ -79,6 +117,36 @@
         .DB_RESOURCE_FIELDS, biocVersion(), .id_as_single_string(x))
     .query_as_data.frame(x, query)
 }
+
+###############################################################################
+## need a new helper that will return MOAR fields (from some of the
+## other tables) - but (when needed) as compound tables.
+## The idea is that this should replace most (if not all) instances of
+## .resource_table.  IOW I want this to be the new and more inclusive
+## table that will already include things like tags, rdataclass and
+## recipes.
+
+## Helper for adding one more vector onto our table with a precise fieldName
+.cbindAnother <- function(tbl, vec, headerName){
+    if(length(vec) == dim(tbl)[1]){
+        tbl <- cbind(tbl, vec, stringsAsFactors=FALSE)
+    }
+    colnames(tbl)[colnames(tbl) %in% 'vec'] <- headerName
+    tbl
+}
+
+.compoundResourceTable <- function(x){
+    tbl <- .resource_table(x)
+    tags <- .tags_as_collapsed_string(x)    
+    tbl <- .cbindAnother(tbl, tags, headerName='tags')
+    rdataclass <- .rdataclass_as_collapsed_string(x)
+    tbl <- .cbindAnother(tbl, rdataclass, headerName='rdataclass')
+    sourceurl <- .sourceurl_as_collapsed_string(x)
+    tbl <- .cbindAnother(tbl, sourceurl, headerName='sourceurl')
+    ## TODO: add recipe to main query.
+    tbl
+}
+
 
 .resource_columns <- function()
     strsplit(gsub("resources.", "", .DB_RESOURCE_FIELDS), ", ")[[1]]
@@ -138,7 +206,29 @@
 
 ## mcols
 .mcols <- function(x){
-    DataFrame(.resource_table(x))
+    DataFrame(.compoundResourceTable(x))
+
+    ## TODO: this is not enough, I need to move the addition of tags back to .resource_table (OR maybe make a new function resource_table) to consolidate attachment of thigns like tags etc.
 }
 ## mcols method
 setMethod("mcols", "AnnotationHub", function(x){ .mcols(x)} )
+
+
+## make a function to create a view whenever the DB is updated..
+## SQL will look kind of like the one used for go:
+## CREATE VIEW go AS
+## SELECT _id,go_id,evidence, 'BP' AS 'ontology' FROM go_bp
+## UNION
+## SELECT _id,go_id,evidence, 'CC' FROM go_cc
+## UNION
+## SELECT _id,go_id,evidence, 'MF' FROM go_mf;
+
+
+## SO now we just need to decide on which views we want/need.
+## So really we want to 1st refactor the show method (and make hard decisions there)
+## And the view we create here should reflect those ideas.
+
+
+## CREATE VIEW hub AS
+## SELECT * FROM resources AS r, rdatapaths AS rdp, input_sources AS ins  WHERE r.id=rdp.resource_id AND r.id=ins.resource_id LIMIT 2;
+
