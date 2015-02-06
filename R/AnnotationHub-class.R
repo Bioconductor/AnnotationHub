@@ -173,17 +173,29 @@ AnnotationHub <-
         return (x)
     possibleDates <- possibleDates(x)
     if (!snapshotDate %in% possibleDates){
-        stop("'value' is not in possibleDates(x)")
-    }else{## Changing the date is two step process.
-        ## 1st we update the x@.db_uid
-        conn <- .db_connection(x)
-        x@.db_uid <- .uid0(conn, snapshotDate)
-        ## then we update the date slot    
-        x@date <- snapshotDate
-        x
+        newval <- strptime(snapshotDate, "%Y-%m-%d")
+	if(is.na(newval))
+	    stop("'value' should be in YYYY-MM-DD format")
+	if(newval > Sys.time())
+	    stop("This date is in the future") 
+	res <- mapply(function(x,y) {
+    	    x = strptime(x, "%Y-%m-%d")
+            y = strptime(y, "%Y-%m-%d")
+            newval>=x & newval<=y
+        }, possibleDates[-length(possibleDates)],  possibleDates[-1])
+	if(length(which(res))==1)
+           snapshotDate <- possibleDates[res]
+        else
+           snapshotDate <- snapshotDate(ah)
     }
-}
-
+    ## Changing the date is two step process.
+    ## 1st we update the x@.db_uid
+    conn <- .db_connection(x)
+    x@.db_uid <- .uid0(conn, snapshotDate)
+    ## then we update the date slot    
+    x@date <- snapshotDate
+    x
+} 
 
 ## snapshotDate (setter and getter and then the code to filter based on this...)
 ## max(possibleDates(mh)) is the default
