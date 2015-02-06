@@ -52,6 +52,7 @@
 }
 ## test: tail(AnnotationHub:::.db_uid(mh))
 
+## helper to retrieve tags
 .tags <- function(x) {
     query <- sprintf(
         'SELECT DISTINCT tag, resource_id AS id FROM tags
@@ -60,16 +61,7 @@
     dbGetQuery(.db_connection(x), query)
 }
 
-.tags_as_collapsed_string <- function(x)
-{
-    tbl <- .tags(x)
-    tags <- sapply(split(tbl$tag, tbl$id), paste, collapse=", ")
-    tags <- tags[match(.db_uid(x), names(tags))]
-    setNames(tags, .db_uid(x))            # allows for x with no tags
-}
-
-
-## Then do this for rdataclass
+## helper for extracting rdataclass
 .rdataclass <- function(x) {
     query <- sprintf(
         'SELECT DISTINCT rdataclass, resource_id AS id FROM rdatapaths
@@ -77,15 +69,8 @@
         .id_as_single_string(x))
     dbGetQuery(.db_connection(x), query)
 }
-.rdataclass_as_collapsed_string <- function(x)
-{
-    tbl <- .rdataclass(x)
-    rdataclass <- sapply(split(tbl$rdataclass, tbl$id), paste, collapse=", ")
-    rdataclass <- rdataclass[match(.db_uid(x), names(rdataclass))]
-    setNames(rdataclass, .db_uid(x))         # allows for x with no rdataclass
-}
 
-## And again for sourceUrls
+## helper for extracting sourceUrls
 .sourceurl <- function(x) {
     query <- sprintf(
         'SELECT DISTINCT sourceurl, resource_id AS id FROM input_sources
@@ -93,16 +78,25 @@
         .id_as_single_string(x))
     dbGetQuery(.db_connection(x), query)
 }
-.sourceurl_as_collapsed_string <- function(x)
-{
-    tbl <- .sourceurl(x)
-    sourceurl <- sapply(split(tbl$sourceurl, tbl$id), paste, collapse=", ")
-    sourceurl <- sourceurl[match(.db_uid(x), names(sourceurl))]
-    setNames(sourceurl, .db_uid(x))         # allows for x with no sourceurl
+
+##  helper for extracting recipes 
+.recipe <- function(x) {
+    query <- sprintf(
+        'SELECT DISTINCT rec.recipe, res.id FROM
+         recipes AS rec, resources AS res
+         WHERE rec.id=res.recipe_id AND res.id IN (%s)',
+        .id_as_single_string(x))
+    dbGetQuery(.db_connection(x), query)
 }
 
-
-## And do it again for recipes? - shouldn't this one just come from the initial query? - I think it really should...
+## Helper to collapse many to one fields (like above) into one space
+.collapse_as_string <- function(x, FUN, fieldName)
+{
+    tbl <- do.call(FUN,list(x))
+    lst <- sapply(split(tbl[[fieldName]], tbl$id), paste, collapse=", ")
+    lst <- lst[match(.db_uid(x), names(lst))]
+    setNames(lst, .db_uid(x))            # allows for x with no tags
+}
 
 
 
@@ -137,12 +131,14 @@
 
 .compoundResourceTable <- function(x){
     tbl <- .resource_table(x)
-    tags <- .tags_as_collapsed_string(x)    
+    tags <- .collapse_as_string(x,FUN=.tags,fieldName='tag')
     tbl <- .cbindAnother(tbl, tags, headerName='tags')
-    rdataclass <- .rdataclass_as_collapsed_string(x)
+    rdataclass <- .collapse_as_string(x,FUN=.rdataclass,fieldName='rdataclass')
     tbl <- .cbindAnother(tbl, rdataclass, headerName='rdataclass')
-    sourceurl <- .sourceurl_as_collapsed_string(x)
+    sourceurl <- .collapse_as_string(x,FUN=.sourceurl,fieldName='sourceurl')
     tbl <- .cbindAnother(tbl, sourceurl, headerName='sourceurl')
+    recipe <- .collapse_as_string(x,FUN=.recipe,fieldName='recipe')
+    tbl <- .cbindAnother(tbl, recipe, headerName='recipe')
     ## TODO: add recipe to main query.
     tbl
 }
@@ -232,3 +228,56 @@ setMethod("mcols", "AnnotationHub", function(x){ .mcols(x)} )
 ## CREATE VIEW hub AS
 ## SELECT * FROM resources AS r, rdatapaths AS rdp, input_sources AS ins  WHERE r.id=rdp.resource_id AND r.id=ins.resource_id LIMIT 2;
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Sonali better date query
+## SELECT * FROM resources where rdatadateadded <= "2013-03-19" GROUP BY title ORDER BY rdatadateadded DESC limit 2;
+
+
+## Example:
+## SELECT COUNT(id) AS theCount, `Tag` from `images-tags`
+## GROUP BY `Tag`
+## ORDER BY theCount DESC
+## LIMIT 20
+
+
+## SELECT id FROM 
+## (SELECT * FROM
+## (SELECT * FROM resources where rdatadateadded <= "2013-03-19")
+## AS res GROUP BY title ORDER BY rdatadateadded DESC limit 1);
+
+
+## SELECT MAX(id) FROM (SELECT id FROM (select * from resources where ah_id in ('AH523','AH22249')) AS res GROUP BY title) AS res;
+## same issue
+
+
+## Here is an example that actually does get close:
+## SELECT max(id) as mid, id, ah_id, title FROM (select * from resources where ah_id in ('AH523','AH22249','AH524','AH22250')) AS res GROUP BY maintainer;
+
+## Basically I would just want it like this:
+## SELECT max(id) as mid FROM (select * from resources where ah_id in ('AH523','AH22249','AH524','AH22250')) AS res GROUP BY maintainer;
+
+## And then group by title instead so pretty much like this:
+## SELECT max(id) as id FROM (SELECT * FROM resources where rdatadateadded <= "2013-03-19") AS res GROUP BY title;

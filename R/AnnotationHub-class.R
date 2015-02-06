@@ -282,17 +282,19 @@ setReplaceMethod("[",
 setMethod("$", "AnnotationHub",
     function(x, name)
 {
-    if (name == "tags") {
-        unname(.tags_as_collapsed_string(x))
-    } else {
-        .resource_column(x, name)
-    }
+    switch(name,
+     "tags"=unname(.collapse_as_string(x,.tags,'tag')),
+     "rdataclass"=unname(.collapse_as_string(x,.rdataclass,'rdataclass')),
+     "sourceurl"=unname(.collapse_as_string(x,.sourceurl,'sourceurl')),
+     "recipe"=unname(.collapse_as_string(x,.recipe,'recipe')),      
+     .resource_column(x, name))    ## try to get it from main resources table
 })
 
 .DollarNames.AnnotationHub <-
     function(x, pattern="")
 {
-    values <- c(.resource_columns(), "tags")
+    values <- c(.resource_columns(), "tags", "rdataclass",
+                "sourceurl", "recipe")
     grep(pattern, values, value=TRUE)
 }
 
@@ -371,7 +373,7 @@ setMethod("[[", c("AnnotationHub", "character", "missing"),
     cat("display()ing ", length(x0), " of ", length(x), " records on 6 mcols()",
         "\n", sep="")
     tbl <- .resource_table(x0)
-    tags <- .tags_as_collapsed_string(x0)
+    tags <- .collapse_as_string(x0,FUN=.tags,fieldName='tag')
     df <- cbind(tbl, tags, stringsAsFactors=FALSE)
     if (length(x0) != length(x)) {
         df <- rbind(df, "...")
