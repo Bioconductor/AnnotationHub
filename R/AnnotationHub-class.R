@@ -372,9 +372,10 @@ setMethod("[[", c("AnnotationHub", "character", "missing"),
     ## (it results in an empty uid slot)
     cat("display()ing ", length(x0), " of ", length(x), " records on 6 mcols()",
         "\n", sep="")
-    tbl <- .resource_table(x0)
-    tags <- .collapse_as_string(x0,FUN=.tags,fieldName='tag')
-    df <- cbind(tbl, tags, stringsAsFactors=FALSE)
+    tbl <- .compoundResourceTable(x0)
+    ## tags <- .collapse_as_string(x0,FUN=.tags,fieldName='tag')
+    ## df <- cbind(tbl, tags, stringsAsFactors=FALSE)
+    df = tbl
     if (length(x0) != length(x)) {
         df <- rbind(df, "...")
         rownames(df) <- c(rownames(df)[-nrow(df)], "...")
