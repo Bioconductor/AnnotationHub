@@ -186,7 +186,7 @@ AnnotationHub <-
 	if(length(which(res))==1)
            snapshotDate <- possibleDates[res]
         else
-           snapshotDate <- snapshotDate(ah)
+           snapshotDate <- snapshotDate(x)
     }
     ## Changing the date is two step process.
     ## 1st we update the x@.db_uid
@@ -329,17 +329,40 @@ setMethod("query", "AnnotationHub",
 
 ## Test: ahs <- query(ah, 'ChainFile')
 
-setMethod("subset", "AnnotationHub",
-    function(x, resource_table, tags, ...)
-{
-    i <- S4Vectors:::evalqForSubset(resource_table, .resource_table(x), ...)
+.subset <- function(x, resource_table, tags, ...){
+    resourcesIdx <- S4Vectors:::evalqForSubset(resource_table,
+                                               .resource_table(x), ...)
+    ## now check the many to one values:
     tbl <- .tags(x)
-    j <- as.integer(.db_uid(x)) %in% 
-            tbl$id[S4Vectors:::evalqForSubset(tags, tbl)]
-    x[i & j]
-})
+    tagsIdx <- as.integer(.db_uid(x)) %in% 
+                  tbl$id[S4Vectors:::evalqForSubset(tags, tbl)]
 
-## data
+    ## tbl <- .rdataclass(x)
+    ## rdataclassIdx <- as.integer(.db_uid(x)) %in% 
+    ##                     tbl$id[S4Vectors:::evalqForSubset(BOB, tbl)]
+
+    ## tbl <- .sourceurl(x)
+    ## sourceurlIdx <- as.integer(.db_uid(x)) %in% 
+    ##                    tbl$id[S4Vectors:::evalqForSubset(BOB, tbl)]
+
+    ## tbl <- .recipe(x)
+    ## recipeIdx <- as.integer(.db_uid(x)) %in% 
+    ##                 tbl$id[S4Vectors:::evalqForSubset(BOB, tbl)]
+
+#    x[resourcesIdx & tagsIdx & rdataclassIdx & sourceurlIdx & recipeIdx]
+    x[resourcesIdx & tagsIdx]
+}
+setMethod("subset", "AnnotationHub",
+          function(x, resource_table, tags, ...){
+              .subset(x, resource_table, tags, ...)}
+)
+## trace (as below) wasn't working (not sure why)
+## trace(subset, browser(), signature='AnnotationHub')
+## debug(AnnotationHub:::.subset)
+## Tests:
+## library(AnnotationHub);debug(AnnotationHub:::.subset);ah = AnnotationHub()
+## ahs <- subset(ah, ah$genome=='ailMel1')
+## ahs <- subset(ah, ah$rdataclass=='VCF')
 
 .AnnotationHub_get1 <-
     function(x)
