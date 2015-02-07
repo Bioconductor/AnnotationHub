@@ -406,20 +406,43 @@ setMethod("[[", c("AnnotationHub", "character", "missing"),
 .show <-
     function(x, ..., n=6)
 { 
-    x0 <- x[head(seq_along(.db_uid(x)), n)]  ## This line is the problem?
+#    x0 <- x[head(seq_along(.db_uid(x)), n)]  ## This line is the problem?
     ## (it results in an empty uid slot)
-    cat("display()ing ", length(x0), " of ", length(x), " records on 6 mcols()",
-        "\n", sep="")
-    tbl <- .compoundResourceTable(x0)
+##    cat("display()ing ", length(x0), " of ", length(x), " records on 6 mcols()","\n", sep="")
+    
+#    tbl <- .compoundResourceTable(x0)
     ## tags <- .collapse_as_string(x0,FUN=.tags,fieldName='tag')
     ## df <- cbind(tbl, tags, stringsAsFactors=FALSE)
-    df = tbl
-    if (length(x0) != length(x)) {
-        df <- rbind(df, "...")
-        rownames(df) <- c(rownames(df)[-nrow(df)], "...")
-    }
-    print(df)
+#    df = tbl
+    ## if (length(x0) != length(x)) {
+    ##     df <- rbind(df, "...")
+    ##     rownames(df) <- c(rownames(df)[-nrow(df)], "...")
+    ## }
+    ## print(df)
+
+## Try again
+    ## It might actually be better to 'hard code' this function.
+    
+    df <- .compoundResourceTable(x)
+    cat("--------------------------------------------------------------", "\n")
+    cat("Some common metadata fields represented here (e.g.):", "\n")
+    cat("Title: ", df$title[[1]], "\n")
+    cat("dataprovider: ", df$dataprovider[[1]], "\n")
+    cat("species: ", df$species[[1]], "\n")
+    cat("taxonomyid: ", df$taxonomyid[[1]], "\n")
+    cat("genome: ", df$genome[[1]], "\n")
+    cat("description: ", df$description[[1]], "\n")
+    cat("tags: ", df$tags[[1]], "\n")
+    cat("rdataclass: ", df$rdataclass[[1]], "\n")
+    cat("recipe: ", df$recipe[[1]], "\n")
+    cat("sourceurl: ", df$sourceurl[[1]], "\n")
+    cat("To see the full range for any of these,",
+        " please use the '$' operator and hit tab from this object.", "\n")
 }
+
+## Candidate for hard coding example: 
+## ahs  = subset(ah, ah$recipe=="NCBIToOrgDbsRecipe")
+## ahs
 
 setMethod(show, "AnnotationHub", function(object) {
     cat("class:", class(object), "\n")
