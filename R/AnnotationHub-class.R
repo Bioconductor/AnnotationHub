@@ -337,20 +337,20 @@ setMethod("query", "AnnotationHub",
     tagsIdx <- as.integer(.db_uid(x)) %in% 
                   tbl$id[S4Vectors:::evalqForSubset(tags, tbl)]
 
-    ## tbl <- .rdataclass(x)
-    ## rdataclassIdx <- as.integer(.db_uid(x)) %in% 
-    ##                     tbl$id[S4Vectors:::evalqForSubset(BOB, tbl)]
+    tbl <- .rdataclass(x)
+    rdataclassIdx <- as.integer(.db_uid(x)) %in% 
+                        tbl$id[S4Vectors:::evalqForSubset(tags, tbl)]
 
-    ## tbl <- .sourceurl(x)
-    ## sourceurlIdx <- as.integer(.db_uid(x)) %in% 
-    ##                    tbl$id[S4Vectors:::evalqForSubset(BOB, tbl)]
+    tbl <- .sourceurl(x)
+    sourceurlIdx <- as.integer(.db_uid(x)) %in% 
+                       tbl$id[S4Vectors:::evalqForSubset(tags, tbl)]
 
-    ## tbl <- .recipe(x)
-    ## recipeIdx <- as.integer(.db_uid(x)) %in% 
-    ##                 tbl$id[S4Vectors:::evalqForSubset(BOB, tbl)]
+    tbl <- .recipe(x)
+    recipeIdx <- as.integer(.db_uid(x)) %in% 
+                    tbl$id[S4Vectors:::evalqForSubset(tags, tbl)]
 
-#    x[resourcesIdx & tagsIdx & rdataclassIdx & sourceurlIdx & recipeIdx]
-    x[resourcesIdx & tagsIdx]
+    x[resourcesIdx & tagsIdx & rdataclassIdx & sourceurlIdx & recipeIdx]
+#    x[resourcesIdx & tagsIdx]
 }
 setMethod("subset", "AnnotationHub",
           function(x, resource_table, tags, ...){
