@@ -422,8 +422,11 @@ setMethod("[[", c("AnnotationHub", "character", "missing"),
 
 ## Try again
     ## It might actually be better to 'hard code' this function.
-    
-    df <- .compoundResourceTable(x)
+    ## OR I could do work to speed up .resource_table and .compoundResourceTable
+    ## Those could presumably speed up by only getting the ids requested (which in this case is one thing, but in other cases could be a different amount of things.)
+
+    x0 <- x[1]
+    df <- .compoundResourceTable(x0)
     cat("--------------------------------------------------------------", "\n")
     cat("Some common metadata fields represented here (e.g.):", "\n")
     cat("Title: ", df$title[[1]], "\n")
