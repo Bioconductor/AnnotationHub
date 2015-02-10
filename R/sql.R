@@ -92,14 +92,17 @@
 ## Helper to collapse many to one fields (like above) into one space
 .collapse_as_string <- function(x, FUN, fieldName)
 {
-    tbl <- do.call(FUN,list(x))
-    lst <- sapply(split(tbl[[fieldName]], tbl$id), paste, collapse=", ")
-    lst <- lst[match(.db_uid(x), names(lst))]
-    setNames(lst, .db_uid(x))            # allows for x with no tags
+    uid <- .db_uid(x)
+    tbl <- FUN(x)
+    lst <- vapply(split(tbl[[1]], tbl[["id"]]), paste,
+                  character(1), collapse=", ")
+    lst <- lst[match(uid, names(lst))]
+    setNames(lst, names(uid))           # allows for x with no tags 
 }
 
 
-
+## This gets many useful fields together for the end user and puts them into
+## a nice square shaped container.
 .resource_table <- function(x)
 {
     query <- sprintf(
@@ -109,37 +112,13 @@
          AND resources.id == biocversions.resource_id
          AND resources.id IN (%s)',
         .DB_RESOURCE_FIELDS, biocVersion(), .id_as_single_string(x))
-    .query_as_data.frame(x, query)
-}
-
-###############################################################################
-## need a new helper that will return MOAR fields (from some of the
-## other tables) - but (when needed) as compound tables.
-## The idea is that this should replace most (if not all) instances of
-## .resource_table.  IOW I want this to be the new and more inclusive
-## table that will already include things like tags, rdataclass and
-## recipes.
-
-## Helper for adding one more vector onto our table with a precise fieldName
-.cbindAnother <- function(tbl, vec, headerName){
-    if(length(vec) == dim(tbl)[1]){
-        tbl <- cbind(tbl, vec, stringsAsFactors=FALSE)
-    }
-    colnames(tbl)[colnames(tbl) %in% 'vec'] <- headerName
-    tbl
-}
-
-.compoundResourceTable <- function(x){
-    tbl <- .resource_table(x)
-    tags <- .collapse_as_string(x,FUN=.tags,fieldName='tag')
-    tbl <- .cbindAnother(tbl, tags, headerName='tags')
-    rdataclass <- .collapse_as_string(x,FUN=.rdataclass,fieldName='rdataclass')
-    tbl <- .cbindAnother(tbl, rdataclass, headerName='rdataclass')
-    sourceurl <- .collapse_as_string(x,FUN=.sourceurl,fieldName='sourceurl')
-    tbl <- .cbindAnother(tbl, sourceurl, headerName='sourceurl')
-    recipe <- .collapse_as_string(x,FUN=.recipe,fieldName='recipe')
-    tbl <- .cbindAnother(tbl, recipe, headerName='recipe')
-    ## TODO: add recipe to main query.
+    tbl <- .query_as_data.frame(x, query)
+    tbl[["tags"]] <- .collapse_as_string(x,FUN=.tags,fieldName='tag')
+    tbl[["rdataclass"]] <- .collapse_as_string(x,FUN=.rdataclass,
+                                               fieldName='rdataclass')
+    tbl[["sourceurl"]] <- .collapse_as_string(x,FUN=.sourceurl,
+                                              fieldName='sourceurl')
+    tbl[["recipe"]] <- .collapse_as_string(x,FUN=.recipe,fieldName='recipe')
     tbl
 }
 
@@ -202,7 +181,7 @@
 
 ## mcols
 .mcols <- function(x){
-    DataFrame(.compoundResourceTable(x))
+    DataFrame(.resource_table(x))
 
     ## TODO: this is not enough, I need to move the addition of tags back to .resource_table (OR maybe make a new function resource_table) to consolidate attachment of thigns like tags etc.
 }

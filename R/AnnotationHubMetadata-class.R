@@ -26,26 +26,26 @@ setClass("AnnotationHubMetadata",
         DataProvider="character",
         DerivedMd5="character",
         Description='character',
-        Genome="character",
+        Genome="character",                    ## needed for record_id
         Maintainer="character",
         Notes='character',
-        RDataClass="character",
+        RDataClass="character",                ## needed for record_id
         RDataDateAdded="POSIXct",
         RDataLastModifiedDate="POSIXct",
         RDataPath="character",
         RDataSize="numeric",
         RDataVersion="numeric_version",
-        Recipe="character",
+        Recipe="character",                    ## needed for record_id
         RecipeArgs="list",
         SourceFile="character",
         SourceLastModifiedDate="POSIXct",
         SourceMd5="character",
         SourceSize="numeric",
-        SourceUrl="character",
+        SourceUrl="character",                 ## needed for record_id
         SourceVersion="character",
         Species="character",
         Tags='character',
-        TaxonomyId="integer", 
+        TaxonomyId="integer",                  ## needed for record_id
         Title="character",
         Location_Prefix="character"
     ),
@@ -78,7 +78,7 @@ setClass("AnnotationHubMetadata",
         TaxonomyId=NA_integer_,
         Title=NA_character_,
         Location_Prefix=NA_character_
-    )        
+    )
 )
 
 ## ------------------------------------------------------------------------------

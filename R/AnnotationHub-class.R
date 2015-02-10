@@ -304,7 +304,7 @@ setGeneric("query", function(x, pattern, ...) standardGeneric("query"),
 setMethod("query", "AnnotationHub",
     function(x, pattern, ...)
 {
-    tbl <- .compoundResourceTable(x)
+    tbl <- .resource_table(x)
     idx0 <- Reduce(`|`,
                    Map(grepl, x=tbl, MoreArgs=list(pattern=pattern, ...)))
 
@@ -410,7 +410,7 @@ setMethod("[[", c("AnnotationHub", "character", "missing"),
     ## (it results in an empty uid slot)
 ##    cat("display()ing ", length(x0), " of ", length(x), " records on 6 mcols()","\n", sep="")
     
-#    tbl <- .compoundResourceTable(x0)
+#    tbl <- .resource_table(x0)
     ## tags <- .collapse_as_string(x0,FUN=.tags,fieldName='tag')
     ## df <- cbind(tbl, tags, stringsAsFactors=FALSE)
 #    df = tbl
@@ -422,11 +422,11 @@ setMethod("[[", c("AnnotationHub", "character", "missing"),
 
 ## Try again
     ## It might actually be better to 'hard code' this function.
-    ## OR I could do work to speed up .resource_table and .compoundResourceTable
+    ## OR I could do work to speed up .resource_table 
     ## Those could presumably speed up by only getting the ids requested (which in this case is one thing, but in other cases could be a different amount of things.)
 
     x0 <- x[1]
-    df <- .compoundResourceTable(x0)
+    df <- .resource_table(x0)
     cat("--------------------------------------------------------------", "\n")
     cat("Some common metadata fields represented here (e.g.):", "\n")
     cat("Title: ", df$title[[1]], "\n")
