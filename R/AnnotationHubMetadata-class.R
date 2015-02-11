@@ -177,9 +177,42 @@ setMethod(show, "AnnotationHubMetadata",
     }
 })
 
-## TODO: add some checks in here to disallow any AHMs if the metadata for the 
-## rdatapath is not the same as the source URL whenever the location_prefix is 
-## something other than the standard thing
+
+## check function that verifies that all of a vector of values have a valid prefixes
+.checkSourceurlPrefixesAreValid <- function(url){
+    safePrefixes <- c('http://','https://','ftp://','rtracklayer://')
+    lst <- lapply(safePrefixes, grepl, x=url)
+    if(!all(Reduce('|', lst))){
+        stop(wmsg(paste0("sourceurl provided has an invalid prefix (missing ",
+                        "protocol). Source urls should be full uris that point ",
+                        "to the original resources used in a recipe.")))
+    }
+}  ## it turns out the above is a bit overkill (did not need to be vectorised). :P
+
+## check function to ensure that we don't have double slashes in url
+.checkSourceurlsFreeOfDoubleSlashes <- function(url){
+    if(grepl("\\w//", url, perl=TRUE)){
+        stop(wmsg(paste0("sourceurl provided has a double slash outside of the ",
+                         "protocol). Source urls should be working uris that ",
+                         "point to the original resources used in a recipe.")))        
+    }
+}
+
+## try to make sure genomes do not contain weird suffixes.. (should be short)
+.checkThatGenomeLooksReasonable <- function(genome){
+    if(nchar(genome)>12){
+        warning(wmsg(paste0("genome provided is suspiciously long. ",
+                         "Check to make sure that the genome is legitimate and ",
+                         "does not contain unecessary extensions etc.")))        
+    }
+}
+
+## check that the rdataclass specified is a real class.
+.checkRdataclassIsReal <- function(class){
+    tryCatch(getClass(class), finally = print("The rdataclass must be a valid R data type"))
+}
+
+
 
 setValidity("AnnotationHubMetadata",function(object) {
     msg = NULL
@@ -197,4 +230,11 @@ setValidity("AnnotationHubMetadata",function(object) {
         }
     }
     if (is.null(msg)) TRUE else msg 
+    
+    ## more checks
+    .checkSourceurlPrefixesAreValid(object@SourceUrl)
+    .checkSourceurlsFreeOfDoubleSlashes(object@SourceUrl)
+    .checkThatGenomeLooksReasonable(object@Genome)
+    .checkRdataclassIsReal(object@RDataClass)
+    
 })
