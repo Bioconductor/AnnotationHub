@@ -38,6 +38,7 @@ hubUrl <- function(x) {
         tmp <- tempfile()
         ## Download the resource in a way that supports https
         response <- GET(hubpath, progress(), write_disk(tmp))
+        cat("\n") ## line break after progress bar
         if (length(status_code(response)))  
         {
             # FTP requests return empty status code, see
