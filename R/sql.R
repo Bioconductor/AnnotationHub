@@ -171,7 +171,7 @@
 .dataclass <- function(x)
 {
     query <- sprintf(
-        'SELECT DISTINCT r.ah_id AS ah_id, rdp.rdataclass
+        'SELECT DISTINCT r.ah_id AS ah_id, rdp.dispatchclass
          FROM rdatapaths AS rdp, resources AS r WHERE
          r.id = rdp.resource_id
          AND rdp.resource_id IN (%s)',
