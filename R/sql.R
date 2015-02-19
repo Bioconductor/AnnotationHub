@@ -3,7 +3,7 @@
 
 .query_as_data.frame <- function(x, query)
 {
-    tbl <- dbGetQuery(.db_connection(x), query)
+    tbl <- dbGetQuery(dbconn(x), query)
     ridx <- match(names(x), tbl$ah_id)
     cidx <- match("ah_id", names(tbl))
     rownames(tbl) <- tbl$ah_id
@@ -14,8 +14,8 @@
     query <- sprintf(
         'SELECT resources.id, resources.ah_id
          FROM resources, biocversions
-        WHERE biocversion == "%s"
-        AND biocversions.resource_id == resources.id',
+         WHERE biocversion == "%s"
+         AND biocversions.resource_id == resources.id',
         biocVersion())
     mtchData <- dbGetQuery(conn, query)
     names(ids) <- mtchData[mtchData[[1]] %in% ids,][[2]]
@@ -58,7 +58,12 @@
         'SELECT DISTINCT tag, resource_id AS id FROM tags
          WHERE resource_id IN (%s)',
         .id_as_single_string(x))
-    dbGetQuery(.db_connection(x), query)
+    dbGetQuery(dbconn(x), query)
+}
+
+.possibleDates <- function(conn) {
+    query <- 'SELECT DISTINCT rdatadateadded FROM resources'
+    dbGetQuery(conn, query)[[1]]
 }
 
 ## helper for extracting rdataclass
@@ -67,7 +72,7 @@
         'SELECT DISTINCT rdataclass, resource_id AS id FROM rdatapaths
          WHERE resource_id IN (%s)',
         .id_as_single_string(x))
-    dbGetQuery(.db_connection(x), query)
+    dbGetQuery(dbconn(x), query)
 }
 
 ## helper for extracting sourceUrls
@@ -76,7 +81,7 @@
         'SELECT DISTINCT sourceurl, resource_id AS id FROM input_sources
          WHERE resource_id IN (%s)',
         .id_as_single_string(x))
-    dbGetQuery(.db_connection(x), query)
+    dbGetQuery(dbconn(x), query)
 }
 
 ## ##  helper for extracting recipes 
@@ -95,7 +100,7 @@
         'SELECT DISTINCT sourcetype, resource_id AS id FROM input_sources
          WHERE resource_id IN (%s)',
         .id_as_single_string(x))
-    dbGetQuery(.db_connection(x), query)
+    dbGetQuery(dbconn(x), query)
 }
 
 
@@ -175,7 +180,7 @@
          FROM rdatapaths WHERE resource_id IN (%s)',
         .id_as_single_string(x))
     ## TODO: 'single': sounds incorrect...
-    dbGetQuery(.db_connection(x), query)[[1]]    
+    dbGetQuery(dbconn(x), query)[[1]]    
 }
 
 ## 
@@ -199,6 +204,42 @@
 ## mcols method
 setMethod("mcols", "AnnotationHub", function(x){ .mcols(x)} )
 
+## 
+## queries used by show,AnnotationHub-method
+## 
+.title_data.frame <-
+    function(x)
+{
+    query <- sprintf(
+        "SELECT ah_id, title FROM resources
+         WHERE resources.id IN (%s)",
+        .id_as_single_string(x))
+    .query_as_data.frame(x, query)
+}
+
+.count_resources <-
+    function(x, column, limit=10)
+{
+    query <- sprintf(
+        "SELECT %s FROM resources
+         WHERE resources.id IN (%s)
+         GROUP BY %s ORDER BY COUNT(%s) DESC LIMIT %d", 
+        column, .id_as_single_string(x), column, column, limit)
+    dbGetQuery(dbconn(x), query)[[column]]
+}
+
+.count_join_resources <-
+    function(x, table, column, limit=10)
+{
+    query <- sprintf(
+        "SELECT %s FROM resources, %s
+         WHERE resources.id IN (%s) AND %s.resource_id == resources.id
+         GROUP BY %s ORDER BY COUNT(%s) DESC LIMIT %d", 
+        column, table,
+        .id_as_single_string(x), table,
+        column, column, limit)
+    dbGetQuery(dbconn(x), query)[[column]]
+}
 
 ## make a function to create a view whenever the DB is updated..
 ## SQL will look kind of like the one used for go:

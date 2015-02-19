@@ -24,7 +24,7 @@ AnnotationHub <-
 
     .db_path <- .cache_create(cache)
     .db_connection <- .getDbConn(.db_path, hub)
-    .date <- max(.possibleDates(conn = .db_connection))    
+    .date <- max(.possibleDates(.db_connection))    
     .db_uid <- .getDbUid(.db_path, .db_connection, .date)
     .AnnotationHub(cache=cache, hub=hub, date=.date,
                    .db_connection=.db_connection, .db_uid=.db_uid)
@@ -147,8 +147,6 @@ AnnotationHub <-
 
 .hub <- function(x) slot(x, "hub")
 
-.db_connection <- function(x) slot(x, ".db_connection")
-
 .db_uid <- function(x) slot(x, ".db_uid")
 
 `.db_uid<-` <- function(x, ..., value)
@@ -160,6 +158,10 @@ AnnotationHub <-
     slot(x, ".db_uid") <- value
     x
 }
+
+setMethod("dbconn", "AnnotationHub", function(x) slot(x, ".db_connection"))
+
+setMethod("dbfile", "AnnotationHub", function(x) dbconn(x)@dbname)
 
 .snapshotDate <- function(x) slot(x, "date")
 
@@ -190,7 +192,7 @@ AnnotationHub <-
     }
     ## Changing the date is two step process.
     ## 1st we update the x@.db_uid
-    conn <- .db_connection(x)
+    conn <- dbconn(x)
     x@.db_uid <- .uid0(conn, snapshotDate)
     ## then we update the date slot    
     x@date <- snapshotDate
@@ -204,11 +206,9 @@ setGeneric("snapshotDate", function(x, ...) standardGeneric("snapshotDate"))
 setGeneric("snapshotDate<-", signature="x",
            function(x, value) standardGeneric("snapshotDate<-"))
 
+setMethod("snapshotDate", "AnnotationHub", .snapshotDate)
 
-setMethod("snapshotDate", "AnnotationHub", function(x){.snapshotDate(x)} )
-
-setReplaceMethod("snapshotDate", "AnnotationHub", 
-                 function(x, value){.replaceSnapshotDate(x,value)})
+setReplaceMethod("snapshotDate", "AnnotationHub", .replaceSnapshotDate)
 
 
 ## 
@@ -402,79 +402,89 @@ setMethod("[[", c("AnnotationHub", "character", "missing"),
     .AnnotationHub_get1(x[idx])
 })
 
+## 
 ## show
+##
+
+.pprintf0 <- function(fmt, ...)
+    paste(strwrap(sprintf(fmt, ...), exdent=2), collapse="\n# ")
+
+.pprintf1 <-
+    function(column, values, width=getOption("width") - 1L)
+{
+    answer <- sprintf("# $%s: %s", column, paste(values, collapse=", "))
+    ifelse(nchar(answer) > width,
+           sprintf("%s...\n", substring(answer, 1L, width - 3L)),
+           sprintf("%s\n", answer))
+}
+
 .show <-
-    function(x, ..., n=6)
-{ 
-#    x0 <- x[head(seq_along(.db_uid(x)), n)]  ## This line is the problem?
-    ## (it results in an empty uid slot)
-##    cat("display()ing ", length(x0), " of ", length(x), " records on 6 mcols()","\n", sep="")
-    
-#    tbl <- .resource_table(x0)
-    ## tags <- .collapse_as_string(x0,FUN=.tags,fieldName='tag')
-    ## df <- cbind(tbl, tags, stringsAsFactors=FALSE)
-#    df = tbl
-    ## if (length(x0) != length(x)) {
-    ##     df <- rbind(df, "...")
-    ##     rownames(df) <- c(rownames(df)[-nrow(df)], "...")
-    ## }
-    ## print(df)
+    function(object)
+{
+    .some <-
+        function(elt, nh, nt, fill="...", width=getOption("width") - 11L)
+    {
+        answer <- if (length(elt) < nh + nt + 1L)
+            elt
+        else
+            c(head(elt, nh), fill, tail(elt, nt))
+        ifelse(nchar(answer) > width,
+               sprintf("%s...", substring(answer, 1L, width-3L)),
+               answer)
+    }
 
-## Try again
-    ## It might actually be better to 'hard code' this function.
-    ## OR I could do work to speed up .resource_table 
-    ## Those could presumably speed up by only getting the ids requested (which in this case is one thing, but in other cases could be a different amount of things.)
+    cat(.pprintf1("dataprovider", .count_resources(object, "dataprovider")))
+    cat(.pprintf1("species", .count_resources(object, "species")))
+    cat(.pprintf1("rdataclass",
+                  .count_join_resources(object, "rdatapaths", "rdataclass")))
+    shown <- c("dataprovider", "species", "rdataclass", "title")
+    cols <- paste(setdiff(names(mcols(object[0])), shown), collapse=", ")
+    cat(.pprintf0("# additional mcols(): %s", cols), "\n")
+    cat(.pprintf0("# retrieve records with, e.g., 'object[[\"%s\"]]'",
+                  names(object)[[1]]), "\n")
 
-    x0 <- x[1]
-    df <- .resource_table(x0)
-    cat("--------------------------------------------------------------", "\n")
-    cat("Some common metadata fields represented here (e.g.):", "\n")
-    cat("Title: ", df$title[[1]], "\n")
-    cat("dataprovider: ", df$dataprovider[[1]], "\n")
-    cat("species: ", df$species[[1]], "\n")
-    cat("taxonomyid: ", df$taxonomyid[[1]], "\n")
-    cat("genome: ", df$genome[[1]], "\n")
-    cat("description: ", df$description[[1]], "\n")
-    cat("tags: ", df$tags[[1]], "\n")
-    cat("rdataclass: ", df$rdataclass[[1]], "\n")
-    cat("sourcetype: ", df$sourcetype[[1]], "\n")
-    cat("sourceurl: ", df$sourceurl[[1]], "\n")
-    cat("To see the full range for any of these,",
-        " please use the '$' operator and hit tab from this object.", "\n")
+    if (len <- length(object)) {
+        nhead <- get_showHeadLines()
+        ntail <- get_showTailLines()
+        title <- .title_data.frame(object)
+        rownames <- paste0("  ", .some(rownames(title), nhead, ntail))
+        out <- matrix(c(.some(rep("|", len), nhead, ntail, fill=""),
+                        .some(title[[1]], nhead, ntail)),
+                      ncol=2L,
+                      dimnames=list(rownames, c("", "title")))
+
+        cat("\n")
+        print(out, quote=FALSE, right=FALSE)
+    }
 }
 
-## Candidate for hard coding example: 
-## ahs  = subset(ah, ah$sourcetype=="FASTA file")
-## ahs
+.show1 <-
+    function(object)
+{
+    rsrc <- .resource_table(object)
+    cat("# names(): ", names(object)[[1]], "\n", sep="")
+    cat(.pprintf1("dataprovider", rsrc[["dataprovider"]]))
+    cat(.pprintf1("species", rsrc[["species"]]))
+    cat(.pprintf1("rdataclass", rsrc[["rdataclass"]]))
+    cat(.pprintf1("title", rsrc[["title"]]))
+    cat(.pprintf1("description", rsrc[["description"]]))
+    cat(.pprintf1("taxonomyid", rsrc[["taxonomyid"]]))
+    cat(.pprintf1("genome", rsrc[["genome"]]))
+    cat(.pprintf1("sourceurl", rsrc[["sourceurl"]]))
+    cat(.pprintf0("# $tags: %s", rsrc[["tags"]]), "\n")
+    cat(.pprintf0("# retrieve record with 'object[[\"%s\"]]'",
+                  names(object)[[1]]), "\n")
+}
 
-setMethod(show, "AnnotationHub", function(object) {
-    cat("class:", class(object), "\n")
-    cat("hub:", .hub(object), "\n")
-    cat("cache:", .cache(object), "\n")
-    .show(object, n=3)
+setMethod("show", "AnnotationHub", function(object) 
+{
+    len <- length(object)
+    cat(sprintf("%s with %d record%s\n", class(object), len,
+                ifelse(len == 1L, "", "s")))
+    cat("# snapshotDate():", snapshotDate(object), "\n")
+
+    if (len > 1)
+        .show(object)
+    else if (len == 1)
+        .show1(object)
 })
-
-
-## helpers used in the constructor as well as elsehwere
-
-.possibleDates <- function(conn){
-    query <- 'SELECT DISTINCT rdatadateadded FROM resources'
-    dbGetQuery(conn, query)[[1]]
-}
-
-
-
-## methods for dbconn and dbfile
-.dbconn <- function(x){
-    con <- x@.db_connection
-    ## CANNOT name a connection object. :(
-    con
-}
-setMethod("dbconn", "AnnotationHub", function(x){.dbconn(x)})
-
-.dbfile <- function(x){
-    file <- x@.db_connection@dbname
-    ## So (for now) I am not using names here either)
-    file
-}
-setMethod("dbfile", "AnnotationHub", function(x){.dbfile(x)})

@@ -86,11 +86,9 @@ hubUrl <- function(x) {
 
 
 ## Add possibleDates here (SELECT DISTINCT rdatadateadded FROM)
-possibleDates <- function(x){
-##    query <- 'SELECT DISTINCT rdatadateadded FROM resources'
-##    dbGetQuery(.db_connection(x), query)[[1]]
-    .possibleDates(conn = .db_connection(x))
-}
+possibleDates <- function(x) 
+    .possibleDates(dbconn(x))
+
 ## Date filter "1": will look kind of like this 
 ## it will be a subquery that will be passed to the next step...
 ## SELECT * FROM resources where rdatadateadded < '2013-03-21';

@@ -112,7 +112,8 @@ AnnotationHubMetadata <-
         SourceSize <- file.info(SourceFile)$size
     if (missing(TaxonomyId))
     {
-        if (!is.na(Species) && require(AnnotationHubData))
+        if (!is.na(Species) &&
+            requireNamespace("AnnotationHubData", quietly=TRUE))
             TaxonomyId <- AnnotationHubData:::.taxonomyId(Species)
         else
             TaxonomyId <- NA_character_
