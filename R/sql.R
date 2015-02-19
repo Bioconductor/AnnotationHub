@@ -121,12 +121,9 @@
 .resource_table <- function(x)
 {
     query <- sprintf(
-        'SELECT %s
-         FROM resources, biocversions
-         WHERE biocversions.biocversion == %s
-         AND resources.id == biocversions.resource_id
-         AND resources.id IN (%s)',
-        .DB_RESOURCE_FIELDS, biocVersion(), .id_as_single_string(x))
+        'SELECT %s FROM resources
+         WHERE resources.id IN (%s)',
+        .DB_RESOURCE_FIELDS, .id_as_single_string(x))
     tbl <- .query_as_data.frame(x, query)
     tbl[["tags"]] <- .collapse_as_string(x,FUN=.tags,fieldName='tag')
     tbl[["rdataclass"]] <- .collapse_as_string(x,FUN=.rdataclass,
@@ -153,6 +150,16 @@
         'SELECT ah_id, %s FROM resources WHERE id IN (%s)',
         name, .id_as_single_string(x))
     .query_as_data.frame(x, query)[[1]]
+}
+
+.join_resource_column <- function(x, table, name)
+{
+    query <- sprintf(
+        "SELECT ah_id, %s FROM resources, %s
+         WHERE resources.id IN (%s)
+         AND %s.resource_id == resources.id",
+        name, table, .id_as_single_string(x), table)
+    .query_as_data.frame(x, query)[[name]]
 }
 
 .datapath <- function(x)

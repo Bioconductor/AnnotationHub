@@ -471,6 +471,10 @@ setMethod("[[", c("AnnotationHub", "character", "missing"),
     cat(.pprintf1("taxonomyid", rsrc[["taxonomyid"]]))
     cat(.pprintf1("genome", rsrc[["genome"]]))
     cat(.pprintf1("sourceurl", rsrc[["sourceurl"]]))
+    x <- .join_resource_column(object, "input_sources", "sourcelastmodifieddate")
+    cat(.pprintf1("sourcelastmodifieddate", x))
+    x <- .join_resource_column(object, "input_sources", "sourcesize")
+    cat(.pprintf1("sourcesize", x))
     cat(.pprintf0("# $tags: %s", rsrc[["tags"]]), "\n")
     cat(.pprintf0("# retrieve record with 'object[[\"%s\"]]'",
                   names(object)[[1]]), "\n")
