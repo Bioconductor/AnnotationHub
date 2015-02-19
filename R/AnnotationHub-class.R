@@ -286,7 +286,7 @@ setMethod("$", "AnnotationHub",
      "tags"=unname(.collapse_as_string(x,.tags,'tag')),
      "rdataclass"=unname(.collapse_as_string(x,.rdataclass,'rdataclass')),
      "sourceurl"=unname(.collapse_as_string(x,.sourceurl,'sourceurl')),
-     "recipe"=unname(.collapse_as_string(x,.recipe,'recipe')),      
+     "sourcetype"=unname(.collapse_as_string(x,.sourcetype,'sourcetype')),      
      .resource_column(x, name))    ## try to get it from main resources table
 })
 
@@ -294,7 +294,7 @@ setMethod("$", "AnnotationHub",
     function(x, pattern="")
 {
     values <- c(.resource_columns(), "tags", "rdataclass",
-                "sourceurl", "recipe")
+                "sourceurl", "sourcetype")
     grep(pattern, values, value=TRUE)
 }
 
@@ -320,9 +320,9 @@ setMethod("query", "AnnotationHub",
     idx3 <- rownames(tbl) %in%
                unique(sourceurl$id[grepl(pattern, sourceurl$sourceurl)])
 
-    recipe <- .recipe(x)
+    sourcetype <- .sourcetype(x)
     idx4 <- rownames(tbl) %in%
-               unique(recipe$id[grepl(pattern, recipe$recipe)])
+               unique(sourcetype$id[grepl(pattern, sourcetype$sourcetype)])
         
     x[idx0 | idx1 | idx2 | idx3 | idx4]
 })
@@ -345,11 +345,11 @@ setMethod("query", "AnnotationHub",
     sourceurlIdx <- as.integer(.db_uid(x)) %in% 
                        tbl$id[S4Vectors:::evalqForSubset(tags, tbl)]
 
-    tbl <- .recipe(x)
-    recipeIdx <- as.integer(.db_uid(x)) %in% 
+    tbl <- .sourcetype(x)
+    sourcetypeIdx <- as.integer(.db_uid(x)) %in% 
                     tbl$id[S4Vectors:::evalqForSubset(tags, tbl)]
 
-    x[resourcesIdx & tagsIdx & rdataclassIdx & sourceurlIdx & recipeIdx]
+    x[resourcesIdx & tagsIdx & rdataclassIdx & sourceurlIdx & sourcetypeIdx]
 #    x[resourcesIdx & tagsIdx]
 }
 setMethod("subset", "AnnotationHub",
@@ -437,14 +437,14 @@ setMethod("[[", c("AnnotationHub", "character", "missing"),
     cat("description: ", df$description[[1]], "\n")
     cat("tags: ", df$tags[[1]], "\n")
     cat("rdataclass: ", df$rdataclass[[1]], "\n")
-    cat("recipe: ", df$recipe[[1]], "\n")
+    cat("sourcetype: ", df$sourcetype[[1]], "\n")
     cat("sourceurl: ", df$sourceurl[[1]], "\n")
     cat("To see the full range for any of these,",
         " please use the '$' operator and hit tab from this object.", "\n")
 }
 
 ## Candidate for hard coding example: 
-## ahs  = subset(ah, ah$recipe=="NCBIToOrgDbsRecipe")
+## ahs  = subset(ah, ah$sourcetype=="FASTA file")
 ## ahs
 
 setMethod(show, "AnnotationHub", function(object) {

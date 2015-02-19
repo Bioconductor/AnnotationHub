@@ -79,15 +79,25 @@
     dbGetQuery(.db_connection(x), query)
 }
 
-##  helper for extracting recipes 
-.recipe <- function(x) {
+## ##  helper for extracting recipes 
+## .recipe <- function(x) {
+##     query <- sprintf(
+##         'SELECT DISTINCT rec.recipe, res.id FROM
+##          recipes AS rec, resources AS res
+##          WHERE rec.id=res.recipe_id AND res.id IN (%s)',
+##         .id_as_single_string(x))
+##     dbGetQuery(.db_connection(x), query)
+## }
+
+##  helper for extracting sourcetype
+.sourcetype <- function(x) {
     query <- sprintf(
-        'SELECT DISTINCT rec.recipe, res.id FROM
-         recipes AS rec, resources AS res
-         WHERE rec.id=res.recipe_id AND res.id IN (%s)',
+        'SELECT DISTINCT sourcetype, resource_id AS id FROM input_sources
+         WHERE resource_id IN (%s)',
         .id_as_single_string(x))
     dbGetQuery(.db_connection(x), query)
 }
+
 
 ## Helper to collapse many to one fields (like above) into one space
 .collapse_as_string <- function(x, FUN, fieldName)
@@ -118,7 +128,8 @@
                                                fieldName='rdataclass')
     tbl[["sourceurl"]] <- .collapse_as_string(x,FUN=.sourceurl,
                                               fieldName='sourceurl')
-    tbl[["recipe"]] <- .collapse_as_string(x,FUN=.recipe,fieldName='recipe')
+    tbl[["sourcetype"]] <- .collapse_as_string(x,FUN=.sourcetype,
+                                               fieldName='sourcetype')
     tbl
 }
 
