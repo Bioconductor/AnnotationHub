@@ -31,23 +31,22 @@ setClass("AnnotationHubMetadata",
         Notes='character',
         RDataClass="character",                ## needed for record_id
         RDataDateAdded="POSIXct",
-        RDataLastModifiedDate="POSIXct",
         RDataPath="character",
-        RDataSize="numeric",
-        RDataVersion="numeric_version",
-        Recipe="character",                    ## needed for record_id
+        Recipe="character",                 ## no longer needed for record_id
         RecipeArgs="list",
-        SourceFile="character",
         SourceLastModifiedDate="POSIXct",
         SourceMd5="character",
         SourceSize="numeric",
         SourceUrl="character",                 ## needed for record_id
         SourceVersion="character",
+        SourceType="character",
         Species="character",
         Tags='character',
         TaxonomyId="integer",                  ## needed for record_id
         Title="character",
-        Location_Prefix="character"
+        Location_Prefix="character",
+        DispatchClass="character",
+        PreparerClass="character"              ## needed for record_id
     ),
     prototype = prototype(
         AnnotationHubRoot=NA_character_,
@@ -62,35 +61,35 @@ setClass("AnnotationHubMetadata",
         Notes=NA_character_,
         RDataClass=NA_character_,
         RDataDateAdded=as.POSIXct(NA_character_),
-        RDataLastModifiedDate=as.POSIXct(NA_character_),
         RDataPath=NA_character_,
-        RDataSize=NA_real_,
-        RDataVersion=.NA_version_,
         Recipe=NA_character_,
         RecipeArgs=list(),
-        SourceFile=NA_character_,
         SourceLastModifiedDate=as.POSIXct(NA_character_),
         SourceMd5=NA_character_,
         SourceSize=NA_real_,
         SourceVersion=NA_character_,
+        SourceType=NA_character_,
         Species=NA_character_,
         Tags=NA_character_,
         TaxonomyId=NA_integer_,
         Title=NA_character_,
-        Location_Prefix=NA_character_
+        Location_Prefix=NA_character_,
+        DispatchClass=NA_character_,
+        PreparerClass=NA_character_
     )
 )
+
 
 ## ------------------------------------------------------------------------------
 ## constructor, validity
 ## 
 
 .derivedFileName <-
-    function(originalFile, RDataVersion, suffix)
+    function(originalFile, suffix)
 {
     ret <- sub(".gz$", "", basename(originalFile))
     ret <- paste(ret, collapse="-")
-    sprintf("%s_%s.%s", ret, RDataVersion, suffix)
+    sprintf("%s_%s.%s", ret, suffix)
 }
 
 
@@ -98,18 +97,20 @@ setClass("AnnotationHubMetadata",
 ## http://hgdownload.cse.ucsc.edu/
 
 AnnotationHubMetadata <-
-    function(AnnotationHubRoot, SourceFile, SourceUrl, SourceVersion,
+    function(AnnotationHubRoot,  SourceUrl, SourceType, SourceVersion,
         SourceMd5, SourceSize, DataProvider, Title, Description,
         Species, TaxonomyId, Genome, Tags, Recipe, RecipeArgs =
-        list(), RDataClass, RDataVersion, RDataDateAdded, RDataPath, Maintainer,
-        ..., BiocVersion=biocVersion(), Coordinate_1_based = TRUE,
-        Notes=NA_character_,
+        list(), RDataClass, RDataDateAdded, RDataPath,
+        Maintainer, ..., BiocVersion=biocVersion(), Coordinate_1_based = TRUE,
+        Notes=NA_character_, DispatchClass,
         Location_Prefix='http://s3.amazonaws.com/annotationhub/')
 {
-    if (missing(SourceMd5))
-        SourceMd5 <- unname(tools::md5sum(SourceFile))
-    if (missing(SourceSize))
-        SourceSize <- file.info(SourceFile)$size
+    ## TODO: work out a way to derive these (Sonali has some methods for some files that we can apply using httr etc.)
+    ## And we *may just want to continue requiring that the recipe give this value - and then not store it.
+    ## if (missing(SourceMd5))
+    ##     SourceMd5 <- unname(tools::md5sum(SourceFile))
+    ## if (missing(SourceSize))
+    ##     SourceSize <- file.info(SourceFile)$size
     if (missing(TaxonomyId))
     {
         if (!is.na(Species) &&
@@ -118,11 +119,13 @@ AnnotationHubMetadata <-
         else
             TaxonomyId <- NA_character_
     }
-    ## This is probably too aggressive since some resources will not have this?
+    ## This was probably too aggressive since some resources do not have the sourceFile field
     if (missing(RDataPath)) {
-        resourceDir <- dirname(SourceFile[1])
-        resourceFiles <- .derivedFileName(SourceFile,  RDataVersion, "RData")
-        RDataPath <- file.path(resourceDir, resourceFiles)
+        ## resourceDir <- dirname(SourceFile[1])
+        ## resourceFiles <- .derivedFileName(SourceFile,  RDataVersion, "RData")
+        ## RDataPath <- file.path(resourceDir, resourceFiles)
+        Stop("You must supply an Rdatapath")
+        ## TODO: try to derive this from the sourceUrl and the location prefix (if present)
     }
     if (missing(AnnotationHubRoot)){
         AnnotationHubRoot <- "/var/FastRWeb/web" ## Dans preferred default
@@ -144,19 +147,19 @@ AnnotationHubMetadata <-
         RDataClass=RDataClass,
         RDataDateAdded=as.POSIXct(RDataDateAdded),
         RDataPath=RDataPath,
-        RDataVersion=numeric_version(RDataVersion),
         Recipe=Recipe,
         RecipeArgs=RecipeArgs,
-        SourceFile=SourceFile,
-        SourceMd5=SourceMd5,
-        SourceSize=SourceSize,
+#        SourceMd5=SourceMd5,                          ## temporarily required
+#        SourceSize=SourceSize,                        ## temporarily required?
         SourceUrl=SourceUrl,
         SourceVersion=SourceVersion,
+        SourceType=SourceType,
         Species=Species,
         Tags=Tags,
         TaxonomyId=TaxonomyId,
         Title=Title,
         Location_Prefix=Location_Prefix,
+        DispatchClass=DispatchClass, 
         ...
     )
 }
@@ -221,21 +224,23 @@ setValidity("AnnotationHubMetadata",function(object) {
     if(grepl(" ", object@RDataPath)){
         msg <- c(msg, "the string for RDataPath cannot contain spaces.")
     }
-    ## if the location prefix is "non-standard" (IOW not stored in S3) and 
-    ## if the source URL is not the same as rdatapath 
-    ## then we need to add a message and fail out
-    standardLocationPrefix <- 'http://s3.amazonaws.com/annotationhub/'
-    if(object@Location_Prefix != standardLocationPrefix){
-        if(object@RDataPath != object@SourceUrl){
-            msg <- c(msg, "the string for RDataPath must match the SourceUrl.")
-        }
-    }
-    if (is.null(msg)) TRUE else msg 
+## TODO: work out what is wrong with this check!
+    ## ## if the location prefix is "non-standard" (IOW not stored in S3) and 
+    ## ## if the source URL is not the same as rdatapath 
+    ## ## then we need to add a message and fail out
+    ## standardLocationPrefix <- 'http://s3.amazonaws.com/annotationhub/'
+    ## if(object@Location_Prefix != standardLocationPrefix){
+    ##     if(object@RDataPath != object@SourceUrl){
+    ##         msg <- c(msg, "the string for RDataPath must match the SourceUrl.")
+    ##     }
+    ## }
+    ## if (is.null(msg)) TRUE else msg 
     
     ## more checks
     .checkSourceurlPrefixesAreValid(object@SourceUrl)
     .checkSourceurlsFreeOfDoubleSlashes(object@SourceUrl)
     .checkThatGenomeLooksReasonable(object@Genome)
-    .checkRdataclassIsReal(object@RDataClass)
+## TODO: work out what is wrong with this check!
+#    .checkRdataclassIsReal(object@RDataClass)
     
 })
