@@ -107,15 +107,14 @@ AnnotationHub <-
 
 ## Helper checks if local Db is stale, returns TRUE if it needs an update.
 .isDbStale <- function(con){
-    ## Compare the highest online assigned unique ID to database id
-    url <- paste0(hubOption('URL'), '/metadata/highest_id')
+    ## Compare the timestamp online to the one in the DB
+    url <- paste0(hubOption('URL'), '/metadata/database_timestamp')
     tryCatch({
-        latestOnlineID <- as.integer(content(GET(url)))
-        if(is.na(latestOnlineID)){
-            stop(wmsg("Back end is not currently displaying the highest ID"))
-        }
-        sql <- "SELECT max(id) FROM resources"
-        latestOnlineID > dbGetQuery(con, sql)[[1]]
+        onlineTime <- as.POSIXct(content(GET(url)))        
+        ## then get the db timestamp
+        sql <- "SELECT * FROM timestamp"
+        localTime <- as.POSIXct(dbGetQuery(con, sql)[[1]])
+        onlineTime > localTime
     }, error=function(e) {
         warning("'AnnotationHub' database may not be current",
                 "\n  database: ", sQuote(con@dbname),
