@@ -226,17 +226,16 @@ setValidity("AnnotationHubMetadata",function(object) {
     if(grepl(" ", object@RDataPath)){
         msg <- c(msg, "the string for RDataPath cannot contain spaces.")
     }
-## TODO: work out what is wrong with this check!
-    ## ## if the location prefix is "non-standard" (IOW not stored in S3) and 
-    ## ## if the source URL is not the same as rdatapath 
-    ## ## then we need to add a message and fail out
-    ## standardLocationPrefix <- 'http://s3.amazonaws.com/annotationhub/'
-    ## if(object@Location_Prefix != standardLocationPrefix){
-    ##     if(object@RDataPath != object@SourceUrl){
-    ##         msg <- c(msg, "the string for RDataPath must match the SourceUrl.")
-    ##     }
-    ## }
-    ## if (is.null(msg)) TRUE else msg 
+    ## if the location prefix is "non-standard" (IOW not stored in S3) and 
+    ## if the source URL is not the same as rdatapath 
+    ## then we need to add a message and fail out
+    standardLocationPrefix <- 'http://s3.amazonaws.com/annotationhub/'
+    if(object@Location_Prefix != standardLocationPrefix){
+        if(object@RDataPath != object@SourceUrl){
+            msg <- c(msg, "the string for RDataPath must match the SourceUrl.")
+        }
+    }
+    if (is.null(msg)) TRUE else msg 
     
     ## more checks
     .checkSourceurlPrefixesAreValid(object@SourceUrl)
