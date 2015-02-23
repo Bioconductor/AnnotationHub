@@ -213,7 +213,9 @@ setMethod(show, "AnnotationHubMetadata",
 
 ## check that the rdataclass specified is a real class.
 .checkRdataclassIsReal <- function(class){
-    tryCatch(getClass(class), finally = print("The rdataclass must be a valid R data type"))
+    tryCatch(isClass(class), error = function(err){
+        stop("The rdataclass must be a valid R data type. \n",
+             conditionMessage(err))})
 }
 
 
@@ -240,7 +242,5 @@ setValidity("AnnotationHubMetadata",function(object) {
     .checkSourceurlPrefixesAreValid(object@SourceUrl)
     .checkSourceurlsFreeOfDoubleSlashes(object@SourceUrl)
     .checkThatGenomeLooksReasonable(object@Genome)
-## TODO: work out what is wrong with this check!
-#    .checkRdataclassIsReal(object@RDataClass)
-    
+    .checkRdataclassIsReal(object@RDataClass)
 })
