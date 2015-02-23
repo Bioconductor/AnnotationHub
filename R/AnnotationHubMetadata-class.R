@@ -219,6 +219,31 @@ setMethod(show, "AnnotationHubMetadata",
 }
 
 
+.checkThatSourceTypeSoundsReasonable <- function(sourcetype){
+expectedSourceTypes <- c("BED file",                                            
+                         "UCSC track",
+                         "VCF file",
+                         "GTF file",
+                         "GFF file",
+                         "CSV file",
+                         "TSV file",
+                         "BigWig file",
+                         "TwoBit file",
+                         "Chain file",
+                         "FASTA file",
+                         "Inparanoid sqltable files",
+                         "NCBI gene files with supplemental data from blast2GO",
+                         "NHLBI GRASP 2.0 GWAS database")
+  if(!(sourcetype %in% expectedSourceTypes)){
+      stop(wmsg(paste0("The source type you have provided (",sourcetype,")",
+                       " looks unusual.  We were expecting one of these",
+                       " values: ",paste(expectedSourceTypes, collapse=", "),
+                       ". Please check to make sure that yoour source type",
+                       " is really what you want and if so, then please tell",
+                       " us about it so that we can add your source type to",
+                       " our list of expected values.."))) 
+  }
+}
 
 setValidity("AnnotationHubMetadata",function(object) {
     msg = NULL
@@ -242,4 +267,5 @@ setValidity("AnnotationHubMetadata",function(object) {
     .checkSourceurlsFreeOfDoubleSlashes(object@SourceUrl)
     .checkThatGenomeLooksReasonable(object@Genome)
     .checkRdataclassIsReal(object@RDataClass)
+    .checkThatSourceTypeSoundsReasonable(object@SourceType)
 })
