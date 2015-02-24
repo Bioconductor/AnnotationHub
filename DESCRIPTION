@@ -1,7 +1,7 @@
 Package: AnnotationHub
 Type: Package 
 Title: Client to access AnnotationHub resources
-Version: 1.99.59
+Version: 1.99.60
 Authors@R:
     c(person("Martin", "Morgan", email="mtmorgan@fhcrc.org", role="cre"),
       person("Marc", "Carlson", role="ctb"),
@@ -23,6 +23,5 @@ Imports: utils, methods, RSQLite, BiocInstaller, BiocGenerics,
 Suggests: GenomicRanges, VariantAnnotation, Rsamtools, rtracklayer,
     GenomeInfoDb, BiocStyle, knitr, AnnotationForge
 Collate: AnnotationHub-class.R  AnnotationHubResource-class.R 
-    AnnotationHubMetadata-class.R utilities.R option.R sql.R hub.R 
-    cache.R display.R zzz.R
+    utilities.R option.R sql.R hub.R cache.R display.R zzz.R
 VignetteBuilder: knitr

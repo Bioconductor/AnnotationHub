@@ -16,10 +16,10 @@ importFrom(BiocInstaller, biocVersion)
 
 import(S4Vectors)
 
-exportClasses(AnnotationHub, AnnotationHubMetadata) 
+exportClasses(AnnotationHub) 
 
 export(AnnotationHub, cache, "cache<-", display, hubUrl, hubCache,
-    hubOption, setHubOption, possibleDates, mcols, AnnotationHubMetadata)
+    hubOption, setHubOption, possibleDates, mcols)
 
 S3method(.DollarNames, AnnotationHub)
 
