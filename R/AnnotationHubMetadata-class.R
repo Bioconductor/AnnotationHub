@@ -245,6 +245,24 @@ expectedSourceTypes <- c("BED file",
   }
 }
 
+
+.checkForAValidTaxonomyId <- function(taxId){
+## TODO: precompute the list of valid tax Ids
+if (!exists("speciesMap")) 
+         data(speciesMap, package = "AnnotationHubData")
+validTaxIds <- unique(speciesMap$taxon)
+if(!(taxId %in% validTaxIds)){
+      stop(wmsg(paste0("The taxonomy Id you have provided (",taxId,")",
+                       " is not in our list of valid Tax Ids.",
+                       ". Please check to make sure that your tax ID",
+                       " is really legitimate and if so, then please tell",
+                       " us about it so that we can update our list."))) 
+  }
+}
+    
+
+
+
 setValidity("AnnotationHubMetadata",function(object) {
     msg = NULL
     ## no spaces are allowed int he RDataPath field
@@ -268,4 +286,5 @@ setValidity("AnnotationHubMetadata",function(object) {
     .checkThatGenomeLooksReasonable(object@Genome)
     .checkRdataclassIsReal(object@RDataClass)
     .checkThatSourceTypeSoundsReasonable(object@SourceType)
+ ##   .checkForAValidTaxonomyId(object@TaxonomyId)
 })
