@@ -152,14 +152,15 @@
     .query_as_data.frame(x, query)[[1]]
 }
 
-.join_resource_column <- function(x, table, name)
+.join_resource_columns <- function(x, table, names)
 {
+    names <- paste(names, collapse=", ")
     query <- sprintf(
         "SELECT ah_id, %s FROM resources, %s
          WHERE resources.id IN (%s)
          AND %s.resource_id == resources.id",
-        name, table, .id_as_single_string(x), table)
-    .query_as_data.frame(x, query)[[name]]
+        names, table, .id_as_single_string(x), table)
+    .query_as_data.frame(x, query)
 }
 
 .datapath <- function(x)
