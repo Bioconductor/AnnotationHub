@@ -73,6 +73,15 @@ setMethod(".get1", "GRangesResource",
     callNextMethod(x, ...)
 })
 
+setClass("zipResource", contains="RdaResource")
+
+setMethod(".get1", "zipResource",
+    function(x, ...)
+{
+    chea <- cache(.hub(x))
+    .gunzip(chea, tempfile())
+})
+
 setClass("VCFResource", contains="RdaResource")
 
 setMethod(".get1", "VCFResource",
