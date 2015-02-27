@@ -30,6 +30,16 @@ describing your new R resources for the AnnotationHub.  And the 2nd
 function is for describing how to take these online resources and
 transform them into an R object that is useful to end users.
 
+## Setup
+
+It should go without saying that this vignette is intended for users who are comfortable with R.  And in order to follow the instuctions in this vignette, you will need to install the AnnotationHubData package.  This package is not meant to be used by most people, and in fact it's not really intended to be anything other than a support package. So it's not exposed via biocLite(). So to get it you will need to use svn to check it out from the following location:
+
+```{}
+https://hedgehog.fhcrc.org/bioconductor/trunk/madman/Rpacks/AnnotationHubData
+```
+
+Once you have that checked out, you will need to use R CMD INSTALL to install the package from source.
+
 ## Introducing AnnotationHubMetadata Objects
 
 The AnnotationHubData package is a complementary package to
