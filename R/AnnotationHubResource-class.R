@@ -143,18 +143,6 @@ setMethod(".get1", "SQLiteFileResource",
     AnnotationDbi::loadDb(cache(.hub(x)))
 })
 
-
-setClass("importBioPax", contains="AnnotationHubResource") 
-
-setMethod(".get1", "SQLiteFileResource",
-    function(x, ...)
-{
-    er <- cache(.hub(x))
-    .require("rBiopaxParser")
-    rBiopaxParser::readBiopax(er)
-})
-
-
 ## GRASP2 SQLiteFile
 
 setClass("GRASPResource", contains="SQLiteFileResource")
