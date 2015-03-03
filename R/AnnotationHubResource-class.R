@@ -120,9 +120,9 @@ setClass("dbSNPVCFFileResource", contains="AnnotationHubResource")
 setMethod(".get1", "dbSNPVCFFileResource",
     function(x, ...)      
 {
-      er <- cache(.hub(x))
-      .require("VariantAnnotation")
-      VariantAnnotation::VcfFile(file=er[1],index=er[2])      
+    .require("VariantAnnotation")
+    er <- cache(.hub(x))
+    VariantAnnotation::VcfFile(file=er[1],index=er[2])      
 })
 ## SQLiteFile
 
@@ -153,7 +153,7 @@ setMethod(".get1", "ZipResource",
     zip <- cache(.hub(x))
     for (fl in filenames)
         unzip(zip, fl, exdir=tempdir())
-    file.path(tempdir, filenames)
+    file.path(tempdir(), filenames)
 })
 
 setClass("ChEAResource", contains="ZipResource")
@@ -162,7 +162,7 @@ setMethod(".get1", "ChEAResource",
     function(x, ...)
 {
     fl <- callNextMethod(x, filenames="chea-background.csv")
-    read.csv(fl, header=TRUE)
+    read.csv(fl, header=FALSE, stringsAsFactors=FALSE)
 }) 
 
 setClass("BioPaxResource", contains="AnnotationHubResource")
@@ -170,18 +170,18 @@ setClass("BioPaxResource", contains="AnnotationHubResource")
 setMethod(".get1", "BioPaxResource",
     function(x, ...)
 {
-    er <- cache(.hub(x))
     .require("rBiopaxParser")
+    er <- cache(.hub(x))
     rBiopaxParser::readBiopax(er)
 })
  
-setClass("CSVResource", contains="AnnotationHubResource")
+setClass("PazarResource", contains="AnnotationHubResource")
 
-setMethod(".get1", "CSVResource",
+setMethod(".get1", "PazarResource",
     function(x, ...)
 {
     er <- cache(.hub(x))
-    read.csv(er, header=TRUE )
+    read.delim(er, header=FALSE, stringsAsFactors=FALSE)
 
 })
  
