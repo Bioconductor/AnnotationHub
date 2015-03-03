@@ -73,15 +73,6 @@ setMethod(".get1", "GRangesResource",
     callNextMethod(x, ...)
 })
 
-setClass("zipResource", contains="RdaResource")
-
-setMethod(".get1", "zipResource",
-    function(x, ...)
-{
-    chea <- cache(.hub(x))
-    .gunzip(chea, tempfile())
-})
-
 setClass("VCFResource", contains="RdaResource")
 
 setMethod(".get1", "VCFResource",
@@ -152,4 +143,46 @@ setMethod(".get1", "GRASPResource",
 {
     RSQLite::dbConnect(RSQLite::SQLite(), cache(.hub(x)),
         flags=RSQLite::SQLITE_RO)
+})
+
+setClass("ZipResource", contains="AnnotationHubResource")
+
+setMethod(".get1", "ZipResource",
+    function(x, filenames, ...)
+{
+    zip <- cache(.hub(x))
+    for (fl in filenames)
+        unzip(zip, fl, exdir=tempdir())
+    file.path(tempdir, filenames)
+})
+
+setClass("ChEAResource", contains="ZipResource")
+
+setMethod(".get1", "ChEAResource",
+    function(x, ...)
+{
+    fl <- callNextMethod(x, filenames="chea-background.csv")
+    read.csv(fl, header=TRUE)
 }) 
+
+setClass("BioPaxResource", contains="AnnotationHubResource")
+
+setMethod(".get1", "BioPaxResource",
+    function(x, ...)
+{
+    er <- cache(.hub(x))
+    .require("rBiopaxParser")
+    rBiopaxParser::readBiopax(er)
+})
+ 
+setClass("CSVResource", contains="AnnotationHubResource")
+
+setMethod(".get1", "CSVResource",
+    function(x, ...)
+{
+    er <- cache(.hub(x))
+    read.csv(er, header=TRUE )
+
+})
+ 
+ 

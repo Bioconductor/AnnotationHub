@@ -21,7 +21,7 @@ License: Artistic-2.0
 Imports: utils, methods, RSQLite, BiocInstaller, BiocGenerics,
     S4Vectors, interactiveDisplayBase, httr, AnnotationDbi
 Suggests: GenomicRanges, VariantAnnotation, Rsamtools, rtracklayer,
-    GenomeInfoDb, BiocStyle, knitr, AnnotationForge
+    GenomeInfoDb, BiocStyle, knitr, AnnotationForge, rBiopaxParser
 Collate: AnnotationHub-class.R  AnnotationHubResource-class.R 
     utilities.R option.R sql.R hub.R cache.R display.R zzz.R
 VignetteBuilder: knitr
