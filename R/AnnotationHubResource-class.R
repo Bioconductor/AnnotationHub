@@ -190,7 +190,8 @@ setMethod(".get1", "PazarResource",
         "EnsemblGeneAccession", "Chr", "GeneStart", "GeneEnd", "Species", 
 	"ProjectName","PMID", "AnalysisMethod"))
     dat <- dat[, -12]  # collumn contains only NA
-    makeGRangesFromDataFrame(dat, keep.extra.columns=TRUE)
+    gr <- makeGRangesFromDataFrame(dat, keep.extra.columns=TRUE)
+    sortSeqlevels(gr)
 })
  
  
