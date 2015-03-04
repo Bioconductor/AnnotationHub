@@ -162,7 +162,10 @@ setMethod(".get1", "ChEAResource",
     function(x, ...)
 {
     fl <- callNextMethod(x, filenames="chea-background.csv")
-    read.csv(fl, header=FALSE, stringsAsFactors=FALSE)
+    read.csv(fl, header=FALSE, stringsAsFactors=FALSE, 
+        col.names=c("s.no","TranscriptionFactor", "TranscriptionFactor-PubmedID", 
+        "TranscriptionFactorTarget", "PubmedID", "Experiment", "CellType",
+        "Species","DateAdded"))
 }) 
 
 setClass("BioPaxResource", contains="AnnotationHubResource")
@@ -180,9 +183,14 @@ setClass("PazarResource", contains="AnnotationHubResource")
 setMethod(".get1", "PazarResource",
     function(x, ...)
 {
+    .require("GenomicRanges")
     er <- cache(.hub(x))
-    read.delim(er, header=FALSE, stringsAsFactors=FALSE)
-
+    dat <- read.delim(er, header=FALSE, stringsAsFactors=FALSE,
+        col.names=c("PazarTFID","EnsemblTFAccession", "TFName", "PazarGeneID",
+        "EnsemblGeneAccession", "Chr", "GeneStart", "GeneEnd", "Species", 
+	"ProjectName","PMID", "AnalysisMethod"))
+    dat <- dat[, -12]  # collumn contains only NA
+    makeGRangesFromDataFrame(dat, keep.extra.columns=TRUE)
 })
  
  
