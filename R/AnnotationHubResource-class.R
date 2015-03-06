@@ -109,11 +109,33 @@ setClass("EpigenomeRoadmapFileResource", contains="AnnotationHubResource")
 setMethod(".get1", "EpigenomeRoadmapFileResource",
     function(x, ...)      
 {
+    .require("rtracklayer") 
     er <- cache(.hub(x))
     rtracklayer::import(er, format="bed", 
         extraCols=c(signalValue="numeric", pValue="numeric", qValue="numeric", 
         peak="numeric"))
 })
+
+setClass("GTFFileResource", contains="AnnotationHubResource")
+
+setMethod(".get1", "GTFFileResource",
+    function(x, ...)
+{
+    .require("rtracklayer")
+    er <- cache(.hub(x))
+    rtracklayer::import(er, format="gtf")
+})
+
+setClass("BigWigFileResource", contains="AnnotationHubResource")
+
+setMethod(".get1", "BigWigFileResource",
+    function(x, ...)
+{
+    .require("rtracklayer")
+    er <- cache(.hub(x))
+    rtracklayer::BigWigFile(er)  
+})
+
 
 setClass("dbSNPVCFFileResource", contains="AnnotationHubResource")
 
@@ -168,14 +190,13 @@ setMethod(".get1", "ChEAResource",
         "Species","DateAdded"))
 }) 
 
-setClass("BioPaxResource", contains="AnnotationHubResource")
+setClass("BioPaxResource", contains="RdaResource")
 
 setMethod(".get1", "BioPaxResource",
     function(x, ...)
 {
     .require("rBiopaxParser")
-    er <- cache(.hub(x))
-    rBiopaxParser::readBiopax(er)
+    callNextMethod(x, ...)
 })
  
 setClass("PazarResource", contains="AnnotationHubResource")
@@ -194,4 +215,18 @@ setMethod(".get1", "PazarResource",
     sortSeqlevels(gr)
 })
  
- 
+
+setClass("CSVtoGrangesResource", contains="AnnotationHubResource")
+
+setMethod(".get1", "CSVtoGrangesResource",
+   function(x, ...)
+{
+    .require("GenomicRanges")
+    er <- cache(.hub(x))
+    dat <- read.csv(er, header=TRUE, stringsAsFactors=FALSE)
+    dat <- dat[,!(names(dat) %in% "width")]
+    gr <- makeGRangesFromDataFrame(dat, keep.extra.columns=TRUE)
+    sortSeqlevels(gr)
+})
+
+
