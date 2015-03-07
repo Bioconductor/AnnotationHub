@@ -104,18 +104,6 @@ setMethod(".get1", "TwoBitFileResource",
     rtracklayer::TwoBitFile(bit)
 })
 
-setClass("EpigenomeRoadmapFileResource", contains="AnnotationHubResource")
-
-setMethod(".get1", "EpigenomeRoadmapFileResource",
-    function(x, ...)      
-{
-    .require("rtracklayer") 
-    er <- cache(.hub(x))
-    rtracklayer::import(er, format="bed", 
-        extraCols=c(signalValue="numeric", pValue="numeric", qValue="numeric", 
-        peak="numeric"))
-})
-
 setClass("GTFFileResource", contains="AnnotationHubResource")
 
 setMethod(".get1", "GTFFileResource",
@@ -135,7 +123,6 @@ setMethod(".get1", "BigWigFileResource",
     er <- cache(.hub(x))
     rtracklayer::BigWigFile(er)  
 })
-
 
 setClass("dbSNPVCFFileResource", contains="AnnotationHubResource")
 
@@ -211,8 +198,12 @@ setMethod(".get1", "PazarResource",
         "EnsemblGeneAccession", "Chr", "GeneStart", "GeneEnd", "Species", 
 	"ProjectName","PMID", "AnalysisMethod"))
     dat <- dat[, -12]  # collumn contains only NA
-    gr <- makeGRangesFromDataFrame(dat, keep.extra.columns=TRUE)
-    sortSeqlevels(gr)
+    classes <- c(class(dat[,5]), class(dat[,6]) , class(dat[,7]))
+    if(identical("numeric", unique(classes))) {
+    	dat <- makeGRangesFromDataFrame(dat, keep.extra.columns=TRUE)
+        dat <- sortSeqlevels(dat)
+    } 
+    dat
 })
  
 
