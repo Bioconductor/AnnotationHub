@@ -5,9 +5,12 @@ setClass("BEDFileResource", contains="AnnotationHubResource")
 setMethod(".get1", "BEDFileResource",
     function(x, extraCols, ...)
 {
-    .require(rtracklayer)
+    .require("rtracklayer")
     dat <- cache(.hub(x))
-    rtracklyer::import(dat, format="bed", extraCols=extraCols)
+    if(length(extraCols)!=0)
+        rtracklayer::import(dat, format="bed", extraCols=extraCols)
+    else
+        rtracklayer::import(dat, format="bed")
 })
 
 
@@ -16,8 +19,7 @@ setClass("UCSCBroadPeakResource", contains="BEDFileResource")
 setMethod(".get1", "UCSCBroadPeakResource",
     function(x, ...)
 {
-    broadPeaksmcols <- c(name="character", score="integer",
-        strand="character", signalValue="numeric",
+    broadPeaksmcols <- c(signalValue="numeric",
         pValue="numeric", qValue="numeric") 
     fl <- callNextMethod(x, extraCols="broadPeaksmcols")
 })
@@ -27,8 +29,7 @@ setClass("UCSCNarrowPeakResource", contains="BEDFileResource")
 setMethod(".get1", "UCSCNarrowPeakResource",
     function(x, ...)
 {
-    narrowPeaksmcols <- c(name="character", score="integer",
-        strand="character",
+    narrowPeaksmcols <- c(
         signalValue="numeric", pValue="numeric",
         qValue="numeric", peak="numeric") 
     fl <- callNextMethod(x, extraCols=narrowPeaksmcols)
@@ -45,7 +46,7 @@ setMethod(".get1", "UCSCBedRnaElementsResource",
     fl <- callNextMethod(x, extraCols=narrowPeaksmcols)
 })
 
-setClass("HaemcodeBedResource", contains="BEDFileResource")
+setClass("SimpleBedResource", contains="BEDFileResource")
 
 setMethod(".get1", "HaemcodeBedResource",
     function(x, ...)
