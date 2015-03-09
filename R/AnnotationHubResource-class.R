@@ -198,11 +198,10 @@ setMethod(".get1", "PazarResource",
         "EnsemblGeneAccession", "Chr", "GeneStart", "GeneEnd", "Species", 
 	"ProjectName","PMID", "AnalysisMethod"))
     dat <- dat[, -12]  # collumn contains only NA
-    classes <- c(class(dat[,5]), class(dat[,6]) , class(dat[,7]))
-    if(identical("numeric", unique(classes))) {
-    	dat <- makeGRangesFromDataFrame(dat, keep.extra.columns=TRUE)
-        dat <- sortSeqlevels(dat)
-    } 
+    tryCatch({
+        dat <- makeGRangesFromDataFrame(dat, keep.extra.columns=TRUE)
+    }, error=function(err){
+    })
     dat
 })
  
@@ -216,8 +215,7 @@ setMethod(".get1", "CSVtoGrangesResource",
     er <- cache(.hub(x))
     dat <- read.csv(er, header=TRUE, stringsAsFactors=FALSE)
     dat <- dat[,!(names(dat) %in% "width")]
-    gr <- makeGRangesFromDataFrame(dat, keep.extra.columns=TRUE)
-    sortSeqlevels(gr)
+    makeGRangesFromDataFrame(dat, keep.extra.columns=TRUE)
 })
 
 
