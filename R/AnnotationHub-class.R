@@ -42,6 +42,21 @@ AnnotationHub <-
     })    
 }
 
+.createViewIfneeded <- function(con){
+    ## Create a view for dlyr folks (can remove stuff here as needed)
+    sql <- paste0("CREATE VIEW IF NOT EXISTS AllCoreData AS SELECT",
+                  " ah_id,title,dataprovider,species,taxonomyid,genome,",
+                  "description,coordinate_1_based,maintainer,status_id,",
+                  "location_prefix_id,recipe_id,rdatadateadded,",
+                  "rdatadateremoved,record_id,preparerclass,rdatapath,",
+                  "dispatchclass,sourcesize,sourceurl,sourceversion,",
+                  "sourcemd5,sourcelastmodifieddate,rdp.resource_id,",
+                  "sourcetype FROM resources AS res, rdatapaths AS rdp, ",
+                  "input_sources AS ins WHERE res.id = rdp.resource_id ",
+                  "AND res.id = ins.resource_id ") 
+    dbGetQuery(con, sql)
+}
+
 ## Helper to make the metadata DB connection
 .getDbConn <- function(db_path, hub){    
     if(!file.exists(db_path)){ .getMetadataDb(db_path, hub) }
@@ -64,6 +79,9 @@ AnnotationHub <-
         ## New DB?  So make sure the new one is valid as well.
         .checkDBIsValid(.db_connection)
     }
+    ## if we need to, then make a view for dplyr folks
+    .createViewIfneeded(.db_connection)
+    
     ## always return a good connection
     .db_connection
 }
