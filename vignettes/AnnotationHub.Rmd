@@ -39,53 +39,70 @@ ah = AnnotationHub()
 Now at this point you have already done everything you need in order
 to start retrieving annotations.  For most operations, using the
 `AnnotationHub` object should feel a lot like working with a familiar
-`list` or `data.frame`. For example you can simply retrieve the data
-from the first record in the hub by doing the following:
+`list` or `data.frame`. 
 
-```{r subset2}
-res <- ah[[1]]
-res
-```
-
-This retrieves the first row of the `AnnotationHub` object and copies
-it into the local variable `res`.  The object is retrieved from the
-AnnotationHub server. The object is also cache locally, so that the
-next time you need to retrieve it, it should download much more
-quickly.
-
-Now if you look at the `AnnotationHub` again, you will notice that it
-also looks a lot like a `data.frame` object.  This is intentional as
-the data displayed represents metadata that can be used to choose
-which item you want to retrieve.
+Lets take a minute to look at the show method for the hub object ah 
 
 ```{r show}
 ah
 ```
 
-By default the show method will only display the first 3 rows of
-records.  There are already thousands of records present in the hub.
+From a first glance, you can see that it gives you an idea about the
+different types of data that is present inside the hub. You can see 
+where the data is coming from 
+
+```{r dataprovider}
+unique(ah$dataprovider)
+```
+
+You can also see data from different species inside the hub using 
+
+```{r species}
+head(unique(ah$species))
+```
+Now lets try getting the Chain Files from UCSC using the query and subset
+ methods to selectively pare down the hub based on specific criteria. 
+The query method lets you search rows for
+specific strings, returning an `AnnotationHub` instance with just the
+rows matching the query.
+
+```{r chain1}
+chain <- query(ah, "ChainFile")
+chain
+```
+From the show method, one can easily see that the dataprovider now contains
+only UCSC and rdataclass has only ChainFile
+
+One can further subset to get the chain files from Drosophila melanogaster
+
+```{r dm1}
+dm <- query(chain, "Drosophila melanogaster")
+dm
+```
+Query has worked and you can now see that the only species present is 
+Drosophila melanogaster. 
+ 
+The metadata underlying this hub object can be retrieved by you 
+
+```{r show2}
+df <- mcols(dm)
+```
+
+By default the show method will only display the first 5 and last 5  rows.
+There are already thousands of records present in the hub.
 
 ```{r length}
 length(ah)
 ```
-
-Use the query and subset methods to selectively pare down the hub
-based on specific criteria. The query method lets you search rows for
-specific strings, returning an `AnnotationHub` instance with just the
-rows matching the query.
-
-```{r query}
-ahs <- query(ah, 'inparanoid8')
-length(ahs)
-```
-
-Similarly, subset lets use a more specific criteria from the object to
-return a smaller base object (here we are finding cases where the
-genome column is set to panda).
+Lets look at another example, where we pull down only Inparanoid8 data 
+from the hub and use  subset to return a smaller base object (here we
+ are finding cases where the genome column is set to panda).
 
 ```{r subset}
+ahs <- query(ah, 'inparanoid8')
+ahs
 ahs <- subset(ah, ah$genome=='ailMel1')
-length(ahs)
+ahs
 ```
 
 We can also look at the `AnnotationHub` object in a browser using the
@@ -110,19 +127,21 @@ which filters the `AnnotationHub` object.
 
 ## Using `AnnotationHub` to retrieve data
 
-So now that we have our `AnnotationHub` object configured to expose
-only the data for humans how would we go about getting that data
-downloaded?  As mentioned above, we can use the `[[]]` operator to
-pull down records of interest on our new smaller `AnnotationHub`
-object
+Looking back at our chain file example, if we are interested in the file 
+dm1ToDm2.over.chain.gz, we can gets its metadata using
 
-```{r subset2-2, eval=FALSE}
-res <- d[[1]]
+```{r dm2}
+dm
+dm["AH15146"]
 ```
+We can download the file using
 
-And once you have done this, you can look at the object stored in res
-and use it etc..  Any dependencies that you need to use this kind of
-object should have automatically tried to load at this time.
+```{r dm3}
+dm[["AH15146"]]
+```
+Each file is retrieved from the AnnotationHub server and the file is
+also cache locally, so that the next time you need to retrieve it,
+it should download much more quickly.
 
 ## Configuring `AnnotationHub` objects
 

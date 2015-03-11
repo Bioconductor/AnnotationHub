@@ -218,27 +218,34 @@ possibleDates(x)
   ## how many resources?
   length(ah)
 
-  ## what are the names for these resources?
-  head(names(ah))
+  ## from which resources, is data available?
+  unique(ah$dataprovider)
+
+  ## from which species, is data available ? 
+  head(unique(ah$species)) 
 
   ## what web service and local cache does this AnnotationHub point to?
   hubUrl(ah)
   hubCache(ah)
 
+  ### Examples ###
+  ### HOW TO : get Inparanoid  data wrt ailMel1
   ## query and subset
   ahs <- query(ah, 'inparanoid8') 
   ahs <- subset(ah, ah$genome=='ailMel1')
+
+  ## We can get the metadata for the file 
+  ahs[1]
 
   ## We can extract a result by name like this (using a list semantic):
   res <- ahs[[1]]
   ## And we can also extract it by the names like this:
   res <- ahs[["AH6298"]]
-
+   
   ## And we can also use "[" to restrict the things that are in the
   ## AnnotationHub object (by position, character, or logical vector).
   ## Here is a demo of position:
   subHub <- ah[1:3]
-
 
   if(interactive()) {
     ## Display method involves user interaction through web interface
