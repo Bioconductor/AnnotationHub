@@ -35,14 +35,17 @@
          AND biocversions.resource_id == resources.id',
         biocVersion())
     biocIds <- dbGetQuery(conn, query)[[1]]
-    
-    ## Then get only ids that are appropriate for the date (date filter)
+
+    ## Then filter so we get the most recent dates after grouping by record_id
     query <- sprintf(
         'SELECT id FROM 
          (SELECT * FROM resources where rdatadateadded <= "%s")
-         GROUP BY title',
-        date)    
+         GROUP BY record_id ORDER BY rdatadateadded ASC',
+        date)        
     dateFilterIds <- dbGetQuery(conn, query)[[1]]
+    
+    ## Third filter so that rdatadateremoved (where that is not null)
+    
     
     ## Then get the intersection
     allIds <- intersect(biocIds, dateFilterIds)
