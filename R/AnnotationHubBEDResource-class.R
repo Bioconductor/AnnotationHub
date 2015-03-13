@@ -44,6 +44,16 @@ setMethod(".get1", "UCSCBEDRnaElementsResource",
     callNextMethod(x, extraCols=mcols)
 })
 
+setClass("UCSCGappedPeakResource", contains="BEDFileResource")
+
+setMethod(".get1", "UCSCGappedPeakResource",
+    function(x, ...)
+{
+    gappedPeakmcols <- c(signalValue="numeric",
+        pValue="numeric", qValue="numeric")
+    callNextMethod(x, extraCols=gappedPeakmcols)    
+})
+
 setClass("EpigenomeRoadmapFileResource", contains="AnnotationHubResource")
 
 setMethod(".get1", "EpigenomeRoadmapFileResource",

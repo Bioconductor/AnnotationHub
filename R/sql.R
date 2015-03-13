@@ -45,11 +45,15 @@
     dateFilterIds <- dbGetQuery(conn, query)[[1]]
     
     ## Third filter so that rdatadateremoved (where that is not null)
-    
+     query <- sprintf(
+         'SELECT id from resources  WHERE rdatadateremoved <= "%s"', date) 
+     removeIds <- dbGetQuery(conn, query)[[1]]
     
     ## Then get the intersection
     allIds <- intersect(biocIds, dateFilterIds)
     
+    allIds <- setdiff(allIds,removeIds) 
+
     ## Then match back to the AHIDs
     .getAHNamesForId(conn, allIds)
 }
