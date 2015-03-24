@@ -1,21 +1,13 @@
 .display <- function(object, ...) { 
     #metadata- do not touch
-    md <- .resource_table(object)
+    md <- mcols(object)
         
     #create a data frame copy for edits called df
     df <- as.data.frame(md)
-    
-    #Adding a unique identifier
-    Id <- seq_len(nrow(df))
-    df <- cbind(Id, df)
-    
+        
     #dropping column names
-    drops <-c("Title", "TaxonomyId")
+    drops <-c("title", "taxonomyid", "sourceurl")
     df <- df[,!(names(df) %in% drops), drop=FALSE]
-    
-    #Truncating extra large columns
-#     df[["Tags"]] <- substr(df[["Tags"]], 1, 10)
-#     df[["RDataPath"]] <- substr(df[["RDataPath"]], 1, 10)
     
     summaryMessage = capture.output(show(object))
     serverOptions= list(
@@ -24,26 +16,10 @@
         iDisplayLength = 1000,
         "sDom" = '<"top"i>rt<"top"f>lt<"bottom"p><"clear">')
         
-        
     d <- display(object =df, summaryMessage = summaryMessage, 
                  serverOptions = serverOptions)
-
-    idx <- gsub(" ","",as.vector(d[,'Id']))
-
-#     ## trap the initial rownames like this:
-#     finalMd <- data.frame(md, db_uid= rownames(md))
-#     ## remove rownames from finalMd
-#     rownames(finalMd) <- NULL
-#     ## now subset out the rows and then modify the object
-#     finalMd <- finalMd[idx,]
-#     .db_uid(object) <- as.integer(as.character(finalMd[,'db_uid']))
-
-#     new_db_uid <- as.integer(idx)
-#     names(new_db_uid) <- rownames(md)[as.integer(idx)]
-#     .db_uid(object) <- rownames(md)[as.integer(idx)]
-
-    .db_uid(object) <- .db_uid(object)[as.integer(idx)]
-    object
+    idx <- rownames(d)
+    object[idx]
 }
 
 setMethod("display", signature(object="AnnotationHub"),
