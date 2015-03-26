@@ -218,4 +218,11 @@ setMethod(".get1", "CSVtoGrangesResource",
     makeGRangesFromDataFrame(dat, keep.extra.columns=TRUE)
 })
 
+setClass("ExpressionSetResource", contains="RdaResource")
 
+setMethod(".get1", "ExpressionSetResource",
+    function(x, ...)
+{
+    .require("Biobase")
+    callNextMethod(x, ...)
+})
