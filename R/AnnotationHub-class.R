@@ -439,7 +439,7 @@ setMethod("[[", c("AnnotationHub", "character", "missing"),
     function(object)
 {
     .some <-
-        function(elt, nh, nt, fill="...", width=getOption("width") - 11L)
+        function(elt, nh, nt, fill="...", width=getOption("width") - 13L)
     {
         answer <- if (length(elt) < nh + nt + 1L)
             elt
