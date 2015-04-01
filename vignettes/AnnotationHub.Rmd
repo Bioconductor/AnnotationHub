@@ -47,21 +47,30 @@ Lets take a minute to look at the show method for the hub object ah
 ah
 ```
 
-From a first glance, you can see that it gives you an idea about the
-different types of data that is present inside the hub. You can see 
-where the data is coming from 
+You can see that it gives you an idea about the different types of data that are present inside the hub. You can see where the data is coming from (dataprovider), as well as what species have samples present (species), what kinds of R data objects could be returned (rdataclass).  We can take a closer look at all the kinds of data providers that are available by simply looking at the contents of dataprovider as if it were the column of a data.frame object like this:
 
 ```{r dataprovider}
 unique(ah$dataprovider)
 ```
 
-You can also see data from different species inside the hub using 
+In the same way, you can also see data from different species inside the hub by looking at the contents of species like this: 
 
 ```{r species}
 head(unique(ah$species))
 ```
-Now lets try getting the Chain Files from UCSC using the query and subset
- methods to selectively pare down the hub based on specific criteria. 
+
+And this will also work for any of the other types of metadata present.  You can learn which kinds of metadata are available by simply hitting the tab key after you type 'ah$'.  In this way you can explore for yourself what kinds of data are present in the hub right from the command line. This interface also allows you to access the hub programatically to extract data that matches a particular set of criteria.
+
+Another valuable types of metadata to pay attention to is the rdataclass.
+
+```{r rdataclass}
+head(unique(ah$rdataclass))
+```
+
+The rdataclass allows you to see which kinds of R objects the hub will return to you.  This kind of information is valuable both as a means to filter results and also as a means to explore and learn about some of the kinds of annotation objects that are widely available for the project.  Right now this is a pretty short list, but over time it should grow as we support more of the different kinds of annotation objects via the hub.
+
+
+Now lets try getting the Chain Files from UCSC using the query and subset methods to selectively pare down the hub based on specific criteria. 
 The query method lets you search rows for
 specific strings, returning an `AnnotationHub` instance with just the
 rows matching the query.
