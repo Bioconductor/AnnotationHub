@@ -107,8 +107,8 @@ ahs
 
 We can also look at the `AnnotationHub` object in a browser using the
 `display()` function. We can then filter the `AnnotationHub` object
-for _Homo sapiens_ by either using the Global search field on the top
-right corner of the page or the in-column search field for `Species'.
+for _chainFile__ by either using the Global search field on the top
+right corner of the page or the in-column search field for `rdataclass'.
 
 ```{r display, eval=FALSE}
 d <- display(ah)
@@ -119,11 +119,12 @@ Displaying and filtering the Annotation Hub object in a browser
 
 By default 1000 entries are displayed per page, we can change this using
 the filter on the top of the page or navigate through different pages
-using the page scrolling feature at the bottom of the page.
+using the page scrolling feature at the bottom of the page. 
 
 We can also select the rows of interest to us and send them back to
-the R session using 'Send Rows' button ; this sets a filter internally
-which filters the `AnnotationHub` object.
+the R session using 'Return rows to R session' button ; this sets a filter 
+internally which filters the `AnnotationHub` object. The AHID'S selected 
+are displayed at the top of the page. 
 
 ## Using `AnnotationHub` to retrieve data
 
