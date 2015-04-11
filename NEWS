@@ -1,0 +1,44 @@
+        **************************************************
+        *                                                *
+        *               2.0.x SERIES NEWS                *
+        *                                                *
+        **************************************************
+
+
+NEW FEATURES and API changes
+
+    o AnnotationHub is all new.  We basically rewrote the entire thing.
+
+    o The back end is new (new database, new way of tracking/routing
+    data etc.)
+
+    o The front end is new (new AnntoationHub object, new methods, new
+    behaviors, new ways of finding and downloading data)
+
+    o The metadata has also been cleaned up and made more
+    consistent/searchable 
+
+    o The recipes that are used to populate these data have also been
+    cleaned up.  
+
+    o There is also a new vignette to explain how to use the new
+    AnnotationHub in detail 
+
+
+Improvements since last time:
+
+    o The old way of finding data (an enormous tree of paths), was not
+    really scalable to the amount of data we have to provide access
+    to.  So we junked it.  Now you have a number of better methods to
+    allow you to search for terms instead.
+
+    o The new hub interface can be searched using a new display
+    method, but it can *also* be searched entirely from the command
+    line.  This allows you to use it in examples and scripts in a way
+    that is friendlier for reproducible research.
+    
+    o For users who want to contribute valuable new annotation
+    resources to the AnnotationHub, it is now possible to write a
+    recipe and test that it works for yourself.  Then once you are
+    happy with it, you can contact us and we can add data to the
+    AnnotationHub.
