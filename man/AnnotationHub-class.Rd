@@ -234,6 +234,10 @@ possibleDates(x)
   ahs <- query(ah, 'inparanoid8') 
   ahs <- subset(ah, ah$genome=='ailMel1')
 
+  ## One can also serach the hub for multiple strings 
+  query(ah, c("GTF", "Ensembl", "Homo sapiens"))
+
+
   ## We can get the metadata for the file 
   ahs[1]
 

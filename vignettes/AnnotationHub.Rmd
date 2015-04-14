@@ -75,17 +75,13 @@ The query method lets you search rows for
 specific strings, returning an `AnnotationHub` instance with just the
 rows matching the query.
 
-```{r chain1}
-chain <- query(ah, "ChainFile")
-chain
-```
-From the show method, one can easily see that the dataprovider now contains
-only UCSC and rdataclass has only ChainFile
+From the show method, one can easily see that one of the dataprovider is
+UCSC and there is a rdataclass for ChainFile
 
-One can further subset to get the chain files from Drosophila melanogaster
+One can get chain files for Drosophila melanogaster from UCSC with:
 
 ```{r dm1}
-dm <- query(chain, "Drosophila melanogaster")
+dm <- query(ah, c("ChainFile", "UCSC", "Drosophila melanogaster"))
 dm
 ```
 Query has worked and you can now see that the only species present is 
@@ -108,9 +104,7 @@ from the hub and use  subset to return a smaller base object (here we
  are finding cases where the genome column is set to panda).
 
 ```{r subset}
-ahs <- query(ah, 'inparanoid8')
-ahs
-ahs <- subset(ah, ah$genome=='ailMel1')
+ahs <- query(ah, c('inparanoid8', 'ailMel1'))
 ahs
 ```
 
