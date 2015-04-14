@@ -321,27 +321,16 @@ setGeneric("query", function(x, pattern, ...) standardGeneric("query"),
 setMethod("query", "AnnotationHub",
     function(x, pattern, ...)
 {
-    tbl <- .resource_table(x)
-    idx0 <- Reduce(`|`,
-                   Map(grepl, x=tbl, MoreArgs=list(pattern=pattern, ...)))
+    tbl <- mcols(x)
+    idx <- rep(TRUE, nrow(tbl))
+    for (pat in pattern) {
+        idx0 <- logical(nrow(tbl))
+        for (column in names(tbl))   # '|' across columns
+            idx0 <- idx0 | grepl(pat, tbl[[column]])
+        idx <- idx & idx0            # '&' for each element of pattern
+    }
 
-    ## now check the many to one values:
-    tags <- .tags(x)
-    idx1 <- rownames(tbl) %in% unique(tags$id[grepl(pattern, tags$tag)])
-
-    rdataclass <- .rdataclass(x)
-    idx2 <- rownames(tbl) %in%
-               unique(rdataclass$id[grepl(pattern, rdataclass$rdataclass)])
-
-    sourceurl <- .sourceurl(x)
-    idx3 <- rownames(tbl) %in%
-               unique(sourceurl$id[grepl(pattern, sourceurl$sourceurl)])
-
-    sourcetype <- .sourcetype(x)
-    idx4 <- rownames(tbl) %in%
-               unique(sourcetype$id[grepl(pattern, sourcetype$sourcetype)])
-        
-    x[idx0 | idx1 | idx2 | idx3 | idx4]
+    x[idx]
 })
 
 ## Test: ahs <- query(ah, 'ChainFile')
