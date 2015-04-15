@@ -338,33 +338,14 @@ setMethod("query", "AnnotationHub",
 
 ## Test: ahs <- query(ah, 'ChainFile')
 
-.subset <- function(x, resource_table, tags, ...){
-    resourcesIdx <- S4Vectors:::evalqForSubset(resource_table,
-                                               .resource_table(x), ...)
-    ## now check the many to one values:
-    tbl <- .tags(x)
-    tagsIdx <- as.integer(.db_uid(x)) %in% 
-                  tbl$id[S4Vectors:::evalqForSubset(tags, tbl)]
-
-    tbl <- .rdataclass(x)
-    rdataclassIdx <- as.integer(.db_uid(x)) %in% 
-                        tbl$id[S4Vectors:::evalqForSubset(tags, tbl)]
-
-    tbl <- .sourceurl(x)
-    sourceurlIdx <- as.integer(.db_uid(x)) %in% 
-                       tbl$id[S4Vectors:::evalqForSubset(tags, tbl)]
-
-    tbl <- .sourcetype(x)
-    sourcetypeIdx <- as.integer(.db_uid(x)) %in% 
-                    tbl$id[S4Vectors:::evalqForSubset(tags, tbl)]
-
-    x[resourcesIdx & tagsIdx & rdataclassIdx & sourceurlIdx & sourcetypeIdx]
-#    x[resourcesIdx & tagsIdx]
-}
 setMethod("subset", "AnnotationHub",
-          function(x, resource_table, tags, ...){
-              .subset(x, resource_table, tags, ...)}
-)
+    function(x, subset)
+{
+    tbl <- mcols(x)
+    idx <- S4Vectors:::evalqForSubset(subset, tbl)
+    x[idx]
+})
+
 ## trace (as below) wasn't working (not sure why)
 ## trace(subset, browser(), signature='AnnotationHub')
 ## debug(AnnotationHub:::.subset)
