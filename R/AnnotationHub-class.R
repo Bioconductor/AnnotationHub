@@ -319,15 +319,18 @@ setGeneric("query", function(x, pattern, ...) standardGeneric("query"),
     signature="x")
 
 setMethod("query", "AnnotationHub",
-    function(x, pattern, ...)
+    function(x, pattern, ignore.case=TRUE, pattern.op=`&`)
 {
     tbl <- mcols(x)
-    idx <- rep(TRUE, nrow(tbl))
+    idx <- logical()
     for (pat in pattern) {
         idx0 <- logical(nrow(tbl))
         for (column in names(tbl))   # '|' across columns
-            idx0 <- idx0 | grepl(pat, tbl[[column]])
-        idx <- idx & idx0            # '&' for each element of pattern
+            idx0 <- idx0 | grepl(pat, tbl[[column]], ignore.case=ignore.case)
+        if (length(idx))
+            idx <- pattern.op(idx, idx0) # pattern.op for combining patterns
+        else
+            idx <- idx0
     }
 
     x[idx]
