@@ -1,9 +1,4 @@
-        **************************************************
-        *                                                *
-        *               2.0.x SERIES NEWS                *
-        *                                                *
-        **************************************************
-
+CHANGES IN VERSION 2.0.0
 
 NEW FEATURES and API changes
 
@@ -12,7 +7,7 @@ NEW FEATURES and API changes
     o The back end is new (new database, new way of tracking/routing
     data etc.)
 
-    o The front end is new (new AnntoationHub object, new methods, new
+    o The front end is new (new AnnotationHub object, new methods, new
     behaviors, new ways of finding and downloading data)
 
     o The metadata has also been cleaned up and made more
