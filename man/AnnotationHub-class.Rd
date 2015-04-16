@@ -99,8 +99,8 @@ possibleDates(x)
 \S4method{mcols}{AnnotationHub}(x)
 \S4method{snapshotDate}{AnnotationHub}(x)
 \S4method{snapshotDate}{AnnotationHub}(x) <- value
-\S4method{query}{AnnotationHub}(x, pattern, ...)
-\S4method{subset}{AnnotationHub}(x, resource_table, tags, ...)
+\S4method{query}{AnnotationHub}(x, pattern, ignore.case, pattern.op )
+\S4method{subset}{AnnotationHub}(x, subset)
 \S4method{display}{AnnotationHub}(object)
 \S4method{dbfile}{AnnotationHub}(x)
 \S4method{dbconn}{AnnotationHub}(x)
@@ -118,8 +118,8 @@ possibleDates(x)
   \item{subset}{An expression referring to columns of
     \code{metadata(x)}. See Methods for additional detail.}
 
-  \item{resource_table}{An expression that indicates which part of the
-    data set you want to keep indicated as a subset expression.}
+  \item{ignore.case}{if FALSE, the pattern matching is case sensitive and if
+    TRUE, case is ignored during matching. }
 
   \item{hub}{The URI where the online hub metadata is stored.}
 
@@ -130,7 +130,9 @@ possibleDates(x)
     without prompting.  Used as a safety net to prevent users from
     trying to cache the entire hub.}
 
-  \item{tags}{Tags used to label the initial object.}
+  \item{pattern.op}{if & then records containing all the patterns will be 
+     returned and if '|' then records containing any one of or both patterns
+      will be returned}
   
   \item{...}{Additional arguments.}
 }
@@ -166,7 +168,7 @@ possibleDates(x)
     }      
 
     \item{}{
-      \code{query(x, pattern, ...)}:
+      \code{query(x, pattern, ignore.case, pattern.op)}:
       Return an AnnotationHub subset containing only those elements
       whose metadata matches \code{pattern}. Matching uses
       \code{pattern} as in \code{\link{grepl}} to search the
@@ -174,7 +176,7 @@ possibleDates(x)
       logical \code{OR} across columns. Arguments \code{...} are passed
       to \code{grepl} for within-column matching.}
     \item{}{
-      \code{subset(x, subset, ...)}:
+      \code{subset(x, subset )}:
       Return an AnnotationHub subset containing only those elements
       whose metadata satisfies the \emph{expression} in
       \code{subset}. The expression can reference columns of
