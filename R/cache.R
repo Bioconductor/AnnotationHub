@@ -66,7 +66,7 @@ cache <-
 {
     stopifnot(is(x, "AnnotationHub"))
     path <- .datapathIds(x)
-    cachepath <- setNames(.cache_path(.cache(x), path), .db_uid(x))
+    cachepath <- setNames(.cache_path(.cache(x), path), names(path))
     need <- !file.exists(cachepath)
     if (sum(need) > max.downloads) {
         if (!interactive()) {

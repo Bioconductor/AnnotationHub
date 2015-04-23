@@ -175,18 +175,14 @@
 ## (instead of the resource_id)
 .datapathIds <- function(x)
 {
-#     query <- sprintf(
-#         'SELECT resource_id AS id, resource_id
-#          FROM rdatapaths WHERE resource_id IN (%s)',
-#         .id_as_single_string(x))
-#     ## TODO: 'single': sounds incorrect...
-#     .query_as_data.frame(x, query)[[1]]    
     query <- sprintf(
-        'SELECT DISTINCT id
-         FROM rdatapaths WHERE resource_id IN (%s)',
+        'SELECT DISTINCT resources.ah_id, rdatapaths.id
+         FROM resources, rdatapaths
+         WHERE resources.id IN (%s)
+         AND resources.id == rdatapaths.resource_id',
         .id_as_single_string(x))
-    ## TODO: 'single': sounds incorrect...
-    dbGetQuery(dbconn(x), query)[[1]]    
+    result <- dbGetQuery(dbconn(x), query)
+    setNames(result[[2]], result[[1]])
 }
 
 ## 
