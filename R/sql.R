@@ -170,15 +170,6 @@
     .query_as_data.frame(x, query)
 }
 
-.datapath <- function(x)
-{
-    query <- sprintf(
-        'SELECT resource_id AS id, rdatapath
-         FROM rdatapaths WHERE resource_id IN (%s)',
-        .id_as_single_string(x))
-    .query_as_data.frame(x, query)[[1]]
-}
-
 ## This is used by cache to get the rDataPath ID for a resource
 ## I think this should say to select 'id' as id to extract the rdatapathID 
 ## (instead of the resource_id)

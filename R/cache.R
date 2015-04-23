@@ -88,7 +88,7 @@ cache <-
 {
     stopifnot(is(x, "AnnotationHub"))
     stopifnot(identical(value, NULL))
-    cachepath <- .cache_path(.cache(x), .datapath(x))
+    cachepath <- .cache_path(.cache(x), .datapathIds(x))
     result <- unlink(cachepath)
     status <- file.exists(cachepath)
     if (any(status))

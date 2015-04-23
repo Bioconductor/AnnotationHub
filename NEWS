@@ -1,6 +1,15 @@
-CHANGES IN VERSION 2.0.0
+CHANGES IN VERSION 2.1
+----------------------
 
-NEW FEATURES and API changes
+BUG FIXES
+
+    o cache<- now behaves as documented, e.g., removing the cached
+    version of the file.
+
+CHANGES IN VERSION 2.0.0
+------------------------
+
+NEW FEATURES
 
     o AnnotationHub is all new.  We basically rewrote the entire thing.
 
@@ -19,8 +28,7 @@ NEW FEATURES and API changes
     o There is also a new vignette to explain how to use the new
     AnnotationHub in detail 
 
-
-Improvements since last time:
+IMPROVEMENTS SINCE LAST TIME
 
     o The old way of finding data (an enormous tree of paths), was not
     really scalable to the amount of data we have to provide access
