@@ -24,6 +24,13 @@ setMethod(".get1", "AnnotationHubResource",
 ## implementations
 ##
 
+.metadataForAH <- 
+    function(x, ...)
+{
+    stopifnot(length(.hub(x)) == 1)
+    list(AnnotationHubName=names(.hub(x)))
+}
+
 .require <-
     function(pkg)
 {
@@ -39,6 +46,37 @@ setMethod(".get1", "AnnotationHubResource",
                        conditionMessage(err))
         stop(msg)
     })
+}
+
+.seqlevelsIsCircular <- 
+    function(seqlevs) 
+{
+    cirInd <- which(seqlevs %in% 
+        c("MT", "MtDNA", "dmel_mitochondrion_genome","Mito", "chrM"))
+    if(length(cirInd)!=0){
+        cirVec <- rep(FALSE, length(seqlevs))
+        cirVec[cirInd] <- TRUE
+    } else {
+        cirVec <- rep(FALSE, length(seqlevs))
+    }
+    cirVec
+}
+
+.tidyGRanges <- 
+    function(x, gr, sort=TRUE, guess.circular=TRUE, addGenome=TRUE) 
+{
+    si <- seqinfo(sortSeqlevels(gr))
+    yy <- .hub(x)
+    if(sort)
+        seqlevels(gr) <- seqlevels(si) 
+    if(guess.circular) 
+        isCircular(si)  <- .seqlevelsIsCircular(seqlevels(si))
+    if(addGenome)
+        genome(si) <-yy$genome      
+    ## TODO: add seqlengths code
+    seqinfo(gr) <- si
+    metadata(gr)  <- .metadataForAH(x)
+    gr
 }
 
 ## FaFile
@@ -70,7 +108,8 @@ setMethod(".get1", "GRangesResource",
     function(x, ...)
 {
     .require("GenomicRanges")
-    callNextMethod(x, ...)
+    gr <- callNextMethod(x, ...)
+    .tidyGRanges(x, gr)
 })
 
 setClass("VCFResource", contains="RdaResource")
@@ -110,8 +149,9 @@ setMethod(".get1", "GTFFileResource",
     function(x, ...)
 {
     .require("rtracklayer")
-    er <- cache(.hub(x))
-    rtracklayer::import(er, format="gtf")
+    yy <- .hub(x)
+    gtf <- rtracklayer::import(cache(yy), format="gtf", genome=yy$genome, ...)
+    .tidyGRanges(x, gtf)
 })
 
 setClass("BigWigFileResource", contains="AnnotationHubResource")
@@ -200,6 +240,7 @@ setMethod(".get1", "PazarResource",
     dat <- dat[, -12]  # collumn contains only NA
     tryCatch({
         dat <- makeGRangesFromDataFrame(dat, keep.extra.columns=TRUE)
+        dat <- .tidyGRanges(x, gr) 
     }, error=function(err){
     })
     dat
@@ -212,10 +253,11 @@ setMethod(".get1", "CSVtoGrangesResource",
    function(x, ...)
 {
     .require("GenomicRanges")
-    er <- cache(.hub(x))
-    dat <- read.csv(er, header=TRUE, stringsAsFactors=FALSE)
+    yy <- .hub(x)
+    dat <- read.csv(cache(yy), header=TRUE, stringsAsFactors=FALSE)
     dat <- dat[,!(names(dat) %in% "width")]
-    makeGRangesFromDataFrame(dat, keep.extra.columns=TRUE)
+    gr<- makeGRangesFromDataFrame(dat, keep.extra.columns=TRUE)
+    .tidyGRanges(x, gr)
 })
 
 setClass("ExpressionSetResource", contains="RdaResource")

@@ -6,9 +6,10 @@ setMethod(".get1", "BEDFileResource",
     function(x, ...)
 {
     .require("rtracklayer")
-    dat <- cache(.hub(x))
-    dat <- rtracklayer::BEDFile(dat)
-    rtracklayer::import(dat, format="bed", ...)
+    yy <- .hub(x)
+    dat <- rtracklayer::BEDFile(cache(yy))
+    gr <- rtracklayer::import(dat, format="bed", genome=yy$genome, ...)
+    .tidyGRanges(x, gr)
 })
 
 
@@ -60,9 +61,11 @@ setMethod(".get1", "EpigenomeRoadmapFileResource",
     function(x, ...)
 {
     .require("rtracklayer")
-    er <- cache(.hub(x))
-    rtracklayer::import(er, format="bed",
+    yy <- .hub(x)
+    gr <- rtracklayer::import(cache(yy), format="bed", genome=yy$genome,
         extraCols=c(signalValue="numeric", pValue="numeric", qValue="numeric",
         peak="numeric"))
+    gr <- sortSeqlevels(gr)
+    .tidyGRanges(x, gr) 
 })
 
