@@ -346,6 +346,43 @@ setMethod("subset", "AnnotationHub",
     x[idx]
 })
 
+as.list.AnnotationHub <- function(x, ..., use.names=TRUE) {
+    ans <- lapply(seq_along(x), function(i, x) x[i], x)
+    if (use.names)
+        names(ans) <- names(x)
+    ans
+}
+
+setMethod("as.list", "AnnotationHub", as.list.AnnotationHub)
+
+setMethod("c", "AnnotationHub",
+    function(x, ..., recursive=FALSE)
+{
+    if (!identical(recursive, FALSE)) 
+        stop("'recursive' argument not supported")
+    if (missing(x)) 
+        args <- unname(list(...))
+    else args <- unname(list(x, ...))
+
+    .test <- function(args, fun, what) {
+        ans <- unique(vapply(args, fun, character(1)))
+        if (length(ans) != 1L)
+            stop(sprintf("'%s' differs between arguments", what))
+    }
+    .test(args, hubCache, "hubCache")
+    .test(args, hubUrl, "hubUrl")
+    .test(args, snapshotDate, "snapshotDate")
+    .test(args, dbfile, "dbfile")
+
+    db_uid <- unlist(lapply(unname(args), .db_uid))
+    if (length(db_uid) == 0 && is.null(names(db_uid)))
+        names(db_uid) <- character()
+    udb_uid <- unique(db_uid)
+    idx <- match(udb_uid, db_uid)
+    .db_uid <- setNames(udb_uid, names(db_uid)[idx])
+    initialize(args[[1]], .db_uid=.db_uid)
+})
+
 ## trace (as below) wasn't working (not sure why)
 ## trace(subset, browser(), signature='AnnotationHub')
 ## debug(AnnotationHub:::.subset)

@@ -1,6 +1,11 @@
 CHANGES IN VERSION 2.1
 ----------------------
 
+NEW FEATURES
+
+    o as.list() splits AnnotationHub instances into a list of
+    instances, each with a single record. c() concatenates hubs.
+
 BUG FIXES
 
     o cache<- now behaves as documented, e.g., removing the cached

@@ -15,3 +15,12 @@ test_metadata <- function() {
     checkEquals("GRCh38", unique(genome(gr)))
 } 
 
+test_as.list_and_c <- function() {
+    ah <- AnnotationHub()
+    cc <- selectMethod("c", "AnnotationHub")
+    checkIdentical(ah[1:5], do.call("cc", as.list(ah[1:5])))
+    checkIdentical(ah[1:5], c(ah[1:2], ah[3:5]))
+    checkIdentical(ah[FALSE], c(ah[FALSE], ah[FALSE]))
+    checkIdentical(ah[1:5], c(ah[FALSE], ah[1:5]))
+    checkIdentical(ah[1:5], c(ah[1:4], ah[3:5])) # unique() ids
+}
