@@ -238,12 +238,8 @@ setMethod(".get1", "PazarResource",
         "EnsemblGeneAccession", "Chr", "GeneStart", "GeneEnd", "Species", 
 	"ProjectName","PMID", "AnalysisMethod"))
     dat <- dat[, -12]  # collumn contains only NA
-    tryCatch({
-        dat <- makeGRangesFromDataFrame(dat, keep.extra.columns=TRUE)
-        dat <- .tidyGRanges(x, gr) 
-    }, error=function(err){
-    })
-    dat
+    gr <- GenomicRanges::makeGRangesFromDataFrame(dat, keep.extra.columns=TRUE)
+    .tidyGRanges(x, gr) 
 })
  
 
@@ -256,7 +252,7 @@ setMethod(".get1", "CSVtoGrangesResource",
     yy <- .hub(x)
     dat <- read.csv(cache(yy), header=TRUE, stringsAsFactors=FALSE)
     dat <- dat[,!(names(dat) %in% "width")]
-    gr<- makeGRangesFromDataFrame(dat, keep.extra.columns=TRUE)
+    gr <- GenomicRanges::makeGRangesFromDataFrame(dat, keep.extra.columns=TRUE)
     .tidyGRanges(x, gr)
 })
 
