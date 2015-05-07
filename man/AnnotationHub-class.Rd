@@ -2,14 +2,35 @@
 \docType{class}
 
 % Classes
-\alias{AnnotationHub}
 \alias{class:AnnotationHub}
 \alias{AnnotationHub-class}
 
-% Accessor-like methods
-\alias{show,AnnotationHub-method}
-\alias{show,AnnotationHubResource-method}
+% Constructor
+\alias{AnnotationHub}
 
+% Accessor-like methods
+\alias{mcols,AnnotationHub-method} 
+
+\alias{cache}
+\alias{cache<-}
+
+\alias{hubUrl} 
+\alias{hubCache}
+
+\alias{possibleDates}
+\alias{snapshotDate}
+\alias{snapshotDate,AnnotationHub-method}
+\alias{snapshotDate<-}
+\alias{snapshotDate<-,AnnotationHub-method}
+
+\alias{dbconn,AnnotationHub-method}
+\alias{dbfile,AnnotationHub-method}
+
+% List-like
+\alias{length,AnnotationHub-method}
+\alias{names,AnnotationHub-method}
+
+% Subsetting:
 \alias{$,AnnotationHub-method}
 
 \alias{[[,AnnotationHub,character,missing-method}
@@ -19,200 +40,246 @@
 \alias{[,AnnotationHub,logical,missing-method} 
 \alias{[,AnnotationHub,numeric,missing-method} 
 
-% used for replacing ranges - give an example
 \alias{[<-,AnnotationHub,character,missing,AnnotationHub-method} 
 \alias{[<-,AnnotationHub,logical,missing,AnnotationHub-method} 
 \alias{[<-,AnnotationHub,numeric,missing,AnnotationHub-method} 
-
-
-\alias{mcols,AnnotationHub-method} 
-
-\alias{cache}
-\alias{cache<-}
 
 \alias{subset,AnnotationHub-method}
 
 \alias{query}
 \alias{query,AnnotationHub-method}
 
-\alias{length,AnnotationHub-method}
-
-\alias{names,AnnotationHub-method}
-
-\alias{hubUrl} 
-\alias{hubCache}
-
-\alias{possibleDates}
-
-\alias{snapshotDate}
-\alias{snapshotDate,AnnotationHub-method}
-\alias{snapshotDate<-}
-\alias{snapshotDate<-,AnnotationHub-method}
-
 \alias{display}
 \alias{display,AnnotationHub-method}
 
+% as.list / c
+\alias{as.list.AnnotationHub}
+\alias{as.list,AnnotationHub-method}
+\alias{c,AnnotationHub-method}
 
-\alias{dbconn,AnnotationHub-method}
-\alias{dbfile,AnnotationHub-method}
-
+% show method:
+\alias{show,AnnotationHub-method}
+\alias{show,AnnotationHubResource-method}
 
 
 \title{AnnotationHub objects and their related methods and functions}
 
 \description{
-  \code{AnnotationHub} is the base class for interacting with the
-  AnnotationHub services using Bioconductor.  When using the
-  \code{AnnotationHub} package, users will create an instance of this
-  class and then subset it down to those resources that are of interest.
 
-  Once an \code{AnnotationHub} is created users can extract data by using 
-  the subset operators (along with an assignment operator to put the contents 
-  of one of these resources into a local variable).  Basically you just need to 
-  look at the contents of the \code{AnnotationHub} object using grep or a 
-  display method until you have decided which records you want to retrieve and 
-  then you can use the \code{[[} operator to retrieve the relevant records. 
-  Using the \code{[} operator will just subset the \code{AnnotationHub} object 
-  so that it refers to fewer records.
+  Use \code{AnnotationHub} to interact with Bioconductor's AnnotationHub
+  service.  Query the instance to discover and use resources that are of
+  interest, and then easily download and import the resource into R for
+  immediate use.
 
-  All \code{AnnotationHub} have a snapshot date that by default is set
-  to the most recent one.  The \code{snapshotDate} method indicates
-  which one is in use, but this value can also be set to previous dates.
-  Other dates can be accessed with the \code{possibleDates} function.
+  Use \code{AnnotationHub()} to retrieve information about all records
+  in the hub.
 
-  Whenever you download a file from \code{AnnotationHub} it will
-  automatically put the data in a local cache for future reference. The
-  location of this cache can be found and even changed with the
-  \code{hubCache} setters and getters.  This cache provides a performance
-  boost for users but it does not mean that you can use this on a plane
-  without needing wireless access.  
+  Discover records in a hub using \code{mcols()}, \code{query()},
+  \code{subset()}, \code{[}, and \code{display()}.
+
+  Retrieve individual records using \code{[[}. On first use of a
+  resource, the corresponding files or other hub resources are
+  downloaded from the internet to a local cache. On this and all
+  subsequent uses the files are quickly input from the cache into the R
+  session.
+
+  \code{AnnotationHub} records can be added (and sometimes removed) at
+  any time. \code{snapshotDate()} restricts hub records to those
+  available at the time of the snapshot; use \code{possibleDates()} to
+  see possible snapshot dates.
+
+  The location of the local cache can be found (and updated) with
+  \code{hubCache()}.
+
 }
 
-\usage{
-AnnotationHub(..., hub=hubOption("URL"), cache=hubOption("CACHE"),
-    max.downloads=hubOption("MAX_DOWNLOADS"))
-cache(x, ..., max.downloads)
-cache(x, ...) <- value
-hubUrl(x)
-hubCache(x)
-possibleDates(x)
-\S4method{mcols}{AnnotationHub}(x)
-\S4method{snapshotDate}{AnnotationHub}(x)
-\S4method{snapshotDate}{AnnotationHub}(x) <- value
-\S4method{query}{AnnotationHub}(x, pattern, ignore.case, pattern.op )
-\S4method{subset}{AnnotationHub}(x, subset)
-\S4method{display}{AnnotationHub}(object)
-\S4method{dbfile}{AnnotationHub}(x)
-\S4method{dbconn}{AnnotationHub}(x)
+\section{Constructors}{
+  \describe{
+    \item{}{
+      \code{AnnotationHub(..., hub=hubOption("URL"), cache=hubOption("CACHE"),
+        max.downloads=hubOption("MAX_DOWNLOADS"))}:
+      Create an \code{AnnotationHub} instance, possibly updating the
+      current database of records.
+    }
+  }
 }
 
-\arguments{
+\section{Discovery and retrieval}{
+  In the code snippets below, \code{x} and \code{object} are
+  AnnotationHub objects.
 
-  \item{x, object}{The \code{AnnotationHub} object.}
+  \describe{
+    \item{}{
+      \code{length(x)}:
+      Get the number of hub records.
+    }
 
-  \item{value}{The value to be assigned.}
+    \item{}{
+      \code{names(x)}:
+      Get the names (AnnotationHub unique identifiers, of the form
+      AH12345) of the hub records.
+    }
 
-  \item{pattern}{A character regular expression to query metadata of
-    \code{x}.}
+    \item{}{
+      \code{mcols(x)}:
+      Get the metadata columns describing each record. Columns include:
+      \describe{
 
-  \item{subset}{An expression referring to columns of
-    \code{metadata(x)}. See Methods for additional detail.}
+        \item{title}{Record title, frequently the file name of the
+          object.}
 
-  \item{ignore.case}{if FALSE, the pattern matching is case sensitive and if
-    TRUE, case is ignored during matching. }
+        \item{dataprovider}{Original provider of the resource, e.g.,
+          Ensembl, UCSC.}
 
-  \item{hub}{The URI where the online hub metadata is stored.}
+        \item{species}{The species for which the record is most
+          relevant, e.g., \sQuote{Homo sapiens}.}
 
-  \item{cache}{the local cache where the data is stored after being
-    downloaded or updated.}
+        \item{taxonomyid}{NCBI taxonomy identifier of the species.}
 
-  \item{max.downloads}{The maximum number of items to try and download
-    without prompting.  Used as a safety net to prevent users from
-    trying to cache the entire hub.}
+        \item{genome}{Genome build relevant to the record, e.g., hg19.}
 
-  \item{pattern.op}{if & then records containing all the patterns will be 
-     returned and if '|' then records containing any one of or both patterns
-      will be returned}
-  
-  \item{...}{Additional arguments.}
+        \item{description}{Textual description of the resource,
+          frequently automatically generated from file path and other
+          information available when the record was created.}
+
+        \item{tags}{Single words added to the record to facilitate
+          identification, e.g,. TCGA, Roadmap.}
+
+        \item{rdataclass}{The class of the R object used to represent
+          the object when imported into R, e.g., \code{GRanges},
+          \code{VCFFile}.}
+
+        \item{sourceurl}{Original URL of the resource.}
+
+        \item{sourectype}{Format of the original resource, e.g., BED
+          file.}
+      }
+    }
+
+    \item{}{
+      \code{x$name}:
+      Convenient reference to individual metadata columns, e.g.,
+      \code{x$species}.
+    }
+
+    \item{}{
+      \code{x[i]}:
+      Numerical, logical, or character vector (of AnnotationHub names)
+      to subset the hub, e.g., \code{x[x$species == "Homo sapiens"]}.
+    }
+
+    \item{}{
+      \code{x[[i]]}:
+      Numerical or character scalar to retrieve (if necessary) and
+      import the resource into R.
+    }
+
+    \item{}{
+      \code{query(x, pattern, ignore.case=TRUE, pattern.op= `&`)}:
+      Return an AnnotationHub subset containing only those elements
+      whose metadata matches \code{pattern}. Matching uses
+      \code{pattern} as in \code{\link{grepl}} to search the
+      \code{as.character} representation of each column, performing a
+      logical \code{`&`} across columns.
+      e.g., \code{query(x, c("Homo sapiens", "hg19", "GTF"))}.
+      \describe{
+        \item{\code{pattern}}{A character vector of patterns to search
+          (via \code{grepl}) for in any of the \code{mcols()} columns.}
+        \item{\code{ignore.case}}{A logical(1) vector indicating whether
+          the search should ignore case (TRUE) or not (FALSE).}
+        \item{\code{pattern.op}}{Any function of two arguments,
+          describing how matches across pattern elements are to be
+          combined. The default \code{`&`} requires that only records
+          with \emph{all} elements of \code{pattern} in their metadata
+          columns are returned.}
+      }
+    }
+
+    \item{}{
+      \code{subset(x, subset)}:
+      Return the subset of records containing only those elements whose
+      metadata satisfies the \emph{expression} in \code{subset}. The
+      expression can reference columns of \code{mcols(x)}, and should
+      return a logical vector of length \code{length(x)}.
+      e.g., \code{subset(x, species == "Homo sapiens" &
+        genome="GRCh38")}.
+    }
+
+    \item{}{
+      \code{display(object)}:
+      Open a web browser allowing for easy selection of hub records via
+      interactive tabular display. Return value is the subset of hub
+      records identified while navigating the display.
+    }
+  }
 }
 
-
-\section{Methods}{
+\section{Cache and hub management}{
   In the code snippets below, \code{x} is an AnnotationHub object.
   \describe{
     \item{}{
-      \code{AnnotationHub()}:
-      Constructs an AnnotationHub object.
+      \code{snapshotDate(x)} and \code{snapshotDate(x) <- value}:
+      Gets or sets the date for the snapshot in use. \code{value} should
+      be one of \code{possibleDates()}.
+    }
+    \item{}{
+      \code{possibleDates(x)}:
+      Lists dates for snapshots that the hub could potentially use.
+    }
+    \item{}{
+      \code{cache(x)} and \code{cache(x) <- value}: Adds (downloads) all
+      resources in \code{x}, or removes all local resources
+      corresponding to the records in \code{x} from the cache.
     }      
     \item{}{
       \code{hubUrl(x)}:
       Gets the URL for the online hub.
     }      
     \item{}{
-      \code{hubUrl(x)}:
-      Gets the path to the local hub cache.
-    }      
-    \item{}{
-      \code{possibleDates(x, ...)}:
-      Lists dates for snapshots that the hub could potentially use.
-    }
-    \item{}{
-      \code{snapshotDate(x)} and \code{snapshotDate(x, ...) <- value}:
-      Gets or sets the date for the snapshot in use.
-    }
-    \item{}{
-      \code{cache(x, ...)} and \code{cache(x, ...) <- value}: Adds
-      (downloads) all resources in \code{x}, or (caution!) removes all
-      local resources from the cache.
-    }      
-
-    \item{}{
-      \code{query(x, pattern, ignore.case, pattern.op)}:
-      Return an AnnotationHub subset containing only those elements
-      whose metadata matches \code{pattern}. Matching uses
-      \code{pattern} as in \code{\link{grepl}} to search the
-      \code{as.character} representation of each column, performing a
-      logical \code{OR} across columns. Arguments \code{...} are passed
-      to \code{grepl} for within-column matching.}
-    \item{}{
-      \code{subset(x, subset )}:
-      Return an AnnotationHub subset containing only those elements
-      whose metadata satisfies the \emph{expression} in
-      \code{subset}. The expression can reference columns of
-      \code{metadata(x)}, and should return a logical vector of length
-      \code{length(x)}.}
-    \item{}{
-      \code{display(object, ...)}:
-      Implements the display generic from interactiveDisplay package.
-      Users can select metadata rows from a web interface, the values in
-      the rows selected by the user become filters applied to the
-      AnnotationHub object.
-    }
-    \item{}{
-      \code{mcols(x)}:
-      returns a DataFrame with metadata for the \code{AnnotationHub} object.
+      \code{hubCache(x)}:
+      Gets the file system location of the local AnnotationHub cache.
     }      
     \item{}{
       \code{dbfile(x)}:
-      returns the file path to the \code{AnnotationHub} objects metadata
+      Returns the file path to the \code{AnnotationHub} objects metadata
       database cache.
     }
     \item{}{
       \code{dbconn(x)}:
-      returns a database connection for the \code{AnnotationHub} objects
+      Returns a database connection for the \code{AnnotationHub} objects
       metadata cache.
-    }          
+    }
   }
 }
 
-\author{Martin Morgan, Marc Carlson and Dan Tenenbaum}
+\section{Coercion}{
+  In the code snippets below, \code{x} is an AnnotationHub object.
+  \describe{
+    \item{}{
+      \code{as.list(x)}:
+      Coerce x to a list of hub instances, one entry per
+      element. Primarily for internal use.
+    }
+    \item{}{
+      \code{c(x, ...)}:
+      Concatenate one or more sub-hub. Sub-hubs must reference the same
+      AnnotationHub instance. Duplicate entries are removed.
+    }
+  }
+}
 
+\author{Martin Morgan, Marc Carlson, Sonali Arora, and Dan Tenenbaum}
 
 \examples{
   ## create an AnnotationHub object
   library(AnnotationHub)
   ah = AnnotationHub()
+
+  ## Summary of available records
+  ah
+
+  ## Detail for a single record
+  ah[1]
 
   ## and what is the date we are using?
   snapshotDate(ah)
@@ -221,10 +288,10 @@ possibleDates(x)
   length(ah)
 
   ## from which resources, is data available?
-  unique(ah$dataprovider)
+  head(table(ah$dataprovider))
 
   ## from which species, is data available ? 
-  head(unique(ah$species)) 
+  head(table(ah$species)) 
 
   ## what web service and local cache does this AnnotationHub point to?
   hubUrl(ah)
@@ -239,9 +306,6 @@ possibleDates(x)
   ## One can also serach the hub for multiple strings 
   query(ah, c("GTF", "Ensembl", "Homo sapiens"))
 
-
-  ## We can get the metadata for the file 
-  ahs[1]
 
   ## We can extract a result by name like this (using a list semantic):
   res <- ahs[[1]]
@@ -263,8 +327,5 @@ possibleDates(x)
   dbconn(ah)
 }
 
-
-
 \keyword{classes}
 \keyword{methods}
-
