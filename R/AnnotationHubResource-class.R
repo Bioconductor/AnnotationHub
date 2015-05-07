@@ -178,13 +178,21 @@ setMethod(".get1", "PazarResource",
 {
     .require("GenomicRanges")
     er <- cache(.hub(x))
-    dat <- read.delim(er, header=FALSE, stringsAsFactors=FALSE,
-        col.names=c("PazarTFID","EnsemblTFAccession", "TFName", "PazarGeneID",
-        "EnsemblGeneAccession", "Chr", "GeneStart", "GeneEnd", "Species", 
-	"ProjectName","PMID", "AnalysisMethod"))
-    dat <- dat[, -12]  # collumn contains only NA
-    gr <- GenomicRanges::makeGRangesFromDataFrame(dat, keep.extra.columns=TRUE)
-    .tidyGRanges(x, gr) 
+    colClasses <-
+        setNames(c(rep("character", 6), rep("integer", 2),
+                   rep("factor", 2), "character", "NULL"),
+                 c("PazarTFID","EnsemblTFAccession", "TFName",
+                   "PazarGeneID", "EnsemblGeneAccession", "Chr", "GeneStart",
+                   "GeneEnd", "Species", "ProjectName","PMID",
+                   "AnalysisMethod"))
+    dat <- read.delim(er, header=FALSE, col.names=names(colClasses),
+                      na.strings="-", colClasses=colClasses)
+    if (!anyNA(dat[["GeneStart"]])) {
+        dat <- GenomicRanges::makeGRangesFromDataFrame(dat,
+                                                       keep.extra.columns=TRUE)
+        dat <- .tidyGRanges(x, dat)
+    }
+    dat
 })
  
 
