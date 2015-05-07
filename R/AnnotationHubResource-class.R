@@ -24,61 +24,6 @@ setMethod(".get1", "AnnotationHubResource",
 ## implementations
 ##
 
-.metadataForAH <- 
-    function(x, ...)
-{
-    stopifnot(length(.hub(x)) == 1)
-    list(AnnotationHubName=names(.hub(x)))
-}
-
-.require <-
-    function(pkg)
-{
-    if (length(grep(sprintf("package:%s", pkg), search())) != 0L)
-        return()
-    message("require(", dQuote(pkg), ")")
-    tryCatch({
-        suppressPackageStartupMessages({
-            require(pkg, quietly=TRUE, character.only=TRUE)
-        })
-    }, error=function(err) {
-        msg <- sprintf("require(%s) failed: %s", dQuote(pkg),
-                       conditionMessage(err))
-        stop(msg)
-    })
-}
-
-.seqlevelsIsCircular <- 
-    function(seqlevs) 
-{
-    cirInd <- which(seqlevs %in% 
-        c("MT", "MtDNA", "dmel_mitochondrion_genome","Mito", "chrM"))
-    if(length(cirInd)!=0){
-        cirVec <- rep(FALSE, length(seqlevs))
-        cirVec[cirInd] <- TRUE
-    } else {
-        cirVec <- rep(FALSE, length(seqlevs))
-    }
-    cirVec
-}
-
-.tidyGRanges <- 
-    function(x, gr, sort=TRUE, guess.circular=TRUE, addGenome=TRUE) 
-{
-    si <- seqinfo(sortSeqlevels(gr))
-    yy <- .hub(x)
-    if(sort)
-        seqlevels(gr) <- seqlevels(si) 
-    if(guess.circular) 
-        isCircular(si)  <- .seqlevelsIsCircular(seqlevels(si))
-    if(addGenome)
-        genome(si) <-yy$genome      
-    ## TODO: add seqlengths code
-    seqinfo(gr) <- si
-    metadata(gr)  <- .metadataForAH(x)
-    gr
-}
-
 ## FaFile
 
 setClass("FaFileResource", contains="AnnotationHubResource")

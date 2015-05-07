@@ -65,7 +65,6 @@ setMethod(".get1", "EpigenomeRoadmapFileResource",
     gr <- rtracklayer::import(cache(yy), format="bed", genome=yy$genome,
         extraCols=c(signalValue="numeric", pValue="numeric", qValue="numeric",
         peak="numeric"))
-    gr <- sortSeqlevels(gr)
     .tidyGRanges(x, gr) 
 })
 

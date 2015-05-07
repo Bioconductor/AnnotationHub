@@ -1,7 +1,6 @@
 import(methods)
 
 import(BiocGenerics)
-import(GenomeInfoDb)
 import(RSQLite)
 import(S4Vectors)
 
