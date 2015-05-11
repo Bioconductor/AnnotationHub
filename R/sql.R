@@ -5,8 +5,11 @@
 {
     tbl <- dbGetQuery(dbconn(x), query)
     ridx <- match(names(x), tbl$ah_id)
-    cidx <- match("ah_id", names(tbl))
-    rownames(tbl) <- tbl$ah_id
+    cidx <- match("ah_id", names(tbl)) 
+    if(length(x)!=nrow(tbl))
+        tbl <- tbl[1, ]
+    else  
+        rownames(tbl) <- tbl$ah_id
     tbl[ridx, -cidx, drop=FALSE]
 }
 
