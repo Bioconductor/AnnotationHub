@@ -29,6 +29,7 @@
 % List-like
 \alias{length,AnnotationHub-method}
 \alias{names,AnnotationHub-method}
+\alias{fileName,AnnotationHub-method}
 
 % Subsetting:
 \alias{$,AnnotationHub-method}

@@ -294,6 +294,13 @@ setReplaceMethod("[",
     x
 })
 
+setMethod("fileName", signature=(object="AnnotationHub"),
+    function(object)
+{
+    cache(object)
+})
+
+
 ## $, query / subset
 
 setMethod("$", "AnnotationHub",

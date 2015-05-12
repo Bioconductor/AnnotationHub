@@ -27,5 +27,5 @@ S3method(.DollarNames, AnnotationHub)
 S3method(as.list, AnnotationHub)
 
 exportMethods(names, length, "$", "[", query, subset, "[[", as.list, c,
-    show,
+    show, fileName,
     snapshotDate, "snapshotDate<-", display, mcols, dbconn, dbfile)
