@@ -6,10 +6,7 @@
     tbl <- dbGetQuery(dbconn(x), query)
     ridx <- match(names(x), tbl$ah_id)
     cidx <- match("ah_id", names(tbl)) 
-    if(length(x)!=nrow(tbl))
-        tbl <- tbl[1, ]
-    else  
-        rownames(tbl) <- tbl$ah_id
+    rownames(tbl) <- tbl$ah_id
     tbl[ridx, -cidx, drop=FALSE]
 }
 
@@ -108,6 +105,22 @@
 .sourcetype <- function(x) {
     query <- sprintf(
         'SELECT DISTINCT sourcetype, resource_id AS id FROM input_sources
+         WHERE resource_id IN (%s)',
+        .id_as_single_string(x))
+    dbGetQuery(dbconn(x), query)
+}
+
+.sourcesize <- function(x) {
+    query <- sprintf(
+        'SELECT DISTINCT sourcesize, resource_id AS id FROM input_sources
+         WHERE resource_id IN (%s)',
+        .id_as_single_string(x))
+    dbGetQuery(dbconn(x), query)
+}
+
+.sourcelastmodifieddate <- function(x) {
+    query <- sprintf(
+        'SELECT DISTINCT sourcelastmodifieddate, resource_id AS id FROM input_sources
          WHERE resource_id IN (%s)',
         .id_as_single_string(x))
     dbGetQuery(dbconn(x), query)

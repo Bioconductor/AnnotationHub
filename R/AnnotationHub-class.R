@@ -496,6 +496,10 @@ setMethod("[[", c("AnnotationHub", "character", "missing"),
     function(object)
 {
     rsrc <- .resource_table(object)
+    size <- .collapse_as_string(object,FUN=.sourcesize,fieldName='sourcesize')   
+    date <- .collapse_as_string(object,FUN=.sourcelastmodifieddate,
+        fieldName='sourcelastmodifieddate') 
+  
     cat("# names(): ", names(object)[[1]], "\n", sep="")
     cat(.pprintf1("dataprovider", rsrc[["dataprovider"]]))
     cat(.pprintf1("species", rsrc[["species"]]))
@@ -504,12 +508,10 @@ setMethod("[[", c("AnnotationHub", "character", "missing"),
     cat(.pprintf1("description", rsrc[["description"]]))
     cat(.pprintf1("taxonomyid", rsrc[["taxonomyid"]]))
     cat(.pprintf1("genome", rsrc[["genome"]]))
-    srcfields <- c("sourcetype", "sourcelastmodifieddate", "sourcesize")
-    x <- .join_resource_columns(object, "input_sources", srcfields)
-    cat(.pprintf1("sourcetype", x[["sourcetype"]]))
+    cat(.pprintf1("sourcetype", rsrc[["sourcetype"]]))
     cat(.pprintf1("sourceurl", rsrc[["sourceurl"]]))
-    cat(.pprintf1("sourcelastmodifieddate", x[["sourcelastmodifieddate"]]))
-    cat(.pprintf1("sourcesize", x[["sourcesize"]]))
+    cat(.pprintf1("sourcelastmodifieddate", date))
+    cat(.pprintf1("sourcesize", size))
     cat(.pprintf0("# $tags: %s", rsrc[["tags"]]), "\n")
     cat(.pprintf0("# retrieve record with 'object[[\"%s\"]]'",
                   names(object)[[1]]), "\n")

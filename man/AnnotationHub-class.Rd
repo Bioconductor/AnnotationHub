@@ -120,7 +120,13 @@
       Get the names (AnnotationHub unique identifiers, of the form
       AH12345) of the hub records.
     }
-
+    
+    \item{}{
+      \code{fileName(x)}:
+      Get the file path of the hub records as stored in your local cache
+     (AnnotationHub files are stored as unique numbers, of the form 12345).
+    }
+    
     \item{}{
       \code{mcols(x)}:
       Get the metadata columns describing each record. Columns include:
@@ -240,16 +246,6 @@
       \code{hubCache(x)}:
       Gets the file system location of the local AnnotationHub cache.
     }      
-    \item{}{
-      \code{dbfile(x)}:
-      Returns the file path to the \code{AnnotationHub} objects metadata
-      database cache.
-    }
-    \item{}{
-      \code{dbconn(x)}:
-      Returns a database connection for the \code{AnnotationHub} objects
-      metadata cache.
-    }
   }
 }
 
@@ -289,29 +285,42 @@
   length(ah)
 
   ## from which resources, is data available?
-  head(table(ah$dataprovider))
+  head(sort(table(ah$dataprovider), decreasing=TRUE))
 
   ## from which species, is data available ? 
-  head(table(ah$species)) 
+  head(sort(table(ah$species),decreasing=TRUE)) 
 
   ## what web service and local cache does this AnnotationHub point to?
   hubUrl(ah)
   hubCache(ah)
 
   ### Examples ###
-  ### HOW TO : get Inparanoid  data wrt ailMel1
-  ## query and subset
-  ahs <- query(ah, 'inparanoid8') 
-  ahs <- subset(ah, ah$genome=='ailMel1')
 
-  ## One can also serach the hub for multiple strings 
-  query(ah, c("GTF", "Ensembl", "Homo sapiens"))
+  ## One can  search the hub for multiple strings 
+  ahs2 <- query(ah, c("GTF", "77","Ensembl", "Homo sapiens"))
+  
+  ## information about the file can be retrieved using 
+  ahs2[1]
 
+  ## one can further extract information from this show method
+  ## like the sourceurl using:
+  ahs2$sourceurl 
+  ahs2$description
+  ahs2$title
 
-  ## We can extract a result by name like this (using a list semantic):
-  res <- ahs[[1]]
+  ## We can download a file by name like this (using a list semantic):
+  gr <- ahs2[[1]]
   ## And we can also extract it by the names like this:
-  res <- ahs[["AH6298"]]
+  res <- ah[["AH28812"]]
+
+  ## the gtf file is returned as a GenomicRanges object and contains
+  ## data about which organism it belongs to, its seqlevels and seqlengths
+  seqinfo(gr) 
+
+  ## each GenomicRanges contains a metadata slot which can be used to get 
+  ## the name of the hub object. 
+  metadata(gr) 
+  ah[metadata(gr)$AnnotationHubName]
    
   ## And we can also use "[" to restrict the things that are in the
   ## AnnotationHub object (by position, character, or logical vector).
@@ -323,9 +332,7 @@
     ah2 <- display(ah)
   }
 
-  ## get the file to the metadata dabase cache or a DBI db connection.
-  dbfile(ah)
-  dbconn(ah)
+  
 }
 
 \keyword{classes}
