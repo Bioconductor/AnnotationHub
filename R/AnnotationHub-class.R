@@ -307,10 +307,10 @@ setMethod("$", "AnnotationHub",
     function(x, name)
 {
     switch(name,
-     "tags"=unname(.collapse_as_string(x,.tags,'tag')),
-     "rdataclass"=unname(.collapse_as_string(x,.rdataclass,'rdataclass')),
-     "sourceurl"=unname(.collapse_as_string(x,.sourceurl,'sourceurl')),
-     "sourcetype"=unname(.collapse_as_string(x,.sourcetype,'sourcetype')),      
+     "tags"=unname(.collapse_as_string(x, .tags)),
+     "rdataclass"=unname(.collapse_as_string(x, .rdataclass)),
+     "sourceurl"=unname(.collapse_as_string(x, .sourceurl)),
+     "sourcetype"=unname(.collapse_as_string(x, .sourcetype)),      
      .resource_column(x, name))    ## try to get it from main resources table
 })
 
@@ -496,9 +496,8 @@ setMethod("[[", c("AnnotationHub", "character", "missing"),
     function(object)
 {
     rsrc <- .resource_table(object)
-    size <- .collapse_as_string(object,FUN=.sourcesize,fieldName='sourcesize')   
-    date <- .collapse_as_string(object,FUN=.sourcelastmodifieddate,
-        fieldName='sourcelastmodifieddate') 
+    size <- .collapse_as_string(object, .sourcesize)   
+    date <- .collapse_as_string(object, .sourcelastmodifieddate)
   
     cat("# names(): ", names(object)[[1]], "\n", sep="")
     cat(.pprintf1("dataprovider", rsrc[["dataprovider"]]))

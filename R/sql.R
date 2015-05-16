@@ -128,11 +128,11 @@
 
 
 ## Helper to collapse many to one fields (like above) into one space
-.collapse_as_string <- function(x, FUN, fieldName)
+.collapse_as_string <- function(x, FUN)
 {
     uid <- .db_uid(x)
     tbl <- FUN(x)
-    lst <- vapply(split(tbl[[1]], tbl[["id"]]), paste,
+    lst <- vapply(split(tbl[[1]], tbl[["id"]]), paste0,
                   character(1), collapse=", ")
     lst <- lst[match(uid, names(lst))]
     setNames(lst, names(uid))           # allows for x with no tags 
@@ -148,13 +148,10 @@
          WHERE resources.id IN (%s)',
         .DB_RESOURCE_FIELDS, .id_as_single_string(x))
     tbl <- .query_as_data.frame(x, query)
-    tbl[["tags"]] <- .collapse_as_string(x,FUN=.tags,fieldName='tag')
-    tbl[["rdataclass"]] <- .collapse_as_string(x,FUN=.rdataclass,
-                                               fieldName='rdataclass')
-    tbl[["sourceurl"]] <- .collapse_as_string(x,FUN=.sourceurl,
-                                              fieldName='sourceurl')
-    tbl[["sourcetype"]] <- .collapse_as_string(x,FUN=.sourcetype,
-                                               fieldName='sourcetype')
+    tbl[["tags"]] <- .collapse_as_string(x, .tags)
+    tbl[["rdataclass"]] <- .collapse_as_string(x, .rdataclass)
+    tbl[["sourceurl"]] <- .collapse_as_string(x, .sourceurl)
+    tbl[["sourcetype"]] <- .collapse_as_string(x, .sourcetype)
     tbl
 }
 
