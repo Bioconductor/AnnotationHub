@@ -32,8 +32,8 @@ hubUrl <- function(x) {
 
 ## example of hub resource (sometimes convenient)
 ## hub = 'https://annotationhub.bioconductor.org/metadata/annotationhub.sqlite3'
-
-.getResource <- function(hubpath, cachepath) {
+.hub_cache_resource <- function(hubpath, cachepath) {
+    ## retrieve file from hub to cache
     tryCatch({
         tmp <- tempfile()
         ## Download the resource in a way that supports https
@@ -65,8 +65,10 @@ hubUrl <- function(x) {
 .hub_resource <-
     function(hub, resource, cachepath, overwrite=FALSE)
 {
-    if (length(resource)) {
-        msg <- sprintf("retrieving %d resources", length(resource))
+    len <- length(resource)
+    if (len > 0L) {
+        msg <- sprintf("retrieving %d resource%s", len,
+                       if (len > 1L) "s" else "")
         message(msg)
     }
 
@@ -80,8 +82,7 @@ hubUrl <- function(x) {
     }
 
     hubpath <- .hub_resource_path(hub, resource)
-    ## Then extract the resource(s)
-    mapply(.getResource, hubpath, cachepath)
+    mapply(.hub_cache_resource, hubpath, cachepath)
 }
 
 

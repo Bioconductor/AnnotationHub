@@ -2,7 +2,8 @@
 
 .AnnotationHub <- setClass("AnnotationHub",
     representation(hub="character", cache="character", date="character",
-                   .db_connection="SQLiteConnection", .db_uid="integer")
+                   .db_connection="SQLiteConnection", .db_index="character",
+                   .db_uid="integer")
 )
 
 ## Add code to check : https://annotationhub.bioconductor.org/metadata/highest_id
@@ -15,7 +16,7 @@ AnnotationHub <-
     if (!isSingleString(hub))
         stop("'hub' must be a single string (url)")
     if (!isSingleString(cache))
-        stop("'cache' must be a single string (file path)")
+        stop("'cache' must be a single string (directory path)")
     if (!isSingleInteger(max.downloads)) {
         msg <- "'max.downloads' must be a single integer
                 (resource download throttle)"
@@ -23,146 +24,167 @@ AnnotationHub <-
     }
 
     .db_path <- .cache_create(cache)
-    .db_connection <- .getDbConn(.db_path, hub)
+    .db_connection <- .db_get(.db_path, hub)
     .date <- max(.possibleDates(.db_connection))    
-    .db_uid <- .getDbUid(.db_path, .db_connection, .date)
-    .AnnotationHub(cache=cache, hub=hub, date=.date,
-                   .db_connection=.db_connection, .db_uid=.db_uid)
+    .db_uid <- .db_uid0(.db_connection, .date, .db_path)
+    hub <- .AnnotationHub(cache=cache, hub=hub, date=.date,
+                          .db_connection=.db_connection, .db_uid=.db_uid)
+    message("snapshotDate(): ", snapshotDate(hub))
+    .db_index <- .db_index_create(hub)
+    initialize(hub, .db_index=.db_index)
 }
 
-
-.makeConnection <- function(db_path){
+## Helpers to get a fresh metadata DB connection
+.db_get_db <- function(path, hub) {
+    ## download or cache
     tryCatch({
-        dbConnect(SQLite(), db_path)
+        need <- !file.exists(path)
+        .hub_resource(.hub_metadata_path(hub), basename(path)[need], path[need])
     }, error=function(err) {
-        stop("'AnnotationHub' failed to open local data base",
-             "\n  database: ", sQuote(db_path),
+        stop("'AnnotationHub' failed to create local data base",
+             "\n  database: ", sQuote(path),
+             "\n  reason: ", conditionMessage(err),
+             call.=FALSE)
+    })
+    .db_open(path)
+}
+
+.db_open <- function(path){
+    tryCatch({
+        dbConnect(SQLite(), path)
+    }, error=function(err) {
+        stop("'AnnotationHub' failed to connect to local data base",
+             "\n  database: ", sQuote(path),
              "\n  reason: ", conditionMessage(err),
              call.=FALSE)
     })    
 }
 
-.createViewIfneeded <- function(con){
-    ## Create a view for dlyr folks (can remove stuff here as needed)
-    sql <- paste0("CREATE VIEW IF NOT EXISTS AllCoreData AS SELECT",
-                  " ah_id,title,dataprovider,species,taxonomyid,genome,",
-                  "description,coordinate_1_based,maintainer,status_id,",
-                  "location_prefix_id,recipe_id,rdatadateadded,",
-                  "rdatadateremoved,record_id,preparerclass,rdatapath,",
-                  "dispatchclass,sourcesize,sourceurl,sourceversion,",
-                  "sourcemd5,sourcelastmodifieddate,rdp.resource_id,",
-                  "sourcetype FROM resources AS res, rdatapaths AS rdp, ",
-                  "input_sources AS ins WHERE res.id = rdp.resource_id ",
-                  "AND res.id = ins.resource_id ") 
-    dbGetQuery(con, sql)
+.db_close <- function(con) {
+    dbDisconnect(con)
 }
 
-## Helper to make the metadata DB connection
-.getDbConn <- function(db_path, hub){    
-    if(!file.exists(db_path)){ .getMetadataDb(db_path, hub) }
-    ## This just gets a formal DB connection object
-    .db_connection <- .makeConnection(db_path)
-    ## Before we try to connect to the DB and check for staleness, 
-    ## lets 1st check that the DB we have is valid
-    .checkDBIsValid(.db_connection)
-    
-    ## Here I need to test the DB that I have to make sure its current.
-    if(.isDbStale(.db_connection)){ ## get another one
-        ## Then disconnect from the old DB
-        dbDisconnect(.db_connection)
-        ## TODO: delete the existing one  
-        file.remove(db_path)
-        ## AND replace it with a new one
-        .getMetadataDb(db_path, hub)
-        ## And then reconnect to the updated DB 
-        .db_connection <- .makeConnection(db_path)
-        ## New DB?  So make sure the new one is valid as well.
-        .checkDBIsValid(.db_connection)
-    }
-    ## if we need to, then make a view for dplyr folks
-    .createViewIfneeded(.db_connection)
-    
-    ## always return a good connection
-    .db_connection
-}
-
-## Some very minor testing to make sure metadata DB is intact.
-.checkDBIsValid <- function(con){
-    ## are required tables present?
-    expected <- c("biocversions","input_sources","location_prefixes",
-                  "rdatapaths", "recipes","resources", 
-                  "statuses","tags", "timestamp")
-    tables <- dbListTables(con)
-    if (!all(expected %in% tables))
-        stop("'AnnotationHub' database corrupt; remove it and try again",
-             "\n  database: ", sQuote(con@dbname),
-             "\n  reason: missing tables",
-             call.=FALSE)
-    ## are there values for resources?
-    sql <- "SELECT count(id) FROM resources"
-    numResources <- dbGetQuery(con, sql)[[1]]
-    if (numResources < 1L)
-        stop("'AnnotationHub' database corrupt; remove it and try again",
-             "\n  database: ", sQuote(con@dbname),
-             "\n  reason: database empty",
-             call.=FALSE)
-    TRUE
-}
-
-
-## Helper to just get a fresh the metadata DB connection
-.getMetadataDb <- function(db_path, hub){
-    ## This makes the DB (if it's absent)
+.db_is_current <- function(path, hub) {
     tryCatch({
-            .hub_resource(.hub_metadata_path(hub), basename(db_path), db_path)
-    }, error=function(err) {
-        stop("'AnnotationHub' failed to create local data base",
-             "\n  database: ", sQuote(db_path),
-             "\n  reason: ", conditionMessage(err),
-             call.=FALSE)
-    })
-}
-
-## Helper checks if local Db is stale, returns TRUE if it needs an update.
-.isDbStale <- function(con){
-    ## Compare the timestamp online to the one in the DB
-    url <- paste0(hubOption('URL'), '/metadata/database_timestamp')
-    tryCatch({
+        url <- paste0(hub, '/metadata/database_timestamp')
         onlineTime <- as.POSIXct(content(GET(url)))        
-        ## then get the db timestamp
+
+        con <- .db_get_db(path, hub)
         sql <- "SELECT * FROM timestamp"
         localTime <- as.POSIXct(dbGetQuery(con, sql)[[1]])
-        onlineTime > localTime
+        .db_close(con)
+
+        onlineTime == localTime
     }, error=function(e) {
         warning("'AnnotationHub' database may not be current",
-                "\n  database: ", sQuote(con@dbname),
+                "\n  database: ", sQuote(dbfile(con)),
                 "\n  reason: ", conditionMessage(e),
                 call.=FALSE)
         FALSE
     })
 }
 
-
-## Helper to get relevant .uids for the object
-.getDbUid <- function(db_path, .db_connection, .date){
-    .db_uid <- tryCatch({
-        uid <- .uid0(.db_connection, .date)
-        sort(uid)
+.db_is_valid <- function(con) {
+    ## Some very minor testing to make sure metadata DB is intact.
+    tryCatch({
+        ## required tables present?
+        expected <- c("biocversions", "input_sources", "location_prefixes",
+                      "rdatapaths", "recipes", "resources", "statuses",
+                      "tags", "timestamp")
+        if (!all(expected %in% dbListTables(con)))
+            stop("missing tables")
+        ## any resources?
+        sql <- "SELECT COUNT(id) FROM resources"
+        if (dbGetQuery(con, sql)[[1]] == 0L)
+            stop("empty 'resources' table")
     }, error=function(err) {
-        stop("'AnnotationHub' failed to connect to local data base ",
-             "\n  database: ", sQuote(db_path),
+        stop("'AnnotationHub' database corrupt; remove it and try again",
+             "\n  database: ", sQuote(dbfile(con)),
              "\n  reason: ", conditionMessage(err),
              call.=FALSE)
     })
-    .db_uid
+    TRUE
 }
 
+.db_create_view <- function(con) {
+    ## Create a 'flat' view for simplified access, e.g., via dlyr
+    sql <- 
+        "CREATE VIEW IF NOT EXISTS AllCoreData AS
+         SELECT
+           ah_id, title, dataprovider, species, taxonomyid, genome,
+           description, coordinate_1_based, maintainer, status_id,
+           location_prefix_id, recipe_id, rdatadateadded,
+           rdatadateremoved, record_id, preparerclass, rdatapath,
+           dispatchclass, sourcesize, sourceurl, sourceversion,
+           sourcemd5, sourcelastmodifieddate, rdp.resource_id,
+           sourcetype
+         FROM
+           resources AS res,
+           rdatapaths AS rdp, 
+           input_sources AS ins
+         WHERE res.id = rdp.resource_id 
+         AND res.id = ins.resource_id;"
+    dbGetQuery(con, sql)
+}
+
+.db_get <- function(path, hub) {
+    update <- !file.exists(path)
+    if (!update && !.db_is_current(path, hub)) {
+        file.remove(path)
+        update <- TRUE
+    }
+    if (update)
+        message("updating AnnotationHub metadata: ", appendLF=FALSE)
+    con <- .db_get_db(path, hub)
+    .db_is_valid(con)
+    .db_create_view(con)
+    con
+}
+
+
+.db_uid0 <- function(con, .date, path){
+    tryCatch({
+        uid <- .uid0(con, .date)
+        sort(uid)
+    }, error=function(err) {
+        stop("'AnnotationHub' failed to connect to local data base",
+             "\n  database: ", sQuote(path),
+             "\n  reason: ", conditionMessage(err),
+             call.=FALSE)
+    })
+}
+
+.db_index_file <- function(x)
+    file.path(hubCache(x), "index.rds")
+
+.db_index_create <- function(x) {
+    fl <- .db_index_file(x)
+    if (file.exists(fl) && (file.mtime(fl) > file.mtime(dbfile(x))))
+        return(fl)
+    
+    tryCatch({
+        tbl <- .resource_table(x)
+        tbl <- setNames(do.call("paste", c(tbl, sep="\r")), rownames(tbl))
+        saveRDS(tbl, fl)
+    }, error=function(err) {
+        stop("'AnnotationHub' failed to create index",
+             "\n  hubCache(): ", hubCache(x),
+             "\n  reason: ", conditionMessage(err))
+    })
+
+    fl
+}
+
+.db_index_load <- function(x)
+    readRDS(.db_index_file(x))[names(x)]
 
 ## accessors
 
 .cache <- function(x) slot(x, "cache")
 
 .hub <- function(x) slot(x, "hub")
+
+.db_index <- function(x) slot(x, ".db_index")
 
 .db_uid <- function(x) slot(x, ".db_uid")
 
@@ -178,7 +200,7 @@ AnnotationHub <-
 
 setMethod("dbconn", "AnnotationHub", function(x) slot(x, ".db_connection"))
 
-setMethod("dbfile", "AnnotationHub", function(x) dbconn(x)@dbname)
+setMethod("dbfile", "AnnotationHub", function(x) dbfile(dbconn(x)))
 
 .snapshotDate <- function(x) slot(x, "date")
 
@@ -328,12 +350,10 @@ setGeneric("query", function(x, pattern, ...) standardGeneric("query"),
 setMethod("query", "AnnotationHub",
     function(x, pattern, ignore.case=TRUE, pattern.op=`&`)
 {
-    tbl <- mcols(x)
+    tbl <- .db_index_load(x)
     idx <- logical()
     for (pat in pattern) {
-        idx0 <- logical(nrow(tbl))
-        for (column in names(tbl))   # '|' across columns
-            idx0 <- idx0 | grepl(pat, tbl[[column]], ignore.case=ignore.case)
+        idx0 <- grepl(pat, tbl, ignore.case=ignore.case)
         if (length(idx))
             idx <- pattern.op(idx, idx0) # pattern.op for combining patterns
         else

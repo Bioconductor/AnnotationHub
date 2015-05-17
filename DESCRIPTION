@@ -1,7 +1,7 @@
 Package: AnnotationHub
 Type: Package 
 Title: Client to access AnnotationHub resources
-Version: 2.1.12
+Version: 2.1.13
 Authors@R:
     c(person("Martin", "Morgan", email="mtmorgan@fhcrc.org", role="cre"),
       person("Marc", "Carlson", role="ctb"),
@@ -20,7 +20,7 @@ Description: This package provides a client for the Bioconductor
     access.
 License: Artistic-2.0
 Imports: utils, methods, RSQLite, BiocInstaller, BiocGenerics,
-    S4Vectors, interactiveDisplayBase, httr, AnnotationDbi
+    S4Vectors, interactiveDisplayBase, httr, AnnotationDbi (>= 1.31.9)
 Suggests: GenomicRanges, GenomeInfoDb, VariantAnnotation, Rsamtools,
     rtracklayer, BiocStyle, knitr, AnnotationForge, rBiopaxParser,
     RUnit
