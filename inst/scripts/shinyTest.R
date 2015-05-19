@@ -150,7 +150,7 @@ display2 <-
                     Shiny.onInputChange('tbl',                    
             table.rows('.selected').indexes().toArray());
                     }); }")
-## TODO: change the above callback so that it returns rowData (not just indexes)
+## TODO: change the above callback so that it returns rowRanges (not just indexes)
                 observe({
                     if(input$btnSend > 0)
                         isolate({
