@@ -1,0 +1,174 @@
+<!--
+% \VignetteIndexEntry{AnnotationHub: AnnotationHub HOW TO's}
+% \VignetteDepends{AnnotationHub}
+% \VignetteEngine{knitr::knitr}
+-->
+
+```{r style, echo = FALSE, results = 'asis'}
+BiocStyle::markdown()
+```
+
+# AnnotationHub HOW To's
+
+**Package**: `r Biocpkg("AnnotationHub")`<br />
+**Authors**: `r packageDescription("AnnotationHub")[["Author"]] `<br />
+**Modified**: 20 May, 2015<br />
+**Compiled**: `r date()`
+
+
+# Acccessing Epigenome RoadMap Project Data from AnnotationHub
+
+
+All Epigenome roadmap files are hosted [here](http://egg2.wustl.edu/roadmap/data/byFileType/)
+
+If one had to download these files on their own, one would use something like
+the following R code.
+
+```{r, eval=FALSE}
+url <- "http://egg2.wustl.edu/roadmap/data/byFileType/peaks/consolidated/broadPeak/E001-H3K4me1.broadPeak.gz"
+filename = basename(url)
+download.file(url, destfile=filename)
+if(file.exists(filename)){
+   data <- import(filename, format="bed")
+}
+```
+This would have to be repeated for all the files and the onus would lie on the
+user to make sure he populates a list of all possible files that he's 
+interested in, download them and then read those files into R using the
+appropriate functions.
+
+AnnotationHub reduces this task to just a few lines of Rcode 
+```{r}
+library(AnnotationHub)
+ah = AnnotationHub()
+epiFiles <- query(ah, "EpigenomeRoadMap")
+```
+A closer look at the show method tells us that `r length(epiFiles)` are 
+available to us via AnnotationHub. And apart from the files we can get 
+information about the files ie where the files came from (dataprovider),
+genome, species, sourceurl, sourcetypes. 
+```{r}
+epiFiles
+```
+
+A good sanity check to ensure that we have files only from EpigenomeRoadMap
+project, is to check that all the files in the returned smaller hub object, 
+come from Homo sapiens and the same genome 
+```{r}
+unique(epiFiles$species)
+unique(epiFiles$genome)
+```
+Broadly, one can get an idea of the different files from this project 
+looking at the sourcetype
+```{r}
+table(epiFiles$sourcetype)
+```
+
+To get a more descriptive idea of these different files one can use:
+```{r}
+sort(table(epiFiles$description))
+```
+
+The metadata underlying these files is also available. Note that the show 
+method is quite different for 1 file as compared to a group of files. 
+```{r}
+metadatafile <- query(ah , c("EpigenomeRoadMap", "Metadata"))
+metadatafile
+```
+
+One can retrive the whole file using the '[[' as indicated at
+the end of the show method
+```{r}
+metadata <- ah[["AH41830"]]
+head(metadata[,1:5])
+```
+
+One can keep constructing different queries using multiple arguments to 
+trim down these `r length(epiFiles)` to get the files one wants. 
+For example, to get the chipseq files for consolidated epigenomes, 
+one could use
+```{r}
+bpChipEpi <- query(ah , c("EpigenomeRoadMap", "broadPeak", "chip", "consolidated"))
+```
+
+Or To get all the bigWig signal files, one can query the hub using 
+```{r}
+allBigWigFiles <- query(ah, c("EpigenomeRoadMap", "BigWig"))
+```
+
+Or to access the 15 state chromatin segmentations, one can use
+```{r}
+seg <- query(ah, c("EpigenomeRoadMap", "segmentations"))
+```
+
+Or one might be interested in getting all the files related to one sample
+```{r}
+E126 <- query(ah , c("EpigenomeRoadMap", "E126", "H3K4ME2"))
+E126
+```
+
+Where possible the files are parsed and returned as the appropriate object. 
+For example, the peak files are returned as GRanges objects. These GRanges 
+objects have their seqinfo populated too.  
+
+```{r}
+gr19 <- E126[[1]]
+gr19
+seqinfo(gr19)
+```
+The bigWig files are returned as BigWig File objects which you can then read
+in using rtracklayer::import()
+
+Each AnnotationHub record is associated with a unique identifier. 
+Most GRanges object contain a metadata slot which contains the unique 
+AnnotationHub identifier. This can come handy when a user has been working with
+the GRanges object for a while, and wants to retrive the name of the file
+or the sourceurl for the GRanges object that he/she is working with.
+
+```{r}
+metadata(gr19)
+ah[metadata(gr19)$AnnotationHubName]$sourceurl
+```
+
+##LiftOver Example
+
+Let us assume we wanted to lift features from one genome build to the other.
+We know that UCSC provides liftover tools for such tasks. 
+
+In this example, we will take our broad Peak GRanges from E126 which comes
+from 'hg19' genome and liftover features to 'hg18'
+
+```{r}
+chainfiles <- query(ah , c("hg38", "hg19", "chainfile"))
+chainfiles
+```
+
+We are interested in the one which lifts over features from hg19 to hg 18
+so lets download that using 
+
+```{r}
+chain <- chainfiles[['AH14150']]
+chain
+```
+Lets perform the liftOver operation using rtracklayer's function 
+
+```{r}
+library(rtracklayer)
+gr18 <- liftOver(gr19, chain)
+```
+This returns a GRangeslist - one can unlist it to get a GRanges and
+specify the genome to get the final result 
+
+```{r}
+gr18 <- unlist(gr18)
+genome(gr18) <- "hg18"
+gr18
+``` 
+
+
+# SessionInfo
+
+```{r}
+sessionInfo()
+```
+
