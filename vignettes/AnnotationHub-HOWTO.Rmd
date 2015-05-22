@@ -76,7 +76,7 @@ metadata.tab <- query(ah , c("EpigenomeRoadMap", "Metadata"))
 metadata.tab
 ```
 
-One can retrive the whole file using the '[[' as indicated at
+One can retrieve the whole file using the '[[' as indicated at
 the end of the show method
 
 ```{r results='hide'}
@@ -172,6 +172,65 @@ This returns a _GRangeslist_ -One can specify the genome to get the final result
 genome(gr18) <- "hg18"
 gr18
 ``` 
+
+## Get Variants from dbSNP 
+
+One may also be interested in finding out "common" germline variations with 
+evidence of medical interest. This information is available at NCBI 
+[here](http://www.ncbi.nlm.nih.gov/variation/docs/human_variation_vcf/)
+
+We need to get the "common_and_clinical.vcf.gz" from GRCh38. NCBI has 2 builds
+- b141 and b14, for GRCh38 - we will query for files from b142
+
+```{r}
+vcf_file <- query(ah, c("grch38", "b142", "vcffile", "common_and_clinical"))
+vcf_file
+```
+```{r results='hide', message=FALSE}
+vcf <- ah[['AH47032']]
+```
+This returns a _VcfFile_ which can be read in using `r Biocpkg("VariantAnnotation")`
+
+```{r message=FALSE}
+library(VariantAnnotation)
+vcf
+vcfdata <- readVcf(vcf, genome="hg19")
+```
+
+_rowRanges_ contains information from the CHROM, POS and ID fields of the VCF 
+file, represented as a _GRanges_
+
+```{r}
+vcf_rng <- rowRanges(vcfdata)
+vcf_rng
+```
+
+Note that the broadPeaks follow the UCSC style of chromosome naming convention,
+and the vcf data follows the NCBI style of chromosome naming convention. 
+To bring both the broadPeaks from E126 and these ranges in the same chromosome
+naming convention (ie UCSC), we would use
+
+```{r}
+seqlevelsStyle(vcf_rng) <-"UCSC"
+```
+
+And then finally to find which Variants overlap these broadPeaks we would use:
+
+```{r}
+overlap <- findOverlaps(vcf_rng, gr19)
+overlap
+```
+
+One can then interpret the results in the following manner- In these broadPeaks
+
+```{r}
+gr19[head(subjectHits(overlap)),]
+```
+the following common variants were found 
+```{r}
+vcf_rng[head(queryHits(overlap)),]
+```
+
 
 
 # SessionInfo
