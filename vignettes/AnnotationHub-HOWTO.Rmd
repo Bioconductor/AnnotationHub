@@ -37,14 +37,14 @@ user to make sure he populates a list of all possible files that he's
 interested in, download them and then read those files into R using the
 appropriate functions.
 
-AnnotationHub reduces this task to just a few lines of Rcode 
-```{r}
+`r Biocpkg("AnnotationHub")` reduces this task to just a few lines of Rcode 
+```{r results='hide'}
 library(AnnotationHub)
 ah = AnnotationHub()
 epiFiles <- query(ah, "EpigenomeRoadMap")
 ```
 A closer look at the show method tells us that `r length(epiFiles)` are 
-available to us via AnnotationHub. And apart from the files we can get 
+available to us via `r Biocpkg("AnnotationHub")`. And apart from the files we can get 
 information about the files ie where the files came from (dataprovider),
 genome, species, sourceurl, sourcetypes. 
 ```{r}
@@ -72,15 +72,22 @@ sort(table(epiFiles$description))
 The metadata underlying these files is also available. Note that the show 
 method is quite different for 1 file as compared to a group of files. 
 ```{r}
-metadatafile <- query(ah , c("EpigenomeRoadMap", "Metadata"))
-metadatafile
+metadata.tab <- query(ah , c("EpigenomeRoadMap", "Metadata"))
+metadata.tab
 ```
 
 One can retrive the whole file using the '[[' as indicated at
 the end of the show method
+
+```{r results='hide'}
+metadata.tab <- ah[["AH41830"]]
+```
+
+The metadata.tab file is returned as a data.frame and the first 6 rows of the 
+first 5 columns are shown here
+
 ```{r}
-metadata <- ah[["AH41830"]]
-head(metadata[,1:5])
+head(metadata.tab[,1:5])
 ```
 
 One can keep constructing different queries using multiple arguments to 
@@ -108,22 +115,23 @@ E126
 ```
 
 Where possible the files are parsed and returned as the appropriate object. 
-For example, the peak files are returned as GRanges objects. These GRanges 
-objects have their seqinfo populated too.  
+For example, the peak files are returned as _GRanges_ objects.
 
+```{r results='hide'}
+gr19 <- E126[['AH29817']]
+```
 ```{r}
-gr19 <- E126[[1]]
 gr19
 seqinfo(gr19)
 ```
-The bigWig files are returned as BigWig File objects which you can then read
+The bigWig files are returned as _BigWigFile_ objects which you can then read
 in using rtracklayer::import()
 
-Each AnnotationHub record is associated with a unique identifier. 
-Most GRanges object contain a metadata slot which contains the unique 
+Each record inside `r Biocpkg("AnnotationHub")` is associated with a unique 
+identifier. Most _GRanges_ object contain a metadata slot which contains the unique 
 AnnotationHub identifier. This can come handy when a user has been working with
-the GRanges object for a while, and wants to retrive the name of the file
-or the sourceurl for the GRanges object that he/she is working with.
+the _GRanges_ object for a while, and wants to retrive the name of the file
+or the sourceurl for the _GRanges_ object that he/she is working with.
 
 ```{r}
 metadata(gr19)
@@ -135,7 +143,7 @@ ah[metadata(gr19)$AnnotationHubName]$sourceurl
 Let us assume we wanted to lift features from one genome build to the other.
 We know that UCSC provides liftover tools for such tasks. 
 
-In this example, we will take our broad Peak GRanges from E126 which comes
+In this example, we will take our broad Peak _GRanges_ from E126 which comes
 from 'hg19' genome and liftover features to 'hg18'
 
 ```{r}
@@ -146,21 +154,21 @@ chainfiles
 We are interested in the one which lifts over features from hg19 to hg 18
 so lets download that using 
 
-```{r}
+```{r results='hide'}
 chain <- chainfiles[['AH14150']]
+```
+```{r}
 chain
 ```
-Lets perform the liftOver operation using rtracklayer's function 
+Lets perform the liftOver operation using `r Biocpkg("rtracklayer")` 
 
 ```{r}
 library(rtracklayer)
 gr18 <- liftOver(gr19, chain)
 ```
-This returns a GRangeslist - one can unlist it to get a GRanges and
-specify the genome to get the final result 
+This returns a _GRangeslist_ -One can specify the genome to get the final result 
 
 ```{r}
-gr18 <- unlist(gr18)
 genome(gr18) <- "hg18"
 gr18
 ``` 
