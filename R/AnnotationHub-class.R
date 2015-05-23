@@ -280,6 +280,7 @@ setMethod("[", c("AnnotationHub", "numeric", "missing"),
 setMethod("[", c("AnnotationHub", "logical", "missing"),
     function(x, i, j, ..., drop=TRUE)
 {
+    i[is.na(i)] <- FALSE
     .db_uid(x) <- .db_uid(x)[i]
     x
 })

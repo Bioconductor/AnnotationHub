@@ -7,6 +7,13 @@ test_query <- function() {
     checkEquals(nm, names(mcols(q1)))
 }
 
+test_NA_subscript <- function() {
+    ah <- AnnotationHub()
+    checkIdentical(0L, length(ah[NA]))
+    checkIdentical(0L, length(ah[NA_character_]))
+    checkIdentical(0L, length(ah[NA_integer_]))
+}
+
 test_as.list_and_c <- function() {
     ah <- AnnotationHub()
     cc <- selectMethod("c", "AnnotationHub")
