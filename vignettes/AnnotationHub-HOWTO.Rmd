@@ -6,9 +6,10 @@
 
 ```{r style, echo = FALSE, results = 'asis'}
 BiocStyle::markdown()
+options(width=100)
 ```
 
-# AnnotationHub HOW To's
+# AnnotationHub How-To's
 
 **Package**: `r Biocpkg("AnnotationHub")`<br />
 **Authors**: `r packageDescription("AnnotationHub")[["Author"]] `<br />
@@ -16,44 +17,46 @@ BiocStyle::markdown()
 **Compiled**: `r date()`
 
 
-# Acccessing Epigenome RoadMap Project Data from AnnotationHub
+# Accessing Genome-Scale Data
 
+## Roadmap Epigenomics Project 
 
-All Epigenome roadmap files are hosted [here](http://egg2.wustl.edu/roadmap/data/byFileType/)
-
-If one had to download these files on their own, one would use something like
-the following R code.
+All Roadmap Epigenomics files are hosted
+[here](http://egg2.wustl.edu/roadmap/data/byFileType/). If one had to
+download these files on their own, one would navigate through the web
+interface to find useful files, then use something like the following
+_R_ code.
 
 ```{r, eval=FALSE}
 url <- "http://egg2.wustl.edu/roadmap/data/byFileType/peaks/consolidated/broadPeak/E001-H3K4me1.broadPeak.gz"
-filename = basename(url)
+filename <-  basename(url)
 download.file(url, destfile=filename)
-if(file.exists(filename)){
+if (file.exists(filename))
    data <- import(filename, format="bed")
-}
 ```
-This would have to be repeated for all the files and the onus would lie on the
-user to make sure he populates a list of all possible files that he's 
-interested in, download them and then read those files into R using the
-appropriate functions.
+This would have to be repeated for all files, and the onus would lie
+on the user to identify, download, import, and manage the local disk
+location of these files.
 
-`r Biocpkg("AnnotationHub")` reduces this task to just a few lines of Rcode 
+`r Biocpkg("AnnotationHub")` reduces this task to just a few lines of _R_ code 
 ```{r results='hide'}
 library(AnnotationHub)
 ah = AnnotationHub()
 epiFiles <- query(ah, "EpigenomeRoadMap")
 ```
-A closer look at the show method tells us that `r length(epiFiles)` are 
-available to us via `r Biocpkg("AnnotationHub")`. And apart from the files we can get 
-information about the files ie where the files came from (dataprovider),
-genome, species, sourceurl, sourcetypes. 
+A look at the value returned by `epiFiles` shows us that 
+`r length(epiFiles)` roadmap resources are available via 
+`r Biocpkg("AnnotationHub")`.  Additional information about 
+the files is also available, e.g., where the files came from
+(dataprovider), genome, species, sourceurl, sourcetypes.
+
 ```{r}
 epiFiles
 ```
 
-A good sanity check to ensure that we have files only from EpigenomeRoadMap
-project, is to check that all the files in the returned smaller hub object, 
-come from Homo sapiens and the same genome 
+A good sanity check to ensure that we have files only from the Roadmap Epigenomics
+project is to check that all the files in the returned smaller hub object
+come from _Homo sapiens_ and the `r unique(epiFiles$genome)` genome 
 ```{r}
 unique(epiFiles$species)
 unique(epiFiles$genome)
@@ -63,179 +66,204 @@ looking at the sourcetype
 ```{r}
 table(epiFiles$sourcetype)
 ```
-
 To get a more descriptive idea of these different files one can use:
 ```{r}
-sort(table(epiFiles$description))
+sort(table(epiFiles$description), decreasing=TRUE)
 ```
 
-The metadata underlying these files is also available. Note that the show 
-method is quite different for 1 file as compared to a group of files. 
+The 'metadata' provided by the Roadmap Epigenomics Project is also
+available. Note that the information displayed about a hub with a
+single resource is quite different from the information displayed when
+the hub references more than one resource.
 ```{r}
 metadata.tab <- query(ah , c("EpigenomeRoadMap", "Metadata"))
 metadata.tab
 ```
 
-One can retrieve the whole file using the '[[' as indicated at
-the end of the show method
+So far we have been exploring information about resources, without
+downloading the resource to a local cache and importing it into R.
+One can retrieve the resource using `[[` as indicated at the
+end of the show method
 
-```{r results='hide'}
+```{r echo=FALSE, results='hide'}
+metadata.tab <- ah[["AH41830"]]
+```
+```{r}
 metadata.tab <- ah[["AH41830"]]
 ```
 
-The metadata.tab file is returned as a data.frame and the first 6 rows of the 
-first 5 columns are shown here
+The metadata.tab file is returned as a _data.frame_. The first 6 rows
+of the first 5 columns are shown here:
 
 ```{r}
-head(metadata.tab[,1:5])
+metadata.tab[1:6, 1:5]
 ```
 
 One can keep constructing different queries using multiple arguments to 
 trim down these `r length(epiFiles)` to get the files one wants. 
-For example, to get the chipseq files for consolidated epigenomes, 
+For example, to get the ChIP-Seq files for consolidated epigenomes, 
 one could use
 ```{r}
 bpChipEpi <- query(ah , c("EpigenomeRoadMap", "broadPeak", "chip", "consolidated"))
 ```
-
-Or To get all the bigWig signal files, one can query the hub using 
+To get all the bigWig signal files, one can query the hub using 
 ```{r}
 allBigWigFiles <- query(ah, c("EpigenomeRoadMap", "BigWig"))
 ```
-
-Or to access the 15 state chromatin segmentations, one can use
+To access the 15 state chromatin segmentations, one can use
 ```{r}
 seg <- query(ah, c("EpigenomeRoadMap", "segmentations"))
 ```
-
-Or one might be interested in getting all the files related to one sample
+If one is interested in getting all the files related to one sample
 ```{r}
 E126 <- query(ah , c("EpigenomeRoadMap", "E126", "H3K4ME2"))
 E126
 ```
+Hub resources can also be selected using `$`, `subset()`, and
+`display()`; see the main
+[_AnnotationHub_ vignette](AnnotationHub.html) for additional detail.
 
-Where possible the files are parsed and returned as the appropriate object. 
-For example, the peak files are returned as _GRanges_ objects.
+Hub resources are imported as the appropriate _Bioconductor_ object
+for use in further analysis.  For example, peak files are returned as
+_GRanges_ objects.
 
-```{r results='hide'}
-gr19 <- E126[['AH29817']]
+```{r echo=FALSE, results='hide'}
+peaks <- E126[['AH29817']]
 ```
 ```{r}
-gr19
-seqinfo(gr19)
+peaks <- E126[['AH29817']]
+seqinfo(peaks)
 ```
-The bigWig files are returned as _BigWigFile_ objects which you can then read
-in using rtracklayer::import()
 
-Each record inside `r Biocpkg("AnnotationHub")` is associated with a unique 
-identifier. Most _GRanges_ object contain a metadata slot which contains the unique 
-AnnotationHub identifier. This can come handy when a user has been working with
-the _GRanges_ object for a while, and wants to retrive the name of the file
-or the sourceurl for the _GRanges_ object that he/she is working with.
+BigWig files are returned as _BigWigFile_ objects. A _BigWigFile_ is a
+reference to a file on disk; the data in the file can be read in using
+`rtracklayer::import()`, perhaps querying these large files for
+particular genomic regions of interest as described on the help page
+`?import.bw`.
+
+Each record inside `r Biocpkg("AnnotationHub")` is associated with a
+unique identifier. Most _GRanges_ objects returned by 
+`r Biocpkg("AnnotationHub")` contain the unique AnnotationHub identifier of
+the resource from which the _GRanges_ is derived.  This can come handy
+when working with the _GRanges_ object for a while, and additional
+information about the object (e.g., the name of the file in the cache,
+or the original sourceurl for the data underlying the resource) that
+is being worked with.
 
 ```{r}
-metadata(gr19)
-ah[metadata(gr19)$AnnotationHubName]$sourceurl
+metadata(peaks)
+ah[metadata(peaks)$AnnotationHubName]$sourceurl
 ```
 
-##LiftOver Example
+## liftOver
 
-Let us assume we wanted to lift features from one genome build to the other.
-We know that UCSC provides liftover tools for such tasks. 
+Suppose we wanted to lift features from one genome build to another,
+e.g., because annotations were generated for hg19 but our experimental
+analysis used hg18.  We know that UCSC provides 'liftover' files for
+mapping between genome builds.
 
-In this example, we will take our broad Peak _GRanges_ from E126 which comes
-from 'hg19' genome and liftover features to 'hg18'
+In this example, we will take our broad Peak _GRanges_ from E126 which
+comes from the 'hg19' genome, and lift over these features to their
+'hg38' coordinates.
 
 ```{r}
 chainfiles <- query(ah , c("hg38", "hg19", "chainfile"))
 chainfiles
 ```
 
-We are interested in the one which lifts over features from hg19 to hg 18
-so lets download that using 
+We are interested in the file that lifts over features from hg19 to
+hg38 so lets download that using
 
-```{r results='hide'}
+```{r echo=FALSE, results='hide'}
 chain <- chainfiles[['AH14150']]
 ```
 ```{r}
+chain <- chainfiles[['AH14150']]
 chain
 ```
-Lets perform the liftOver operation using `r Biocpkg("rtracklayer")` 
+Perform the liftOver operation using `rtracklayer::liftOver()`:
 
 ```{r}
 library(rtracklayer)
-gr18 <- liftOver(gr19, chain)
+gr38 <- liftOver(peaks, chain)
 ```
-This returns a _GRangeslist_ -One can specify the genome to get the final result 
+This returns a _GRangeslist_; update the genome of the result to get
+the final result
 
 ```{r}
-genome(gr18) <- "hg18"
-gr18
+genome(gr38) <- "hg38"
+gr38
 ``` 
 
-## Get Variants from dbSNP 
+## dbSNP Variants
 
-One may also be interested in finding out "common" germline variations with 
-evidence of medical interest. This information is available at NCBI 
-[here](http://www.ncbi.nlm.nih.gov/variation/docs/human_variation_vcf/)
+One may also be interested in working with common germline variants with 
+evidence of medical interest. This information is available at 
+[NCBI](http://www.ncbi.nlm.nih.gov/variation/docs/human_variation_vcf/).
 
-We need to get the "common_and_clinical.vcf.gz" from GRCh38. NCBI has 2 builds
-- b141 and b14, for GRCh38 - we will query for files from b142
+We need to get the "common\_and\_clinical.vcf.gz" from GRCh38. NCBI
+has 2 builds (b141 and b142) for GRCh38 - we will query for files from
+b142
 
-```{r}
-vcf_file <- query(ah, c("grch38", "b142", "vcffile", "common_and_clinical"))
-vcf_file
-```
-```{r results='hide', message=FALSE}
+```{r echo=FALSE, results='hide', message=FALSE}
 vcf <- ah[['AH47032']]
 ```
-This returns a _VcfFile_ which can be read in using `r Biocpkg("VariantAnnotation")`
+```{r}
+query(ah, c("GRCh38", "b142", "vcffile", "common_and_clinical"))
+vcf <- ah[['AH47032']]
+```
+This returns a _VcfFile_ which can be read in using `r Biocpkg("VariantAnnotation")`;
+because VCF files can be large, `readVcf()` supports several
+strategies for importing only relevant parts of the file (e.g.,
+particular genomic locations, particular features of the variants),
+see `?readVcf` for additional information.
 
 ```{r message=FALSE}
-library(VariantAnnotation)
-vcf
-vcfdata <- readVcf(vcf, genome="hg19")
+variants <- readVcf(vcf, genome="hg19")
+variants
 ```
 
-_rowRanges_ contains information from the CHROM, POS and ID fields of the VCF 
-file, represented as a _GRanges_
+`rowRanges()` returns information from the CHROM, POS and ID fields of the VCF 
+file, represented as a _GRanges_ instance
 
 ```{r}
-vcf_rng <- rowRanges(vcfdata)
-vcf_rng
+rowRanges(variants)
 ```
 
-Note that the broadPeaks follow the UCSC style of chromosome naming convention,
+Note that the broadPeaks files follow the UCSC chromosome naming convention,
 and the vcf data follows the NCBI style of chromosome naming convention. 
-To bring both the broadPeaks from E126 and these ranges in the same chromosome
+To bring these ranges in the same chromosome
 naming convention (ie UCSC), we would use
 
 ```{r}
-seqlevelsStyle(vcf_rng) <-"UCSC"
+seqlevelsStyle(variants) <-seqlevelsStyle(peaks)
 ```
 
-And then finally to find which Variants overlap these broadPeaks we would use:
+And then finally to find which variants overlap these broadPeaks we would use:
 
 ```{r}
-overlap <- findOverlaps(vcf_rng, gr19)
+overlap <- findOverlaps(variants, peaks)
 overlap
 ```
 
-One can then interpret the results in the following manner- In these broadPeaks
+Some insight into how these results can be interpretted comes from
+looking a particular peak, e.g., the 3852nd peak
 
 ```{r}
-gr19[head(subjectHits(overlap)),]
+idx <- subjectHits(overlap) == 3852
+overlap[idx]
 ```
-the following common variants were found 
+
+There are three variants overlapping this peak; the coordinates of the
+peak and the overlapping variants are
+
 ```{r}
-vcf_rng[head(queryHits(overlap)),]
+peaks[3852]
+rowRanges(variants)[queryHits(overlap[idx])]
 ```
 
-
-
-# SessionInfo
+# sessionInfo
 
 ```{r}
 sessionInfo()
 ```
-
