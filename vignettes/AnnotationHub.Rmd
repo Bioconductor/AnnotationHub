@@ -104,7 +104,7 @@ from the hub and use  subset to return a smaller base object (here we
  are finding cases where the genome column is set to panda).
 
 ```{r subset}
-ahs <- query(ah, c('inparanoid8', 'ailMel1'))
+ahs <- query(ah, c('inparanoid8', 'ailuropoda'))
 ahs
 ```
 
