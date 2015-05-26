@@ -77,10 +77,11 @@ AnnotationHub <-
         onlineTime == localTime
     }, error=function(e) {
         warning("'AnnotationHub' database may not be current",
-                "\n  database: ", sQuote(dbfile(con)),
+                "\n  database: ", sQuote(path),
                 "\n  reason: ", conditionMessage(e),
                 call.=FALSE)
-        FALSE
+        ## TRUE even though not current, e.g., no internet connection
+        TRUE
     })
 }
 
@@ -129,6 +130,10 @@ AnnotationHub <-
 
 .db_get <- function(path, hub) {
     update <- !file.exists(path)
+    if (!update && !file.size(path)) {
+        file.remove(path)
+        update <- TRUE
+    }
     if (!update && !.db_is_current(path, hub)) {
         file.remove(path)
         update <- TRUE
