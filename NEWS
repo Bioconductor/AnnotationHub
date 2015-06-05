@@ -1,3 +1,17 @@
+CHANGES IN VERSION 2.1.21
+--------------------------
+
+SIGNIFICANT USER-VISIBLE CHANGES
+
+    o fileName()  returns the cache path on
+      the disk for a file that has been cached and NA for files which 
+      have not been cached. A warning is also given to the user stating 
+      the number of files which are not cached
+    
+    o The error message (when file is not downloaded from the hub)
+      displays the AHID, name of file and the reason for failure clearly.
+
+
 CHANGES IN VERSION 2.1
 ----------------------
 

@@ -325,7 +325,21 @@ setReplaceMethod("[",
 setMethod("fileName", signature=(object="AnnotationHub"),
     function(object)
 {
-    cache(object)
+    cachepath <- .getCachePath(object)
+    ahid <- unique(names(cachepath))
+    fname <- sapply(ahid, function(x) {
+        temp <- cachepath[names(cachepath) %in% x]
+        if(all(file.exists(temp)))
+	    paste0(temp, collapse=", ")
+        else
+            NA_character_
+    })
+    missingfileid <- names(fname[is.na(fname)])
+    missingfilename <- object[missingfileid]$title
+    msg <- sprintf("%d files not cache()ed: %s %s", length(missingfilename), 
+        paste0(head(missingfilename, 3), collapse=", "), ", ...")
+    warning(msg)
+    fname
 })
 
 
@@ -433,19 +447,17 @@ setMethod("c", "AnnotationHub",
     tryCatch({
         class <- new(sprintf("%sResource", .dataclass(x)), hub=x)
     }, error=function(err) {
-        msg <- sprintf("failed to create a 'AnnotationHubResource'
-            instance for hub resource %s of class %s; reason: %s",
-            sQuote(x$title), .dataclass(x), conditionMessage(err))
-        stop(paste(strwrap(msg, exdent=4), collapse="\n"))
+        msg <- "Failed to create a 'AnnotationHubResource' instance for"
+        msg2 <- " Hub Resource\nAHID: %s\nTitle: %s\nReason: %s"
+        stop(sprintf(paste0(msg,msg2), names(x), x$title, 
+            conditionMessage(err)))
     })
 
     tryCatch({
         .get1(class)
     }, error=function(err) {
-        msg <- sprintf(
-            "failed to load hub resource %s of class %s; reason: %s",
-            sQuote(x$title), .dataclass(x), conditionMessage(err))
-        stop(paste0(strwrap(msg, exdent=4), collapse="\n"))
+        msg <- "Failed to load Hub Resource\nAHID: %s\nTitle: %s\nReason: %s"
+        stop(sprintf(msg, names(x), x$title, conditionMessage(err))) 
     })
 }
 

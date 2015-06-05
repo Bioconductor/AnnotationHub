@@ -64,9 +64,7 @@ hubCache <-
 cache <-
     function(x, ..., max.downloads=hubOption("MAX_DOWNLOADS"))
 {
-    stopifnot(is(x, "AnnotationHub"))
-    path <- .datapathIds(x)
-    cachepath <- setNames(.cache_path(.cache(x), path), names(path))
+    cachepath <- .getCachePath(x) 
     need <- !file.exists(cachepath)
     if (sum(need) > max.downloads) {
         if (!interactive()) {
@@ -78,11 +76,21 @@ cache <-
         if (ans == "n")
             return(cachepath[!need])
     }
-    ok <- .hub_resource(.hub_data_path(.hub(x)), path[need], cachepath[need])
+    ok <- .hub_resource(.hub_data_path(.hub(x)), basename(cachepath)[need], 
+        cachepath[need])
     if (!all(ok))
         stop(sprintf("%d resources failed to download", sum(!ok)))
     cachepath
 }
+
+.getCachePath <- 
+    function(x) 
+{
+    stopifnot(is(x, "AnnotationHub"))
+    path <- .datapathIds(x)
+    setNames(.cache_path(.cache(x), path), names(path))
+}
+
 
 `cache<-` <- function(x, ..., value)
 {

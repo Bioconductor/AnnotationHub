@@ -125,6 +125,7 @@
       \code{fileName(x)}:
       Get the file path of the hub records as stored in your local cache
      (AnnotationHub files are stored as unique numbers, of the form 12345).
+     NA is returned for those records which have not been cached. 
     }
     
     \item{}{
