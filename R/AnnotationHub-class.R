@@ -323,23 +323,11 @@ setReplaceMethod("[",
 })
 
 setMethod("fileName", signature=(object="AnnotationHub"),
-    function(object)
+    function(object, ...)
 {
-    cachepath <- .getCachePath(object)
-    ahid <- unique(names(cachepath))
-    fname <- sapply(ahid, function(x) {
-        temp <- cachepath[names(cachepath) %in% x]
-        if(all(file.exists(temp)))
-	    paste0(temp, collapse=", ")
-        else
-            NA_character_
-    })
-    missingfileid <- names(fname[is.na(fname)])
-    missingfilename <- object[missingfileid]$title
-    msg <- sprintf("%d files not cache()ed: %s %s", length(missingfilename), 
-        paste0(head(missingfilename, 3), collapse=", "), ", ...")
-    warning(msg)
-    fname
+    cachepath <- .named_cache_path(object)
+    cachepath[!file.exists(cachepath)] <- NA_character_
+    cachepath
 })
 
 

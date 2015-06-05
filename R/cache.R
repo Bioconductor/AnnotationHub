@@ -64,7 +64,7 @@ hubCache <-
 cache <-
     function(x, ..., max.downloads=hubOption("MAX_DOWNLOADS"))
 {
-    cachepath <- .getCachePath(x) 
+    cachepath <- .named_cache_path(x) 
     need <- !file.exists(cachepath)
     if (sum(need) > max.downloads) {
         if (!interactive()) {
@@ -83,7 +83,7 @@ cache <-
     cachepath
 }
 
-.getCachePath <- 
+.named_cache_path <- 
     function(x) 
 {
     stopifnot(is(x, "AnnotationHub"))
