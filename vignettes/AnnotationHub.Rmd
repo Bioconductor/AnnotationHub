@@ -125,9 +125,10 @@ the filter on the top of the page or navigate through different pages
 using the page scrolling feature at the bottom of the page. 
 
 We can also select the rows of interest to us and send them back to
-the R session using 'Return rows to R session' button ; this sets a filter 
-internally which filters the `AnnotationHub` object. The AHID'S selected 
-are displayed at the top of the page. 
+the R session using 'Return rows to R session' button ; this sets a
+filter internally which filters the `AnnotationHub` object. The names
+of the selected AnnotationHub elements displayed at the top of the
+page.
 
 ## Using `AnnotationHub` to retrieve data
 

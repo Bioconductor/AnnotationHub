@@ -223,7 +223,7 @@ setMethod("dbfile", "AnnotationHub", function(x) dbfile(dbconn(x)))
 	if(is.na(newval))
 	    stop("'value' should be in YYYY-MM-DD format")
 	if(newval > Sys.time())
-	    stop("This date is in the future") 
+	    stop("this date is in the future") 
 	res <- mapply(function(x,y) {
     	    x = strptime(x, "%Y-%m-%d")
             y = strptime(y, "%Y-%m-%d")
@@ -435,17 +435,21 @@ setMethod("c", "AnnotationHub",
     tryCatch({
         class <- new(sprintf("%sResource", .dataclass(x)), hub=x)
     }, error=function(err) {
-        msg <- "Failed to create a 'AnnotationHubResource' instance for"
-        msg2 <- " Hub Resource\nAHID: %s\nTitle: %s\nReason: %s"
-        stop(sprintf(paste0(msg,msg2), names(x), x$title, 
-            conditionMessage(err)))
+        stop("failed to create 'AnnotationHubResource' instance",
+             "\n  name: ", names(x),
+             "\n  title: ", x$title,
+             "\n  reason: ", conditionMessage(err),
+             call.=FALSE)
     })
 
     tryCatch({
         .get1(class)
     }, error=function(err) {
-        msg <- "Failed to load Hub Resource\nAHID: %s\nTitle: %s\nReason: %s"
-        stop(sprintf(msg, names(x), x$title, conditionMessage(err))) 
+        stop("failed to load 'AnnotationHub' resource",
+             "\n  name: ", names(x),
+             "\n  title: ", x$title,
+             "\n  reason: ", conditionMessage(err),
+             call.=FALSE)
     })
 }
 
