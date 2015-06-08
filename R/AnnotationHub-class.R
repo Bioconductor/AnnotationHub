@@ -2,7 +2,7 @@
 
 .AnnotationHub <- setClass("AnnotationHub",
     representation(hub="character", cache="character", date="character",
-                   .db_connection="SQLiteConnection", .db_index="character",
+                   .db_env="environment", .db_index="character",
                    .db_uid="integer")
 )
 
@@ -24,11 +24,14 @@ AnnotationHub <-
     }
 
     .db_path <- .cache_create(cache)
+    db_env <- new.env(parent=emptyenv())
     .db_connection <- .db_get(.db_path, hub)
+    db_env[["db_connection"]] <- .db_connection
+    db_env[["db_path"]] <- dbfile(db_env[["db_connection"]])
     .date <- max(.possibleDates(.db_connection))    
     .db_uid <- .db_uid0(.db_connection, .date, .db_path)
-    hub <- .AnnotationHub(cache=cache, hub=hub, date=.date,
-                          .db_connection=.db_connection, .db_uid=.db_uid)
+    hub <- .AnnotationHub(cache=cache, hub=hub, date=.date, .db_env=db_env,
+                          .db_uid=.db_uid)
     message("snapshotDate(): ", snapshotDate(hub))
     .db_index <- .db_index_create(hub)
     initialize(hub, .db_index=.db_index)
@@ -49,7 +52,7 @@ AnnotationHub <-
     .db_open(path)
 }
 
-.db_open <- function(path){
+.db_open <- function(path) {
     tryCatch({
         dbConnect(SQLite(), path)
     }, error=function(err) {
@@ -203,9 +206,18 @@ AnnotationHub <-
     x
 }
 
-setMethod("dbconn", "AnnotationHub", function(x) slot(x, ".db_connection"))
+setMethod("dbconn", "AnnotationHub", function(x) {
+    conn <- slot(x, ".db_env")[["db_connection"]]
+    if (!dbIsValid(conn)) {
+        conn <- .db_open(dbfile(x))
+        slot(x, ".db_env")[["db_connection"]] <- conn
+    }
+    conn
+})
 
-setMethod("dbfile", "AnnotationHub", function(x) dbfile(dbconn(x)))
+setMethod("dbfile", "AnnotationHub", function(x) {
+    slot(x, ".db_env")[["db_path"]]
+})
 
 .snapshotDate <- function(x) slot(x, "date")
 
