@@ -1,19 +1,29 @@
-<!--
-% \VignetteIndexEntry{AnnotationHub: AnnotationHub HOW TO's}
-% \VignetteDepends{AnnotationHub}
-% \VignetteEngine{knitr::knitr}
--->
+---
+title: "AnnotationHub How-To's"
+output:
+  BiocStyle::html_document:
+    toc: true
+vignette: >
+  % \VignetteIndexEntry{AnnotationHub: AnnotationHub HOW TO's}
+  % \VignetteDepends{AnnotationHub, GenomicFeatures, Rsamtools}
+  % \VignetteEngine{knitr::rmarkdown}
+---
 
-```{r style, echo = FALSE, results = 'asis'}
-BiocStyle::markdown()
+```{r style, echo = FALSE, results = 'asis', warning=FALSE}
 options(width=100)
+suppressPackageStartupMessages({
+    ## load here to avoid noise in the body of the vignette
+    library(AnnotationHub)
+    library(GenomicFeatures)
+    library(Rsamtools)
+    library(VariantAnnotation)
+})
+BiocStyle::markdown()
 ```
-
-# AnnotationHub How-To's
 
 **Package**: `r Biocpkg("AnnotationHub")`<br />
 **Authors**: `r packageDescription("AnnotationHub")[["Author"]] `<br />
-**Modified**: 20 May, 2015<br />
+**Modified**: Tue Jun 9 12:02:44 2015<br />
 **Compiled**: `r date()`
 
 
@@ -155,7 +165,63 @@ metadata(peaks)
 ah[metadata(peaks)$AnnotationHubName]$sourceurl
 ```
 
-## liftOver
+## Ensembl GTF and FASTA files for TxDb gene models and sequence queries
+
+_Bioconductor_ represents gene models using 'transcript'
+databases. These are available via packages such as
+`r Biocannopkg("TxDb.Hsapiens.UCSC.hg38.knownGene")`
+or can be constructed using functions such as
+`r Biocpkg("GenomicFeatures")`::`makeTxDbFromBiomart()`.
+
+_AnnotationHub_ provides an easy way to work with gene models
+published by Ensembl. Let's see what Ensembl's Release-80 has in terms
+of data for pufferfish, _Takifugu rubripes_.
+
+```{r takifugu-gene-models}
+query(ah, c("Takifugu", "release-80"))
+```
+
+We see that there is a GTF file descrbing gene models, as well as
+various DNA sequences. Let's retrieve the GTF and top-level DNA
+sequence files. The GTF file is imported as a _GRanges_ instance, the
+DNA sequence as a compressed, indexed Fasta file
+
+
+```{r takifugi-data}
+gtf <- ah[["AH47101"]]
+dna <- ah[["AH47477"]]
+
+head(gtf, 3)
+dna
+head(seqlevels(dna))
+```
+
+It is trivial to make a TxDb instance
+
+```{r takifugi-txdb}
+library(GenomicFeatures)         # for makeTxDbFromGRanges
+txdb <- makeTxDbFromGRanges(gtf)
+````
+
+and to use that in conjunction with the DNA sequence, e.g., to find
+exon sequences of all annotated genes.
+
+```{r takifugi-exons}
+library(Rsamtools)               # for getSeq,FaFile-method
+exons <- exons(txdb)
+length(exons)
+getSeq(dna, exons)
+```
+
+There is a one-to-one mapping between the genomic ranges contained in
+`exons` and the DNA sequences returned by `getSeq()`.
+
+Some difficulties arise when working with this partly assembled genome
+that require more advanced GenomicRanges skills, see the
+`r Biocpkg("GenomicRanges")` vignettes, especially "_GenomicRanges_
+HOWTOs" and "An Introduction to _GenomicRanges_".
+
+## liftOver to map between genome builds
 
 Suppose we wanted to lift features from one genome build to another,
 e.g., because annotations were generated for hg19 but our experimental
@@ -195,7 +261,7 @@ genome(gr38) <- "hg38"
 gr38
 ``` 
 
-## dbSNP Variants
+## Working with dbSNP Variants
 
 One may also be interested in working with common germline variants with 
 evidence of medical interest. This information is available at 
