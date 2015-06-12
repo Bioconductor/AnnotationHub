@@ -65,6 +65,13 @@
     ans
 }
 
+# tasks we want .tidyGRanges() to do:
+# 1. add metdata() to GRanges containing the names() of hub object
+# 2. sortSeqlevels()
+# 3. fill the seqinfo with correct information
+# for step 3 - comparison is done with existingSeqinfo and 
+# GenomeInfoDb::Seqinfo() - currently if its not the same, seqinfo is replaced.
+
 .tidyGRanges <- 
     function(x, gr, sort=TRUE, guess.circular=TRUE, addGenome=TRUE,
              metadata=TRUE, genome=.hub(x)$genome)
@@ -72,25 +79,72 @@
     if (metadata)
         metadata(gr)  <- .metadataForAH(x)
 
+    ## BEWARE: 
+    ## 1) GenomeInfoDb::Seqinfo doesnt sortSeqlevels - so we need to 
+    ## sortSeqlevels before comparison else identical wont work.
+    ## 2) case - the input GRanges might have a subset of seqlevels whereas
+    ## the GenomeInfoDb::Seqinfo returns all seqlevels with scaffolds
+    ## from an assembly.  
+    ## 3)only 10-15 genomes supported by GenomeInfoDb::Seqinfo
+
     tryCatch({
         loadNamespace("GenomeInfoDb")
     }, error=function(err) {
         ## quietly return un-tidied GRanges (?)
         return(gr)
-    })
-
-    si <- GenomeInfoDb::seqinfo(gr)
-    if (guess.circular)
-        GenomeInfoDb::isCircular(si)  <- .guessIsCircular(si)
-    if (addGenome)
-        GenomeInfoDb::genome(si) <- genome
+    })      
+    
+    
     if (sort)
-        si <- GenomeInfoDb::sortSeqlevels(si) 
-    ## TODO: add seqlengths code
+        gr <- GenomeInfoDb::sortSeqlevels(gr) 
+    existingSeqinfo <- GenomeInfoDb::seqinfo(gr)    
+
+    ## Not all Genome's are supported by GenomeInfoDb::Seqinfo
+    newSeqinfo <- tryCatch({
+        GenomeInfoDb::Seqinfo(genome=genome)
+    }, error= function(err){
+         message( "Using guess work to populate seqinfo ", conditionMessage(err))
+         
+    })
+    
+    if(class(newSeqinfo)!="Seqinfo"){
+	# use guess work to populate
+        if (guess.circular)
+            GenomeInfoDb::isCircular(existingSeqinfo)  <- 
+                .guessIsCircular(existingSeqinfo)
+        if (addGenome)
+            GenomeInfoDb::genome(existingSeqinfo) <- genome
+        if (sort || guess.circular || addGenome) {
+            new2old <- match(GenomeInfoDb::seqlevels(existingSeqinfo),
+                        GenomeInfoDb::seqlevels(gr))
+            GenomeInfoDb::seqinfo(gr, new2old=new2old) <- existingSeqinfo
+        }
+        return(gr)
+    }
+   
+
+    
+    newSeqinfo <- newSeqinfo[GenomeInfoDb::seqlevels(gr)]
+    # comapre the current and new seqinfo
+    diffSeqlengths <- setdiff(GenomeInfoDb::seqlengths(newSeqinfo), 
+                          GenomeInfoDb::seqlengths(existingSeqinfo))  
+    diffSeqnames <- setdiff(GenomeInfoDb::seqnames(newSeqinfo), 
+                        GenomeInfoDb::seqnames(existingSeqinfo)) 
+    diffGenome <- identical(unique(GenomeInfoDb::genome(newSeqinfo)), 
+                      unique(GenomeInfoDb::genome(existingSeqinfo))) 
+    diffIscircular <- identical(table(GenomeInfoDb::isCircular(newSeqinfo)), 
+                          table(GenomeInfoDb::isCircular(existingSeqinfo)))
+    len <- c(length(diffSeqlengths), length(diffSeqnames))
+    
+    # if its the same dont replace 
+    if(all(unique(len)==0 & diffGenome & diffIscircular))
+        return(gr)   
+
+    ## Replace incorrect seqinfo 
     if (sort || guess.circular || addGenome) {
-        new2old <- match(GenomeInfoDb::seqlevels(si),
-                         GenomeInfoDb::seqlevels(gr))
-        GenomeInfoDb::seqinfo(gr, new2old=new2old) <- si
+        new2old <- match(GenomeInfoDb::seqlevels(gr), 
+                         GenomeInfoDb::seqlevels(newSeqinfo))
+        GenomeInfoDb::seqinfo(gr, new2old=new2old) <- newSeqinfo
     }
     gr
 }
