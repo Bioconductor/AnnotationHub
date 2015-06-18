@@ -51,7 +51,13 @@
     function(x, ...)
 {
     stopifnot(length(.hub(x)) == 1)
-    list(AnnotationHubName=names(.hub(x)))
+    meta <- .hub(x)
+    list(AnnotationHubName=names(meta), 
+         `File Name`=basename(meta$sourceurl),
+         `Data Source`=meta$sourceurl,
+         `Provider`=meta$dataprovider,
+         `Organism`=meta$species,
+         `Taxonomy ID`=meta$taxonomyid )
 }
 
 .guessIsCircular <-

@@ -320,7 +320,7 @@
   seqinfo(gr) 
 
   ## each GenomicRanges contains a metadata slot which can be used to get 
-  ## the name of the hub object. 
+  ## the name of the hub object and other associated metadata. 
   metadata(gr) 
   ah[metadata(gr)$AnnotationHubName]
    
