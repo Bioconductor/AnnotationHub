@@ -172,17 +172,6 @@
     .query_as_data.frame(x, query)[[1]]
 }
 
-.join_resource_columns <- function(x, table, names)
-{
-    names <- paste(names, collapse=", ")
-    query <- sprintf(
-        "SELECT ah_id, %s FROM resources, %s
-         WHERE resources.id IN (%s)
-         AND %s.resource_id == resources.id",
-        names, table, .id_as_single_string(x), table)
-    .query_as_data.frame(x, query)
-}
-
 ## This is used by cache to get the rDataPath ID for a resource
 ## I think this should say to select 'id' as id to extract the rdatapathID 
 ## (instead of the resource_id)
