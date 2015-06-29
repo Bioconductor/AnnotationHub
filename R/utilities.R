@@ -108,13 +108,13 @@
     ## Not all Genome's are supported by GenomeInfoDb::Seqinfo
     newSeqinfo <- tryCatch({
         GenomeInfoDb::Seqinfo(genome=genome)
-    }, error= function(err){
-         message( "Using guess work to populate seqinfo ", conditionMessage(err))
-         
+    }, error= function(err) {
+         NULL
     })
     
-    if(class(newSeqinfo)!="Seqinfo"){
-	# use guess work to populate
+    if (is.null(newSeqinfo)) {
+        message("using guess work to populate seqinfo")
+        ## use guess work to populate
         if (guess.circular)
             GenomeInfoDb::isCircular(existingSeqinfo)  <- 
                 .guessIsCircular(existingSeqinfo)
