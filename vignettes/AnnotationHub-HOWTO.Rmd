@@ -23,11 +23,40 @@ BiocStyle::markdown()
 
 **Package**: `r Biocpkg("AnnotationHub")`<br />
 **Authors**: `r packageDescription("AnnotationHub")[["Author"]] `<br />
-**Modified**: Tue Jun 9 12:02:44 2015<br />
+**Modified**: Sun Jun 28 10:41:23 2015<br />
 **Compiled**: `r date()`
 
 
 # Accessing Genome-Scale Data
+
+## Non-model organism gene annotations
+
+_Bioconductor_ offers pre-built `org.*` annotation packages for model
+organisms, with their use described in the
+[OrgDb](http://bioconductor.org/help/workflows/annotation/Annotation_Resources/#OrgDb)
+section of the Annotation work flow. Here we discover available `OrgDb`
+objects (more than 1000!) for less-model organisms
+
+```{r less-model-org}
+library(AnnotationHub)
+ah <- AnnotationHub()
+query(ah, "OrgDb")
+query(ah, c("OrgDb", "Takifugu"))
+takifugu <- ah[["AH13173"]]
+```
+
+The object returned by AnnotationHub is directly usable with the
+`select()` interface, e.g., to discover the available keytypes for
+querying the object, the columns that these keytypes can map to, and
+finally selecting the SYMBOL and GENENAME corresponding to the first 6
+ENTREZIDs
+
+```{r less-model-org-select}
+keytypes(takifugu)
+columns(takifugu)
+egid <- head(keys(takifugu, "ENTREZID"))
+select(takifugu, egid, c("SYMBOL", "GENENAME"), "ENTREZID")
+```
 
 ## Roadmap Epigenomics Project 
 
@@ -187,7 +216,7 @@ sequence files. The GTF file is imported as a _GRanges_ instance, the
 DNA sequence as a compressed, indexed Fasta file
 
 
-```{r takifugi-data}
+```{r takifugu-data}
 gtf <- ah[["AH47101"]]
 dna <- ah[["AH47477"]]
 
@@ -196,17 +225,26 @@ dna
 head(seqlevels(dna))
 ```
 
-It is trivial to make a TxDb instance
+Let's identify the 25 longest DNA sequences, and keep just the
+annotations on these scaffolds.
 
-```{r takifugi-txdb}
+```{r takifugu-seqlengths}
+keep <- names(tail(sort(seqlengths(dna)), 25))
+gtf_subset <- gtf[seqnames(gtf) %in% keep]
+```
+
+It is trivial to make a TxDb instance of this subset (or of the entire
+gtf)
+
+```{r takifugu-txdb}
 library(GenomicFeatures)         # for makeTxDbFromGRanges
-txdb <- makeTxDbFromGRanges(gtf)
+txdb <- makeTxDbFromGRanges(gtf_subset)
 ````
 
-and to use that in conjunction with the DNA sequence, e.g., to find
+and to use that in conjunction with the DNA sequences, e.g., to find
 exon sequences of all annotated genes.
 
-```{r takifugi-exons}
+```{r takifugu-exons}
 library(Rsamtools)               # for getSeq,FaFile-method
 exons <- exons(txdb)
 length(exons)
