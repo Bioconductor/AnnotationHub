@@ -1,8 +1,8 @@
 Package: AnnotationHub
-Type: Package 
+Type: Package
 Title: Client to access AnnotationHub resources
-Version: 2.1.28
-Authors@R:
+Version: 2.1.29
+Authors@R: 
     c(person("Martin", "Morgan", email="mtmorgan@fhcrc.org", role="cre"),
       person("Marc", "Carlson", role="ctb"),
       person("Dan", "Tenenbaum", role="ctb"),
@@ -20,11 +20,19 @@ Description: This package provides a client for the Bioconductor
     access.
 License: Artistic-2.0
 Imports: utils, methods, RSQLite, BiocInstaller, BiocGenerics,
-    S4Vectors, interactiveDisplayBase, httr, AnnotationDbi (>= 1.31.9)
+        S4Vectors, interactiveDisplayBase, httr, AnnotationDbi (>=
+        1.31.9)
 Suggests: GenomicRanges, GenomeInfoDb, VariantAnnotation, Rsamtools,
-    rtracklayer, BiocStyle, knitr, AnnotationForge, rBiopaxParser,
-    RUnit, GenomicFeatures
-Collate: AnnotationHub-class.R  AnnotationHubResource-class.R 
-    AnnotationHubBEDResource-class.R AnnotationHubEpigenomeResource-class.R
-    utilities.R option.R sql.R hub.R cache.R display.R zzz.R
+        rtracklayer, BiocStyle, knitr, AnnotationForge, rBiopaxParser,
+        RUnit, GenomicFeatures, AnnotationHubData
+Collate: AnnotationHub-class.R AnnotationHubResource-class.R
+        AnnotationHubBEDResource-class.R
+        AnnotationHubEpigenomeResource-class.R utilities.R option.R
+        sql.R hub.R cache.R display.R zzz.R
 VignetteBuilder: knitr
+NeedsCompilation: yes
+Packaged: 2015-07-13 21:40:41 UTC; mcarlson
+Author: Martin Morgan [cre],
+  Marc Carlson [ctb],
+  Dan Tenenbaum [ctb],
+  Sonali Arora [ctb]

@@ -108,6 +108,74 @@ makeinparanoid8ToAHMs <- function(currentMetadata){
 }
 ```
 
+Now before we move on on to step two here is a listing of the different arguments that the AnntotationHubMetadata object can take and what class is expected for each of them:
+
+```{}
+AnnotationHubRoot: 'character(1)' Absolute path to directory structure 
+    containing resources to be added to AnnotationHub
+
+SourceUrl: 'character()' URL where resource(s) can be found
+
+SourceType: 'character()' which indicates what kind of resource was initially 
+    processed.  The preference is to name the type of resource if it's a single 
+    file type and to name where the resources came from if it is a compound 
+    resource.  So Typical answers would be like: 'BED','FASTA' or 'Inparanoid' 
+    etc.
+
+SourceVersion: 'character(1)' Version of original file
+
+SourceLastModifiedDate: 'POSIXct()' The date when the source was last modified. 
+    Leaving this blank should allow the values to be retrieved for you (if your 
+    sourceURL is valid).
+
+SourceMd5: 'character()' md5 hash of original file
+
+SourceSize: 'numeric(1)' Number of bytes in original file
+
+DataProvider: 'character(1)' Where did this resource come from?
+
+Title: 'character(1)' Title for this resource
+
+Description: 'character(1)' Description of the resource
+
+Species: 'character(1)' Species name
+
+TaxonomyId: 'character(1)' NCBI code
+
+Genome: 'character(1)' Name of genome build
+
+Tags: 'character()' Free-form tags
+
+Recipe: 'character(1)' Name of recipe function
+
+RDataClass: 'character(1)' Class of derived object (e.g. 'GRanges')
+
+RDataDateAdded: 'POSIXct()' Date added to AnnotationHub. Used to determine 
+    snapshots.
+
+RDataPath: 'character(1)' file path to serialized form
+
+Maintainer: 'character(1)' Maintainer name and email address, 'A Maintainer 
+    <URL: a.maintainer@email.addr>'
+
+BiocVersion: 'character(1)' Under which resource was built
+
+Coordinate_1_based: 'logical(1)' Do coordinates start with 1 or 0?
+
+DispatchClass: 'character(1)' string used to indicate which code should be 
+    called by the client when the resource is downloaded. This is often the same
+    as the RDataClass.  But it is allowed to be a different value so that the 
+    client can do something different internally if required.
+
+Location_Prefix: 'character(1)' This was added for resources where the metadata 
+    only is stored and the resource itself comes from a third party web site.  
+    The location prefix says the base path where the resource is coming from, 
+    and the default value will be from our own site.
+
+Notes: 'character()' Notes about the resource.
+```
+
+
 
 ## Step 2: Writing your recipe 
 
