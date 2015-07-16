@@ -11,9 +11,10 @@ BiocStyle::markdown()
 # AnnotationHub: How to write recipes for new resources for the AnnotationHub
 
 **Package**: `r Biocpkg("AnnotationHub")`<br />
-**Authors**: `r packageDescription("AnnotationHub")[["Author"]] `<br />
+**Authors**: Marc Carlson and Sonali Arora <br />
 **Modified**: 11 October, 2014<br />
 **Compiled**: `r date()`
+
 
 
 ## Overview of the process
@@ -69,10 +70,8 @@ function lives.
 The steps involved include writing a recipe which adds files to AnnotationHub
 and can be summarized briefly as :
 
-- Creating a helper function which returns a data.frame containing
-  information about the files that we want to add to AnnotationHub.
-- Writing a function which takes the data.frame from above and
-  processes them into AnnotationHubMetadata objects
+- Writing a function which takes the metadata about the resource 
+  and processes them into AnnotationHubMetadata objects
 - Optional step : Write an additional function specifying how
   the files need to pre-processed. The data from these files is
   transformed into an R object that is useful to end users.
@@ -205,12 +204,12 @@ Location_Prefix: 'character(1)' This was added for resources where the metadata
 Notes: 'character()' Notes about the resource.
 ```
 
-## Step 2: Function for pre-processing the File (Recipe Field)
+## Step 2: Function for pre-processing the File (Recipe)
 
 The 2nd kind of function you need to write is called a recipe
-function.  It always must take an single argument that must be an 
-AnnotationHubMetadata object.  The job of a recipe function is to 
-use the metadata from an AnnotationHubMetadata object to produce an 
+function.  It always must take an single AnnotationHubMetadata 
+object as an argument.  The job of a recipe function is to 
+use the metadata in an AnnotationHubMetadata object to produce an 
 R object or data file that will be retrievable from the AnnotationHub 
 service later on.  Below is a recipe function that calls some 
 helper functions to generate an inparanoid database object from the 
@@ -264,10 +263,15 @@ Example -
   RDataPath="chainfile/dummy.Rda" 
 ```
 
+If this seems confusing, please note how in both of these cases, the sourceUrl 
+needs to reflect the location that the resource will actually come from once 
+when the client is in use.
+
 
 ## Step 3: Function for Post-processing a File in User's cache. 
 
-One can post-process the file when it is rendered via AnnotationHub in the user's cache. 
+One can post-process the file when it is instantiated into AnnotationHub from 
+the user's cache. 
 An example, would be a BED file is downloaded to the user's cache, and we want 
 AnnotationHub to read it as a `GRanges` using `rtrackler::import`
 Then along with your recipe, one would write a class to be included inside 
@@ -285,6 +289,11 @@ setMethod(".get1", "BEDFileResource",
     rtracklayer::import(dat, format="bed", genome=yy$genome, ...)
 })
 ```
+
+If you need to do this with a set of files that you are crafting a recipe for, 
+you will need to coordinate with us so that we can patch the appropriate 
+supporting code into the client.  Alternatively, you can make sure to set the 
+RDataClass to an existing value (one that we already have a method for).
 
 ## Step 4: Test your functions and then contact us when they work
 
