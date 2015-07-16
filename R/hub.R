@@ -37,8 +37,12 @@ hubUrl <- function(x) {
     tryCatch({
         tmp <- tempfile()
         ## Download the resource in a way that supports https
-        response <- GET(hubpath, progress(), write_disk(tmp))
-        cat("\n") ## line break after progress bar
+        if(interactive()){
+            response <- GET(hubpath, progress(), write_disk(tmp))
+            cat("\n") ## line break after progress bar
+        }else{
+            response <- GET(hubpath, write_disk(tmp))
+        }
         if (length(status_code(response)))  
         {
             # FTP requests return empty status code, see
