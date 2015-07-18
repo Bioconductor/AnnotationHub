@@ -24,7 +24,8 @@ Imports: utils, methods, RSQLite, BiocInstaller, BiocGenerics,
         1.31.9)
 Suggests: GenomicRanges, GenomeInfoDb, VariantAnnotation, Rsamtools,
         rtracklayer, BiocStyle, knitr, AnnotationForge, rBiopaxParser,
-        RUnit, GenomicFeatures, AnnotationHubData
+        RUnit, GenomicFeatures
+Enhances: AnnotationHubData
 Collate: AnnotationHub-class.R AnnotationHubResource-class.R
         AnnotationHubBEDResource-class.R
         AnnotationHubEpigenomeResource-class.R utilities.R option.R
