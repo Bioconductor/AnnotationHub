@@ -42,7 +42,7 @@ library(AnnotationHub)
 ah <- AnnotationHub()
 query(ah, "OrgDb")
 query(ah, c("OrgDb", "Takifugu"))
-takifugu <- ah[["AH13173"]]
+takifugu <- ah[["AH48147"]]
 ```
 
 The object returned by AnnotationHub is directly usable with the
