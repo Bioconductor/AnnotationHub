@@ -1,7 +1,7 @@
 Package: AnnotationHub
 Type: Package
 Title: Client to access AnnotationHub resources
-Version: 2.1.32
+Version: 2.1.33
 Authors@R: 
     c(person("Martin", "Morgan", email="mtmorgan@fhcrc.org", role="cre"),
       person("Marc", "Carlson", role="ctb"),
