@@ -21,6 +21,19 @@ setMethod(".get1", "EpigenomeRoadmapFileResource",
     .tidyGRanges(x, gr)
 })
 
+
+
+setClass("EpiExpressionTextResource", contains="AnnotationHubResource")
+
+setMethod(".get1", "EpiExpressionTextResource",
+    function(x, ...)
+{
+    yy <- cache(.hub(x))
+    read.delim(yy, header=TRUE)
+
+})
+
+
 setClass("EpichmmModelsResource", contains="AnnotationHubResource")
 
 setMethod(".get1", "EpichmmModelsResource",
