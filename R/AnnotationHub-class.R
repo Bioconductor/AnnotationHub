@@ -444,8 +444,15 @@ setMethod("c", "AnnotationHub",
     if (length(x) != 1L)
         stop("'i' must be length 1")
 
+    className <- sprintf("%sResource", .dataclass(x))
+    if (is.null(getClassDef(className))) {
+        msg <- sprintf("'%s' not available in this version of AnnotationHub;
+                        use biocLite('AnnotationHub') to update?", names(x))
+        stop(paste(strwrap(msg, exdent=2), collapse="\n"), call.=FALSE)
+    }
+
     tryCatch({
-        class <- new(sprintf("%sResource", .dataclass(x)), hub=x)
+        class <- new(className, hub=x)
     }, error=function(err) {
         stop("failed to create 'AnnotationHubResource' instance",
              "\n  name: ", names(x),
