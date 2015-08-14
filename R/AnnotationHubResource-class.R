@@ -99,6 +99,19 @@ setMethod(".get1", "GTFFileResource",
     .tidyGRanges(x, gtf)
 })
 
+setClass("GFF3FileResource", contains="AnnotationHubResource")
+
+setMethod(".get1", "GFF3FileResource",
+    function(x, ...)
+{
+    .require("rtracklayer")
+    yy <- .hub(x)
+    gtf <- rtracklayer::import(cache(yy), format="GFF", genome=yy$genome, ...)
+    .tidyGRanges(x, gtf)
+})
+
+
+
 setClass("BigWigFileResource", contains="AnnotationHubResource")
 
 setMethod(".get1", "BigWigFileResource",
