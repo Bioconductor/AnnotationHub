@@ -446,8 +446,9 @@ setMethod("c", "AnnotationHub",
 
     className <- sprintf("%sResource", .dataclass(x))
     if (is.null(getClassDef(className))) {
-        msg <- sprintf("'%s' not available in this version of AnnotationHub;
-                        use biocLite('AnnotationHub') to update?", names(x))
+        msg <- sprintf("'%s' not available in this version of the
+            AnnotationHub package; use biocLite('AnnotationHub') to update?",
+            names(x))
         stop(paste(strwrap(msg, exdent=2), collapse="\n"), call.=FALSE)
     }
 
