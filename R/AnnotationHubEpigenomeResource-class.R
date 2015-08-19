@@ -29,8 +29,14 @@ setMethod(".get1", "EpiExpressionTextResource",
     function(x, ...)
 {
     yy <- cache(.hub(x))
-    read.delim(yy, header=TRUE)
-
+    data <- read.delim(yy, header=TRUE)
+    if(grepl("chr" ,rownames(data)[1])){
+       .require("SummarizedExperiment")
+       data <- SummarizedExperiment::SummarizedExperiment(
+           assays=as.matrix(data[,-c(1:2)]), 
+           rowRanges=.makeGrFromCharacterString(data))
+    }
+    data  
 })
 
 
@@ -46,6 +52,17 @@ setMethod(".get1", "EpichmmModelsResource",
     .tidyGRanges(x, gr)
     
 })
+
+## helper function which changes 'chr10:100011323-100011459<-1' to gr!
+.makeGrFromCharacterString <- function(data) {
+    nms = sub("<-*1", "", rownames(data))  
+    lst = strsplit(nms, "[:-]")                 
+    v = function(x, i) vapply(x, "[[", "character", i)
+    gr = GenomicRanges::GRanges(v(lst, 1), 
+       IRanges::IRanges(as.integer(v(lst, 2)), as.integer(v(lst, 3))))
+    mcols(gr) = data[,1:2]
+    gr
+}
 
 
 ## this data is got from :
