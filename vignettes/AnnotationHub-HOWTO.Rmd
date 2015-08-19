@@ -305,16 +305,16 @@ One may also be interested in working with common germline variants with
 evidence of medical interest. This information is available at 
 [NCBI](http://www.ncbi.nlm.nih.gov/variation/docs/human_variation_vcf/).
 
-We need to get the "common\_and\_clinical.vcf.gz" from GRCh38. NCBI
+We need to get the "All_papu.vcf.gz" from GRCh38. NCBI
 has 2 builds (b141 and b142) for GRCh38 - we will query for files from
 b142
 
 ```{r echo=FALSE, results='hide', message=FALSE}
-vcf <- ah[['AH47032']]
+vcf <- ah[['AH47028']]
 ```
 ```{r}
-query(ah, c("GRCh38", "b142", "vcffile", "common_and_clinical"))
-vcf <- ah[['AH47032']]
+query(ah, c("GRCh38", "b142", "vcffile" ))
+vcf <- ah[['AH47028']]
 ```
 This returns a _VcfFile_ which can be read in using `r Biocpkg("VariantAnnotation")`;
 because VCF files can be large, `readVcf()` supports several
