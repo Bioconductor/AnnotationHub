@@ -93,6 +93,7 @@ setClass("GTFFileResource", contains="AnnotationHubResource")
 setMethod(".get1", "GTFFileResource",
     function(x, ...)
 {
+    message("Importing File into R ..")
     .require("rtracklayer")
     yy <- .hub(x)
     gtf <- rtracklayer::import(cache(yy), format="gtf", genome=yy$genome, ...)
@@ -106,8 +107,7 @@ setMethod(".get1", "GFF3FileResource",
 {
     .require("rtracklayer")
     yy <- .hub(x)
-    gtf <- rtracklayer::import(cache(yy), format="GFF", genome=yy$genome, ...)
-    .tidyGRanges(x, gtf)
+    rtracklayer::import(cache(yy), format="GFF", ...)
 })
 
 
