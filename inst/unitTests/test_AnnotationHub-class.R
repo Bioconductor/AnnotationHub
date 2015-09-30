@@ -1,3 +1,9 @@
+test_open <- function() {
+    ## valid connection, including on second try
+    checkTrue(RSQLite::dbIsValid(dbconn(AnnotationHub())))
+    checkTrue(RSQLite::dbIsValid(dbconn(AnnotationHub())))
+}
+
 test_query <- function() {
     ah = AnnotationHub()
     q1 <- query(ah, c("GTF", "Ensembl", "Homo sapiens"))

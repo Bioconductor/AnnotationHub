@@ -31,6 +31,5 @@
 }
 
 .onUnload <- function(libpath) {
-    if (!is.null(.db_env[["db_connection"]]))
-        .db_close(.db_env[["db_connection"]])
+    .db_close()
 }

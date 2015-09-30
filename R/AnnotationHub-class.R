@@ -57,19 +57,23 @@ AnnotationHub <-
 .db_open <- function(path) {
     tryCatch({
         if (is.null(.db_env[["db_connection"]])) {
-            .db_env[["db_connection"]] <- dbConnect(SQLite(), path, flag=SQLITE_RO)
+            .db_env[["db_connection"]] <- dbConnect(SQLite(), path)
         }
     }, error=function(err) {
         stop("'AnnotationHub' failed to connect to local data base",
              "\n  database: ", sQuote(path),
              "\n  reason: ", conditionMessage(err),
              call.=FALSE)
-    })    
+    })
+    .db_env[["db_connection"]]
 }
 
-.db_close <- function(con) {
-    dbDisconnect(con)
-    .db_env[["db_connection"]] <- NULL
+.db_close <- function() {
+    con <- .db_env[["db_connection"]]
+    if (!is.null(con)) {
+        dbDisconnect(con)
+        .db_env[["db_connection"]] <- NULL
+    }
 }
 
 .db_is_current <- function(path, hub) {
@@ -80,7 +84,7 @@ AnnotationHub <-
         con <- .db_get_db(path, hub)
         sql <- "SELECT * FROM timestamp"
         localTime <- as.POSIXct(dbGetQuery(con, sql)[[1]])
-        .db_close(con)
+        .db_close()
 
         onlineTime == localTime
     }, error=function(e) {
