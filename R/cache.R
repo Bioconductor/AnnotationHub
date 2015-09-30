@@ -91,7 +91,6 @@ cache <-
     setNames(.cache_path(.cache(x), path), names(path))
 }
 
-
 `cache<-` <- function(x, ..., value)
 {
     stopifnot(is(x, "AnnotationHub"))
@@ -105,26 +104,31 @@ cache <-
     x
 }
 
-
-clearCache <- function(x=hubCache())
+removeCache <- function(x=hubCache())
 {
-    rv = FALSE
+    rv = TRUE
 
     reply <- .ask("Delete cache file", c("y", "n"))
     if (reply == "y") {
-      tryCatch({
+      rv <- tryCatch({
           .db_close()
-          unlink(.hub_options[["CACHE"]], recursive=TRUE, force=TRUE)
+          if (file.exists(x)) {
+              status <- unlink(x, recursive=TRUE, force=TRUE)
+              if (status == 1)
+                  stop("'unlink()' failed to remove directory")
+          }
+
+          TRUE
       }, error=function(err) {
-          warning("'AnnotationHub' failed to unlink the local database",
-              "\n  database: ", sQuote(.hub_options[["CACHE"]]),
+          warning("'clearCache()' failed",
+              "\n  database: ", sQuote(x),
               "\n  reason: ", conditionMessage(err),
               call.=FALSE)
 
-          rv = TRUE
+          FALSE
       })
-    }
+    } else
+        rv <- FALSE
 
     rv
 }
-

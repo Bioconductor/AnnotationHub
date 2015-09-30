@@ -20,7 +20,7 @@ importFrom(BiocInstaller, biocVersion)
 exportClasses(AnnotationHub) 
 
 export(AnnotationHub, cache, "cache<-", display, hubUrl, hubCache,
-    hubOption, setHubOption, possibleDates, mcols)
+    hubOption, setHubOption, removeCache, possibleDates, mcols)
 
 S3method(.DollarNames, AnnotationHub)
 

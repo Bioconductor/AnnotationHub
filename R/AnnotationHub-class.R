@@ -71,7 +71,8 @@ AnnotationHub <-
 .db_close <- function() {
     con <- .db_env[["db_connection"]]
     if (!is.null(con)) {
-        dbDisconnect(con)
+        if (RSQLite::dbIsValid(con))
+            dbDisconnect(con)
         .db_env[["db_connection"]] <- NULL
     }
 }

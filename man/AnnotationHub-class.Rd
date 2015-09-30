@@ -16,6 +16,7 @@
 
 \alias{hubUrl} 
 \alias{hubCache}
+\alias{removeCache}
 
 \alias{possibleDates}
 \alias{snapshotDate}
@@ -90,7 +91,7 @@
   see possible snapshot dates.
 
   The location of the local cache can be found (and updated) with
-  \code{hubCache()}.
+  \code{hubCache()}; \code{removeCache()} removes all cache resources.
 
 }
 
@@ -247,7 +248,13 @@
     \item{}{
       \code{hubCache(x)}:
       Gets the file system location of the local AnnotationHub cache.
-    }      
+    }
+    \item{}{
+      \code{removeCache(x=hubCache())}:
+      Removes local AnnotationHub database and all related resources. After
+      calling this function, the user will have to download any AnnotationHub
+      resources again.
+    }
   }
 }
 
