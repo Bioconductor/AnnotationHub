@@ -6,6 +6,8 @@
                    .db_uid="integer")
 )
 
+.db_env <- new.env(parent=emptyenv())
+
 ## Add code to check : https://annotationhub.bioconductor.org/metadata/highest_id
 ## And compare to the highest ID locally (to see if we have the latest DB)
 ## And if not, delete the DB so it will be re-downloaded...
@@ -54,7 +56,9 @@ AnnotationHub <-
 
 .db_open <- function(path) {
     tryCatch({
-        dbConnect(SQLite(), path)
+        if (is.null(.db_env[["db_connection"]])) {
+            .db_env[["db_connection"]] <- dbConnect(SQLite(), path, flag=SQLITE_RO)
+        }
     }, error=function(err) {
         stop("'AnnotationHub' failed to connect to local data base",
              "\n  database: ", sQuote(path),
@@ -65,6 +69,7 @@ AnnotationHub <-
 
 .db_close <- function(con) {
     dbDisconnect(con)
+    .db_env[["db_connection"]] <- NULL
 }
 
 .db_is_current <- function(path, hub) {

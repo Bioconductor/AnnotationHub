@@ -104,3 +104,33 @@ cache <-
                 paste(sQuote(.cache_path(x)[status]), collapse="\n  "))
     x
 }
+
+
+clearCache <- function(x=hubCache())
+{
+    rv = 0 # 0 = success, 1 = failure
+
+    cat("Delete cache file? (y/n) ");
+    reply = readLines(con=stdin(), n=1)
+     ## Trim leading and trailing white space, then get first character of reply.
+    reply = substr(tolower(gsub("^\\s+|\\s+$", "", reply)), 1, 1)
+    if (reply == "y") {
+      tryCatch({
+          if (!is.null(.db_env[["db_connection"]])) {
+              .db_close(.db_env[["db_connection"]])
+          }
+
+          unlink(.hub_options[["CACHE"]], recursive=TRUE, force=TRUE)
+      }, error=function(err) {
+          warning("'AnnotationHub' failed to unlink the local database",
+              "\n  database: ", sQuote(.hub_options[["CACHE"]]),
+              "\n  reason: ", conditionMessage(err),
+              call.=FALSE)
+
+          rv = 1
+      })
+    }
+
+    return (rv)
+}
+
