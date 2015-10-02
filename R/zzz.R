@@ -28,6 +28,12 @@
         opt <- Sys.getenv("ANNOTATION_HUB_CACHE", opt)
         setHubOption("CACHE", opt)
     }
+    if (is.null(hubOption("PROXY"))) {
+        opt <- getOption("ANNOTATION_HUB_PROXY", "")
+        opt <- Sys.getenv("ANNOTATION_HUB_PROXY", opt)
+        if (nzchar(opt))
+            setHubOption("PROXY", opt)
+    }
 }
 
 .onUnload <- function(libpath) {

@@ -14,6 +14,10 @@
 AnnotationHub <-
     function(..., hub=hubOption("URL"), cache=hubOption("CACHE"))
 {
+    if (!isSingleString(hub))
+        stop("'hub' must be a single string (url)")
+    if (!isSingleString(cache))
+        stop("'cache' must be a single string (directory path)")
     .db_path <- .cache_create(cache)
     db_env <- new.env(parent=emptyenv())
     .db_connection <- .db_get(.db_path, hub)
@@ -69,7 +73,7 @@ AnnotationHub <-
 .db_is_current <- function(path, hub) {
     tryCatch({
         url <- paste0(hub, '/metadata/database_timestamp')
-        onlineTime <- as.POSIXct(content(GET(url, hubOption("PROXY"))))        
+        onlineTime <- as.POSIXct(content(GET(url, hubOption("PROXY"))))
 
         con <- .db_get_db(path, hub)
         sql <- "SELECT * FROM timestamp"

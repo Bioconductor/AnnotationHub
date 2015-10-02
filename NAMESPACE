@@ -6,8 +6,8 @@ import(S4Vectors)
 
 importFrom(stats, setNames)
 
-importFrom(httr, GET, content, progress, write_disk, stop_for_status,
-           status_code)
+importFrom(httr, GET, content, parse_url, progress, write_disk,
+    stop_for_status, status_code, use_proxy)
 
 importFrom(utils, capture.output, .DollarNames)
 
