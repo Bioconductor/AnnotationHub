@@ -12,19 +12,8 @@
 ## And compare to the highest ID locally (to see if we have the latest DB)
 ## And if not, delete the DB so it will be re-downloaded...
 AnnotationHub <-
-    function(..., hub=hubOption("URL"), cache=hubOption("CACHE"),
-             max.downloads=hubOption("MAX_DOWNLOADS"))
+    function(..., hub=hubOption("URL"), cache=hubOption("CACHE"))
 {
-    if (!isSingleString(hub))
-        stop("'hub' must be a single string (url)")
-    if (!isSingleString(cache))
-        stop("'cache' must be a single string (directory path)")
-    if (!isSingleInteger(max.downloads)) {
-        msg <- "'max.downloads' must be a single integer
-                (resource download throttle)"
-        stop(paste(strwrap(msg), collapse="\n"))
-    }
-
     .db_path <- .cache_create(cache)
     db_env <- new.env(parent=emptyenv())
     .db_connection <- .db_get(.db_path, hub)
@@ -80,7 +69,7 @@ AnnotationHub <-
 .db_is_current <- function(path, hub) {
     tryCatch({
         url <- paste0(hub, '/metadata/database_timestamp')
-        onlineTime <- as.POSIXct(content(GET(url)))        
+        onlineTime <- as.POSIXct(content(GET(url, hubOption("PROXY"))))        
 
         con <- .db_get_db(path, hub)
         sql <- "SELECT * FROM timestamp"

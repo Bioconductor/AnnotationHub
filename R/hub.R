@@ -38,10 +38,10 @@ hubUrl <- function(x) {
         tmp <- tempfile()
         ## Download the resource in a way that supports https
         if(interactive()){
-            response <- GET(hubpath, progress(), write_disk(tmp))
+            response <- GET(hubpath, progress(), write_disk(tmp), hubOption("PROXY"))
             cat("\n") ## line break after progress bar
         }else{
-            response <- GET(hubpath, write_disk(tmp))
+            response <- GET(hubpath, write_disk(tmp), hubOption("PROXY"))
         }
         if (length(status_code(response)))  
         {
