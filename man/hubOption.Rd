@@ -21,7 +21,7 @@ setHubOption(arg, value)
   \item{arg}{The character(1) hub options to set. see \sQuote{Details}
     for current options.}
 
-  \item{value}{The (scalar) value to be assigned to the hub option.}
+  \item{value}{The value to be assigned to the hub option.}
 
 }
 
@@ -41,6 +41,18 @@ setHubOption(arg, value)
       downloads allowed before triggering an error. This is to help
       avoid accidental download of a large number of AnnotationHub
       members.}
+
+    \item{\dQuote{PROXY}:}{\code{request} object returned by
+      \code{httr::use_proxy()}. The \code{request} object describes a proxy
+      connection allowing Internet access, usually through a restrictive
+      firewall. Setting this option sends all AnnotationHub requests through
+      the proxy. Default: NULL.
+
+      In \code{setHubOption("PROXY", value)}, \code{value} can be one of NULL,
+      a \code{request} object returned by \code{httr::use_proxy()}, or a
+      well-formed URL as character(1). The URL can be completely
+      specified by \code{http://username:password@proxy.dom.com:8080};
+      \code{username:password} and port (e.g. \code{:8080}) are optional.}
   }
 
   Default values may also be determined by system and global R
