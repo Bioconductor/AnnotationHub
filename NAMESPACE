@@ -1,7 +1,9 @@
 import(methods)
 
 import(BiocGenerics)
+
 import(RSQLite)
+
 import(S4Vectors)
 
 importFrom(stats, setNames)
@@ -11,11 +13,11 @@ importFrom(httr, GET, content, parse_url, progress, write_disk,
 
 importFrom(utils, capture.output, .DollarNames)
 
-importFrom(AnnotationDbi, dbconn, dbfile)
-
 importFrom(interactiveDisplayBase, display)
 
 importFrom(BiocInstaller, biocVersion)
+
+importMethodsFrom(AnnotationDbi, dbconn, dbfile)
 
 exportClasses(AnnotationHub) 
 
