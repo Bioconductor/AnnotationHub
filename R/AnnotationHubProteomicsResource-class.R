@@ -7,15 +7,6 @@ setMethod(".get1", "mzRpwizResource",
     mzR::openMSfile(yy, backend = "pwiz")
 })
 
-setClass("mzTabResource", contains="RdaResource")
-setMethod(".get1", "MSnSetResource",
-    function(x, ...) 
-{
-    .require("MSnbase")
-    yy <- cache(.hub(x))
-    load(yy) 
-})
-
 setClass("mzRidentResource", contains="AnnotationHubResource")
 setMethod(".get1", "mzRidentResource",
     function(x, ...) 
@@ -25,14 +16,12 @@ setMethod(".get1", "mzRidentResource",
     mzR::openIDfile(yy)
 })
 
-
-setClass("MSnSetResource", contains="AnnotationHubResource")
+setClass("MSnSetResource", contains="RdaResource")
 setMethod(".get1", "MSnSetResource",
     function(x, ...) 
 {
-    yy <- cache(.hub(x))
     .require("MSnbase")
-    load(yy) 
+    callNextMethod(x, ...) 
 })
 
 setClass("AAStringSetResource", contains="AnnotationHubResource")
@@ -43,4 +32,3 @@ setMethod(".get1", "AAStringSetResource",
     yy <- cache(.hub(x))
     Biostrings::readAAStringSet(yy)
 })
-
