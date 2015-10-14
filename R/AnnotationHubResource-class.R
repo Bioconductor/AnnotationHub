@@ -31,6 +31,7 @@ setClass("FaFileResource", contains="AnnotationHubResource")
 setMethod(".get1", "FaFileResource",
     function(x, ...)
 {
+    .require("Rsamtools")
     fa <- cache(.hub(x))
     Rsamtools::FaFile(file=fa[1],index=fa[2])
 })
@@ -73,6 +74,8 @@ setClass("ChainFileResource", contains="AnnotationHubResource")
 setMethod(".get1", "ChainFileResource",
     function(x, ...)
 {
+    .require("rtracklayer")
+    .require("GenomeInfoDb")
     chain <- cache(.hub(x))
     tf <- .gunzip(chain, tempfile())
     tf <- rtracklayer::import.chain(tf)
@@ -84,6 +87,7 @@ setClass("TwoBitFileResource", contains="AnnotationHubResource")
 setMethod(".get1", "TwoBitFileResource",
     function(x, ...)      
 {
+    .require("rtracklayer")
     bit <- cache(.hub(x))
     rtracklayer::TwoBitFile(bit)
 })
@@ -95,6 +99,7 @@ setMethod(".get1", "GTFFileResource",
 {
     message("Importing File into R ..")
     .require("rtracklayer")
+    .require("GenomeInfoDb")
     yy <- .hub(x)
     gtf <- rtracklayer::import(cache(yy), format="gtf", genome=yy$genome, ...)
     .tidyGRanges(x, gtf)
