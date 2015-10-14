@@ -237,9 +237,10 @@
       Lists dates for snapshots that the hub could potentially use.
     }
     \item{}{
-      \code{cache(x)} and \code{cache(x) <- value}: Adds (downloads) all
+      \code{cache(x)} and \code{cache(x) <- NULL}: Adds (downloads) all
       resources in \code{x}, or removes all local resources
-      corresponding to the records in \code{x} from the cache.
+      corresponding to the records in \code{x} from the cache. In this case,
+      \code{x} would typically be a small subset of AnnotationHub resources.
     }      
     \item{}{
       \code{hubUrl(x)}:
