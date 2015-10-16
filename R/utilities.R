@@ -4,15 +4,18 @@
     if (length(grep(sprintf("package:%s", pkg), search())) != 0L)
         return()
     message("require(", dQuote(pkg), ")")
+    handler <- function(err) {
+        msg <- sprintf("require(%s) failed: %s", dQuote(pkg),
+                       conditionMessage(err))
+        stop(msg)
+    }
     tryCatch({
         suppressPackageStartupMessages({
             require(pkg, quietly=TRUE, character.only=TRUE)
         })
-    }, error=function(err) {
-        msg <- sprintf("require(%s) failed: %s", dQuote(pkg),
-                       conditionMessage(err))
-        stop(msg)
-    })
+    }, ## error first, so warnings-converted-to-error are not handled
+       ## again
+       error=handler, warning=handler)
 }
 
 .ask <- function(txt, values) {

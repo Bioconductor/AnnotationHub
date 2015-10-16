@@ -66,14 +66,14 @@ cache <-
 {
     cachepath <- .named_cache_path(x) 
     need <- !file.exists(cachepath)
-    if (need) {
+    if (any(need)) {
         hubpath <- .hub_resource_path(.hub_data_path(.hub(x)),
             basename(cachepath)[need])
         message("downloading from ", paste0(sQuote(hubpath), collapse="\n    "))
     } else {
         message("loading from cache ", paste0(sQuote(cachepath), collapse="\n    "))
     }
-    if (sum(need) > max.downloads) {
+    if (any(need) > max.downloads) {
         if (!interactive()) {
             txt <- sprintf("resources needed (%d) exceeds max.downloads (%d)",
                            sum(need), max.downloads)
