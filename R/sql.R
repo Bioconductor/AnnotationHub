@@ -70,7 +70,10 @@
 
 .possibleDates <- function(conn) {
     query <- 'SELECT DISTINCT rdatadateadded FROM resources'
-    dbGetQuery(conn, query)[[1]]
+    dateAdded <- dbGetQuery(conn, query)[[1]]
+    query <- 'SELECT DATE(timestamp) FROM timestamp'
+    dateModified <- dbGetQuery(conn, query)[[1]]
+    c(dateAdded, dateModified)
 }
 
 ## helper for extracting rdataclass
