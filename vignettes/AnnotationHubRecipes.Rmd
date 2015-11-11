@@ -1,10 +1,10 @@
 ---
-title: "How to write recipes for new AnnotationHub resorucees"
+title: "How to create new AnnotationHub resources"
 author: "Marc Carlson, Sonali Arora"
 date: "Modified 11 November 2015; compiled `r BiocStyle::doc_date()`"
 package: "`r BiocStyle::pkg_ver('AnnotationHub')`"
 vignette: >
-  %\VignetteIndexEntry{How to write recipes for new AnnotationHub resorucees}
+  %\VignetteIndexEntry{How to create new AnnotationHub resources}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 output: 
@@ -94,68 +94,45 @@ makeinparanoid8ToAHMs <-
 Here is a listing of `AnntotationHubMetadata` arguments:
 
 
-- AnnotationHubRoot: 'character(1)' Absolute path to directory
+- `AnnotationHubRoot`: 'character(1)' Absolute path to directory
   structure containing resources to be added to AnnotationHub. 
-
-- SourceUrl: 'character()' URL where resource(s) can be found
-
-- SourceType: 'character()' which indicates what kind of resource was
+- `SourceUrl`: 'character()' URL where resource(s) can be found
+- `SourceType`: 'character()' which indicates what kind of resource was
   initially processed.  The preference is to name the type of resource
   if it's a single file type and to name where the resources came from
   if it is a compound resource.  So Typical answers would be like:
   'BED','FASTA' or 'Inparanoid' etc.
-
-- SourceVersion: 'character(1)' Version of original file
-
-- SourceLastModifiedDate: 'POSIXct()' The date when the source was
+- `SourceVersion`: 'character(1)' Version of original file
+- `SourceLastModifiedDate`: 'POSIXct()' The date when the source was
   last modified.  Leaving this blank should allow the values to be
   retrieved for you (if your sourceURL is valid).
-
-- SourceMd5: 'character()' md5 hash of original file
-
-- SourceSize: 'numeric(1)' Number of bytes in original file
-
-- DataProvider: 'character(1)' Where did this resource come from?
-
-- Title: 'character(1)' Title for this resource
-
-- Description: 'character(1)' Description of the resource
-
-- Species: 'character(1)' Species name
-
-- TaxonomyId: 'character(1)' NCBI code
-
-- Genome: 'character(1)' Name of genome build
-
-- Tags: 'character()' Free-form tags
-
-- Recipe: 'character(1)' Name of recipe function
-
-- RDataClass: 'character(1)' Class of derived object (e.g. 'GRanges')
-
-- RDataDateAdded: 'POSIXct()' Date added to AnnotationHub. Used to
+- `SourceMd5`: 'character()' md5 hash of original file
+- `SourceSize`: 'numeric(1)' Number of bytes in original file
+- `DataProvider`: 'character(1)' Where did this resource come from?
+- `Title`: 'character(1)' Title for this resource
+- `Description`: 'character(1)' Description of the resource
+- `Species`: 'character(1)' Species name
+- `TaxonomyId`: 'character(1)' NCBI code
+- `Genome`: 'character(1)' Name of genome build
+- `Tags`: 'character()' Free-form tags
+- `Recipe`: 'character(1)' Name of recipe function
+- `RDataClass`: 'character(1)' Class of derived object (e.g. 'GRanges')
+- `RDataDateAdded`: 'POSIXct()' Date added to AnnotationHub. Used to
   determine snapshots.
-
-- RDataPath: 'character(1)' file path to serialized form
-
-- Maintainer: 'character(1)' Maintainer name and email address, 'A
+- `RDataPath`: 'character(1)' file path to serialized form
+- `Maintainer`: 'character(1)' Maintainer name and email address, 'A
   Maintainer <URL: a.maintainer@email.addr>'
-
-- BiocVersion: 'character(1)' Under which resource was built
-
-- Coordinate_1_based: 'logical(1)' Do coordinates start with 1 or 0?
-
-- DispatchClass: 'character(1)' string used to indicate which code
+- `BiocVersion`: 'character(1)' Under which resource was built
+- `Coordinate_1_based`: 'logical(1)' Do coordinates start with 1 or 0?
+- `DispatchClass`: 'character(1)' string used to indicate which code
   should be called by the client when the resource is downloaded. This
   is often the same as the RDataClass.  But it is allowed to be a
   different value so that the client can do something different
   internally if required.
-
-- Location\_Prefix: 'character(1)' The location prefix is the base path
+- `Location_Prefix`: 'character(1)' The location prefix is the base path
   where the resource is coming from; the default is the _Bioconductor_
   _AnnotationHub_ server.
-
-- Notes: 'character()' Notes about the resource.
+- `Notes`: 'character()' Notes about the resource.
 
 # Step 2: Function for pre-processing the File (Recipe)
 
