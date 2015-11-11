@@ -1,5 +1,5 @@
 ---
-title: "How to create new AnnotationHub resources"
+title: "How to create new _AnnotationHub_ resources"
 author: "Marc Carlson, Sonali Arora"
 date: "Modified 11 November 2015; compiled `r BiocStyle::doc_date()`"
 package: "`r BiocStyle::pkg_ver('AnnotationHub')`"
@@ -11,7 +11,7 @@ output:
   BiocStyle::html_document
 ---
 
-# AnnotationHub: How to write recipes for new resources for the AnnotationHub
+# How to write recipes for new _AnnotationHub_ resources
 
 ## Overview of the process
 
@@ -46,7 +46,7 @@ The steps involved include writing a recipe are:
    read in to the user's _R_ session after being downloaded to a
    user's local cache.
 
-# Step 1: Writing your `AnnotationHubMetadata` generating function
+# Step 1: Writing `AnnotationHubMetadata` Generating Functions
 
 The following example function takes files from the latest release of
 inparanoid and processes them into a list of `AnnotationHubMetadata`
@@ -134,7 +134,7 @@ Here is a listing of `AnntotationHubMetadata` arguments:
   _AnnotationHub_ server.
 - `Notes`: 'character()' Notes about the resource.
 
-# Step 2: Function for pre-processing the File (Recipe)
+# Step 2: Recipes for Pre-Processing Resources
 
 A (optional) recipe function transformed the source data into an
 object served by _AnnotationHub_ to the user.  It takes a single
@@ -160,7 +160,7 @@ inparanoid8ToDbsRecipe <-
 }
 ```
 
-## Note for step 1 and step 2
+## Note for Steps 1 and 2
 
 While writing this function, care has to be taken for a couple of
 fields:
@@ -201,7 +201,7 @@ If this seems confusing, please note how in both of these cases, the
 sourceUrl needs to reflect the location that the resource will
 actually come from once when the client is in use.
 
-# Step 3: Function for Post-processing a File in User's cache.
+# Step 3: Post-Processing Resources
 
 One can post-process a file when it is instantiated into
 _AnnotationHub_ from the user's cache.  An example, would be a BED
@@ -226,7 +226,7 @@ The class and method definition typically need to be added to
 [AnnotationHub][], and require coordination with us.
 
 
-# Step 4: Test your functions and then contact us when they work
+# Step 4: Testing and Next Steps
 
 At this point make sure that the `AnnotationHubMetadata` generating
 function produces a list of `AnnotationHubMetadata` objects and that
