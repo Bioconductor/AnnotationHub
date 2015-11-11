@@ -114,10 +114,10 @@ AnnotationHub <-
 }
 
 .db_create_view <- function(con) {
-    ## Create a 'flat' view for simplified access, e.g., via dlyr
+    ## Create a 'flat' view for simplified access, e.g., via dplyr
     sql <- 
         "CREATE VIEW IF NOT EXISTS AllCoreData AS
-         SELECT
+         SELECT DISTINCT
            ah_id, title, dataprovider, species, taxonomyid, genome,
            description, coordinate_1_based, maintainer, status_id,
            location_prefix_id, recipe_id, rdatadateadded,
@@ -485,7 +485,11 @@ setMethod("[[", c("AnnotationHub", "numeric", "missing"),
 setMethod("[[", c("AnnotationHub", "character", "missing"),
     function(x, i, j, ...)
 {
+    if (length(i) != 1L)
+        stop("'i' must be length 1")
     idx <- match(i, names(.db_uid(x)))
+    if (is.na(idx))
+        stop("unknown key ", sQuote(i))
     .AnnotationHub_get1(x[idx])
 })
 
