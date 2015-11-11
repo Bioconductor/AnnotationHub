@@ -1,113 +1,102 @@
-<!--
-% \VignetteIndexEntry{How to write recipes for new resources for the AnnotationHub}
-% \VignetteDepends{AnnotationHub}
-% \VignetteEngine{knitr::knitr}
--->
-
-```{r style, echo = FALSE, results = 'asis'}
-BiocStyle::markdown()
-```
+---
+title: "How to write recipes for new AnnotationHub resorucees"
+author: "Marc Carlson, Sonali Arora"
+date: "Modified 11 October 2014; compiled `r BiocStyle::doc_date()`"
+package: "`r BiocStyle::pkg_ver('AnnotationHub')`"
+vignette: >
+  %\VignetteIndexEntry{How to write recipes for new AnnotationHub resorucees}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+output: 
+  BiocStyle::html_document
+---
 
 # AnnotationHub: How to write recipes for new resources for the AnnotationHub
-
-**Package**: `r Biocpkg("AnnotationHub")`<br />
-**Authors**: Marc Carlson and Sonali Arora <br />
-**Modified**: 11 October, 2014<br />
-**Compiled**: `r date()`
-
-
 
 ## Overview of the process
 
 If you are reading this it is (hopefully) because you intend to write
 some code that will allow the processing of online resources into R
-objects that are to be made available via that the
-AnnotationHub package.  In order to do this you will have
-to do four basic steps (outlined below).  These steps will have you
-writing two functions and then calling a third function to do some
-automatic set up for you.  The 1st function will contain instructions
-on how to process data that is stored online into metadata for
-describing your new R resources for the AnnotationHub.  And the 2nd
-function is for describing how to take these online resources and
-transform them into an R object that is useful to end users.
+objects that are to be made available via that the AnnotationHub
+package.  In order to do this you will have to do four basic steps
+(outlined below).  These steps will have you writing two functions and
+then calling a third function to do some automatic set up for you.
+The 1st function will contain instructions on how to process data that
+is stored online into metadata for describing your new R resources for
+the AnnotationHub.  And the 2nd function is for describing how to take
+these online resources and transform them into an R object that is
+useful to end users.
 
 ## Setup
 
-It should go without saying that this vignette is intended for users 
-who are comfortable with R.  And in order to follow the instuctions in 
-this vignette, you will need to install the AnnotationHubData package.  
-This package is not meant to be used by most people, and in fact it's 
-not really intended to be anything other than a support package. 
-So it's not exposed via biocLite(). So to get it you will need to 
-use svn to check it out from the following location:
+It should go without saying that this vignette is intended for users
+who are comfortable with R.  And in order to follow the instuctions in
+this vignette, you will need to install the AnnotationHubData package.
+This package is not meant to be used by most people, and in fact it's
+not really intended to be anything other than a support package.  So
+it's not exposed via biocLite(). So to get it you will need to use svn
+to check it out from the following location:
 
 ```{}
 https://hedgehog.fhcrc.org/bioconductor/trunk/madman/Rpacks/AnnotationHubData
 ```
 
-Once you have that checked out, you will need to use R CMD INSTALL to install the package from source.
+Once you have that checked out, you will need to use R CMD INSTALL to
+install the package from source.
 
 ## Introducing AnnotationHubMetadata Objects
 
-The AnnotationHubData package is a complementary package to
-the AnnotationHub package that provides a place where we
-can store code that processes online resources into R objects suitable
-for access through the AnnotationHub package.  But before
-you can understand the requirements for this package it is important
-that you 1st learn about the objects that are used as
-intermediaries between the hub and its web based repository behind the
-scenes.  That means that you need to know about
-AnnotationHubMetadata objects.  These objects store the
+The AnnotationHubData package is a complementary package to the
+AnnotationHub package that provides a place where we can store code
+that processes online resources into R objects suitable for access
+through the AnnotationHub package.  But before you can understand the
+requirements for this package it is important that you 1st learn about
+the objects that are used as intermediaries between the hub and its
+web based repository behind the scenes.  That means that you need to
+know about AnnotationHubMetadata objects.  These objects store the
 metadata that describes an online resource.  And if you want to see a
 set of online resources added to the repository and maintained, then
-it will be necessary to become familiar with the
-AnnotationHubMetadata constructor.  For each online
-resource that you want to process into the AnnotationHub, you will
-have to be able to construct an AnnotationHubMetadata object that 
-describes it in detail and that specifies where the recipe
-function lives.
+it will be necessary to become familiar with the AnnotationHubMetadata
+constructor.  For each online resource that you want to process into
+the AnnotationHub, you will have to be able to construct an
+AnnotationHubMetadata object that describes it in detail and that
+specifies where the recipe function lives.
 
-The steps involved include writing a recipe which adds files to AnnotationHub
-and can be summarized briefly as :
+The steps involved include writing a recipe which adds files to
+AnnotationHub and can be summarized briefly as :
 
-- Writing a function which takes the metadata about the resource 
-  and processes them into AnnotationHubMetadata objects
-- Optional step : Write an additional function specifying how
-  the files need to pre-processed. The data from these files is
+- Writing a function which takes the metadata about the resource and
+  processes them into AnnotationHubMetadata objects
+- Optional step : Write an additional function specifying how the
+  files need to pre-processed. The data from these files is
   transformed into an R object that is useful to end users.
-- Optional step: Write a function specifying how the files need
-  to be post-processed once downloaded to a user's local cache.
-
-
+- Optional step: Write a function specifying how the files need to be
+  post-processed once downloaded to a user's local cache.
 
 ## Step 1: Writing your AnnotationHubMetadata generating function
-  
-
 
 The following example function takes files from the latest release of
-inparanoid and processes them into AnnotationHubMetadata objects using Map.
+inparanoid and processes them into AnnotationHubMetadata objects using
+Map.
 
 The 1st function you need to provide is one that processes some online
-resources into AnnotationHubMetadata objects.  This function
-MUST return a list of AnnotationHubMetadata objects.  It can
-rely on other helper functions that you define, but ultimately it
-(and it's helpers) need to contain all of the instructions needed
-to find resources and process those resources into
-AnnotationHubMetadata objects.
-The calling of the Map function is really the important part of this
+resources into AnnotationHubMetadata objects.  This function MUST
+return a list of AnnotationHubMetadata objects.  It can rely on other
+helper functions that you define, but ultimately it (and it's helpers)
+need to contain all of the instructions needed to find resources and
+process those resources into AnnotationHubMetadata objects.  The
+calling of the Map function is really the important part of this
 function, as it shows the function creating a series of
-AnnotationHubMetadata objects.  Prior to that, the function
-was just calling out to other helper functions in order to process the
-metadata so that it could be passed to the
-AnnotationHubMetadata constructor using Map.
-Notice how one of the fields specified by this function is the Recipe,
-which indicates both the name and location of the recipe function.  We
-expect most people will want to submit their recipe to the same
-package as they are submitting their metadata processing function.
+AnnotationHubMetadata objects.  Prior to that, the function was just
+calling out to other helper functions in order to process the metadata
+so that it could be passed to the AnnotationHubMetadata constructor
+using Map.  Notice how one of the fields specified by this function is
+the Recipe, which indicates both the name and location of the recipe
+function.  We expect most people will want to submit their recipe to
+the same package as they are submitting their metadata processing
+function.
 
-
-
-```{r, exampleInpProcessing}
+```{r exampleInpProcessing}
 makeinparanoid8ToAHMs <- function(currentMetadata){
     baseUrl <- 'http://inparanoid.sbc.su.se/download/current/Orthologs_other_formats'
     ## Make list of metadata in a helper function
@@ -116,7 +105,7 @@ makeinparanoid8ToAHMs <- function(currentMetadata){
     Map(AnnotationHubMetadata,
         Description=meta$description,
         Genome=meta$genome,
-        SourceFile=meta$sourceFile, 
+        SourceFile=meta$sourceFile,
         SourceUrl=meta$sourceUrl,
         SourceVersion=meta$sourceVersion,
         Species=meta$species,
@@ -135,26 +124,26 @@ makeinparanoid8ToAHMs <- function(currentMetadata){
 }
 ```
 
-Now before we move on on to step two here is a listing of the different 
-arguments that the AnntotationHubMetadata object can take and what 
-class is expected for each of them:
+Now before we move on on to step two here is a listing of the
+different arguments that the AnntotationHubMetadata object can take
+and what class is expected for each of them:
 
-```{}
-AnnotationHubRoot: 'character(1)' Absolute path to directory structure 
+```
+AnnotationHubRoot: 'character(1)' Absolute path to directory structure
     containing resources to be added to AnnotationHub
 
 SourceUrl: 'character()' URL where resource(s) can be found
 
-SourceType: 'character()' which indicates what kind of resource was initially 
-    processed.  The preference is to name the type of resource if it's a single 
-    file type and to name where the resources came from if it is a compound 
-    resource.  So Typical answers would be like: 'BED','FASTA' or 'Inparanoid' 
+SourceType: 'character()' which indicates what kind of resource was initially
+    processed.  The preference is to name the type of resource if it's a single
+    file type and to name where the resources came from if it is a compound
+    resource.  So Typical answers would be like: 'BED','FASTA' or 'Inparanoid'
     etc.
 
 SourceVersion: 'character(1)' Version of original file
 
-SourceLastModifiedDate: 'POSIXct()' The date when the source was last modified. 
-    Leaving this blank should allow the values to be retrieved for you (if your 
+SourceLastModifiedDate: 'POSIXct()' The date when the source was last modified.
+    Leaving this blank should allow the values to be retrieved for you (if your
     sourceURL is valid).
 
 SourceMd5: 'character()' md5 hash of original file
@@ -179,26 +168,26 @@ Recipe: 'character(1)' Name of recipe function
 
 RDataClass: 'character(1)' Class of derived object (e.g. 'GRanges')
 
-RDataDateAdded: 'POSIXct()' Date added to AnnotationHub. Used to determine 
+RDataDateAdded: 'POSIXct()' Date added to AnnotationHub. Used to determine
     snapshots.
 
 RDataPath: 'character(1)' file path to serialized form
 
-Maintainer: 'character(1)' Maintainer name and email address, 'A Maintainer 
+Maintainer: 'character(1)' Maintainer name and email address, 'A Maintainer
     <URL: a.maintainer@email.addr>'
 
 BiocVersion: 'character(1)' Under which resource was built
 
 Coordinate_1_based: 'logical(1)' Do coordinates start with 1 or 0?
 
-DispatchClass: 'character(1)' string used to indicate which code should be 
+DispatchClass: 'character(1)' string used to indicate which code should be
     called by the client when the resource is downloaded. This is often the same
-    as the RDataClass.  But it is allowed to be a different value so that the 
+    as the RDataClass.  But it is allowed to be a different value so that the
     client can do something different internally if required.
 
-Location_Prefix: 'character(1)' This was added for resources where the metadata 
-    only is stored and the resource itself comes from a third party web site.  
-    The location prefix says the base path where the resource is coming from, 
+Location_Prefix: 'character(1)' This was added for resources where the metadata
+    only is stored and the resource itself comes from a third party web site.
+    The location prefix says the base path where the resource is coming from,
     and the default value will be from our own site.
 
 Notes: 'character()' Notes about the resource.
@@ -207,15 +196,15 @@ Notes: 'character()' Notes about the resource.
 ## Step 2: Function for pre-processing the File (Recipe)
 
 The 2nd kind of function you need to write is called a recipe
-function.  It always must take an single AnnotationHubMetadata 
-object as an argument.  The job of a recipe function is to 
-use the metadata in an AnnotationHubMetadata object to produce an 
-R object or data file that will be retrievable from the AnnotationHub 
-service later on.  Below is a recipe function that calls some 
-helper functions to generate an inparanoid database object from the 
-metadata stored in it's AnnotationHubMetadata object.
+function.  It always must take an single AnnotationHubMetadata object
+as an argument.  The job of a recipe function is to use the metadata
+in an AnnotationHubMetadata object to produce an R object or data file
+that will be retrievable from the AnnotationHub service later on.
+Below is a recipe function that calls some helper functions to
+generate an inparanoid database object from the metadata stored in
+it's AnnotationHubMetadata object.
 
-```{r, exampleRecipe}
+```{r exampleRecipe}
 inparanoid8ToDbsRecipe <- function(ahm){
     require(AnnotationForge)
     inputFiles <- metadata(ahm)$SourceFile
@@ -224,18 +213,20 @@ inparanoid8ToDbsRecipe <- function(ahm){
     db <- loadDb(file=dbname)
     outputPath <- file.path(metadata(ahm)$AnnotationHubRoot,
                             metadata(ahm)$RDataPath)
-    saveDb(db, file=outputPath) 
+    saveDb(db, file=outputPath)
     outputFile(ahm)
 }
 ```
 
 ## Note for step 1 and step 2
 
-While writing this function, care has to be taken for a couple of fields:
+While writing this function, care has to be taken for a couple of
+fields:
 
-Case 1 - If the file just needs to be downloaded and only post-processed in users local cache then
+Case 1 - If the file just needs to be downloaded and only
+post-processed in users local cache then
 
-1) SourceUrls = Location_Prefix + RDataPath  
+1) SourceUrls = Location_Prefix + RDataPath
 2) Recipe = NA_character_
 
 Example -
@@ -246,38 +237,40 @@ Example -
  Location_Prefix = "http://hgdownload.cse.ucsc.edu/",
 ```
 
-Case 2 - If the recipe needs to retrieve a file from an external website, pre-process it,
-store this pre-processed file at our amazon location and always render the pre-processed
-file ( not the original file) to the user then
+Case 2 - If the recipe needs to retrieve a file from an external
+website, pre-process it, store this pre-processed file at our amazon
+location and always render the pre-processed file ( not the original
+file) to the user then
 
-1) SourceUrls should merely document the original location of the untouched file  
-2)  Location_Prefix + RDataPath should be equal to the file path on the amazon machine
-where all pre-processed files are stored.  
-3) Recipe = helper function which tells us how to pre-process the original file  
+1. SourceUrls should merely document the original location of the
+   untouched file
+2. Location_Prefix + RDataPath should be equal to the file path on the
+   amazon machine where all pre-processed files are stored.
+3. Recipe = helper function which tells us how to pre-process the
+   original file
 
 Example -
 
 ```{}
   SourceUrls="http://hgdownload.cse.ucsc.edu/goldenPath/hg38/liftOver/hg38ToRn5.over.chain.gz",
   Location_Prefix = "http://s3.amazonaws.com/annotationhub/",
-  RDataPath="chainfile/dummy.Rda" 
+  RDataPath="chainfile/dummy.Rda"
 ```
 
-If this seems confusing, please note how in both of these cases, the sourceUrl 
-needs to reflect the location that the resource will actually come from once 
-when the client is in use.
+If this seems confusing, please note how in both of these cases, the
+sourceUrl needs to reflect the location that the resource will
+actually come from once when the client is in use.
 
+## Step 3: Function for Post-processing a File in User's cache.
 
-## Step 3: Function for Post-processing a File in User's cache. 
+One can post-process the file when it is instantiated into
+AnnotationHub from the user's cache.  An example, would be a BED file
+is downloaded to the user's cache, and we want AnnotationHub to read
+it as a `GRanges` using `rtrackler::import` Then along with your
+recipe, one would write a class to be included inside AnnotationHub as
+shown below-
 
-One can post-process the file when it is instantiated into AnnotationHub from 
-the user's cache. 
-An example, would be a BED file is downloaded to the user's cache, and we want 
-AnnotationHub to read it as a `GRanges` using `rtrackler::import`
-Then along with your recipe, one would write a class to be included inside 
-AnnotationHub as shown below- 
-
-```{r eval=FALSE}
+```{r, eval=FALSE}
 setClass("BEDFileResource", contains="AnnotationHubResource")
 
 setMethod(".get1", "BEDFileResource",
@@ -290,24 +283,23 @@ setMethod(".get1", "BEDFileResource",
 })
 ```
 
-If you need to do this with a set of files that you are crafting a recipe for, 
-you will need to coordinate with us so that we can patch the appropriate 
-supporting code into the client.  Alternatively, you can make sure to set the 
-RDataClass to an existing value (one that we already have a method for).
+If you need to do this with a set of files that you are crafting a
+recipe for, you will need to coordinate with us so that we can patch
+the appropriate supporting code into the client.  Alternatively, you
+can make sure to set the RDataClass to an existing value (one that we
+already have a method for).
 
 ## Step 4: Test your functions and then contact us when they work
 
-So at this point you should make sure that the AnnotationHubMetadata 
-generating function produces a list of AnnotationHubMetadata objects 
-and that your recipe produces a path to a file that is generated in 
-the way that you expect it to.  Once this happens you should contact 
-us about running your recipe so that your data can actually be put into the hub.
-
+So at this point you should make sure that the AnnotationHubMetadata
+generating function produces a list of AnnotationHubMetadata objects
+and that your recipe produces a path to a file that is generated in
+the way that you expect it to.  Once this happens you should contact
+us about running your recipe so that your data can actually be put
+into the hub.
 
 ## Session Information
 
-```{r, SessionInfo, echo=FALSE}
+```{r SessionInfo, echo=FALSE}
 sessionInfo()
 ```
-
-
