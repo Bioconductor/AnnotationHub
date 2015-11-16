@@ -7,7 +7,7 @@ setMethod("show", "AnnotationHubResource",
 })
 
 setGeneric(".get1", function(x, ...) {
-    stopifnot(is(x, "AnnotationHubResource") && length(x) == 1L)
+    stopifnot(is(x, "AnnotationHubResource"), length(x) == 1L)
     standardGeneric(".get1")
 })
 
