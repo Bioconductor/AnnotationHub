@@ -115,8 +115,6 @@ setMethod(".get1", "GFF3FileResource",
     rtracklayer::import(cache(yy), format="GFF", ...)
 })
 
-
-
 setClass("BigWigFileResource", contains="AnnotationHubResource")
 
 setMethod(".get1", "BigWigFileResource",

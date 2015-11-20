@@ -12,7 +12,6 @@ setMethod(".get1", "BEDFileResource",
     .tidyGRanges(x, gr)
 })
 
-
 setClass("UCSCBroadPeakResource", contains="BEDFileResource")
 
 setMethod(".get1", "UCSCBroadPeakResource",

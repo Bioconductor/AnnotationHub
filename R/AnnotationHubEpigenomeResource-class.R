@@ -21,8 +21,6 @@ setMethod(".get1", "EpigenomeRoadmapFileResource",
     .tidyGRanges(x, gr)
 })
 
-
-
 setClass("EpiExpressionTextResource", contains="AnnotationHubResource")
 
 setMethod(".get1", "EpiExpressionTextResource",
@@ -38,7 +36,6 @@ setMethod(".get1", "EpiExpressionTextResource",
     }
     data  
 })
-
 
 setClass("EpichmmModelsResource", contains="AnnotationHubResource")
 
@@ -108,3 +105,23 @@ setMethod(".get1", "EpichmmModelsResource",
     mcols(gr) <- newdf
     gr
 }
+
+setClass("EpigenomeRoadmapNarrowAllPeaksResource", 
+         contains="BEDFileResource")
+
+setMethod(".get1", "EpigenomeRoadmapNarrowAllPeaksResource",
+    function(x, ...)
+{
+    narrowAllPeaks <- c(peakTagDensity="numeric")
+    callNextMethod(x, extraCols=narrowAllPeaks)
+})
+
+setClass("EpigenomeRoadmapNarrowFDRResource", 
+         contains="BEDFileResource")
+
+setMethod(".get1", "EpigenomeRoadmapNarrowFDRResource",
+    function(x, ...)
+{
+    narrowFDR <- c(peakTagDensity="numeric", zScore="numeric")
+    callNextMethod(x, extraCols=narrowFDR)
+})
