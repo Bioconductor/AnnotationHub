@@ -35,6 +35,7 @@
 
 % Other
 \alias{dbuid0}
+\alias{dbclose}
 \alias{dbcreateindex}
 
 

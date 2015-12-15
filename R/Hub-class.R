@@ -77,7 +77,7 @@ setValidity("Hub",
     .db_env[["db_connection"]]
 }
 
-.db_close <- function() {
+dbclose <- function() {
     con <- .db_env[["db_connection"]]
     if (!is.null(con)) {
         if (RSQLite::dbIsValid(con))
@@ -94,7 +94,7 @@ setValidity("Hub",
         con <- .db_get_db(path, hub)
         sql <- "SELECT * FROM timestamp"
         localTime <- as.POSIXct(dbGetQuery(con, sql)[[1]])
-        .db_close()
+        dbclose()
 
         onlineTime == localTime
     }, error=function(e) {

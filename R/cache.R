@@ -118,7 +118,7 @@ removeCache <- function(x=hubCache())
     reply <- .ask("Delete cache file", c("y", "n"))
     if (reply == "y") {
       rv <- tryCatch({
-          .db_close()
+          dbclose()
           if (file.exists(x)) {
               status <- unlink(x, recursive=TRUE, force=TRUE)
               if (status == 1)

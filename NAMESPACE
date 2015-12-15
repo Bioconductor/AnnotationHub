@@ -55,7 +55,8 @@ export(
     AnnotationHub, cache, "cache<-", display, 
     hubUrl, hubCache, hubOption, setHubOption, 
     removeCache, possibleDates, mcols,
-    dbindex, "dbindex<-", dbuid0, dbuid, "dbuid<-", dbcreateindex
+    dbindex, "dbindex<-", dbuid0, dbuid, "dbuid<-", 
+    dbcreateindex, dbclose
 )
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

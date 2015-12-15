@@ -20,7 +20,7 @@ AnnotationHub <-
     db_connection <- .db_get(db_path, hub)
     db_env[["db_connection"]] <- db_connection
     db_env[["db_path"]] <- dbfile(db_env[["db_connection"]])
-    db_date <- max(.possibleDates(db_connection))    
+    db_date <- max(possibleDates(db_connection))
     db_uid <- dbuid0(db_connection, db_date, db_path)
     hub <- new("AnnotationHub", cache=cache, hub=hub, date=db_date, 
                .db_env=db_env, .db_uid=db_uid)

@@ -37,5 +37,5 @@
 }
 
 .onUnload <- function(libpath) {
-    .db_close()
+    dbclose()
 }
