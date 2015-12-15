@@ -202,17 +202,6 @@
     .query_as_data.frame(x, query)[[1]]
 }
 
-## mcols
-.mcols <- function(x){
-    DataFrame(.resource_table(x))
-
-    ## TODO: this is not enough, I need to move the addition of tags back to .resource_table (OR maybe make a new function resource_table) to consolidate attachment of thigns like tags etc.
-}
-## mcols method
-setMethod("mcols", "AnnotationHub", function(x){ .mcols(x)} )
-
-## 
-## queries used by show,AnnotationHub-method
 ## 
 .title_data.frame <-
     function(x)

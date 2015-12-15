@@ -1,7 +1,7 @@
 Package: AnnotationHub
 Type: Package
 Title: Client to access AnnotationHub resources
-Version: 2.3.6
+Version: 2.3.7
 Authors@R: 
     c(person("Martin", "Morgan", email="mtmorgan@fhcrc.org", role="cre"),
       person("Marc", "Carlson", role="ctb"),
@@ -27,12 +27,12 @@ Suggests: IRanges, GenomicRanges, GenomeInfoDb, VariantAnnotation, Rsamtools,
         RUnit, GenomicFeatures, MSnbase, mzR, Biostrings,
         SummarizedExperiment
 Enhances: AnnotationHubData
-Collate: AnnotationHub-class.R AnnotationHubResource-class.R
+Collate: option.R Hub-class.R AnnotationHub-class.R 
+        AnnotationHubResource-class.R
         AnnotationHubBEDResource-class.R
         AnnotationHubProteomicsResource-class.R
         AnnotationHubEpigenomeResource-class.R 
-        utilities.R option.R
-        sql.R hub.R cache.R display.R zzz.R
+        utilities.R sql.R hub.R cache.R zzz.R
 VignetteBuilder: knitr
 NeedsCompilation: yes
 Packaged: 2015-07-13 21:40:41 UTC; mcarlson

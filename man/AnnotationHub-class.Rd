@@ -4,12 +4,14 @@
 % Classes
 \alias{class:AnnotationHub}
 \alias{AnnotationHub-class}
+\alias{class:Hub}
+\alias{Hub-class}
 
 % Constructor
 \alias{AnnotationHub}
 
 % Accessor-like methods
-\alias{mcols,AnnotationHub-method} 
+\alias{mcols,Hub-method} 
 
 \alias{cache}
 \alias{cache<-}
@@ -20,47 +22,47 @@
 
 \alias{possibleDates}
 \alias{snapshotDate}
-\alias{snapshotDate,AnnotationHub-method}
+\alias{snapshotDate,Hub-method}
 \alias{snapshotDate<-}
-\alias{snapshotDate<-,AnnotationHub-method}
+\alias{snapshotDate<-,Hub-method}
 
-\alias{dbconn,AnnotationHub-method}
-\alias{dbfile,AnnotationHub-method}
+\alias{dbconn,Hub-method}
+\alias{dbfile,Hub-method}
 
 % List-like
-\alias{length,AnnotationHub-method}
-\alias{names,AnnotationHub-method}
-\alias{fileName,AnnotationHub-method}
+\alias{length,Hub-method}
+\alias{names,Hub-method}
+\alias{fileName,Hub-method}
 
 % Subsetting:
-\alias{$,AnnotationHub-method}
+\alias{$,Hub-method}
 
-\alias{[[,AnnotationHub,character,missing-method}
-\alias{[[,AnnotationHub,numeric,missing-method}
+\alias{[[,Hub,character,missing-method}
+\alias{[[,Hub,numeric,missing-method}
 
-\alias{[,AnnotationHub,character,missing-method} 
-\alias{[,AnnotationHub,logical,missing-method} 
-\alias{[,AnnotationHub,numeric,missing-method} 
+\alias{[,Hub,character,missing-method} 
+\alias{[,Hub,logical,missing-method} 
+\alias{[,Hub,numeric,missing-method} 
 
-\alias{[<-,AnnotationHub,character,missing,AnnotationHub-method} 
-\alias{[<-,AnnotationHub,logical,missing,AnnotationHub-method} 
-\alias{[<-,AnnotationHub,numeric,missing,AnnotationHub-method} 
+\alias{[<-,Hub,character,missing,Hub-method} 
+\alias{[<-,Hub,logical,missing,Hub-method} 
+\alias{[<-,Hub,numeric,missing,Hub-method} 
 
-\alias{subset,AnnotationHub-method}
+\alias{subset,Hub-method}
 
 \alias{query}
-\alias{query,AnnotationHub-method}
+\alias{query,Hub-method}
 
 \alias{display}
-\alias{display,AnnotationHub-method}
+\alias{display,Hub-method}
 
 % as.list / c
-\alias{as.list.AnnotationHub}
-\alias{as.list,AnnotationHub-method}
-\alias{c,AnnotationHub-method}
+\alias{as.list.Hub}
+\alias{as.list,Hub-method}
+\alias{c,Hub-method}
 
 % show method:
-\alias{show,AnnotationHub-method}
+\alias{show,Hub-method}
 \alias{show,AnnotationHubResource-method}
 
 

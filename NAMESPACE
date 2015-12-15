@@ -19,14 +19,14 @@ importFrom(BiocInstaller, biocVersion)
 
 importMethodsFrom(AnnotationDbi, dbconn, dbfile)
 
-exportClasses(AnnotationHub) 
+exportClasses(Hub, AnnotationHub) 
 
 export(AnnotationHub, cache, "cache<-", display, hubUrl, hubCache,
     hubOption, setHubOption, removeCache, possibleDates, mcols)
 
-S3method(.DollarNames, AnnotationHub)
+S3method(.DollarNames, Hub)
 
-S3method(as.list, AnnotationHub)
+S3method(as.list, Hub)
 
 exportMethods(names, length, "$", "[", query, subset, "[[", as.list, c,
     show, fileName,
