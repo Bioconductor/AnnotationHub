@@ -14,12 +14,11 @@ setClass("Hub",
     )
 #    prototype(
 #        .db_env=new.env(parent=emptyenv()),
-#        hub=hubOption("URL"),
-#        cache=hubOption("CACHE")
 #    )
 )
 
-## FIXME: remove this and use 'prototype'? 
+## FIXME: remove this and use 'prototype'? Shouldn't we be accessing
+##        .db_env via the hub object?
 .db_env <- new.env(parent=emptyenv())
 
 
@@ -169,8 +168,13 @@ setValidity("Hub",
     con
 }
 
+.db_index_file <- function(x)
+    file.path(hubCache(x), "index.rds")
 
-.db_uid0 <- function(con, .date, path){
+.db_index_load <- function(x)
+    readRDS(.db_index_file(x))[names(x)]
+
+dbuid0 <- function(con, .date, path){
     tryCatch({
         uid <- .uid0(con, .date)
         sort(uid)
@@ -182,14 +186,11 @@ setValidity("Hub",
     })
 }
 
-.db_index_file <- function(x)
-    file.path(hubCache(x), "index.rds")
-
-.db_index_create <- function(x) {
+dbcreateindex <- function(x) {
     fl <- .db_index_file(x)
     if (file.exists(fl) && (file.mtime(fl) > file.mtime(dbfile(x))))
         return(fl)
-    
+ 
     tryCatch({
         tbl <- .resource_table(x)
         tbl <- setNames(do.call("paste", c(tbl, sep="\r")), rownames(tbl))
@@ -203,9 +204,6 @@ setValidity("Hub",
     fl
 }
 
-.db_index_load <- function(x)
-    readRDS(.db_index_file(x))[names(x)]
-
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### Accessors
 ###
@@ -214,13 +212,21 @@ setValidity("Hub",
 
 .hub <- function(x) slot(x, "hub")
 
-.db_index <- function(x) slot(x, ".db_index")
-
-.db_uid <- function(x) slot(x, ".db_uid")
-
-`.db_uid<-` <- function(x, ..., value)
+dbindex <- function(x) slot(x, ".db_index")
+`dbindex<-` <- function(x, ..., value) 
 {
-    bad <- value[!value %in% .db_uid(x)]
+    if (length(value) > 1L)
+        stop("'value' must be length 1")
+    if (!is(value, "character"))
+        stop("'value' must be a character")
+    slot(x, ".db_index") <- value
+    x
+}
+
+dbuid <- function(x) slot(x, ".db_uid")
+`dbuid<-` <- function(x, ..., value)
+{
+    bad <- value[!value %in% dbuid(x)]
     if (any(bad))
         stop("invalid subscripts: ",
              paste(sQuote(S4Vectors:::selectSome(bad)), collapse=", "))
@@ -292,7 +298,7 @@ setMethod("mcols", "Hub", function(x) DataFrame(.resource_table(x)))
 setMethod("names", "Hub",
     function(x)
 {
-    as.character(names(.db_uid(x)))
+    as.character(names(dbuid(x)))
 })
 
 setMethod("fileName", signature=(object="Hub"),
@@ -306,7 +312,7 @@ setMethod("fileName", signature=(object="Hub"),
 setMethod("length", "Hub",
     function(x)
 {
-    length(.db_uid(x))
+    length(dbuid(x))
 })
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -316,9 +322,9 @@ setMethod("length", "Hub",
 setMethod("[", c("Hub", "numeric", "missing"),
     function(x, i, j, ..., drop=TRUE) 
 {
-    idx <- na.omit(match(i, seq_along(.db_uid(x)))) 
+    idx <- na.omit(match(i, seq_along(dbuid(x)))) 
     ## seq_along creates a special problem for show()...
-    .db_uid(x) <- .db_uid(x)[idx]
+    dbuid(x) <- dbuid(x)[idx]
     x
 })
 
@@ -326,29 +332,29 @@ setMethod("[", c("Hub", "logical", "missing"),
     function(x, i, j, ..., drop=TRUE)
 {
     i[is.na(i)] <- FALSE
-    .db_uid(x) <- .db_uid(x)[i]
+    dbuid(x) <- dbuid(x)[i]
     x
 })
 
 setMethod("[", c("Hub", "character", "missing"),
     function(x, i, j, ..., drop=TRUE) 
 {
-    idx <- na.omit(match(i, names(.db_uid(x))))
-    .db_uid(x) <- .db_uid(x)[idx]
+    idx <- na.omit(match(i, names(dbuid(x))))
+    dbuid(x) <- dbuid(x)[idx]
     x
 })
 
 setReplaceMethod("[", c("Hub", "numeric", "missing", "Hub"),
     function(x, i, j, ..., value)
 {
-    .db_uid(x)[i] <- .db_uid(value)
+    dbuid(x)[i] <- dbuid(value)
     x
 })
 
 setReplaceMethod("[", c("Hub", "logical", "missing", "Hub"),
     function(x, i, j, ..., value)
 {
-    .db_uid(x)[i] <- .db_uid(value)
+    dbuid(x)[i] <- dbuid(value)
     x
 })
 
@@ -356,63 +362,12 @@ setReplaceMethod("[",
     c("Hub", "character", "missing", "Hub"),
     function(x, i, j, ..., value)
 {
-    idx <- match(i, names(.db_uid(x)))
+    idx <- match(i, names(dbuid(x)))
     isNA <- is.na(idx)
-    .db_uid(x)[idx[!isNA]] <- .db_uid(value)[!isNA]
+    dbuid(x)[idx[!isNA]] <- dbuid(value)[!isNA]
     x
 })
 
-.Hub_get1 <-
-    function(x)
-{
-    if (length(x) != 1L)
-        stop("'i' must be length 1")
-
-    className <- sprintf("%sResource", .dataclass(x))
-    if (is.null(getClassDef(className))) {
-        msg <- sprintf("'%s' not available in this version of the
-            package; use biocLite() to update?",
-            names(x))
-        stop(paste(strwrap(msg, exdent=2), collapse="\n"), call.=FALSE)
-    }
-
-    tryCatch({
-        class <- new(className, hub=x)
-    }, error=function(err) {
-        stop("failed to create 'HubResource' instance",
-             "\n  name: ", names(x),
-             "\n  title: ", x$title,
-             "\n  reason: ", conditionMessage(err),
-             call.=FALSE)
-    })
-
-    tryCatch({
-        .get1(class)
-    }, error=function(err) {
-        stop("failed to load resource",
-             "\n  name: ", names(x),
-             "\n  title: ", x$title,
-             "\n  reason: ", conditionMessage(err),
-             call.=FALSE)
-    })
-}
-
-setMethod("[[", c("Hub", "numeric", "missing"),
-    function(x, i, j, ...)
-{
-    .Hub_get1(x[i])
-})
-
-setMethod("[[", c("Hub", "character", "missing"),
-    function(x, i, j, ...)
-{
-    if (length(i) != 1L)
-        stop("'i' must be length 1")
-    idx <- match(i, names(.db_uid(x)))
-    if (is.na(idx))
-        stop("unknown key ", sQuote(i))
-    .Hub_get1(x[idx])
-})
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### $, query and subset methods
@@ -425,7 +380,7 @@ setMethod("$", "Hub",
      "tags"=unname(.collapse_as_string(x, .tags)),
      "rdataclass"=unname(.collapse_as_string(x, .rdataclass)),
      "sourceurl"=unname(.collapse_as_string(x, .sourceurl)),
-     "sourcetype"=unname(.collapse_as_string(x, .sourcetype)),      
+     "sourcetype"=unname(.collapse_as_string(x, .sourcetype)), 
      .resource_column(x, name))    ## try to get it from main resources table
 })
 
@@ -500,7 +455,7 @@ setMethod("c", "Hub",
     .test(args, snapshotDate, "snapshotDate")
     .test(args, dbfile, "dbfile")
 
-    db_uid <- unlist(lapply(unname(args), .db_uid))
+    db_uid <- unlist(lapply(unname(args), dbuid))
     if (length(db_uid) == 0 && is.null(names(db_uid)))
         names(db_uid) <- character()
     udb_uid <- unique(db_uid)

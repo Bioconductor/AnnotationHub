@@ -1,33 +1,76 @@
 import(methods)
-
 import(BiocGenerics)
-
 import(RSQLite)
-
 import(S4Vectors)
 
 importFrom(stats, setNames)
-
-importFrom(httr, GET, content, parse_url, progress, write_disk,
-    stop_for_status, status_code, use_proxy)
-
+importFrom(httr, 
+    GET, content, parse_url, progress, write_disk,
+    stop_for_status, status_code, use_proxy
+)
 importFrom(utils, capture.output, .DollarNames)
-
 importFrom(interactiveDisplayBase, display)
-
 importFrom(BiocInstaller, biocVersion)
 
 importMethodsFrom(AnnotationDbi, dbconn, dbfile)
 
-exportClasses(Hub, AnnotationHub) 
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### Export S4 classes
+###
 
-export(AnnotationHub, cache, "cache<-", display, hubUrl, hubCache,
-    hubOption, setHubOption, removeCache, possibleDates, mcols)
+exportClasses(
+    Hub, 
+    AnnotationHub
+)
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### Export S4 methods for generics not defined in AnnotationHub 
+###
+
+exportMethods(
+    names, length, "$", "[", subset, "[[", as.list, c,
+    show, fileName, display, mcols, dbconn, dbfile
+)
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### Export S4 generics defined in GenomicAlignments + export corresponding
+### methods
+###
+
+export(
+    query,
+    snapshotDate, "snapshotDate<-"
+)
+
+exportMethods(
+    query,
+    snapshotDate, "snapshotDate<-"
+)
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### Export non-generic functions
+###
+
+export(
+    AnnotationHub, cache, "cache<-", display, 
+    hubUrl, hubCache, hubOption, setHubOption, 
+    removeCache, possibleDates, mcols,
+    dbindex, "dbindex<-", dbuid0, dbuid, "dbuid<-", dbcreateindex
+)
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### Export S3 methods
+###
 
 S3method(.DollarNames, Hub)
 
 S3method(as.list, Hub)
 
-exportMethods(names, length, "$", "[", query, subset, "[[", as.list, c,
-    show, fileName,
-    snapshotDate, "snapshotDate<-", display, mcols, dbconn, dbfile)
+### Also export them thru the export() directive so that (a) they can be
+### called directly, (b) tab-completion on the name of the generic shows them,
+### and (c) methods() doesn't asterisk them.
+export(
+    .DollarNames.Hub, 
+    as.list.Hub
+)
+

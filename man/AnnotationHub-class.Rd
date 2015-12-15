@@ -28,6 +28,15 @@
 
 \alias{dbconn,Hub-method}
 \alias{dbfile,Hub-method}
+\alias{dbuid}
+\alias{dbuid<-}
+\alias{dbindex}
+\alias{dbindex<-}
+
+% Other
+\alias{dbuid0}
+\alias{dbcreateindex}
+
 
 % List-like
 \alias{length,Hub-method}
@@ -37,8 +46,8 @@
 % Subsetting:
 \alias{$,Hub-method}
 
-\alias{[[,Hub,character,missing-method}
-\alias{[[,Hub,numeric,missing-method}
+\alias{[[,AnnotationHub,character,missing-method}
+\alias{[[,AnnotationHub,numeric,missing-method}
 
 \alias{[,Hub,character,missing-method} 
 \alias{[,Hub,logical,missing-method} 

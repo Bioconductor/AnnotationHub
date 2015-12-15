@@ -1,5 +1,5 @@
 .id_as_single_string <- function(x)
-    paste(sprintf("'%s'", .db_uid(x)), collapse=", ")
+    paste(sprintf("'%s'", dbuid(x)), collapse=", ")
 
 .query_as_data.frame <- function(x, query)
 {
@@ -57,7 +57,7 @@
     ## Then match back to the AHIDs
     .getAHNamesForId(conn, allIds)
 }
-## test: tail(AnnotationHub:::.db_uid(mh))
+## test: tail(AnnotationHub:::dbuid(mh))
 
 ## helper to retrieve tags
 .tags <- function(x) {
@@ -133,7 +133,7 @@
 ## Helper to collapse many to one fields (like above) into one space
 .collapse_as_string <- function(x, FUN)
 {
-    uid <- .db_uid(x)
+    uid <- dbuid(x)
     tbl <- FUN(x)
     lst <- vapply(split(tbl[[1]], tbl[["id"]]), paste0,
                   character(1), collapse=", ")
