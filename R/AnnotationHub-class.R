@@ -15,10 +15,6 @@ setClass("AnnotationHub", contains="Hub")
 AnnotationHub <-
     function(..., hub=hubOption("URL"), cache=hubOption("CACHE"))
 {
-    #if (!isSingleString(hub))
-    #    stop("'hub' must be a single string (url)")
-    #if (!isSingleString(cache))
-    #    stop("'cache' must be a single string (directory path)")
     .db_path <- .cache_create(cache)
     db_env <- new.env(parent=emptyenv())
     .db_connection <- .db_get(.db_path, hub)
