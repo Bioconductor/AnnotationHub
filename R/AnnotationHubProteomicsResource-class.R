@@ -1,10 +1,10 @@
 setClass("mzRpwizResource", contains="AnnotationHubResource")
 setMethod(".get1", "mzRpwizResource",
-    function(x, ...) 
+    function(x, ...)
 {
     .require("mzR")
     yy <- cache(.hub(x))
-    mzR::openMSfile(yy, backend = "pwiz")
+    mzR::openMSfile(yy, backend = "Ramp")
 })
 
 setClass("mzRidentResource", contains="AnnotationHubResource")
