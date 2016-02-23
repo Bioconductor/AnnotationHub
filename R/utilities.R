@@ -53,8 +53,8 @@
 .metadataForAH <- 
     function(x, ...)
 {
-    stopifnot(length(.hub(x)) == 1)
-    meta <- .hub(x)
+    stopifnot(length(getHub(x)) == 1)
+    meta <- getHub(x)
     list(AnnotationHubName=names(meta), 
          `File Name`=basename(meta$sourceurl),
          `Data Source`=meta$sourceurl,
@@ -83,7 +83,7 @@
 
 .tidyGRanges <- 
     function(x, gr, sort=TRUE, guess.circular=TRUE, addGenome=TRUE,
-             metadata=TRUE, genome=.hub(x)$genome)
+             metadata=TRUE, genome=getHub(x)$genome)
 {
     if (metadata)
         metadata(gr)  <- .metadataForAH(x)

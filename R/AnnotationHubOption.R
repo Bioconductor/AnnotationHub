@@ -1,18 +1,18 @@
-.hub_options <- new.env(parent=emptyenv())
+.AH_hub_options <- new.env(parent=emptyenv())
 
 .hub_option_key <- function(key0=c("URL", "CACHE", "PROXY", "MAX_DOWNLOADS"))
     match.arg(key0)
 
-hubOption <- function(arg) {
+getAnnotationHubOption <- function(arg) {
     arg <- .hub_option_key(toupper(arg))
-    .hub_options[[arg]]
+    .AH_hub_options[[arg]]
 }
 
-setHubOption <- function(arg, value)
+setAnnotationHubOption <- function(arg, value)
 {
     key <- .hub_option_key(toupper(trimws(arg)))
 
-    .hub_options[[key]] <- switch(key, URL=, CACHE={
+    .AH_hub_options[[key]] <- switch(key, URL=, CACHE={
         value <- as.character(value)
         stopifnot(isSingleString(value))
         value

@@ -3,7 +3,7 @@ setMethod(".get1", "mzRpwizResource",
     function(x, ...)
 {
     .require("mzR")
-    yy <- cache(.hub(x))
+    yy <- cache(getHub(x))
     mzR::openMSfile(yy, backend = "Ramp")
 })
 
@@ -12,7 +12,7 @@ setMethod(".get1", "mzRidentResource",
     function(x, ...) 
 {
     .require("mzR")
-    yy <- cache(.hub(x))
+    yy <- cache(getHub(x))
     mzR::openIDfile(yy)
 })
 
@@ -29,6 +29,6 @@ setMethod(".get1", "AAStringSetResource",
      function(x, ...) 
 {
     .require("Biostrings")
-    yy <- cache(.hub(x))
+    yy <- cache(getHub(x))
     Biostrings::readAAStringSet(yy)
 })

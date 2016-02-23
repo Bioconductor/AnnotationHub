@@ -153,8 +153,8 @@ it should download much more quickly.
 When you create the `AnnotationHub` object, it will set up the object
 for you with some default settings.  See `?AnnotationHub` for ways to
 customize the hub source, the local cache, and other instance-specific
-options, and `?hubOption` to set package-global options for use across
-sessions. 
+options, and `?getAnnotationHubOption` to get or set package-global 
+options for use across sessions. 
 
 If you look at the object you will see some helpful information about
 it such as where the data is cached and where online the hub server is

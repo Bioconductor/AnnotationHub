@@ -1,28 +1,24 @@
-\name{hubOption}
-\alias{hubOption}
-\alias{setHubOption}
+\name{getAnnotationHubOption}
 
-\title{Set or get options for default hub behavior.}
+\alias{getAnnotationHubOption}
+\alias{setAnnotationHubOption}
+
+\title{Get and set options for default AnnotationHub behavior.}
 
 \description{
-
   These functions get or set options for creation of new
   \sQuote{AnnotationHub} instances.
-
 }
 
 \usage{
-hubOption(arg)
-setHubOption(arg, value)
+getAnnotationHubOption(arg)
+setAnnotationHubOption(arg, value)
 }
 
 \arguments{
-
   \item{arg}{The character(1) hub options to set. see \sQuote{Details}
     for current options.}
-
   \item{value}{The value to be assigned to the hub option.}
-
 }
 
 \details{
@@ -68,9 +64,9 @@ setHubOption(arg, value)
 \author{Martin Morgan \url{mtmorgan@fhcrc.org}}
 
 \examples{
-hubOption("URL")
+getAnnotationHubOption("URL")
 \dontrun{
-setHubOption("CACHE", "~/.myHub")
+setAnnotationHubOption("CACHE", "~/.myHub")
 }
 }
 \keyword{ manip }

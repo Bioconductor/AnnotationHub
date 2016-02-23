@@ -8,16 +8,24 @@
 \alias{Hub-class}
 
 % Constructor
+\alias{.Hub}
 \alias{AnnotationHub}
 
 % Accessor-like methods
 \alias{mcols,Hub-method} 
 
 \alias{cache}
+\alias{cache,Hub-method}
+\alias{cache,AnnotationHub-method}
 \alias{cache<-}
+\alias{cache<-,Hub-method}
 
 \alias{hubUrl} 
+\alias{hubUrl,Hub-method} 
 \alias{hubCache}
+\alias{hubCache,Hub-method}
+\alias{hubDate}
+\alias{hubDate,Hub-method}
 \alias{removeCache}
 
 \alias{possibleDates}
@@ -28,16 +36,6 @@
 
 \alias{dbconn,Hub-method}
 \alias{dbfile,Hub-method}
-\alias{dbuid}
-\alias{dbuid<-}
-\alias{dbindex}
-\alias{dbindex<-}
-
-% Other
-\alias{dbuid0}
-\alias{dbclose}
-\alias{dbcreateindex}
-
 
 % List-like
 \alias{length,Hub-method}
@@ -47,8 +45,8 @@
 % Subsetting:
 \alias{$,Hub-method}
 
-\alias{[[,AnnotationHub,character,missing-method}
-\alias{[[,AnnotationHub,numeric,missing-method}
+\alias{[[,Hub,character,missing-method}
+\alias{[[,Hub,numeric,missing-method}
 
 \alias{[,Hub,character,missing-method} 
 \alias{[,Hub,logical,missing-method} 
@@ -79,7 +77,6 @@
 \title{AnnotationHub objects and their related methods and functions}
 
 \description{
-
   Use \code{AnnotationHub} to interact with Bioconductor's AnnotationHub
   service.  Query the instance to discover and use resources that are of
   interest, and then easily download and import the resource into R for
@@ -103,37 +100,43 @@
   see possible snapshot dates.
 
   The location of the local cache can be found (and updated) with
-  \code{hubCache()}; \code{removeCache()} removes all cache resources.
-
+  \code{getAnnotationHubCache} and \code{setAnnotationHubCache}; 
+  \code{removeCache} removes all cache resources.
 }
 
 \section{Constructors}{
   \describe{
     \item{}{
-      \code{AnnotationHub(..., hub=hubOption("URL"), cache=hubOption("CACHE"),
-        max.downloads=hubOption("MAX_DOWNLOADS"))}:
+      \code{AnnotationHub(..., hub=getAnnotationHubOption("URL"), 
+                         cache=getAnnotationHubOption("CACHE"))}:
       Create an \code{AnnotationHub} instance, possibly updating the
       current database of records.
     }
   }
 }
 
-\section{Discovery and retrieval}{
+\section{Accessors}{
   In the code snippets below, \code{x} and \code{object} are
   AnnotationHub objects.
 
   \describe{
     \item{}{
+      \code{hubCache(x)}:
+      Gets the file system location of the local AnnotationHub cache.
+    }
+    \item{}{
+      \code{hubUrl(x)}:
+      Gets the URL for the online hub.
+    }
+    \item{}{
       \code{length(x)}:
       Get the number of hub records.
     }
-
     \item{}{
       \code{names(x)}:
       Get the names (AnnotationHub unique identifiers, of the form
       AH12345) of the hub records.
     }
-    
     \item{}{
       \code{fileName(x)}:
       Get the file path of the hub records as stored in the local cache
@@ -141,7 +144,6 @@
       12345).  NA is returned for those records which have not been
       cached.
     }
-    
     \item{}{
       \code{mcols(x)}:
       Get the metadata columns describing each record. Columns include:
@@ -177,25 +179,28 @@
           file.}
       }
     }
+  }
+}
 
+\section{Subsetting and related operations}{
+  In the code snippets below, \code{x} is an AnnotationHub object.
+
+  \describe{
     \item{}{
       \code{x$name}:
       Convenient reference to individual metadata columns, e.g.,
       \code{x$species}.
     }
-
     \item{}{
       \code{x[i]}:
       Numerical, logical, or character vector (of AnnotationHub names)
       to subset the hub, e.g., \code{x[x$species == "Homo sapiens"]}.
     }
-
     \item{}{
       \code{x[[i]]}:
       Numerical or character scalar to retrieve (if necessary) and
       import the resource into R.
     }
-
     \item{}{
       \code{query(x, pattern, ignore.case=TRUE, pattern.op= `&`)}:
       Return an AnnotationHub subset containing only those elements
@@ -216,7 +221,6 @@
           columns are returned.}
       }
     }
-
     \item{}{
       \code{subset(x, subset)}:
       Return the subset of records containing only those elements whose
@@ -226,7 +230,6 @@
       e.g., \code{subset(x, species == "Homo sapiens" &
         genome="GRCh38")}.
     }
-
     \item{}{
       \code{display(object)}:
       Open a web browser allowing for easy selection of hub records via
@@ -253,20 +256,28 @@
       resources in \code{x}, or removes all local resources
       corresponding to the records in \code{x} from the cache. In this case,
       \code{x} would typically be a small subset of AnnotationHub resources.
-    }      
+    } 
     \item{}{
       \code{hubUrl(x)}:
-      Gets the URL for the online hub.
-    }      
+      Gets the URL for the online AnnotationHub.
+    }
     \item{}{
       \code{hubCache(x)}:
       Gets the file system location of the local AnnotationHub cache.
     }
     \item{}{
-      \code{removeCache(x=hubCache())}:
+      \code{removeCache(x)}:
       Removes local AnnotationHub database and all related resources. After
       calling this function, the user will have to download any AnnotationHub
       resources again.
+    }
+    \item{}{
+      \code{getAnnotationHubOption()}:
+      TODO: Get cache options "CACHE", "URL", "MAXDOWNLOADS" ... 
+    }
+    \item{}{
+      \code{setAnnotationHubOption()}:
+      TODO: Set cache options "CACHE", "URL", "MAXDOWNLOADS" ... 
     }
   }
 }

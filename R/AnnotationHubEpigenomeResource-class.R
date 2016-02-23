@@ -5,7 +5,7 @@ setClass("EpiMetadataResource", contains="AnnotationHubResource")
 setMethod(".get1", "EpiMetadataResource",
    function(x, ...)
 {
-    read.delim(cache(.hub(x)))
+    read.delim(cache(getHub(x)))
 })
 
 setClass("EpigenomeRoadmapFileResource", contains="AnnotationHubResource")
@@ -14,7 +14,7 @@ setMethod(".get1", "EpigenomeRoadmapFileResource",
     function(x, ...)
 {
     .require("rtracklayer")
-    yy <- .hub(x)
+    yy <- getHub(x)
     gr <- rtracklayer::import(cache(yy), format="bed", genome=yy$genome,
         extraCols=c(signalValue="numeric", pValue="numeric", qValue="numeric",
         peak="numeric"))
@@ -26,7 +26,7 @@ setClass("EpiExpressionTextResource", contains="AnnotationHubResource")
 setMethod(".get1", "EpiExpressionTextResource",
     function(x, ...)
 {
-    yy <- cache(.hub(x))
+    yy <- cache(getHub(x))
     data <- read.delim(yy, header=TRUE)
     if(grepl("chr" ,rownames(data)[1])){
        .require("SummarizedExperiment")
@@ -43,7 +43,7 @@ setMethod(".get1", "EpichmmModelsResource",
     function(x, ...)
 {
     .require("rtracklayer")
-    yy <- .hub(x)
+    yy <- getHub(x)
     gr <- rtracklayer::import(cache(yy), format="bed", genome="hg19")
     gr <- .mapAbbr2FullName(gr)
     .tidyGRanges(x, gr)

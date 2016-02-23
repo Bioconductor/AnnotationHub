@@ -6,7 +6,7 @@ setMethod(".get1", "BEDFileResource",
     function(x, ...)
 {
     .require("rtracklayer")
-    yy <- .hub(x)
+    yy <- getHub(x)
     dat <- rtracklayer::BEDFile(cache(yy))
     gr <- rtracklayer::import(dat, format="bed", genome=yy$genome, ...)
     .tidyGRanges(x, gr)

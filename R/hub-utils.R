@@ -1,9 +1,4 @@
 ## and hubUrl (https://annotationhub.bioconductor.org/)
-hubUrl <- function(x) {
-    if (missing(x)) {
-        hubOption("URL")
-    } else .hub(x)
-}
 
 .hub_metadata_path <-
     function(hub)
@@ -29,20 +24,19 @@ hubUrl <- function(x) {
     sprintf("%s/%s", hub, resource)
 }
 
-
 ## example of hub resource (sometimes convenient)
 ## hub = 'https://annotationhub.bioconductor.org/metadata/annotationhub.sqlite3'
-.hub_cache_resource <- function(hubpath, cachepath) {
+.hub_cache_resource <- function(hubpath, cachepath, proxy) {
     ## retrieve file from hub to cache
     tryCatch({
         tmp <- tempfile()
         ## Download the resource in a way that supports https
         if (interactive() && (packageVersion("httr") > "1.0.0")) {
             response <-
-                GET(hubpath, progress(), write_disk(tmp), hubOption("PROXY"))
+                GET(hubpath, progress(), write_disk(tmp), proxy)
             cat("\n") ## line break after progress bar
         } else {
-            response <- GET(hubpath, write_disk(tmp), hubOption("PROXY"))
+            response <- GET(hubpath, write_disk(tmp), proxy)
         }
         if (length(status_code(response)))  
         {
@@ -51,7 +45,7 @@ hubUrl <- function(x) {
             if (status_code(response) != 302L)
                 stop_for_status(response)
         }
-        if (!file.exists(dirname(cachepath)))
+        if (!all(file.exists(dirname(cachepath))))
             dir.create(dirname(cachepath), recursive=TRUE)
         file.copy(from=tmp, to=cachepath)
         file.remove(tmp)
@@ -68,7 +62,7 @@ hubUrl <- function(x) {
 
 ## This is the function that gets stuff (metadata AND files) from S3
 .hub_resource <-
-    function(hub, resource, cachepath, overwrite=FALSE)
+    function(hub, resource, cachepath, proxy, overwrite=FALSE)
 {
     len <- length(resource)
     if (len > 0L) {
@@ -87,7 +81,7 @@ hubUrl <- function(x) {
     }
 
     hubpath <- .hub_resource_path(hub, resource)
-    mapply(.hub_cache_resource, hubpath, cachepath)
+    mapply(.hub_cache_resource, hubpath, MoreArgs=list(cachepath, proxy))
 }
 
 

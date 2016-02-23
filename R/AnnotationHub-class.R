@@ -13,21 +13,12 @@ setClass("AnnotationHub", contains="Hub")
 ## And compare to the highest ID locally (to see if we have the latest DB)
 ## And if not, delete the DB so it will be re-downloaded...
 AnnotationHub <-
-    function(..., hub=hubOption("URL"), cache=hubOption("CACHE"))
+    function(...) 
 {
-    db_path <- .cache_create(cache)
-    db_env <- new.env(parent=emptyenv())
-    db_connection <- .db_get(db_path, hub)
-    db_env[["db_connection"]] <- db_connection
-    db_env[["db_path"]] <- dbfile(db_env[["db_connection"]])
-    db_date <- max(possibleDates(db_connection))
-    db_uid <- dbuid0(db_connection, db_date, db_path)
-    hub <- new("AnnotationHub", cache=cache, hub=hub, date=db_date, 
-               .db_env=db_env, .db_uid=db_uid)
-    message("snapshotDate(): ", snapshotDate(hub))
-    index <- dbcreateindex(hub)
-    dbindex(hub) <- index 
-    hub
+    .Hub("AnnotationHub", 
+         getAnnotationHubOption("URL"),
+         getAnnotationHubOption("CACHE"),
+         getAnnotationHubOption("PROXY"))
 }
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -40,6 +31,7 @@ AnnotationHub <-
     if (length(x) != 1L)
         stop("'i' must be length 1")
 
+    ## Add 'Resource' postfix to DispatchClass name
     className <- sprintf("%sResource", .dataclass(x))
     if (is.null(getClassDef(className))) {
         msg <- sprintf("'%s' not available in this version of the
@@ -69,19 +61,16 @@ AnnotationHub <-
     })
 }
 
-setMethod("[[", c("AnnotationHub", "numeric", "missing"),
-    function(x, i, j, ...)
-{
-    .Hub_get1(x[i])
-})
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### cache method
+###
 
-setMethod("[[", c("AnnotationHub", "character", "missing"),
-    function(x, i, j, ...)
-{
-    if (length(i) != 1L)
-        stop("'i' must be length 1")
-    idx <- match(i, names(dbuid(x)))
-    if (is.na(idx))
-        stop("unknown key ", sQuote(i))
-    .Hub_get1(x[idx])
-})
+setMethod("cache", "AnnotationHub",
+    function(x, ...) {
+        callNextMethod(x,
+                       cache.root=".AnnotationHub", 
+                       cache.fun=setAnnotationHubOption, 
+                       proxy=getAnnotationHubOption("PROXY"), 
+                       max.downloads=getAnnotationHubOption("MAX_DOWNLOADS"))
+    }
+)

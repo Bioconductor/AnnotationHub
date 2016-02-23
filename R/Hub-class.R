@@ -5,8 +5,8 @@
 
 setClass("Hub",
     representation("VIRTUAL",
-        hub="character", 
-        cache="character", 
+        hub="character",       ## equivalent to cache URL
+        cache="character",     ## equivalent to cache CACHE 
         date="character",
         .db_env="environment", 
         .db_index="character",
@@ -21,6 +21,25 @@ setClass("Hub",
 ##        .db_env via the hub object?
 .db_env <- new.env(parent=emptyenv())
 
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### Constructor for subclasses
+###
+
+.Hub <- function(.class, url, cache, proxy, ...) {
+    db_path <- .create_cache(cache, .class)
+    db_env <- new.env(parent=emptyenv())
+    db_connection <- .db_get(db_path, url, proxy)
+    db_env[["db_connection"]] <- db_connection
+    db_env[["db_path"]] <- dbfile(db_env[["db_connection"]])
+    db_date <- max(possibleDates(db_connection))
+    db_uid <- .db_uid0(db_connection, db_date, db_path)
+    hub <- new(.class, cache=cache, hub=url, date=db_date, 
+               .db_env=db_env, .db_uid=db_uid, ...)
+    message("snapshotDate(): ", snapshotDate(hub))
+    index <- .db_create_index(hub)
+    .db_index(hub) <- index 
+    hub
+}
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### Validity
@@ -45,208 +64,68 @@ setValidity("Hub",
 )
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### db helpers 
-###
-
-## Helpers to get a fresh metadata DB connection
-.db_get_db <- function(path, hub) {
-    ## download or cache
-    tryCatch({
-        need <- !file.exists(path)
-        .hub_resource(.hub_metadata_path(hub), basename(path)[need], path[need])
-    }, error=function(err) {
-        stop("failed to create local data base",
-             "\n  database: ", sQuote(path),
-             "\n  reason: ", conditionMessage(err),
-             call.=FALSE)
-    })
-    .db_open(path)
-}
-
-.db_open <- function(path) {
-    tryCatch({
-        if (is.null(.db_env[["db_connection"]])) {
-            .db_env[["db_connection"]] <- dbConnect(SQLite(), path)
-        }
-    }, error=function(err) {
-        stop("failed to connect to local data base",
-             "\n  database: ", sQuote(path),
-             "\n  reason: ", conditionMessage(err),
-             call.=FALSE)
-    })
-    .db_env[["db_connection"]]
-}
-
-dbclose <- function() {
-    con <- .db_env[["db_connection"]]
-    if (!is.null(con)) {
-        if (RSQLite::dbIsValid(con))
-            dbDisconnect(con)
-        .db_env[["db_connection"]] <- NULL
-    }
-}
-
-.db_is_current <- function(path, hub) {
-    tryCatch({
-        url <- paste0(hub, '/metadata/database_timestamp')
-        onlineTime <- as.POSIXct(content(GET(url, hubOption("PROXY"))))
-
-        con <- .db_get_db(path, hub)
-        sql <- "SELECT * FROM timestamp"
-        localTime <- as.POSIXct(dbGetQuery(con, sql)[[1]])
-        dbclose()
-
-        onlineTime == localTime
-    }, error=function(e) {
-        warning("database may not be current",
-                "\n  database: ", sQuote(path),
-                "\n  reason: ", conditionMessage(e),
-                call.=FALSE)
-        ## TRUE even though not current, e.g., no internet connection
-        TRUE
-    })
-}
-
-.db_is_valid <- function(con) {
-    ## Some very minor testing to make sure metadata DB is intact.
-    tryCatch({
-        ## required tables present?
-        expected <- c("biocversions", "input_sources", "location_prefixes",
-                      "rdatapaths", "recipes", "resources", "statuses",
-                      "tags", "timestamp")
-        if (!all(expected %in% dbListTables(con)))
-            stop("missing tables")
-        ## any resources?
-        sql <- "SELECT COUNT(id) FROM resources"
-        if (dbGetQuery(con, sql)[[1]] == 0L)
-            stop("empty 'resources' table")
-    }, error=function(err) {
-        stop("database is corrupt; remove it and try again",
-             "\n  database: ", sQuote(dbfile(con)),
-             "\n  reason: ", conditionMessage(err),
-             call.=FALSE)
-    })
-    TRUE
-}
-
-.db_create_view <- function(con) {
-    ## Create a 'flat' view for simplified access, e.g., via dplyr
-    sql <- 
-        "CREATE VIEW IF NOT EXISTS AllCoreData AS
-         SELECT DISTINCT
-           ah_id, title, dataprovider, species, taxonomyid, genome,
-           description, coordinate_1_based, maintainer, status_id,
-           location_prefix_id, recipe_id, rdatadateadded,
-           rdatadateremoved, record_id, preparerclass, rdatapath,
-           dispatchclass, sourcesize, sourceurl, sourceversion,
-           sourcemd5, sourcelastmodifieddate, rdp.resource_id,
-           sourcetype
-         FROM
-           resources AS res,
-           rdatapaths AS rdp, 
-           input_sources AS ins
-         WHERE res.id = rdp.resource_id 
-         AND res.id = ins.resource_id;"
-    dbGetQuery(con, sql)
-}
-
-.db_get <- function(path, hub) {
-    update <- !file.exists(path)
-    if (!update && !file.size(path)) {
-        file.remove(path)
-        update <- TRUE
-    }
-    if (!update && !.db_is_current(path, hub)) {
-        file.remove(path)
-        update <- TRUE
-    }
-    if (update)
-        message("updating metadata: ", appendLF=FALSE)
-    con <- .db_get_db(path, hub)
-    .db_is_valid(con)
-    .db_create_view(con)
-    con
-}
-
-.db_index_file <- function(x)
-    file.path(hubCache(x), "index.rds")
-
-.db_index_load <- function(x)
-    readRDS(.db_index_file(x))[names(x)]
-
-dbuid0 <- function(con, .date, path){
-    tryCatch({
-        uid <- .uid0(con, .date)
-        sort(uid)
-    }, error=function(err) {
-        stop("failed to connect to local data base",
-             "\n  database: ", sQuote(path),
-             "\n  reason: ", conditionMessage(err),
-             call.=FALSE)
-    })
-}
-
-dbcreateindex <- function(x) {
-    fl <- .db_index_file(x)
-    if (file.exists(fl) && (file.mtime(fl) > file.mtime(dbfile(x))))
-        return(fl)
- 
-    tryCatch({
-        tbl <- .resource_table(x)
-        tbl <- setNames(do.call("paste", c(tbl, sep="\r")), rownames(tbl))
-        saveRDS(tbl, fl)
-    }, error=function(err) {
-        stop("failed to create index",
-             "\n  hubCache(): ", hubCache(x),
-             "\n  reason: ", conditionMessage(err))
-    })
-
-    fl
-}
-
-### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### Accessors
 ###
 
-.cache <- function(x) slot(x, "cache")
+setMethod("hubCache", "Hub",
+    function(x) x@cache
+)
 
-.hub <- function(x) slot(x, "hub")
+setMethod("hubUrl", "Hub",
+    function(x) x@hub 
+)
 
-dbindex <- function(x) slot(x, ".db_index")
-`dbindex<-` <- function(x, ..., value) 
+setMethod("hubDate", "Hub",
+    function(x) x@date 
+)
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### cache methods
+###
+
+## FIXME: rather not pass cache.root and cache.fun
+setMethod("cache", "Hub",
+    function(x, ..., cache.root, cache.fun, proxy, max.downloads)
+        .cache_internal(x, cache.root=cache.root, cache.fun=cache.fun, 
+                        proxy=proxy, max.downloads=max.downloads)
+)
+
+setReplaceMethod("cache", "Hub",
+    function(x, ..., value)
 {
-    if (length(value) > 1L)
-        stop("'value' must be length 1")
-    if (!is(value, "character"))
-        stop("'value' must be a character")
-    slot(x, ".db_index") <- value
+    stopifnot(identical(value, NULL))
+    cachepath <- .cache_path(x, .datapathIds(x))
+    result <- unlink(cachepath)
+    status <- file.exists(cachepath)
+    if (any(status))
+        warning("failed to unlink cache files:\n  ",
+                paste(sQuote(.cache_path(x)[status]), collapse="\n  "))
     x
-}
-
-dbuid <- function(x) slot(x, ".db_uid")
-`dbuid<-` <- function(x, ..., value)
-{
-    bad <- value[!value %in% dbuid(x)]
-    if (any(bad))
-        stop("invalid subscripts: ",
-             paste(sQuote(S4Vectors:::selectSome(bad)), collapse=", "))
-    slot(x, ".db_uid") <- value
-    x
-}
-
-setMethod("dbconn", "Hub", function(x) {
-    conn <- slot(x, ".db_env")[["db_connection"]]
-    if (!dbIsValid(conn)) {
-        conn <- .db_open(dbfile(x))
-        slot(x, ".db_env")[["db_connection"]] <- conn
-    }
-    conn
 })
 
-setMethod("dbfile", "Hub", function(x) {
-    slot(x, ".db_env")[["db_path"]]
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### Accessor-like methods 
+###
+
+setMethod("mcols", "Hub", function(x) DataFrame(.resource_table(x))) 
+
+setMethod("names", "Hub",
+    function(x)
+{
+    as.character(names(.db_uid(x)))
 })
 
+setMethod("fileName", signature=(object="Hub"),
+    function(object, ...)
+{
+    cachepath <- .named_cache_path(object)
+    cachepath[!file.exists(cachepath)] <- NA_character_
+    cachepath
+})
+
+setMethod("length", "Hub",
+    function(x) length(.db_uid(x))
+)
 
 ## TODO: This isn't working yet!  Not only does the date not get swapped yet, 
 ## but I also have to update the uids (reset those) when I do this step... 
@@ -282,38 +161,9 @@ setMethod("dbfile", "Hub", function(x) {
     x
 } 
 
-setGeneric("snapshotDate", function(x, ...) standardGeneric("snapshotDate"))
-setMethod("snapshotDate", "Hub", function(x) slot(x, "date"))
+setMethod("snapshotDate", "Hub", function(x) x@date)
 
-setGeneric("snapshotDate<-", signature="x",
-           function(x, value) standardGeneric("snapshotDate<-"))
 setReplaceMethod("snapshotDate", "Hub", .replaceSnapshotDate)
-
-### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### Accessor-like methods 
-###
-
-setMethod("mcols", "Hub", function(x) DataFrame(.resource_table(x))) 
-
-setMethod("names", "Hub",
-    function(x)
-{
-    as.character(names(dbuid(x)))
-})
-
-setMethod("fileName", signature=(object="Hub"),
-    function(object, ...)
-{
-    cachepath <- .named_cache_path(object)
-    cachepath[!file.exists(cachepath)] <- NA_character_
-    cachepath
-})
-
-setMethod("length", "Hub",
-    function(x)
-{
-    length(dbuid(x))
-})
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### Subsetting 
@@ -322,9 +172,9 @@ setMethod("length", "Hub",
 setMethod("[", c("Hub", "numeric", "missing"),
     function(x, i, j, ..., drop=TRUE) 
 {
-    idx <- na.omit(match(i, seq_along(dbuid(x)))) 
+    idx <- na.omit(match(i, seq_along(.db_uid(x)))) 
     ## seq_along creates a special problem for show()...
-    dbuid(x) <- dbuid(x)[idx]
+    .db_uid(x) <- .db_uid(x)[idx]
     x
 })
 
@@ -332,29 +182,29 @@ setMethod("[", c("Hub", "logical", "missing"),
     function(x, i, j, ..., drop=TRUE)
 {
     i[is.na(i)] <- FALSE
-    dbuid(x) <- dbuid(x)[i]
+    .db_uid(x) <- .db_uid(x)[i]
     x
 })
 
 setMethod("[", c("Hub", "character", "missing"),
     function(x, i, j, ..., drop=TRUE) 
 {
-    idx <- na.omit(match(i, names(dbuid(x))))
-    dbuid(x) <- dbuid(x)[idx]
+    idx <- na.omit(match(i, names(.db_uid(x))))
+    .db_uid(x) <- .db_uid(x)[idx]
     x
 })
 
 setReplaceMethod("[", c("Hub", "numeric", "missing", "Hub"),
     function(x, i, j, ..., value)
 {
-    dbuid(x)[i] <- dbuid(value)
+    .db_uid(x)[i] <- .db_uid(value)
     x
 })
 
 setReplaceMethod("[", c("Hub", "logical", "missing", "Hub"),
     function(x, i, j, ..., value)
 {
-    dbuid(x)[i] <- dbuid(value)
+    .db_uid(x)[i] <- .db_uid(value)
     x
 })
 
@@ -362,15 +212,31 @@ setReplaceMethod("[",
     c("Hub", "character", "missing", "Hub"),
     function(x, i, j, ..., value)
 {
-    idx <- match(i, names(dbuid(x)))
+    idx <- match(i, names(.db_uid(x)))
     isNA <- is.na(idx)
-    dbuid(x)[idx[!isNA]] <- dbuid(value)[!isNA]
+    .db_uid(x)[idx[!isNA]] <- .db_uid(value)[!isNA]
     x
 })
 
+setMethod("[[", c("Hub", "numeric", "missing"),
+    function(x, i, j, ...)
+{
+    .Hub_get1(x[i])
+})
+
+setMethod("[[", c("Hub", "character", "missing"),
+    function(x, i, j, ...)
+{
+    if (length(i) != 1L)
+        stop("'i' must be length 1")
+    idx <- match(i, names(.db_uid(x)))
+    if (is.na(idx))
+        stop("unknown key ", sQuote(i))
+    .Hub_get1(x[idx])
+})
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### $, query and subset methods
+### $, query() and subset() methods
 ###
 
 setMethod("$", "Hub",
@@ -455,7 +321,7 @@ setMethod("c", "Hub",
     .test(args, snapshotDate, "snapshotDate")
     .test(args, dbfile, "dbfile")
 
-    db_uid <- unlist(lapply(unname(args), dbuid))
+    db_uid <- unlist(lapply(unname(args), .db_uid))
     if (length(db_uid) == 0 && is.null(names(db_uid)))
         names(db_uid) <- character()
     udb_uid <- unique(db_uid)
@@ -474,7 +340,7 @@ setMethod("c", "Hub",
 ## ahs <- subset(ah, ah$rdataclass=='VCF')
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### show 
+### Show 
 ###
 
 .pprintf0 <- function(fmt, ...)

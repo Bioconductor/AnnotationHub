@@ -20,7 +20,7 @@ importMethodsFrom(AnnotationDbi, dbconn, dbfile)
 
 exportClasses(
     Hub, 
-    AnnotationHub
+    AnnotationHub, AnnotationHubResource
 )
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -33,18 +33,22 @@ exportMethods(
 )
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### Export S4 generics defined in GenomicAlignments + export corresponding
+### Export S4 generics defined in AnnotationHub + export corresponding
 ### methods
 ###
 
 export(
-    query,
-    snapshotDate, "snapshotDate<-"
+    cache, "cache<-", query,
+    hubUrl, hubCache, hubDate,
+    snapshotDate, "snapshotDate<-",
+    getHub
 )
 
 exportMethods(
-    query,
-    snapshotDate, "snapshotDate<-"
+    cache, "cache<-", query,
+    hubUrl, hubCache, hubDate, 
+    snapshotDate, "snapshotDate<-",
+    getHub
 )
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -52,11 +56,11 @@ exportMethods(
 ###
 
 export(
-    AnnotationHub, cache, "cache<-", display, 
-    hubUrl, hubCache, hubOption, setHubOption, 
-    removeCache, possibleDates, mcols,
-    dbindex, "dbindex<-", dbuid0, dbuid, "dbuid<-", 
-    dbcreateindex, dbclose
+    .Hub, AnnotationHub, display, 
+    removeCache,
+    getAnnotationHubOption, setAnnotationHubOption, 
+    possibleDates, mcols,
+    .httr_proxy, .hub_option_key, .db_close
 )
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
