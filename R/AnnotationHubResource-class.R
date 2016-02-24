@@ -3,7 +3,7 @@
 ### -------------------------------------------------------------------------
 ###
 
-setClass("AnnotationHubResource", representation(hub="AnnotationHub"))
+setClass("AnnotationHubResource", representation(hub="Hub"))
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### Constructor 
