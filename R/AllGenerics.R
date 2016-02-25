@@ -22,6 +22,9 @@ setGeneric("snapshotDate",
 setGeneric("snapshotDate<-", signature="x",
     function(x, value) standardGeneric("snapshotDate<-")
 )
+setGeneric("package", signature="x",
+    function(x, value) standardGeneric("package")
+)
 ## cache returns either the path to the URL or the local path (in a cache)
 ## along the way it downloads the resource that it locates 
 ## Already expecting multiple ids from .dataPathIds(), (potentially)

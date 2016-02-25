@@ -74,3 +74,18 @@ setMethod("cache", "AnnotationHub",
                        max.downloads=getAnnotationHubOption("MAX_DOWNLOADS"))
     }
 )
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### Show 
+###
+
+setMethod("show", "AnnotationHub", function(object) 
+{
+    len <- length(object)
+    cat(sprintf("%s with %d record%s\n", class(object), len,
+                ifelse(len == 1L, "", "s")))
+    cat("# snapshotDate():", snapshotDate(object), "\n")
+    callNextMethod(object)
+})
+
+

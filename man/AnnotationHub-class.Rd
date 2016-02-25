@@ -26,6 +26,8 @@
 \alias{hubCache,Hub-method}
 \alias{hubDate}
 \alias{hubDate,Hub-method}
+\alias{package}
+\alias{package,Hub-method}
 \alias{removeCache}
 
 \alias{possibleDates}
@@ -71,6 +73,7 @@
 
 % show method:
 \alias{show,Hub-method}
+\alias{show,AnnotationHub-method}
 \alias{show,AnnotationHubResource-method}
 
 

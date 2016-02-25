@@ -79,6 +79,10 @@ setMethod("hubDate", "Hub",
     function(x) x@date 
 )
 
+setMethod("package", "Hub",
+    function(x) character() 
+)
+
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### cache methods
 ###
@@ -355,9 +359,11 @@ setMethod("c", "Hub",
            sprintf("%s\n", answer))
 }
 
-.show <-
-    function(object)
+.show <- function(object)
 {
+    if (!length(object))
+        return(NULL)
+
     .some <-
         function(elt, nh, nt, fill="...", width=getOption("width") - 13L)
     {
@@ -395,14 +401,15 @@ setMethod("c", "Hub",
     }
 }
 
-.show1 <-
-    function(object)
+.show1 <- function(object)
 {
     rsrc <- .resource_table(object)
     size <- .collapse_as_string(object, .sourcesize)   
     date <- .collapse_as_string(object, .sourcelastmodifieddate)
-  
+ 
     cat("# names(): ", names(object)[[1]], "\n", sep="")
+    if (length(package(object)))
+        cat("# package(): ", package(object)[[1]], "\n", sep="")
     cat(.pprintf1("dataprovider", rsrc[["dataprovider"]]))
     cat(.pprintf1("species", rsrc[["species"]]))
     cat(.pprintf1("rdataclass", rsrc[["rdataclass"]]))
@@ -421,15 +428,10 @@ setMethod("c", "Hub",
 
 setMethod("show", "Hub", function(object) 
 {
-    len <- length(object)
-    cat(sprintf("%s with %d record%s\n", class(object), len,
-                ifelse(len == 1L, "", "s")))
-    cat("# snapshotDate():", snapshotDate(object), "\n")
-
-    if (len > 1)
-        .show(object)
-    else if (len == 1)
+    if (length(object) == 1)
         .show1(object)
+    else
+        .show(object)
 })
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
