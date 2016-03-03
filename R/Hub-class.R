@@ -408,7 +408,7 @@ setMethod("c", "Hub",
     date <- .collapse_as_string(object, .sourcelastmodifieddate)
  
     cat("# names(): ", names(object)[[1]], "\n", sep="")
-    if (length(package(object)))
+    if (length(package(object)) > 0L)
         cat("# package(): ", package(object)[[1]], "\n", sep="")
     cat(.pprintf1("dataprovider", rsrc[["dataprovider"]]))
     cat(.pprintf1("species", rsrc[["species"]]))
