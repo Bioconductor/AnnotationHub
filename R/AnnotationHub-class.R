@@ -28,6 +28,8 @@ AnnotationHub <-
 .Hub_get1 <-
     function(x)
 {
+    if (!length(x))
+        stop("no records found for the given index")
     if (length(x) != 1L)
         stop("'i' must be length 1")
 
