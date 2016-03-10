@@ -81,9 +81,8 @@
     }
 
     hubpath <- .hub_resource_path(hub, resource)
-    mapply(.hub_cache_resource, hubpath, MoreArgs=list(cachepath, proxy))
+    mapply(.hub_cache_resource, hubpath, cachepath, MoreArgs=list(proxy))
 }
-
 
 .possibleDates <- function(conn) {
     query <- 'SELECT DISTINCT rdatadateadded FROM resources'

@@ -64,7 +64,7 @@ setMethod(".get1", "FaFileResource",
     function(x, ...)
 {
     .require("Rsamtools")
-    fa <- cache(x@hub)
+    fa <- cache(getHub(x))
     Rsamtools::FaFile(file=fa[1],index=fa[2])
 })
 
@@ -75,7 +75,7 @@ setClass("RdaResource", contains="AnnotationHubResource")
 setMethod(".get1", "RdaResource",
     function(x, ...)
 {
-    get(load(cache(x@hub)))
+    get(load(cache(getHub(x))))
 })
 
 setClass("data.frameResource", contains="RdaResource")
@@ -108,7 +108,7 @@ setMethod(".get1", "ChainFileResource",
 {
     .require("rtracklayer")
     .require("GenomeInfoDb")
-    chain <- cache(x@hub)
+    chain <- cache(getHub(x))
     tf <- .gunzip(chain, tempfile())
     tf <- rtracklayer::import.chain(tf)
     tf[GenomeInfoDb::sortSeqlevels(names(tf))]
@@ -117,10 +117,10 @@ setMethod(".get1", "ChainFileResource",
 setClass("TwoBitFileResource", contains="AnnotationHubResource")
 
 setMethod(".get1", "TwoBitFileResource",
-    function(x, ...)      
+    function(x, ...) 
 {
     .require("rtracklayer")
-    bit <- cache(x@hub)
+    bit <- cache(getHub(x))
     rtracklayer::TwoBitFile(bit)
 })
 
@@ -132,7 +132,7 @@ setMethod(".get1", "GTFFileResource",
     message("Importing File into R ..")
     .require("rtracklayer")
     .require("GenomeInfoDb")
-    yy <- x@hub
+    yy <- getHub(x)
     gtf <- rtracklayer::import(cache(yy), format="gtf", genome=yy$genome, ...)
     .tidyGRanges(x, gtf)
 })
@@ -143,7 +143,7 @@ setMethod(".get1", "GFF3FileResource",
     function(x, ...)
 {
     .require("rtracklayer")
-    yy <- x@hub
+    yy <- getHub(x)
     rtracklayer::import(cache(yy), format="GFF", ...)
 })
 
@@ -153,18 +153,25 @@ setMethod(".get1", "BigWigFileResource",
     function(x, ...)
 {
     .require("rtracklayer")
-    er <- cache(x@hub)
-    rtracklayer::BigWigFile(er)  
+    er <- cache(getHub(x))
+    rtracklayer::BigWigFile(er) 
 })
 
 setClass("dbSNPVCFFileResource", contains="AnnotationHubResource")
 
 setMethod(".get1", "dbSNPVCFFileResource",
-    function(x, ...)      
+    function(x, ...) 
 {
     .require("VariantAnnotation")
-    er <- cache(x@hub)
-    VariantAnnotation::VcfFile(file=er[1],index=er[2])      
+    withCallingHandlers({
+        ## retrieve the resource
+        er <- cache(getHub(x))
+    }, warning=function(w) {
+        if (grepl("^Failed to parse headers:", conditionMessage(w))[1])
+            ## warning() something different, or...
+            invokeRestart("muffleWarning")
+    })
+    VariantAnnotation::VcfFile(file=er[1],index=er[2]) 
 })
 ## SQLiteFile
 
@@ -173,7 +180,7 @@ setClass("SQLiteFileResource", contains="AnnotationHubResource")
 setMethod(".get1", "SQLiteFileResource",
     function(x, ...)
 {
-    AnnotationDbi::loadDb(cache(x@hub))
+    AnnotationDbi::loadDb(cache(getHub(x)))
 })
 
 ## GRASP2 SQLiteFile
@@ -183,7 +190,7 @@ setClass("GRASPResource", contains="SQLiteFileResource")
 setMethod(".get1", "GRASPResource",
     function(x, ...)
 {
-    RSQLite::dbConnect(RSQLite::SQLite(), cache(x@hub),
+    RSQLite::dbConnect(RSQLite::SQLite(), cache(getHub(x)),
         flags=RSQLite::SQLITE_RO)
 })
 
@@ -192,7 +199,7 @@ setClass("ZipResource", contains="AnnotationHubResource")
 setMethod(".get1", "ZipResource",
     function(x, filenames, ...)
 {
-    zip <- cache(x@hub)
+    zip <- cache(getHub(x))
     for (fl in filenames)
         unzip(zip, fl, exdir=tempdir())
     file.path(tempdir(), filenames)
@@ -225,7 +232,7 @@ setMethod(".get1", "PazarResource",
     function(x, ...)
 {
     .require("GenomicRanges")
-    er <- cache(x@hub)
+    er <- cache(getHub(x))
     colClasses <-
         setNames(c(rep("character", 6), rep("integer", 2),
                    rep("factor", 2), "character", "NULL"),
@@ -250,7 +257,7 @@ setMethod(".get1", "CSVtoGrangesResource",
    function(x, ...)
 {
     .require("GenomicRanges")
-    yy <- x@hub
+    yy <- getHub(x)
     dat <- read.csv(cache(yy), header=TRUE, stringsAsFactors=FALSE)
     dat <- dat[,!(names(dat) %in% "width")]
     gr <- GenomicRanges::makeGRangesFromDataFrame(dat, keep.extra.columns=TRUE)
