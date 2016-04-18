@@ -38,6 +38,7 @@
 
 \alias{dbconn,Hub-method}
 \alias{dbfile,Hub-method}
+\alias{.db_close}
 
 % List-like
 \alias{length,Hub-method}
@@ -111,7 +112,9 @@
   \describe{
     \item{}{
       \code{AnnotationHub(..., hub=getAnnotationHubOption("URL"), 
-                         cache=getAnnotationHubOption("CACHE"))}:
+        cache=getAnnotationHubOption("CACHE"),
+        proxy=getAnnotationHubOption("PROXY"))}:
+
       Create an \code{AnnotationHub} instance, possibly updating the
       current database of records.
     }
@@ -182,6 +185,19 @@
           file.}
       }
     }
+
+    \item{}{
+      \code{dbconn(x)}:
+      Return an open connection to the underyling SQLite database.}
+
+    \item{}{
+      \code{dbfile(x)}:
+      Return the full path the underyling SQLite database.}
+
+    \item{}{
+      \code{.db_close(conn)}:
+      Close the SQLite connection \code{conn} returned by \code{dbconn(x)}.}
+
   }
 }
 

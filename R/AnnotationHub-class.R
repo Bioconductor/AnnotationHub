@@ -13,12 +13,11 @@ setClass("AnnotationHub", contains="Hub")
 ## And compare to the highest ID locally (to see if we have the latest DB)
 ## And if not, delete the DB so it will be re-downloaded...
 AnnotationHub <-
-    function(...) 
+    function(..., hub=getAnnotationHubOption("URL"),
+             cache=getAnnotationHubOption("CACHE"),
+             proxy=getAnnotationHubOption("PROXY")) 
 {
-    .Hub("AnnotationHub", 
-         getAnnotationHubOption("URL"),
-         getAnnotationHubOption("CACHE"),
-         getAnnotationHubOption("PROXY"))
+    .Hub("AnnotationHub", hub, cache, proxy, ...)
 }
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
