@@ -3,28 +3,31 @@
 
 .query_as_data.frame <- function(x, query)
 {
-    tbl <- dbGetQuery(dbconn(x), query)
+    tbl <- .db_query(dbfile(x), query)
     ridx <- match(names(x), tbl$ah_id)
     cidx <- match("ah_id", names(tbl)) 
     rownames(tbl) <- tbl$ah_id
     tbl[ridx, -cidx, drop=FALSE]
 }
 
-.getAHNamesForId <- function(conn, ids){
+.names_for_ids <- function(conn, ids){
     query <- sprintf(
         'SELECT resources.id, resources.ah_id
          FROM resources, biocversions
          WHERE biocversion == "%s"
          AND biocversions.resource_id == resources.id',
         biocVersion())
-    mtchData <- dbGetQuery(conn, query)
+    mtchData <- .db_query(conn, query)
     names(ids) <- mtchData[mtchData[[1]] %in% ids,][[2]]
     ids
 }
 
-.uid0 <- function(conn, date)
+.uid0 <- function(path, date)
     ## AnnotationHub() helper
 {
+    conn <- .db_open(path)
+    on.exit(.db_close(conn))
+
     ## TODO: this may be able to be faster by testing whether to do the sorting
     ## in R vs the DB (not terribly slow though)
     ## 1st get the ids that match our version of Bioc
@@ -34,7 +37,7 @@
          WHERE biocversion == "%s"
          AND biocversions.resource_id == resources.id',
         biocVersion())
-    biocIds <- dbGetQuery(conn, query)[[1]]
+    biocIds <- .db_query(conn, query)[[1]]
 
     ## Then filter so we get the most recent dates after grouping by record_id
     query <- sprintf(
@@ -42,12 +45,12 @@
          (SELECT * FROM resources where rdatadateadded <= "%s")
          GROUP BY record_id ORDER BY rdatadateadded ASC',
         date)        
-    dateFilterIds <- dbGetQuery(conn, query)[[1]]
+    dateFilterIds <- .db_query(conn, query)[[1]]
     
     ## Third filter so that rdatadateremoved (where that is not null)
-     query <- sprintf(
-         'SELECT id from resources  WHERE rdatadateremoved <= "%s"', date) 
-     removeIds <- dbGetQuery(conn, query)[[1]]
+    query <- sprintf(
+        'SELECT id from resources  WHERE rdatadateremoved <= "%s"', date) 
+    removeIds <- .db_query(path, query)[[1]]
     
     ## Then get the intersection
     allIds <- intersect(biocIds, dateFilterIds)
@@ -55,7 +58,7 @@
     allIds <- setdiff(allIds,removeIds) 
 
     ## Then match back to the AHIDs
-    .getAHNamesForId(conn, allIds)
+    .names_for_ids(conn, allIds)
 }
 ## test: tail(AnnotationHub:::.db_uid(mh))
 
@@ -65,7 +68,7 @@
         'SELECT DISTINCT tag, resource_id AS id FROM tags
          WHERE resource_id IN (%s)',
         .id_as_single_string(x))
-    dbGetQuery(dbconn(x), query)
+    .db_query(dbfile(x), query)
 }
 
 ## helper for extracting rdataclass
@@ -74,7 +77,7 @@
         'SELECT DISTINCT rdataclass, resource_id AS id FROM rdatapaths
          WHERE resource_id IN (%s)',
         .id_as_single_string(x))
-    dbGetQuery(dbconn(x), query)
+    .db_query(dbfile(x), query)
 }
 
 ## helper for extracting sourceUrls
@@ -83,18 +86,8 @@
         'SELECT DISTINCT sourceurl, resource_id AS id FROM input_sources
          WHERE resource_id IN (%s)',
         .id_as_single_string(x))
-    dbGetQuery(dbconn(x), query)
+    .db_query(dbfile(x), query)
 }
-
-## ##  helper for extracting recipes 
-## .recipe <- function(x) {
-##     query <- sprintf(
-##         'SELECT DISTINCT rec.recipe, res.id FROM
-##          recipes AS rec, resources AS res
-##          WHERE rec.id=res.recipe_id AND res.id IN (%s)',
-##         .id_as_single_string(x))
-##     dbGetQuery(.db_connection(x), query)
-## }
 
 ##  helper for extracting sourcetype
 .sourcetype <- function(x) {
@@ -102,7 +95,7 @@
         'SELECT DISTINCT sourcetype, resource_id AS id FROM input_sources
          WHERE resource_id IN (%s)',
         .id_as_single_string(x))
-    dbGetQuery(dbconn(x), query)
+    .db_query(dbfile(x), query)
 }
 
 .sourcesize <- function(x) {
@@ -110,7 +103,7 @@
         'SELECT DISTINCT sourcesize, resource_id AS id FROM input_sources
          WHERE resource_id IN (%s)',
         .id_as_single_string(x))
-    dbGetQuery(dbconn(x), query)
+    .db_query(dbfile(x), query)
 }
 
 .sourcelastmodifieddate <- function(x) {
@@ -118,7 +111,7 @@
         'SELECT DISTINCT sourcelastmodifieddate, resource_id AS id FROM input_sources
          WHERE resource_id IN (%s)',
         .id_as_single_string(x))
-    dbGetQuery(dbconn(x), query)
+    .db_query(dbfile(x), query)
 }
 
 
@@ -178,7 +171,7 @@
          WHERE resources.id IN (%s)
          AND resources.id == rdatapaths.resource_id',
         .id_as_single_string(x))
-    result <- dbGetQuery(dbconn(x), query)
+    result <- .db_query(dbfile(x), query)
     setNames(result[[2]], result[[1]])
 }
 
@@ -213,7 +206,7 @@
          WHERE resources.id IN (%s)
          GROUP BY %s ORDER BY COUNT(%s) DESC LIMIT %d", 
         column, .id_as_single_string(x), column, column, limit)
-    dbGetQuery(dbconn(x), query)[[column]]
+    .db_query(dbfile(x), query)[[column]]
 }
 
 .count_join_resources <-
@@ -226,7 +219,7 @@
         column, table,
         .id_as_single_string(x), table,
         column, column, limit)
-    dbGetQuery(dbconn(x), query)[[column]]
+    .db_query(dbfile(x), query)[[column]]
 }
 
 ## make a function to create a view whenever the DB is updated..

@@ -84,17 +84,19 @@
     mapply(.hub_cache_resource, hubpath, cachepath, MoreArgs=list(proxy))
 }
 
-.possibleDates <- function(conn) {
+.possibleDates <- function(path) {
+    conn <- .db_open(path)
+    on.exit(.db_close(conn))
     query <- 'SELECT DISTINCT rdatadateadded FROM resources'
-    dateAdded <- dbGetQuery(conn, query)[[1]]
+    dateAdded <- .db_query(conn, query)[[1]]
     query <- 'SELECT DATE(timestamp) FROM timestamp'
-    dateModified <- dbGetQuery(conn, query)[[1]]
+    dateModified <- .db_query(conn, query)[[1]]
     c(dateAdded, dateModified)
 }
 
 ## Add possibleDates here (SELECT DISTINCT rdatadateadded FROM)
 possibleDates <- function(x) 
-    .possibleDates(dbconn(x))
+    .possibleDates(dbfile(x))
 
 ## Date filter "1": will look kind of like this 
 ## it will be a subquery that will be passed to the next step...

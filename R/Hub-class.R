@@ -8,18 +8,11 @@ setClass("Hub",
         hub="character",       ## equivalent to cache URL
         cache="character",     ## equivalent to cache CACHE 
         date="character",
-        .db_env="environment", 
+        .db_path="character", 
         .db_index="character",
         .db_uid="integer"
     )
-#    prototype(
-#        .db_env=new.env(parent=emptyenv()),
-#    )
 )
-
-## FIXME: remove this and use 'prototype'? Shouldn't we be accessing
-##        .db_env via the hub object?
-.db_env <- new.env(parent=emptyenv())
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### Constructor for subclasses
@@ -27,14 +20,11 @@ setClass("Hub",
 
 .Hub <- function(.class, url, cache, proxy, ...) {
     db_path <- .create_cache(cache, .class)
-    db_env <- new.env(parent=emptyenv())
-    db_connection <- .db_get(db_path, url, proxy)
-    db_env[["db_connection"]] <- db_connection
-    db_env[["db_path"]] <- dbfile(db_env[["db_connection"]])
-    db_date <- max(possibleDates(db_connection))
-    db_uid <- .db_uid0(db_connection, db_date, db_path)
+    db_path <- .db_get(db_path, url, proxy)
+    db_date <- max(.possibleDates(db_path))
+    db_uid <- .db_uid0(db_path, db_date)
     hub <- new(.class, cache=cache, hub=url, date=db_date, 
-               .db_env=db_env, .db_uid=db_uid, ...)
+               .db_path=db_path, .db_uid=db_uid, ...)
     message("snapshotDate(): ", snapshotDate(hub))
     index <- .db_create_index(hub)
     .db_index(hub) <- index 
@@ -158,8 +148,7 @@ setMethod("length", "Hub",
     }
     ## Changing the date is two step process.
     ## 1st we update the x@.db_uid
-    conn <- dbconn(x)
-    x@.db_uid <- .uid0(conn, snapshotDate)
+    x@.db_uid <- .uid0(dbfile(x), snapshotDate)
     ## then we update the date slot    
     x@date <- snapshotDate
     x
