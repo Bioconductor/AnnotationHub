@@ -4,11 +4,14 @@ import(RSQLite)
 import(S4Vectors)
 
 importFrom(stats, setNames)
+importFrom(grDevices, rgb)
+importFrom(utils, packageVersion, read.csv, read.delim, unzip, capture.output,
+    .DollarNames
+)
 importFrom(httr, 
     GET, content, parse_url, progress, write_disk,
     stop_for_status, status_code, use_proxy
 )
-importFrom(utils, capture.output, .DollarNames)
 importFrom(interactiveDisplayBase, display)
 importFrom(BiocInstaller, biocVersion)
 
