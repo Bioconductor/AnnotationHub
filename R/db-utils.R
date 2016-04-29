@@ -172,3 +172,16 @@ setMethod("dbconn", "Hub",
 setMethod("dbfile", "Hub", 
     function(x) x@.db_path
 )
+
+getRecordStatus <- function(hub, hubRecord) {
+    if (!is.character(hubRecord))
+        stop("'hubRecord' must be a character")
+    if (length(hubRecord) != 1L)
+        stop("'hubRecord' must be length 1")
+
+    conn <- dbconn(hub)    
+    query <- paste0("SELECT status FROM statuses WHERE id IN ",
+                    "(SELECT status_id FROM resources WHERE ah_id = '",
+                    hubRecord, "')")
+    data.frame(hubRecord=hubRecord, status=.db_query(conn, query))
+}

@@ -10,6 +10,9 @@
     tbl[ridx, -cidx, drop=FALSE]
 }
 
+## FIXME: This is redundant with the filter criteria in .uid0() and
+## does not reuse ids already discovered (i.e., it's an independent
+## query that may not match up and has no checks to confirm).
 .names_for_ids <- function(conn, ids){
     query <- sprintf(
         'SELECT resources.id, resources.ah_id
@@ -22,45 +25,33 @@
     ids
 }
 
+## This function filters the local annotationhub.sqlite metadata db and
+## dictates the subset exposed by AnnotationHub().
 .uid0 <- function(path, date)
-    ## AnnotationHub() helper
 {
     conn <- .db_open(path)
     on.exit(.db_close(conn))
 
-    ## TODO: this may be able to be faster by testing whether to do the sorting
-    ## in R vs the DB (not terribly slow though)
-    ## 1st get the ids that match our version of Bioc
+    ## Filter on the following:
+    ## - biocversion field <= the current biocVersion
+    ## - rdatadateremoved field is NULL
     query <- sprintf(
         'SELECT resources.id
          FROM resources, biocversions
-         WHERE biocversion == "%s"
+         WHERE biocversions.biocversion <= "%s"
+         AND resources.rdatadateremoved IS NULL
          AND biocversions.resource_id == resources.id',
-        biocVersion())
+         biocVersion())
     biocIds <- .db_query(conn, query)[[1]]
 
-    ## Then filter so we get the most recent dates after grouping by record_id
-    query <- sprintf(
-        'SELECT id FROM 
-         (SELECT * FROM resources where rdatadateadded <= "%s")
-         GROUP BY record_id ORDER BY rdatadateadded ASC',
-        date)        
-    dateFilterIds <- .db_query(conn, query)[[1]]
-    
-    ## Third filter so that rdatadateremoved (where that is not null)
-    query <- sprintf(
-        'SELECT id from resources  WHERE rdatadateremoved <= "%s"', date) 
-    removeIds <- .db_query(path, query)[[1]]
-    
-    ## Then get the intersection
-    allIds <- intersect(biocIds, dateFilterIds)
-    
-    allIds <- setdiff(allIds,removeIds) 
-
-    ## Then match back to the AHIDs
-    .names_for_ids(conn, allIds)
+    ## make unique 
+    allIds = unique(biocIds)
+    ## match id to ah_id
+    query <- paste0('SELECT ah_id FROM resources ',
+                    'WHERE id IN (', paste0(allIds, collapse=","), ')')
+    names(allIds) <- .db_query(conn, query)[[1]]
+    allIds
 }
-## test: tail(AnnotationHub:::.db_uid(mh))
 
 ## helper to retrieve tags
 .tags <- function(x) {

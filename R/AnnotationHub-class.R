@@ -10,7 +10,6 @@ setClass("AnnotationHub", contains="Hub")
 ###
 
 ## Add code to check : https://annotationhub.bioconductor.org/metadata/highest_id
-## And compare to the highest ID locally (to see if we have the latest DB)
 ## And if not, delete the DB so it will be re-downloaded...
 AnnotationHub <-
     function(..., hub=getAnnotationHubOption("URL"),
@@ -88,5 +87,3 @@ setMethod("show", "AnnotationHub", function(object)
     cat("# snapshotDate():", snapshotDate(object), "\n")
     callNextMethod(object)
 })
-
-

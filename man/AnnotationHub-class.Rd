@@ -39,6 +39,7 @@
 \alias{dbconn,Hub-method}
 \alias{dbfile,Hub-method}
 \alias{.db_close}
+\alias{getRecordStatus}
 
 % List-like
 \alias{length,Hub-method}
