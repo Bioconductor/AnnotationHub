@@ -15,9 +15,14 @@ setMethod(".get1", "EpigenomeRoadmapFileResource",
 {
     .require("rtracklayer")
     yy <- getHub(x)
+    ## FIXME: This dispatch class encompases both broad and narrow peak -
+    ##        I think this has been replaced by UCSCNarrowPeak and UCSCBroadPeak
+    ##        which have the correct extra columns.
+    extraCols=c(signalValue="numeric", pValue="numeric", qValue="numeric")
+    if (grepl("narrow", yy$sourceurl))
+        extraCols=c(extraCols, peak="numeric")
     gr <- rtracklayer::import(cache(yy), format="bed", genome=yy$genome,
-        extraCols=c(signalValue="numeric", pValue="numeric", qValue="numeric",
-        peak="numeric"))
+                              extraCols=extraCols)
     .tidyGRanges(x, gr)
 })
 
