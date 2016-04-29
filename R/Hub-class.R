@@ -224,7 +224,7 @@ setMethod("[[", c("Hub", "character", "missing"),
         stop("'i' must be length 1")
     idx <- match(i, names(.db_uid(x)))
     if (is.na(idx))
-        stop("unknown key ", sQuote(i))
+        stop(recordStatus(x, i))
     .Hub_get1(x[idx])
 })
 
@@ -454,3 +454,20 @@ setMethod("show", "Hub", function(object)
 setMethod("display", signature(object="Hub"),
           function(object) .display(object)
 )
+
+setMethod("recordStatus", "Hub",
+    function(hub, record) {
+        if (!is.character(record))
+            stop("'record' must be a character")
+        if (length(record) != 1L)
+            stop("'record' must be length 1")
+
+        conn <- dbconn(hub)
+        query <- paste0("SELECT status FROM statuses WHERE id IN ",
+                        "(SELECT status_id FROM resources WHERE ah_id = '",
+                        record, "')")
+        status=.db_query(conn, query)
+        if (nrow(status) == 0L)
+            status <- "record not found in database"
+        data.frame(record=record, status=status)
+})

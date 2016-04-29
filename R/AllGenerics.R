@@ -35,6 +35,9 @@ setGeneric("cache", signature="x",
 setGeneric("cache<-", signature="x",
     function(x, ..., value) standardGeneric("cache<-")
 )
+setGeneric("recordStatus", signature="hub",
+    function(hub, record) standardGeneric("recordStatus")
+)
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### AnnotationHubResource objects

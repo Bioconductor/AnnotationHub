@@ -66,7 +66,7 @@ export(
     getAnnotationHubOption, setAnnotationHubOption, 
     possibleDates, mcols,
     .httr_proxy, .hub_option_key, .db_close,
-    getRecordStatus
+    recordStatus
 )
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

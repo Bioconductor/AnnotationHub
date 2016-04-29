@@ -39,7 +39,8 @@
 \alias{dbconn,Hub-method}
 \alias{dbfile,Hub-method}
 \alias{.db_close}
-\alias{getRecordStatus}
+\alias{recordStatus}
+\alias{recordStatus,Hub-method}
 
 % List-like
 \alias{length,Hub-method}
@@ -256,6 +257,12 @@
       interactive tabular display. Return value is the subset of hub
       records identified while navigating the display.
     }
+    \item{}{
+      \code{recordStatus(hub, record)}:
+      Returns a \code{data.frame} of the record id and status. \code{hub} must 
+      be a \code{Hub} object and \code{record} must be a \code{character(1)).
+      Can be used to discover why a resource was removed from the hub.
+    }
   }
 }
 
@@ -385,7 +392,9 @@
     ah2 <- display(ah)
   }
 
-  
+  ## recordStatus
+  recordStatus(ah, "TEST")
+  recordStatus(ah, "AH7220")
 }
 
 \keyword{classes}
