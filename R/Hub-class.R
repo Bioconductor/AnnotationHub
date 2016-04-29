@@ -224,7 +224,7 @@ setMethod("[[", c("Hub", "character", "missing"),
         stop("'i' must be length 1")
     idx <- match(i, names(.db_uid(x)))
     if (is.na(idx))
-        stop(recordStatus(x, i))
+        stop(recordStatus(x, i)$status)
     .Hub_get1(x[idx])
 })
 

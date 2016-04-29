@@ -260,7 +260,7 @@
     \item{}{
       \code{recordStatus(hub, record)}:
       Returns a \code{data.frame} of the record id and status. \code{hub} must 
-      be a \code{Hub} object and \code{record} must be a \code{character(1)).
+      be a \code{Hub} object and \code{record} must be a \code{character(1)}.
       Can be used to discover why a resource was removed from the hub.
     }
   }
