@@ -1,4 +1,11 @@
-## all code for Epigenome RoadMap files
+### =========================================================================
+### Epigenome Objects 
+### -------------------------------------------------------------------------
+###
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### EpiMetadata, EpiExpression, EpichmmModel Objects
+###
 
 setClass("EpiMetadataResource", contains="AnnotationHubResource")
 
@@ -6,24 +13,6 @@ setMethod(".get1", "EpiMetadataResource",
    function(x, ...)
 {
     read.delim(cache(getHub(x)))
-})
-
-setClass("EpigenomeRoadmapFileResource", contains="AnnotationHubResource")
-
-setMethod(".get1", "EpigenomeRoadmapFileResource",
-    function(x, ...)
-{
-    .require("rtracklayer")
-    yy <- getHub(x)
-    ## FIXME: This dispatch class encompases both broad and narrow peak -
-    ##        I think this has been replaced by UCSCNarrowPeak and UCSCBroadPeak
-    ##        which have the correct extra columns.
-    extraCols=c(signalValue="numeric", pValue="numeric", qValue="numeric")
-    if (grepl("narrow", yy$sourceurl))
-        extraCols=c(extraCols, peak="numeric")
-    gr <- rtracklayer::import(cache(yy), format="bed", genome=yy$genome,
-                              extraCols=extraCols)
-    .tidyGRanges(x, gr)
 })
 
 setClass("EpiExpressionTextResource", contains="AnnotationHubResource")
@@ -39,7 +28,7 @@ setMethod(".get1", "EpiExpressionTextResource",
            assays=as.matrix(data[,-c(1:2)]), 
            rowRanges=.makeGrFromCharacterString(data))
     }
-    data  
+    data 
 })
 
 setClass("EpichmmModelsResource", contains="AnnotationHubResource")
@@ -52,13 +41,13 @@ setMethod(".get1", "EpichmmModelsResource",
     gr <- rtracklayer::import(cache(yy), format="bed", genome="hg19")
     gr <- .mapAbbr2FullName(gr)
     .tidyGRanges(x, gr)
-    
+ 
 })
 
 ## helper function which changes 'chr10:100011323-100011459<-1' to gr!
 .makeGrFromCharacterString <- function(data) {
-    nms = sub("<-*1", "", rownames(data))  
-    lst = strsplit(nms, "[:-]")                 
+    nms = sub("<-*1", "", rownames(data)) 
+    lst = strsplit(nms, "[:-]") 
     v = function(x, i) vapply(x, "[[", "character", i)
     gr = GenomicRanges::GRanges(v(lst, 1), 
        IRanges::IRanges(as.integer(v(lst, 2)), as.integer(v(lst, 3))))
@@ -103,7 +92,7 @@ setMethod(".get1", "EpichmmModelsResource",
         "15_Quies", "Quiescent/Low", "White", rgb(255,255,255, maxColorValue=255)), 
              byrow=TRUE, nrow=15), stringsAsFactors=FALSE)
     colnames(map) <- c("abbr", "name", "color_name", "color_code")
-    
+
     ##perform the mapping
     toMatch <- mcols(gr)$name
     newdf <- map[match(toMatch, map$abbr),]
@@ -111,6 +100,30 @@ setMethod(".get1", "EpichmmModelsResource",
     gr
 }
 
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### EpigenomeRoadmap* Objects
+###
+
+### These classes are similar to the UCSCBroadPeak, UCSCNarrowPeak, family.
+### The individual methods add 'extraCols' then dispatch through 
+### BEDFileResource. 
+
+setClass("EpigenomeRoadmapFileResource", contains="AnnotationHubResource")
+
+## NOTE: This dispatch class encompasses both broad and narrow peak -
+##       (Precursors were UCSCNarrowPeak and UCSCBroadPeak?)
+setMethod(".get1", "EpigenomeRoadmapFileResource",
+    function(x, ...)
+{
+    .require("rtracklayer")
+    yy <- getHub(x)
+    extraCols=c(signalValue="numeric", pValue="numeric", qValue="numeric")
+    if (grepl("narrow", yy$sourceurl))
+        extraCols=c(extraCols, peak="numeric")
+    gr <- rtracklayer::import(cache(yy), format="bed", genome=yy$genome,
+                              extraCols=extraCols)
+    .tidyGRanges(x, gr)
+})
 setClass("EpigenomeRoadmapNarrowAllPeaksResource", 
          contains="BEDFileResource")
 

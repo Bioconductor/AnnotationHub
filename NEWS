@@ -1,18 +1,65 @@
-CHANGES IN VERSION 2.3
-----------------------
+CHANGES IN VERSION 2.4.0
+------------------------
+
+NEW FEATURES
+
+    o add new status codes '4' and '5' to 'statuses' mysql table;
+      change 'status_id' field to '4' for all removed records to date
+
+    o add getRecordStatus() generic
+
+    o add package() generic
+
+    o create 'Hub' VIRTUAL class
+      - add new .Hub() base constructor for all hubs
+      - add getAnnotationHubOption() and setAnnotationHubOption()
+      - promote cache() to generic 
+      - add getHub() getter for AnnotationHubResource class
+      - add getUrl(), getCache(), getDate() getters
+      - export as few db helpers as possible
+
+    o add 'EpigenomeRoadmapNarrowAllPeaks' and 
+      'EpigenomeRoadmapNarrowFDR' classes
+
+MODIFICATIONS
+    o distinguish between broad and narrow peak files in 
+      EpigenomeRoadmapFileResource dispatch class
+
+    o don't use cache for AnnotationHub SQLite connection
+      - originally introduced so could be closed if needed, but 
+        creates complexity
+      - instead, open / close connection around individual queries (not a
+        performance concern)
+      - expose hub, cache, proxy in AnnotationHub constructor
+      - document dbconn,Hub-method, dbfile,Hub-method, .db_close
+
+    o snapshotDate now uses timestamp (last date any row was modified) instead 
+      of rdatadateadded
+
+    o .require fails rather than emits warning
+      - unit test on .require()
+      - also, cache(hub[FALSE]) does not create spurious error
+
+    o work on removed records and biocVersion
+      - .uid0() was reorganized and no longer groups by record_id
+      - metadata is returned for records with 
+        biocversion field <= current biocVersion
+        instead of an exact match with the current version
+      - metadata is not returned for removed records
 
 BUG FIXES
 
     o Work around httr() progress() bug by disabling progress bar
 
-CHANGES IN VERSION 2.1.26
---------------------------
+
+CHANGES IN VERSION 2.2.0
+------------------------
 
 SIGNIFICANT USER-VISIBLE CHANGES
 
     o seqinfo(GRanges) for all genomes supported by GenomeInfoDb now 
       contain seqlengths. 
-      
+
 
 CHANGES IN VERSION 2.1.21
 --------------------------
@@ -21,7 +68,7 @@ SIGNIFICANT USER-VISIBLE CHANGES
 
     o fileName() returns the cache path on the disk for a file that
       has been cached and NA for files which have not been cached.
-    
+ 
     o The error message (when file is not downloaded from the hub)
       displays the AnnotationHub name, title, and reason for failure.
 
