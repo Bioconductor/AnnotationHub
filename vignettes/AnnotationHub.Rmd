@@ -1,18 +1,21 @@
-<!--
-% \VignetteIndexEntry{AnnotationHub: Access the AnnotationHub Web Service}
-% \VignetteDepends{AnnotationHub}
-% \VignetteEngine{knitr::knitr}
--->
+---
+title: "AnnotationHub: Access the AnnotationHub Web Service"
+output:
+  BiocStyle::html_document:
+    toc: true
+vignette: >
+  % \VignetteIndexEntry{AnnotationHub: Access the AnnotationHub Web Service}
+  % \VignetteDepends{AnnotationHub}
+  % \VignetteEngine{knitr::rmarkdown}
+  % \VignetteEncoding{UTF-8}
+---
 
 ```{r style, echo = FALSE, results = 'asis'}
 BiocStyle::markdown()
 ```
-
-# AnnotationHub: Access the AnnotationHub Web Service
-
 **Package**: `r Biocpkg("AnnotationHub")`<br />
 **Authors**: `r packageDescription("AnnotationHub")[["Author"]] `<br />
-**Modified**: 11 October, 2014<br />
+**Modified**: 27 May, 2016<br />
 **Compiled**: `r date()`
 
 The `AnnotationHub` server provides easy _R / Bioconductor_ access to
@@ -20,7 +23,7 @@ large collections of publicly available whole genome resources,
 e.g,. ENSEMBL genome fasta or gtf files, UCSC chain resources, ENCODE
 data tracks at UCSC, etc.
 
-## AnnotationHub objects
+# AnnotationHub objects
 
 The `r Biocpkg("AnnotationHub")` package provides a client interface
 to resources stored at the AnnotationHub web service.
@@ -130,7 +133,7 @@ filter internally which filters the `AnnotationHub` object. The names
 of the selected AnnotationHub elements displayed at the top of the
 page.
 
-## Using `AnnotationHub` to retrieve data
+# Using `AnnotationHub` to retrieve data
 
 Looking back at our chain file example, if we are interested in the file 
 dm1ToDm2.over.chain.gz, we can gets its metadata using
@@ -148,7 +151,7 @@ Each file is retrieved from the AnnotationHub server and the file is
 also cache locally, so that the next time you need to retrieve it,
 it should download much more quickly.
 
-## Configuring `AnnotationHub` objects
+# Configuring `AnnotationHub` objects
 
 When you create the `AnnotationHub` object, it will set up the object
 for you with some default settings.  See `?AnnotationHub` for ways to
@@ -185,6 +188,44 @@ Set the dates like this:
 
 ```{r setdate, eval=FALSE}
 snapshotDate(ah) <- pd[1]
+```
+# AnnotationHub objects in a cluster environment
+
+Resources in AnnotationHub aren't loaded with the standard `R` package approach
+and therefore can't be loaded on cluster nodes with library(). There are a
+couple of options to sharing AnnotationHub objects across a cluster when
+researchers are using the same R install and want access to the same
+annotations.
+
+As an example, we create a TxDb object from a GRanges stored in AnnotationHub
+contributed by contributed by Timothée Flutre.  The GRanges was created from a
+GFF file and contains gene information for Vitis vinifera.
+
+* Download once and build on the fly
+
+One option is that each user downloads the resource with hub[["AH50773"]] and
+the GRanges is saved in the cache. Each subsequent call to 
+hub[["AH50773"]] retrieves the resource from the cache which is very fast.
+
+The necessary code extracts the resource then calls makeTxDbFromGRanges().
+```{r clusterOptions1, eval=FALSE}
+library(AnnotationHub)
+hub <- AnnotationHub()
+gr <- hub[["AH50773"]]  ## downloaded once
+txdb <- makeTxDbFromGRanges(gr)  ## build on the fly
+```
+
+* Build once and share
+
+Another approach is that one user builds the TxDb and saves it as a .sqlite
+file. The cluster admin installs this in a common place on all cluster nodes
+and each user can load it with loadDb(). Loading the file is as quick and
+easy as calling library() on a TxDb package.
+
+Once the .sqlite file is install each user's code would include:
+```{r clusterOptions2, eval=FALSE}
+library(AnnotationDbi)  ## if not already loaded
+txdb <- loadDb("/locationToFile/mytxdb.sqlite")
 ```
 
 # Session info
