@@ -10,7 +10,7 @@ test_query <- function() {
     checkTrue("AH7558" %in% names(q1))
     nm <- c("title", "dataprovider", "species", "taxonomyid", "genome", 
         "description", "tags", "rdataclass", "sourceurl", "sourcetype")
-    checkEquals(nm, names(mcols(q1)))
+    checkTrue(all(nm %in% names(mcols(q1))))
 }
 
 test_NA_subscript <- function() {
