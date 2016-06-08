@@ -4,7 +4,7 @@
 
 .DB_RESOURCE_FIELDS <- paste(sep=".", collapse=", ", "resources",
     c("ah_id", "title", "dataprovider", "species", "taxonomyid", "genome",
-      "description"))
+      "description", "preparerclass"))
 
 .onLoad <- function(libname, pkgname, ...) {
     ## options from getOption or Sys.env or default, in that order
