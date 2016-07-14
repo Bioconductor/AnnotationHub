@@ -5,12 +5,6 @@
 
 setClass("AnnotationHubResource", representation(hub="Hub"))
 
-### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### Constructor 
-###
-
-### Objects are created when ...
-
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### Accessors 
