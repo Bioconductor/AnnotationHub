@@ -117,6 +117,14 @@
     setNames(lst, names(uid))           # allows for x with no tags 
 }
 
+.collapse_as_list <- function(x, FUN)
+{
+    uid <- .db_uid(x)
+    tbl <- FUN(x)
+    lst <- split(tbl[[1]], tbl$id)
+    lst <- lst[match(uid, names(lst))]
+    setNames(lst, names(uid))           # allows for x with no tags 
+}
 
 ## This gets many useful fields together for the end user and puts them into
 ## a nice square shaped container.
@@ -127,7 +135,7 @@
          WHERE resources.id IN (%s)',
         .DB_RESOURCE_FIELDS, .id_as_single_string(x))
     tbl <- .query_as_data.frame(x, query)
-    tbl[["tags"]] <- .collapse_as_string(x, .tags)
+    tbl[["tags"]] <- I(.collapse_as_list(x, .tags))
     tbl[["rdataclass"]] <- .collapse_as_string(x, .rdataclass)
     tbl[["sourceurl"]] <- .collapse_as_string(x, .sourceurl)
     tbl[["sourcetype"]] <- .collapse_as_string(x, .sourcetype)

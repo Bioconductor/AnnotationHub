@@ -101,7 +101,7 @@ setReplaceMethod("cache", "Hub",
 ### Accessor-like methods 
 ###
 
-setMethod("mcols", "Hub", function(x) DataFrame(.resource_table(x))) 
+setMethod("mcols", "Hub", function(x) DataFrame(.resource_table(x)))
 
 setMethod("names", "Hub",
     function(x)
@@ -121,6 +121,7 @@ setMethod("length", "Hub",
     function(x) length(.db_uid(x))
 )
 
+## Marc's notes:
 ## TODO: This isn't working yet!  Not only does the date not get swapped yet, 
 ## but I also have to update the uids (reset those) when I do this step... 
 ## (uid0)
@@ -430,21 +431,21 @@ setMethod("show", "Hub", function(object)
 .display <- function(object, ...) { 
     #metadata- do not touch
     md <- mcols(object)
-        
+ 
     #create a data frame copy for edits called df
     df <- as.data.frame(md)
-        
+
     #dropping column names
     drops <-c("title", "taxonomyid", "sourceurl")
     df <- df[,!(names(df) %in% drops), drop=FALSE]
-    
+ 
     summaryMessage = capture.output(show(object))
     serverOptions= list(
         bSortClasses=TRUE,
         aLengthMenu = c(1000, 5000, "All"),
         iDisplayLength = 1000,
         "sDom" = '<"top"i>rt<"top"f>lt<"bottom"p><"clear">')
-        
+
     d <- display(object =df, summaryMessage = summaryMessage, 
                  serverOptions = serverOptions)
     idx <- rownames(d)
