@@ -84,4 +84,3 @@ export(
     .DollarNames.Hub, 
     as.list.Hub
 )
-

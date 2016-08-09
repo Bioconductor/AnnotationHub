@@ -99,7 +99,6 @@ setMethod(".get1", "EpichmmModelsResource",
     mcols(gr) <- newdf
     gr
 }
-
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### EpigenomeRoadmap* Objects
 ###
