@@ -44,7 +44,7 @@ export(
     cache, "cache<-", query,
     hubUrl, hubCache, hubDate,
     snapshotDate, "snapshotDate<-",
-    getHub,
+    getHub, listResources, loadResources,
     package
 )
 
@@ -52,7 +52,7 @@ exportMethods(
     cache, "cache<-", query,
     hubUrl, hubCache, hubDate, 
     snapshotDate, "snapshotDate<-",
-    getHub,
+    getHub, listResources, loadResources,
     package
 )
 
