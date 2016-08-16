@@ -105,7 +105,6 @@
     .db_query(dbfile(x), query)
 }
 
-
 ## Helper to collapse many to one fields (like above) into one space
 .collapse_as_string <- function(x, FUN)
 {
@@ -126,8 +125,12 @@
     setNames(lst, names(uid))           # allows for x with no tags 
 }
 
-## This gets many useful fields together for the end user and puts them into
-## a nice square shaped container.
+## Used in mcols()
+.DB_RESOURCE_FIELDS <- paste(sep=".", collapse=", ", "resources",
+    c("ah_id", "title", "dataprovider", "species", "taxonomyid", "genome",
+      "description", "coordinate_1_based", "maintainer", "status_id",
+      "rdatadateadded", "rdatadateremoved", "preparerclass"))
+
 .resource_table <- function(x)
 {
     query <- sprintf(
@@ -141,7 +144,6 @@
     tbl[["sourcetype"]] <- .collapse_as_string(x, .sourcetype)
     tbl
 }
-
 
 .resource_columns <- function()
     strsplit(gsub("resources.", "", .DB_RESOURCE_FIELDS), ", ")[[1]]

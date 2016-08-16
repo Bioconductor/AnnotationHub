@@ -1,11 +1,5 @@
 .CACHE_ROOT <- ".AnnotationHub"
 
-#.DB_SQLITE <- "annotationhub.sqlite3"  ## "ahtest.sqlite3"
-
-.DB_RESOURCE_FIELDS <- paste(sep=".", collapse=", ", "resources",
-    c("ah_id", "title", "dataprovider", "species", "taxonomyid", "genome",
-      "description", "preparerclass"))
-
 .onLoad <- function(libname, pkgname, ...) {
     ## options from getOption or Sys.env or default, in that order
     if (is.null(getAnnotationHubOption("MAX_DOWNLOADS"))) {
