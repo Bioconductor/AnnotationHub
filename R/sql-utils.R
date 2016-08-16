@@ -128,8 +128,8 @@
 ## Used in mcols()
 .DB_RESOURCE_FIELDS <- paste(sep=".", collapse=", ", "resources",
     c("ah_id", "title", "dataprovider", "species", "taxonomyid", "genome",
-      "description", "coordinate_1_based", "maintainer", "status_id",
-      "rdatadateadded", "rdatadateremoved", "preparerclass"))
+      "description", "coordinate_1_based", "maintainer",
+      "rdatadateadded", "preparerclass"))
 
 .resource_table <- function(x)
 {
