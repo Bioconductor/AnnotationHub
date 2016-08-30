@@ -15,7 +15,7 @@
         setAnnotationHubOption("URL", opt)
     }
     if (is.null(getAnnotationHubOption("CACHE"))) {
-        path <- switch(.Platform$OS.type, unix = path.expand("~"),
+        path <- switch(.Platform$OS.type, unix = path.expand("~/"),
                        windows= file.path(gsub("\\\\", "/",
                        Sys.getenv("HOME")), "AppData"))
         opt <- getOption("ANNOTATION_HUB_CACHE", file.path(path, .CACHE_ROOT))
