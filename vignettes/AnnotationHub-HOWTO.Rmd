@@ -303,7 +303,7 @@ gr38
 
 One may also be interested in working with common germline variants with 
 evidence of medical interest. This information is available at 
-[NCBI](http://www.ncbi.nlm.nih.gov/variation/docs/human_variation_vcf/).
+[NCBI](https://www.ncbi.nlm.nih.gov/variation/docs/human_variation_vcf/).
 
 Query the dbDNP files in the hub:
 
