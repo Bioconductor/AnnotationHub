@@ -21,7 +21,7 @@ setMethod(".get1", "EpiExpressionTextResource",
     function(x, ...)
 {
     yy <- cache(getHub(x))
-    data <- read.delim(yy, header=TRUE)
+    data <- read.table(yy, header=TRUE, row.names=1)
     if(grepl("chr" ,rownames(data)[1])){
        .require("SummarizedExperiment")
        data <- SummarizedExperiment::SummarizedExperiment(
