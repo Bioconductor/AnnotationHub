@@ -1,3 +1,34 @@
+CHANGES IN VERSION 2.6.0
+------------------------
+
+NEW FEATURES
+
+    o add vignette section on sharing resources on clusters
+
+    o add 'preparerclass' to index.rda to allow search by package name for
+      ExperimentHub objects
+
+    o add GenomicScoresResource class for Robert Castelo
+
+MODIFICATIONS
+
+    o return 'tags' metadata as list instead of comma-separated character
+      vector
+
+    o move AnnotationHubRecipes vignette to AnnotationHubData
+
+    o move listResources() and loadResources() from ExperimentHub
+
+    o expose additional fields in .DB_RESOURCE_FIELDS()
+
+    o modify cache path to avoid creating a '~' directory on Mac
+
+    o use https: NCBI rul in documentation
+
+    o modify .get1,EpiExpressionTextResource-method to use 'gene_id'
+      column as row names
+
+
 CHANGES IN VERSION 2.4.0
 ------------------------
 
