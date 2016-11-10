@@ -35,14 +35,13 @@ _Bioconductor_ offers pre-built `org.*` annotation packages for model
 organisms, with their use described in the
 [OrgDb](http://bioconductor.org/help/workflows/annotation/Annotation_Resources/#OrgDb)
 section of the Annotation work flow. Here we discover available `OrgDb`
-objects (more than 1000!) for less-model organisms
+objects for less-model organisms
 
 ```{r less-model-org}
 library(AnnotationHub)
 ah <- AnnotationHub()
 query(ah, "OrgDb")
-query(ah, c("OrgDb", "Takifugu"))
-takifugu <- ah[["AH48147"]]
+orgdb <- query(ah, "OrgDb")[[1]] 
 ```
 
 The object returned by AnnotationHub is directly usable with the
@@ -52,10 +51,10 @@ finally selecting the SYMBOL and GENENAME corresponding to the first 6
 ENTREZIDs
 
 ```{r less-model-org-select}
-keytypes(takifugu)
-columns(takifugu)
-egid <- head(keys(takifugu, "ENTREZID"))
-select(takifugu, egid, c("SYMBOL", "GENENAME"), "ENTREZID")
+keytypes(orgdb)
+columns(orgdb)
+egid <- head(keys(orgdb, "ENTREZID"))
+select(orgdb, egid, c("SYMBOL", "GENENAME"), "ENTREZID")
 ```
 
 ## Roadmap Epigenomics Project 

@@ -5,15 +5,15 @@ import(S4Vectors)
 
 importFrom(stats, setNames)
 importFrom(grDevices, rgb)
-importFrom(utils, packageVersion, read.csv, read.delim, unzip, capture.output,
-    .DollarNames
+importFrom(utils, packageVersion, read.csv, read.delim, unzip, 
+    capture.output, read.table, .DollarNames
 )
 importFrom(httr, 
     GET, content, parse_url, progress, write_disk,
     stop_for_status, status_code, use_proxy
 )
 importFrom(interactiveDisplayBase, display)
-importFrom(BiocInstaller, biocVersion)
+importFrom(BiocInstaller, biocVersion, isDevel)
 
 importMethodsFrom(AnnotationDbi, dbconn, dbfile)
 

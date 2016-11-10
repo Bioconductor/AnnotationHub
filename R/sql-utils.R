@@ -10,7 +10,8 @@
     tbl[ridx, -cidx, drop=FALSE]
 }
 
-## FIXME: This is redundant with the filter criteria in .uid0() and
+## FIXME: Should be removed.
+## This is redundant with the filter criteria in .uid0() and
 ## does not reuse ids already discovered (i.e., it's an independent
 ## query that may not match up and has no checks to confirm).
 .names_for_ids <- function(conn, ids){
@@ -26,26 +27,59 @@
 }
 
 ## This function filters the local annotationhub.sqlite metadata db and
-## dictates the subset exposed by AnnotationHub().
+## defines the subset exposed by AnnotationHub().
 .uid0 <- function(path, date)
 {
     conn <- .db_open(path)
     on.exit(.db_close(conn))
 
-    ## Filter on the following:
-    ## - biocversion field <= the current biocVersion
-    ## - rdatadateremoved field is NULL
-    query <- sprintf(
+    ## General filter:
+    ## All AnnotationHub resources (except OrgDbs, see below) are
+    ## available from the time they are added -> infinity unless
+    ## they are removed from the web or by author request. The
+    ## snapshot date can be changed by the user. We want to return records
+    ## with no rdatadateremoved and with rdatadateadded <= snapshot.
+    ## All OrgDbs are omitted in the first filter and selectively 
+    ## exposed in the second filter.
+    query1 <- sprintf(
         'SELECT resources.id
-         FROM resources, biocversions
-         WHERE biocversions.biocversion <= "%s"
+         FROM resources, rdatapaths
+         WHERE resources.rdatadateadded <= "%s"
          AND resources.rdatadateremoved IS NULL
-         AND biocversions.resource_id == resources.id',
-         biocVersion())
-    biocIds <- .db_query(conn, query)[[1]]
+         AND rdatapaths.rdataclass != "OrgDb"
+         AND rdatapaths.resource_id == resources.id',
+         date)
+    biocIds1 <- .db_query(conn, query1)[[1]]
+
+    ## OrgDb sqlite files:
+    ##
+    ## OrgDbs are the single resource designed to expire at the end of a
+    ## release cycle. The sqlite files are built before a release, added to the
+    ## devel branch then propagate to the new release branch. For the
+    ## duration of a release cycle both release and devel share the same
+    ## OrgDb packages. Before the next release, new files are built, added
+    ## to devel, propagated to release and so on.
+    ## 
+    ## When new sqlite files are added to the hub they are stamped
+    ## with the devel version which immediately becomes the new release version.
+    ## For this reason, the devel code loads OrgDbs with the release version
+    ## e.g.,
+    ##   ifelse(isDevel(), biocversion - 0.1, biocversion)
+ 
+    biocversion <- as.numeric(as.character(biocVersion()))
+    orgdb_release_version <- ifelse(isDevel(), biocversion - 0.1, biocversion)
+    query2 <- sprintf(
+        'SELECT resources.id
+         FROM resources, biocversions, rdatapaths
+         WHERE biocversions.biocversion == "%s"
+         AND rdatapaths.rdataclass == "OrgDb"
+         AND biocversions.resource_id == resources.id
+         AND rdatapaths.resource_id == resources.id',
+         orgdb_release_version)
+    biocIds2 <- .db_query(conn, query2)[[1]]
 
     ## make unique 
-    allIds = unique(biocIds)
+    allIds = unique(c(biocIds1, biocIds2))
     ## match id to ah_id
     query <- paste0('SELECT ah_id FROM resources ',
                     'WHERE id IN (', paste0(allIds, collapse=","), ')')
