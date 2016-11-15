@@ -41,14 +41,23 @@
     ## with no rdatadateremoved and with rdatadateadded <= snapshot.
     ## All OrgDbs are omitted in the first filter and selectively 
     ## exposed in the second filter.
+    ##   NOTE: biocversions filter distinguishes between release and devel;
+    ##   this is not caught by rdatadate added filter because the timestamp
+    ##   is updated with each modification and currently someone using
+    ##   an old version of Bioconductor will still get the current db
+    ##   which will have a timestamp > the date when the old version of
+    ##   Bioconductor was valid.
+
     query1 <- sprintf(
         'SELECT resources.id
-         FROM resources, rdatapaths
+         FROM resources, rdatapaths, biocversions
          WHERE resources.rdatadateadded <= "%s"
+         AND biocversions.biocversion <= "%s"
          AND resources.rdatadateremoved IS NULL
          AND rdatapaths.rdataclass != "OrgDb"
+         AND biocversions.resource_id == resources.id
          AND rdatapaths.resource_id == resources.id',
-         date)
+         date, biocVersion())
     biocIds1 <- .db_query(conn, query1)[[1]]
 
     ## OrgDb sqlite files:
@@ -78,11 +87,12 @@
          orgdb_release_version)
     biocIds2 <- .db_query(conn, query2)[[1]]
 
-    ## make unique 
-    allIds = unique(c(biocIds1, biocIds2))
+    ## make unique and sort 
+    allIds = sort(unique(c(biocIds1, biocIds2)))
     ## match id to ah_id
     query <- paste0('SELECT ah_id FROM resources ',
-                    'WHERE id IN (', paste0(allIds, collapse=","), ')')
+                    'WHERE id IN (', paste0(allIds, collapse=","), ')',
+                    'ORDER BY id')
     names(allIds) <- .db_query(conn, query)[[1]]
     allIds
 }

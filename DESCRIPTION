@@ -1,7 +1,7 @@
 Package: AnnotationHub
 Type: Package
 Title: Client to access AnnotationHub resources
-Version: 2.7.1
+Version: 2.7.2
 Authors@R: 
     c(person("Martin", "Morgan", email="martin.morgan@roswellpark.org",
              role="cre"),
@@ -22,21 +22,20 @@ Description: This package provides a client for the Bioconductor
 License: Artistic-2.0
 Depends: BiocGenerics (>= 0.15.10)
 Imports: utils, methods, grDevices, RSQLite, BiocInstaller,
-        AnnotationDbi (>= 1.31.19), S4Vectors, interactiveDisplayBase, httr
+    AnnotationDbi (>= 1.31.19), S4Vectors, interactiveDisplayBase, httr
 Suggests: IRanges, GenomicRanges, GenomeInfoDb, VariantAnnotation, Rsamtools,
-        rtracklayer, BiocStyle, knitr, AnnotationForge, rBiopaxParser,
-        RUnit, GenomicFeatures, MSnbase, mzR, Biostrings,
-        SummarizedExperiment
+    rtracklayer, BiocStyle, knitr, AnnotationForge, rBiopaxParser,
+    RUnit, GenomicFeatures, MSnbase, mzR, Biostrings,
+    SummarizedExperiment
 Enhances: AnnotationHubData
 Collate: AnnotationHubOption.R AllGenerics.R Hub-class.R db-utils.R 
-        AnnotationHub-class.R 
-        AnnotationHubResource-class.R
-        AnnotationHubBEDResource-class.R
-        AnnotationHubProteomicsResource-class.R
-        AnnotationHubEpigenomeResource-class.R 
-        AnnotationHubGenomicScoresResource-class.R 
-        utilities.R sql-utils.R hub-utils.R cache-utils.R 
-        zzz.R
+    AnnotationHub-class.R 
+    AnnotationHubResource-class.R
+    BEDResource-class.R
+    ProteomicsResource-class.R
+    EpigenomeResource-class.R 
+    GenomicScoresResource-class.R 
+    utilities.R sql-utils.R Hub-utils.R cache-utils.R zzz.R
 VignetteBuilder: knitr
 NeedsCompilation: yes
 Packaged: 2015-07-13 21:40:41 UTC; mcarlson

@@ -1,3 +1,10 @@
+### =========================================================================
+### Code for setting options. Most are set in R/zzz.R when the object is 
+### instantiated or used internally for dispatch on different 'Hub's.
+### -------------------------------------------------------------------------
+###
+
+
 .AH_hub_options <- new.env(parent=emptyenv())
 
 .hub_option_key <- function(key0=c("URL", "CACHE", "PROXY", "MAX_DOWNLOADS"))
