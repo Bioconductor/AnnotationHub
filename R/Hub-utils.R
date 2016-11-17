@@ -84,6 +84,32 @@
     mapply(.hub_cache_resource, hubpath, cachepath, MoreArgs=list(proxy))
 }
 
+.biocVersionDate <- function(biocversion) {
+    if (length(biocversion) > 1L)
+        stop("length(biocversion) must == 1")
+
+    yaml <- content(GET("http://bioconductor.org/config.yaml"), 
+                    encoding="UTF8", as="text")
+    obj <- yaml.load(yaml)
+    release_dates <- obj$release_dates
+    version_date <- release_dates[biocversion == names(release_dates)]
+    ## convert to snapshot format 
+    if (length(version_date))
+        as.character(as.POSIXlt(version_date[[1]], format='%m/%d/%Y'))
+    else
+        character()
+}
+
+.restrictDateByVersion <- function(path) {
+    dates <- as.POSIXlt(.possibleDates(path), format='%Y-%m-%d')
+    restrict <- as.POSIXlt(.biocVersionDate(biocVersion()), format='%Y-%m-%d')
+    if (length(restrict))  ## release
+        as.character(max(dates[dates < restrict]))
+    else                   ## devel 
+        as.character(max(dates))
+}
+
+## all dates
 .possibleDates <- function(path) {
     conn <- .db_open(path)
     on.exit(.db_close(conn))
@@ -94,38 +120,10 @@
     c(dateAdded, dateModified)
 }
 
-## Add possibleDates here (SELECT DISTINCT rdatadateadded FROM)
-possibleDates <- function(x) 
-    .possibleDates(dbfile(x))
-
-## Date filter "1": will look kind of like this 
-## it will be a subquery that will be passed to the next step...
-## SELECT * FROM resources where rdatadateadded < '2013-03-21';
-
-## Date filter "1": will look kind of like this
-## To get most recent thing of each kind for the dates.
-## SELECT rdatadateadded, count(title) FROM resources GROUP BY rdatadateadded;
-
-## Final thing (or it's close anyhow)
-## SELECT title,max(rdatadateadded), ah_id FROM 
-## (SELECT * FROM resources where rdatadateadded <= '2013-04-04') 
-## GROUP BY title 
-## limit 4;
-
-## The above will get us there, BUT: it requires some kind of assurance that 
-## our titles will be used as proper IDs...  And this is NOT a call for a 
-## unique constraint because that would mean that we could no longer group.  
-## Basically, it treats title as a key...
-
-
-
-
-
-## snapshotVersion i.e. BiocInstaller::biocVersion()
-
-
-## TODO: I need to modify the uid setter (and make sure that this is used for 
-## setting that slot package-wide) so that the filtering above is applied 
-## whenever this slot is populated.
-## And actually that just means that I need to actually just modify .uid0() so 
-## that it also does date filtering.
+## dates restricted by snapshotDate (and hence biocVersion)
+possibleDates <- function(x) {
+    path <- dbfile(x)
+    dates <- .possibleDates(path)
+    restrict <- snapshotDate(x)
+    dates[as.POSIXlt(dates) <= as.POSIXlt(restrict)]
+}

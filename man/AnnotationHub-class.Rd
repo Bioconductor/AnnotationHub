@@ -102,8 +102,8 @@
 
   \code{AnnotationHub} records can be added (and sometimes removed) at
   any time. \code{snapshotDate()} restricts hub records to those
-  available at the time of the snapshot; use \code{possibleDates()} to
-  see possible snapshot dates.
+  available at the time of the snapshot. \code{possibleDates()} lists
+  snapshot dates valid for the current version of Bioconductor.
 
   The location of the local cache can be found (and updated) with
   \code{getAnnotationHubCache} and \code{setAnnotationHubCache}; 
@@ -276,7 +276,9 @@
     }
     \item{}{
       \code{possibleDates(x)}:
-      Lists dates for snapshots that the hub could potentially use.
+      Lists dates for snapshots that the hub could potentially use. Limited
+      by the version of Biocondcutor being run 
+      (e.g., BiocInstaller::biocVersion()).
     }
     \item{}{
       \code{cache(x)} and \code{cache(x) <- NULL}: Adds (downloads) all

@@ -7,6 +7,7 @@ setClass("Hub",
     representation("VIRTUAL",
         hub="character",       ## equivalent to cache URL
         cache="character",     ## equivalent to cache CACHE 
+        ## FIXME: why was @date defined as data type 'character'
         date="character",
         .db_path="character", 
         .db_index="character",
@@ -21,7 +22,7 @@ setClass("Hub",
 .Hub <- function(.class, url, cache, proxy, ...) {
     db_path <- .create_cache(cache, .class)
     db_path <- .db_get(db_path, url, proxy)
-    db_date <- max(.possibleDates(db_path))
+    db_date <- .restrictDateByVersion(db_path)
     db_uid <- .db_uid0(db_path, db_date)
     hub <- new(.class, cache=cache, hub=url, date=db_date, 
                .db_path=db_path, .db_uid=db_uid, ...)
@@ -121,43 +122,33 @@ setMethod("length", "Hub",
     function(x) length(.db_uid(x))
 )
 
-## Marc's notes:
-## TODO: This isn't working yet!  Not only does the date not get swapped yet, 
-## but I also have to update the uids (reset those) when I do this step... 
-## (uid0)
-.replaceSnapshotDate <- function(x, value) {
- #   snapshotDate <- as.POSIXlt(value) ## TODO: use this class to store dates.
-    snapshotDate <- value
-    if (snapshotDate == snapshotDate(x))
-        return (x)
-    possibleDates <- possibleDates(x)
-    if (!snapshotDate %in% possibleDates){
-        newval <- strptime(snapshotDate, "%Y-%m-%d")
-	if(is.na(newval))
-	    stop("'value' should be in YYYY-MM-DD format")
-	if(newval > Sys.time())
-	    stop("this date is in the future") 
-	res <- mapply(function(x,y) {
-    	    x = strptime(x, "%Y-%m-%d")
-            y = strptime(y, "%Y-%m-%d")
-            newval>=x & newval<=y
-        }, possibleDates[-length(possibleDates)],  possibleDates[-1])
-	if(length(which(res))==1)
-           snapshotDate <- possibleDates[res]
-        else
-           snapshotDate <- snapshotDate(x)
-    }
-    ## Changing the date is two step process.
-    ## 1st we update the x@.db_uid
-    x@.db_uid <- .uid0(dbfile(x), snapshotDate)
-    ## then we update the date slot    
-    x@date <- snapshotDate
-    x
-} 
-
 setMethod("snapshotDate", "Hub", function(x) x@date)
 
-setReplaceMethod("snapshotDate", "Hub", .replaceSnapshotDate)
+setReplaceMethod("snapshotDate", "Hub", 
+    function(x, value) 
+{
+    if (length(value) != 1L)
+        stop("'value' must be a single character or date string")
+    tryCatch({
+       fmt_value <- as.POSIXlt(value)
+    }, error=function(err) {
+        stop("'value' must be a date or character string")
+    })
+    possible_dates <- possibleDates(x)
+    if (!length(possible_dates))
+        stop(paste0("no snapshot dates available for 'value'; ",
+                    "see possibleDates(x) for valid dates"))
+    fmt_max <- max(as.POSIXlt(possible_dates))
+    fmt_min <- min(as.POSIXlt(possible_dates))
+    if (fmt_value > fmt_max || fmt_value < fmt_min)
+        stop("'value' must be in the range of possibleDates(x)")
+
+    new(class(x), cache=hubCache(x), hub=hubUrl(x), 
+        date=as.character(value), 
+        .db_path=x@.db_path,
+        .db_index=x@.db_index,
+        .db_uid=.db_uid0(x@.db_path, value))
+})
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### Subsetting 
