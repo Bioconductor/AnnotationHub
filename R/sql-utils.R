@@ -47,6 +47,7 @@
     ##   an old version of Bioconductor will still get the current db
     ##   which will have a timestamp > the date when the old version of
     ##   Bioconductor was valid.
+    ##   NOTE: The 'date' variable is the snapshotDate().
 
     query1 <- sprintf(
         'SELECT resources.id
@@ -74,6 +75,9 @@
     ## For this reason, the devel code loads OrgDbs with the release version
     ## e.g.,
     ##   ifelse(isDevel(), biocversion - 0.1, biocversion)
+    ## NOTE: Because OrgDbs are valid for a full devel cycle they are
+    ##       not filtered by snapshotDate(); the OrgDbs are valid for all
+    ##       snapshotDates for a given biocVersion() 
  
     biocversion <- as.numeric(as.character(biocVersion()))
     orgdb_release_version <- ifelse(isDevel(), biocversion - 0.1, biocversion)

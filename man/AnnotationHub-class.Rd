@@ -276,9 +276,8 @@
     }
     \item{}{
       \code{possibleDates(x)}:
-      Lists dates for snapshots that the hub could potentially use. Limited
-      by the version of Biocondcutor being run 
-      (e.g., BiocInstaller::biocVersion()).
+      Lists the valid snapshot dates for the version of Bioconductor that
+      is being run (e.g., BiocInstaller::biocVersion()).
     }
     \item{}{
       \code{cache(x)} and \code{cache(x) <- NULL}: Adds (downloads) all

@@ -128,21 +128,21 @@ setReplaceMethod("snapshotDate", "Hub",
     function(x, value) 
 {
     if (length(value) != 1L)
-        stop("'value' must be a single character or date string")
+        stop("'value' must be a single date or character string")
     tryCatch({
        fmt_value <- as.POSIXlt(value)
     }, error=function(err) {
-        stop("'value' must be a date or character string")
+        stop("'value' must be a single date or character string")
     })
-    possible_dates <- possibleDates(x)
-    if (!length(possible_dates))
-        stop(paste0("no snapshot dates available for 'value'; ",
-                    "see possibleDates(x) for valid dates"))
-    fmt_max <- max(as.POSIXlt(possible_dates))
-    fmt_min <- min(as.POSIXlt(possible_dates))
-    if (fmt_value > fmt_max || fmt_value < fmt_min)
-        stop("'value' must be in the range of possibleDates(x)")
 
+    ## 'value' must be < biocVersion() release date
+    restrict <- .restrictDateByVersion(dbfile(x))
+    dates <- .possibleDates(dbfile(x))
+    valid_range <- range(dates[as.POSIXlt(dates) <= as.POSIXlt(restrict)])
+    if (as.POSIXlt(value) > max(valid_range) ||
+        as.POSIXlt(value) < min(valid_range))
+        stop("'value' must be in the range of possibleDates(x)")
+ 
     new(class(x), cache=hubCache(x), hub=hubUrl(x), 
         date=as.character(value), 
         .db_path=x@.db_path,

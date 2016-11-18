@@ -84,6 +84,10 @@
     mapply(.hub_cache_resource, hubpath, cachepath, MoreArgs=list(proxy))
 }
 
+### --------------------------------------------------------------------------
+### snapshotDate helpers
+
+## returns the release date for biocVersion()
 .biocVersionDate <- function(biocversion) {
     if (length(biocversion) > 1L)
         stop("length(biocversion) must == 1")
@@ -100,6 +104,7 @@
         character()
 }
 
+## single date closest to the release date for biocVersion()
 .restrictDateByVersion <- function(path) {
     dates <- as.POSIXlt(.possibleDates(path), format='%Y-%m-%d')
     restrict <- as.POSIXlt(.biocVersionDate(biocVersion()), format='%Y-%m-%d')
@@ -109,7 +114,7 @@
         as.character(max(dates))
 }
 
-## all dates
+## all possible dates 
 .possibleDates <- function(path) {
     conn <- .db_open(path)
     on.exit(.db_close(conn))
@@ -120,10 +125,10 @@
     c(dateAdded, dateModified)
 }
 
-## dates restricted by snapshotDate (and hence biocVersion)
+## dates restricted by snapshotDate (and hence biocVersion())
 possibleDates <- function(x) {
     path <- dbfile(x)
     dates <- .possibleDates(path)
-    restrict <- snapshotDate(x)
+    restrict <- .restrictDateByVersion(path)
     dates[as.POSIXlt(dates) <= as.POSIXlt(restrict)]
 }
