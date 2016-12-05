@@ -7,8 +7,8 @@ setMethod(".get1", "GenomicScoresResource",
     path2rds <- cache(getHub(x))
     object <- readRDS(path2rds)
     mdobj <- metadata(object)
-    gsco <- GScores(provider=mdobj$provider
-                    provider_version=mdobj$provider_version
+    gsco <- GScores(provider=mdobj$provider,
+                    provider_version=mdobj$provider_version,
                     download_url=mdobj$download_url,
                     download_date=mdobj$download_date,
                     reference_genome=mdobj$reference_genome,
