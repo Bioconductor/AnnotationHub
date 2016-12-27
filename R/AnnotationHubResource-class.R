@@ -62,6 +62,16 @@ setMethod(".get1", "FaFileResource",
     Rsamtools::FaFile(file=fa[1],index=fa[2])
 })
 
+## RDS
+
+setClass("RDSResource", contains="AnnotationHubResource")
+
+setMethod(".get1", "RDSResource",
+    function(x, ...)
+{
+    readRDS(cache(getHub(x)))
+})
+
 ## Rda
 
 setClass("RdaResource", contains="AnnotationHubResource")
