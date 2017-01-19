@@ -62,20 +62,19 @@ setMethod(".get1", "FaFileResource",
     Rsamtools::FaFile(file=fa[1],index=fa[2])
 })
 
-## RDS
+## Rds / RDS
 
-setClass("RDSResource", contains="AnnotationHubResource")
+## Michael's AHCytoData is the only package (I think) that uses RDS.
+## Added Rds to be compatible with Rda naming scheme.
+setClass("RDSResource", contains="RdsResource")
+setMethod(".get1", "RDSResource", function(x, ...) callNextMethod(x, ...))
 
-setMethod(".get1", "RDSResource",
-    function(x, ...)
-{
-    readRDS(cache(getHub(x)))
-})
+setClass("RdsResource", contains="AnnotationHubResource")
+setMethod(".get1", "RdsResource", function(x, ...) readRDS(cache(getHub(x))))
 
 ## Rda
 
 setClass("RdaResource", contains="AnnotationHubResource")
-
 setMethod(".get1", "RdaResource",
     function(x, ...)
 {
@@ -85,7 +84,6 @@ setMethod(".get1", "RdaResource",
 setClass("data.frameResource", contains="RdaResource")
 
 setClass("GRangesResource", contains="RdaResource")
-
 setMethod(".get1", "GRangesResource",
     function(x, ...)
 {
@@ -95,7 +93,6 @@ setMethod(".get1", "GRangesResource",
 })
 
 setClass("VCFResource", contains="RdaResource")
-
 setMethod(".get1", "VCFResource",
     function(x, ...)
 {
