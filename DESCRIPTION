@@ -34,7 +34,6 @@ Collate: AnnotationHubOption.R AllGenerics.R Hub-class.R db-utils.R
     BEDResource-class.R
     ProteomicsResource-class.R
     EpigenomeResource-class.R 
-    GenomicScoresResource-class.R 
     utilities.R sql-utils.R Hub-utils.R cache-utils.R zzz.R
 VignetteBuilder: knitr
 NeedsCompilation: yes
