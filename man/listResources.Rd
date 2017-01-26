@@ -19,7 +19,7 @@
 \details{
   Currently \code{listResources} and \code{loadResources} are only meaningful
   for \code{ExperimentHub} objects. Methods for \code{AnnotationHub} 
-  objects may be implemented in the future.
+  objects may be added in the future.
 }
 
 \usage{
