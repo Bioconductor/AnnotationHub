@@ -1,7 +1,7 @@
 Package: AnnotationHub
 Type: Package
 Title: Client to access AnnotationHub resources
-Version: 2.7.11
+Version: 2.7.12
 Authors@R: 
     c(person("Martin", "Morgan", email="martin.morgan@roswellpark.org",
              role="cre"),
@@ -26,7 +26,7 @@ Imports: utils, methods, grDevices, RSQLite, BiocInstaller,
 Suggests: IRanges, GenomicRanges, GenomeInfoDb, VariantAnnotation, Rsamtools,
     rtracklayer, BiocStyle, knitr, AnnotationForge, rBiopaxParser,
     RUnit, GenomicFeatures, MSnbase, mzR, Biostrings,
-    SummarizedExperiment
+    SummarizedExperiment, ExperimentHub
 Enhances: AnnotationHubData
 Collate: AnnotationHubOption.R AllGenerics.R Hub-class.R db-utils.R 
     AnnotationHub-class.R 
@@ -37,7 +37,6 @@ Collate: AnnotationHubOption.R AllGenerics.R Hub-class.R db-utils.R
     utilities.R sql-utils.R Hub-utils.R cache-utils.R zzz.R
 VignetteBuilder: knitr
 NeedsCompilation: yes
-Packaged: 2015-07-13 21:40:41 UTC; mcarlson
 Author: Martin Morgan [cre],
   Marc Carlson [ctb],
   Dan Tenenbaum [ctb],

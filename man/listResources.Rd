@@ -16,6 +16,12 @@
   name and optional search terms.
 }
 
+\details{
+  Currently \code{listResources} and \code{loadResources} are only meaningful
+  for \code{ExperimentHub} objects. Methods for \code{AnnotationHub} 
+  objects may be implemented in the future.
+}
+
 \usage{
 listResources(hub, package, filterBy = character())
 loadResources(hub, package, filterBy = character())
@@ -23,7 +29,7 @@ loadResources(hub, package, filterBy = character())
 
 \arguments{
   \item{hub}{
-    A \code{Hub} object, e.g., AnnotationHub or ExperimentHub.
+    A \code{Hub} object; currently only meaningful for \code{ExperimentHub}.
   }
   \item{package}{
     A \code{character(1)} name of a package with resources hosted in the Hub.
@@ -46,13 +52,9 @@ loadResources(hub, package, filterBy = character())
 
 \examples{
 \dontrun{
-## Packages with resources hosted in AnnotationHub:
-hub <- AnnotationHub()
-unique(package(hub))
-
 ## Packages with resources hosted in ExperimentHub:
 require(ExperimentHub)
-eh <- AnnotationHub()
+eh <- ExperimentHub()
 unique(package(eh))
 
 ## All resources associated with the 'GSE62944' package:
