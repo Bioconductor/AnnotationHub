@@ -230,6 +230,7 @@ setMethod("$", "Hub",
     switch(name,
      "tags"=unname(.collapse_as_string(x, .tags)),
      "rdataclass"=unname(.collapse_as_string(x, .rdataclass)),
+     "rdatapath"=unname(.collapse_as_string(x, .rdatapath)),
      "sourceurl"=unname(.collapse_as_string(x, .sourceurl)),
      "sourcetype"=unname(.collapse_as_string(x, .sourcetype)), 
      .resource_column(x, name))    ## try to get it from main resources table

@@ -101,6 +101,11 @@
     allIds
 }
 
+## FIXME: On one hand it's convenient to have helpers for each of these fields.
+##        Yet the main (only?) use case is probably mcols() and show() in
+##        which case we want all of these and it's inefficient to search
+##        the same table multiple times for the different fields. 
+
 ## helper to retrieve tags
 .tags <- function(x) {
     query <- sprintf(
@@ -114,6 +119,15 @@
 .rdataclass <- function(x) {
     query <- sprintf(
         'SELECT DISTINCT rdataclass, resource_id AS id FROM rdatapaths
+         WHERE resource_id IN (%s)',
+        .id_as_single_string(x))
+    .db_query(dbfile(x), query)
+}
+
+## helper for extracting rdatapath 
+.rdatapath <- function(x) {
+    query <- sprintf(
+        'SELECT DISTINCT rdatapath, resource_id AS id FROM rdatapaths
          WHERE resource_id IN (%s)',
         .id_as_single_string(x))
     .db_query(dbfile(x), query)
@@ -147,7 +161,8 @@
 
 .sourcelastmodifieddate <- function(x) {
     query <- sprintf(
-        'SELECT DISTINCT sourcelastmodifieddate, resource_id AS id FROM input_sources
+        'SELECT DISTINCT sourcelastmodifieddate, resource_id AS id 
+         FROM input_sources
          WHERE resource_id IN (%s)',
         .id_as_single_string(x))
     .db_query(dbfile(x), query)
@@ -188,6 +203,7 @@
     tbl <- .query_as_data.frame(x, query)
     tbl[["tags"]] <- I(.collapse_as_list(x, .tags))
     tbl[["rdataclass"]] <- .collapse_as_string(x, .rdataclass)
+    tbl[["rdatapath"]] <- .collapse_as_string(x, .rdatapath)
     tbl[["sourceurl"]] <- .collapse_as_string(x, .sourceurl)
     tbl[["sourcetype"]] <- .collapse_as_string(x, .sourcetype)
     tbl
