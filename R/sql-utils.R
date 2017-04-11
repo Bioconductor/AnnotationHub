@@ -75,6 +75,7 @@
     ## For this reason, the devel code loads OrgDbs with the release version
     ## e.g.,
     ##   ifelse(isDevel(), biocversion - 0.1, biocversion)
+    ##
     ## NOTE: Because OrgDbs are valid for a full devel cycle they are
     ##       not filtered by snapshotDate(); the OrgDbs are valid for all
     ##       snapshotDates for a given biocVersion() 
