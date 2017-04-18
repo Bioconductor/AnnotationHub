@@ -1,3 +1,42 @@
+CHANGES IN VERSION 2.8.0
+------------------------
+
+NEW FEATURES
+
+    o add .get1,RDSResource-method
+
+    o add RdsResource class
+
+    o add EnsDb dispatch class
+
+    o expose rdatapath in metadata
+
+MODIFICATIONS
+
+    o modify records exposed as metadata
+      - expose records added <= snapshot date
+      - expose a single OrgDb per organism per BioC version
+
+    o edits to .get1,GenomicScores-method and .get1,GenomicScoresResource-method
+
+    o work on biocVersion and snapshotDate relationship:
+      - snapshotDate() must be <= biocVersion() release date 
+      - possibleDates() are now filtered by snapshotDate()
+
+    o remove GenomicScoresResource; Robert Castelo will handle loading these
+    resources in his GenomicScores software package
+
+    o Changed show method for hub object 
+      - removed sourcelastmodifieddate
+      - added rdatadateadded
+ 
+
+BUG FIXES
+
+    o fix bug in ordering of output from .uid0()
+
+    o fix bugs in 'snapshotDate<-' method
+
 CHANGES IN VERSION 2.6.0
 ------------------------
 
