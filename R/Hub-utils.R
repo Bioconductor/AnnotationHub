@@ -109,7 +109,7 @@
     dates <- as.POSIXlt(.possibleDates(path), format='%Y-%m-%d')
     restrict <- as.POSIXlt(.biocVersionDate(biocVersion()), format='%Y-%m-%d')
     if (length(restrict))  ## release
-        as.character(max(dates[dates < restrict]))
+        as.character(max(dates[dates <= restrict]))
     else                   ## devel 
         as.character(max(dates))
 }
