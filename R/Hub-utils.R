@@ -93,7 +93,7 @@
         stop("length(biocversion) must == 1")
 
     yaml <- content(GET("http://bioconductor.org/config.yaml"), 
-                    encoding="UTF8", as="text")
+                    encoding="UTF-8", as="text")
     obj <- yaml.load(yaml)
     release_dates <- obj$release_dates
     version_date <- release_dates[biocversion == names(release_dates)]
