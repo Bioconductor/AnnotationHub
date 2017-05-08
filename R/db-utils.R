@@ -128,7 +128,10 @@
 
 .db_create_index <- function(x) {
     fl <- .db_index_file(x)
-    if (file.exists(fl) && (file.mtime(fl) > file.mtime(dbfile(x))))
+    ind <- readRDS(fl)
+    force <- (length(ind) < length(x))
+    
+    if (file.exists(fl) && (file.mtime(fl) > file.mtime(dbfile(x))) && !force)
         return(fl)
  
     tryCatch({
