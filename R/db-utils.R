@@ -130,14 +130,10 @@
     fl <- .db_index_file(x)
 
     if (file.exists(fl)) {
-        ind <- readRDS(fl)
-        force <- (length(ind) < length(x))
-    }else{
-        force <- TRUE
+        if (file.mtime(fl) > file.mtime(dbfile(x)) &&
+            length(x) == length(readRDS(fl)))
+            return(fl)
     }
-        
-    if (file.exists(fl) && (file.mtime(fl) > file.mtime(dbfile(x))) && !force)
-        return(fl)
  
     tryCatch({
         tbl <- .resource_table(x)
