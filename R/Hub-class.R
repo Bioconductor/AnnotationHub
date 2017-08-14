@@ -19,7 +19,7 @@ setClass("Hub",
 ### Constructor for subclasses
 ###
 
-.Hub <- function(.class, url, cache, proxy, localHub, ...) {
+.Hub <- function(.class, url, cache, proxy, localHub=FALSE, ...) {
     db_path <- .create_cache(cache, .class)
     if (!localHub){
         db_path <- .db_get(db_path, url, proxy)
