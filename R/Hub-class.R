@@ -19,17 +19,51 @@ setClass("Hub",
 ### Constructor for subclasses
 ###
 
-.Hub <- function(.class, url, cache, proxy, ...) {
+.Hub <- function(.class, url, cache, proxy, localHub, ...) {
     db_path <- .create_cache(cache, .class)
-    db_path <- .db_get(db_path, url, proxy)
-    db_date <- .restrictDateByVersion(db_path)
+    if (!localHub){
+        db_path <- .db_get(db_path, url, proxy)
+        tryCatch({
+            db_date <- .restrictDateByVersion(db_path)
+        }, error=function(err) {
+            stop("failed to connect",
+                 "\n  reason: ", conditionMessage(err),
+                 "\n  Consider rerunning with 'localHub=TRUE'")
+        })
+    } else {
+        if (!file.exists(db_path))
+            stop("Local database does not exist.",
+                 "\n  Repeat call with 'localHub=FALSE'")   
+        dates <-.possibleDates(db_path)
+        db_date <- dates[length(dates)]
+    }
     db_uid <- .db_uid0(db_path, db_date)
     hub <- new(.class, cache=cache, hub=url, date=db_date, 
                .db_path=db_path, .db_uid=db_uid, ...)
+    
     message("snapshotDate(): ", snapshotDate(hub))
-    index <- .db_create_index(hub)
-    .db_index(hub) <- index 
+    
+    if (!localHub){
+        index <- .db_create_index(hub)
+        .db_index(hub) <- index 
+    } else{        
+        index <- file.path(dirname(db_path), "index.rds")
+        if (!file.exists(index))
+            stop("Index file not created.",
+                 "\n  Repeat call with 'localHub=FALSE'")
+        .db_index(hub) <- index
+        hub <- .subsethub(hub)
+    }    
     hub
+}
+
+.subsethub <- function(hub){
+    myX = .named_cache_path(hub)
+    locFiles = setdiff(dir(hubCache(hub)),
+        c("annotationhub.sqlite3", "index.rds"))
+    dx = which(basename(myX) %in% locFiles)
+    files = names(myX[dx])
+    hub[files]
 }
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

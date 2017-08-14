@@ -14,9 +14,10 @@ setClass("AnnotationHub", contains="Hub")
 AnnotationHub <-
     function(..., hub=getAnnotationHubOption("URL"),
              cache=getAnnotationHubOption("CACHE"),
-             proxy=getAnnotationHubOption("PROXY")) 
+             proxy=getAnnotationHubOption("PROXY"),
+             localHub=FALSE) 
 {
-    .Hub("AnnotationHub", hub, cache, proxy, ...)
+    .Hub("AnnotationHub", hub, cache, proxy, localHub, ...)
 }
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

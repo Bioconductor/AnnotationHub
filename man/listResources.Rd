@@ -47,9 +47,6 @@ loadResources(hub, package, filterBy = character())
   \code{loadResources} returns a list of data objects.
 }
 
-\seealso{
-}
-
 \examples{
 \dontrun{
 ## Packages with resources hosted in ExperimentHub:
