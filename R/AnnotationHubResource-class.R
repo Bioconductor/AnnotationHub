@@ -273,3 +273,14 @@ setMethod(".get1", "ExpressionSetResource",
     .require("Biobase")
     callNextMethod(x, ...)
 })
+
+# GDS
+setClass("GDSResource", contains="AnnotationHubResource")
+
+setMethod(".get1", "GDSResource",
+    function(x, ...)
+{
+    .require("gdsfmt")
+    yy <- cache(getHub(x))
+    dat <- gdsfmt::opengn.gds(yy)
+})
