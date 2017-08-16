@@ -1,21 +1,23 @@
 .require <-
     function(pkg)
 {
+    result <- TRUE
     if (length(grep(sprintf("package:%s", pkg), search())) != 0L)
-        return()
+        return(invisible(result))
     message("require(", dQuote(pkg), ")")
+
     handler <- function(err) {
         msg <- sprintf("require(%s) failed: %s", dQuote(pkg),
                        conditionMessage(err))
         stop(msg)
     }
-    tryCatch({
-        suppressPackageStartupMessages({
-            require(pkg, quietly=TRUE, character.only=TRUE)
-        })
-    }, ## error first, so warnings-converted-to-error are not handled
-       ## again
-       error=handler, warning=handler)
+
+    result <- tryCatch(suppressPackageStartupMessages(
+        require(pkg, quietly=TRUE, character.only=TRUE)
+    ), error=handler)
+    if (!result)
+        handler(simpleError("use biocLite() to install package?"))
+    invisible(result)
 }
 
 .ask <- function(txt, values) {
