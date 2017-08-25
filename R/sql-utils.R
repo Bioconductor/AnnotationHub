@@ -227,8 +227,6 @@
 }
 
 ## This is used by cache to get the rDataPath ID for a resource
-## I think this should say to select 'id' as id to extract the rdatapathID 
-## (instead of the resource_id)
 .datapathIds <- function(x)
 {
     query <- sprintf(
