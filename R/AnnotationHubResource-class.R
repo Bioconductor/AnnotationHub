@@ -282,5 +282,5 @@ setMethod(".get1", "GDSResource",
 {
     .require("gdsfmt")
     yy <- cache(getHub(x))
-    dat <- gdsfmt::opengn.gds(yy)
+    dat <- gdsfmt::openfn.gds(yy)
 })
