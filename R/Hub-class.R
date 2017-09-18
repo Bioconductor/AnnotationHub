@@ -464,7 +464,10 @@ setMethod("show", "Hub", function(object)
     #dropping column names
     drops <-c("title", "taxonomyid", "sourceurl")
     df <- df[,!(names(df) %in% drops), drop=FALSE]
- 
+    # speeds up search by making character
+    df$tags <- vapply(unname(unclass(md$tags)), base::paste,
+                      character(1), collapse=", ")
+
     summaryMessage = capture.output(show(object))
     serverOptions= list(
         bSortClasses=TRUE,
