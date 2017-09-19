@@ -29,6 +29,7 @@ Suggests: IRanges, GenomicRanges, GenomeInfoDb, VariantAnnotation, Rsamtools,
     SummarizedExperiment, ExperimentHub, gdsfmt
 Enhances: AnnotationHubData
 Collate: AnnotationHubOption.R AllGenerics.R Hub-class.R db-utils.R 
+    readMetadataFromCsv.R
     AnnotationHub-class.R 
     AnnotationHubResource-class.R
     BEDResource-class.R
