@@ -242,7 +242,9 @@
           describing how matches across pattern elements are to be
           combined. The default \code{`&`} requires that only records
           with \emph{all} elements of \code{pattern} in their metadata
-          columns are returned.}
+          columns are returned. \code{`&`}, \code{`|`} and \code{`!`}
+	  are most notably available. See \code{"?&"} or
+	  \code{?base::Ops} for more information.}
       }
     }
     \item{}{
@@ -252,7 +254,7 @@
       expression can reference columns of \code{mcols(x)}, and should
       return a logical vector of length \code{length(x)}.
       e.g., \code{subset(x, species == "Homo sapiens" &
-        genome="GRCh38")}.
+        genome=="GRCh38")}.
     }
     \item{}{
       \code{display(object)}:
@@ -301,14 +303,6 @@
       Removes local AnnotationHub database and all related resources. After
       calling this function, the user will have to download any AnnotationHub
       resources again.
-    }
-    \item{}{
-      \code{getAnnotationHubOption()}:
-      TODO: Get cache options "CACHE", "URL", "MAXDOWNLOADS" ... 
-    }
-    \item{}{
-      \code{setAnnotationHubOption()}:
-      TODO: Set cache options "CACHE", "URL", "MAXDOWNLOADS" ... 
     }
   }
 }
