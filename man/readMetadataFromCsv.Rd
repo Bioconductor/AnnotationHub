@@ -34,7 +34,7 @@
       \code{readMetadataFromCsv} performs checks for required columns
       and data types and can be used by package authors to validate their
       metadata before submitting the package for review. The function is
-      used internally by \code{makeAnnotationHubMetadata}.
+      used internally by \code{AnnotationHubData::makeAnnotationHubMetadata}.
 
       The rows of the .csv file(s) represent individual \code{Hub}
       resources (i.e., data objects) and the columns are the metadata
@@ -149,7 +149,7 @@
 
 \seealso{
   \itemize{
-    \item \code{\link{makeAnnotationHubMetadata}}
+    \item \code{\link[AnnotationHubData]{makeAnnotationHubMetadata}}
   }
 }
 
