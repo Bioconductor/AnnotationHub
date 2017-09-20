@@ -93,35 +93,3 @@ setMethod("show", "AnnotationHub", function(object)
     cat("# snapshotDate():", snapshotDate(object), "\n")
     callNextMethod(object)
 })
-
-### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### listResources and loadResources methods
-###
-
-.filterResources_AH <- function(package, filterBy=character()) {
-    if (!is.character(filterBy))
-        stop("'filterBy' must be a character vector")
-    suppressMessages({ah <- AnnotationHub()})
-    if (!package %in% unique(package(ah)))
-        stop(paste0("no resources for package '", package, 
-                    "' were found in AnnotationHub"))
-
-    sub <- query(ah, package)
-    if (length(filterBy))
-        query(sub, filterBy)
-    else
-        sub
-}
-
-setMethod("listResources", "AnnotationHub", 
-    function(hub, package, filterBy=character()) {
-        metadata <- .filterResources_AH(package, filterBy)
-        mcols(metadata)$title
-})
-
-setMethod("loadResources", "AnnotationHub",
-    function(hub, package, filterBy=character()) {
-        metadata <- .filterResources_AH(package, filterBy)
-        ah <- AnnotationHub()
-        lapply(names(metadata), function(i) ah[[i]]) 
-})
