@@ -107,7 +107,8 @@
 	      remainder of the path to the resource. The
 	      \code{Location_Prefix} will be prepended to
 	      \code{RDataPath} for the full path to the resource.
-	      It should start with the name of the package associated
+	      If the resource is stored in Bioconductor's AWS S3
+	      buckets, it should start with the name of the package associated
 	      with the metadata and should not start with a leading
 	      slash. It should include the resource file name.
 
