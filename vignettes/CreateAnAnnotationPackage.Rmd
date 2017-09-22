@@ -5,11 +5,11 @@ date: "Modified: October 2016. Compiled: `r format(Sys.Date(), '%d %b %Y')`"
 output:
   BiocStyle::html_document:
     toc: true
+vignette: >
+  % \VignetteIndexEntry{AnnotationHub: Creating An AnnotationHub Package}
+  % \VignetteEngine{knitr::rmarkdown}
+  % \VignetteEncoding{UTF-8}
 ---
-<!--
-%% \VignetteEngine{knitr::rmarkdown}
-%\VignetteIndexEntry{Introduction to AnnotationHubData}
--->
 
 
 # Overview
