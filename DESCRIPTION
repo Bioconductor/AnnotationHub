@@ -1,7 +1,7 @@
 Package: AnnotationHub
 Type: Package
 Title: Client to access AnnotationHub resources
-Version: 2.9.17
+Version: 2.9.18
 Authors@R: 
     c(person("Martin", "Morgan", email="martin.morgan@roswellpark.org",
              role="cre"),

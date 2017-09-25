@@ -8,45 +8,24 @@
 % Constructor
 
 % Accessor-like methods
-\alias{getHub} 
-\alias{getHub,AnnotationHubResource-method} 
-\alias{hubCache,AnnotationHubResource-method} 
-\alias{hubUrl,AnnotationHubResource-method} 
+\alias{getHub}
+\alias{getHub,AnnotationHubResource-method}
+\alias{hubCache,AnnotationHubResource-method}
+\alias{hubUrl,AnnotationHubResource-method}
 
 
 \title{AnnotationHubResource objects and their related methods and functions}
 
 \description{
-    TODO
-}
-
-\section{Accessors}{
-  In the code snippets below, \code{x} and \code{object} are
-  AnnotationHubResource objects.
-
-  \describe{
-    \item{}{
-      \code{getHub(x)}:
-      Gets the AnnotationHub from the hub slot.
-    }
-    \item{}{
-      \code{getCache(x)}:
-      Gets the location of the AnnotationHub cache from the AnnotationHub
-      object in the hub slot.
-    }
-    \item{}{
-      \code{getUrl(x)}:
-      Gets the location of the AnnotationHub production server from the 
-      AnnotationHub object in the hub slot.
-    }
-  }
+    This class is utilized internally. AnnotationHubResources are
+    created as an intermediate 'on the fly' process when loading a
+    resource. It's accessor methods are used internally.
 }
 
 \author{Bioconductor Core Team}
 
-\examples{
-    ## TODO
-}
+\seealso{\link{AnnotationHub-class}}
 
+\keyword{internal}
 \keyword{classes}
 \keyword{methods}
