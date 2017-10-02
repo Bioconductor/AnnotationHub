@@ -1,3 +1,31 @@
+CHANGES IN VERSION 2.10.0
+------------------------
+
+NEW FEATURES
+
+    o AnnotationHub will now work offline utilizing argument 'localHub'; will
+    also use this option automatically if no internet connection is detected.
+
+    o Added new GDSResource class
+
+    o Added documentation for creating an AnnotationHub package
+
+MODIFICATIONS
+
+    o Modified tags vector when passed to display to improve speed of display
+    querying 
+
+    o Moved readMetadataFromCsv from AnnotationHubData. 
+
+    o Removed listResources and loadResource from AnnotationHub; not implemented
+    and only valid in ExperimentHub
+
+BUG FIXES
+
+    o Expose snapshot less than or equal to release date
+
+    o Force rebuild of index if index file corrput or out of date
+
 CHANGES IN VERSION 2.8.0
 ------------------------
 
