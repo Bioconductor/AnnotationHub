@@ -30,8 +30,8 @@ readMetadataFromCsv <- function(pathToPackage, fileName=character())
     expected <- mat[,1]
     missing <- !expected %in% names(meta)
     if (any(missing))
-        stop(paste0("missing fields in metadata file ", fileName, ": ",
-                    paste(expected[missing], collapse=", ")))
+        stop("missing fields in metadata file ", fileName, ": ",
+             paste(expected[missing], collapse=", "))
     extra<- !names(meta) %in% expected
 
     ## All fields length 1
@@ -39,8 +39,8 @@ readMetadataFromCsv <- function(pathToPackage, fileName=character())
         function(xx) {
             valid <- sapply(xx, function(field) length(field) == 1L)
             if (any(!valid))
-                stop(paste0("all fields in ", fileName, " must be a character ",
-                     "string of length 1"))
+                stop("all fields in ", fileName, " must be a character ",
+                     "string of length 1")
         }
 
     )
@@ -71,9 +71,9 @@ readMetadataFromCsv <- function(pathToPackage, fileName=character())
         (meta$Location_Prefix == 'http://s3.amazonaws.com/experimenthub/'))
        ){
         package <- basename(pathToPackage)
-        if (!all(sapply(meta$RDataPath,
-                        pattern=paste0("^",package), FUN=grepl))){
-            stop(paste0("RDataPath must start with package name: ", package))
+        test <- vapply(meta$RDataPath, startsWith, logical(1), package)
+        if (!all(test)){
+            stop("RDataPath must start with package name: ", package)
         }
     }
 
