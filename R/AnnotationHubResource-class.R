@@ -284,3 +284,13 @@ setMethod(".get1", "GDSResource",
     yy <- cache(getHub(x))
     dat <- gdsfmt::openfn.gds(yy)
 })
+
+## H5FileResource
+setClass("H5FileResource", contains = "AnnotationHubResource")
+
+setMethod(".get1", "H5FileResource",
+    function(x, ...)
+{
+    .require("rhdf5")
+    cache(getHub(x))
+})
