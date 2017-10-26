@@ -87,6 +87,7 @@
          FROM resources, biocversions, rdatapaths
          WHERE biocversions.biocversion == "%s"
          AND rdatapaths.rdataclass == "OrgDb"
+         AND resources.rdatadateremoved IS NULL
          AND biocversions.resource_id == resources.id
          AND rdatapaths.resource_id == resources.id',
          orgdb_release_version)

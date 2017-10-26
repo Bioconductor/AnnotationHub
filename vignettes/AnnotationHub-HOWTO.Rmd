@@ -307,8 +307,8 @@ evidence of medical interest. This information is available at
 Query the dbDNP files in the hub:
 
 ```{r echo=FALSE, results='hide', message=FALSE}
-query(ah, c("GRCh37", "dbSNP", "VCF" ))
-vcf <- ah[['AH50424']]
+query(ah, c("GRCh38", "dbSNP", "VCF" ))
+vcf <- ah[['AH57960']]
 ```
 This returns a _VcfFile_ which can be read in using `r
 Biocpkg("VariantAnnotation")`; because VCF files can be large, `readVcf()`
