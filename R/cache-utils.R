@@ -51,32 +51,48 @@
     file.path(cache, sqlitefile)
 }
 
+.cache_download_ok <- function(cachepath, max.downloads)
+{
+    need <- !file.exists(cachepath)
+    n <- sum(need)
+
+    if (n > max.downloads) {
+        ans <- "n"
+        if (interactive())
+            ans <- .ask(sprintf("download %d resources?", n), c("y", "n"))
+        if (ans == "n") {
+            txt <- sprintf(
+                "resources needed (%d) exceeds max.downloads (%d)",
+                n, max.downloads
+            )
+            stop(txt, call. = FALSE)
+        }
+    } else {
+        message("downloading ", n, " resources")
+    }
+
+    need
+}
+
 .cache_internal <- function(x, cache.root, cache.fun, proxy, max.downloads)
 {
-    cachepath <- .named_cache_path(x, cache.root, cache.fun) 
-    need <- !file.exists(cachepath)
-    if (any(need)) {
-        hubpath <- .hub_resource_path(.hub_data_path(hubUrl(x)),
-            basename(cachepath)[need])
-        message("downloading from ", paste0(sQuote(hubpath), collapse="\n    "))
-    } else {
-        message("loading from cache ", 
-                paste0(sQuote(cachepath), collapse="\n    "))
-    }
-    if (any(need) > max.downloads) {
-        if (!interactive()) {
-            txt <- sprintf("resources needed (%d) exceeds max.downloads (%d)",
-                           sum(need), max.downloads)
-            stop(txt)
-        }
-        ans <- .ask(sprintf("download %d resources?", sum(need)), c("y", "n"))
-        if (ans == "n")
-            return(cachepath[!need])
-    }
-    ok <- .hub_resource(.hub_data_path(hubUrl(x)), basename(cachepath)[need], 
-                         cachepath[need], proxy=proxy)
+    cachepath <- .named_cache_path(x, cache.root, cache.fun)
+    need <- .cache_download_ok(cachepath, max.downloads)
+
+    ok <- .hub_resource(
+        .hub_data_path(hubUrl(x)), basename(cachepath)[need],
+        cachepath[need], proxy=proxy
+    )
     if (!all(ok))
-        stop(sprintf("%d resources failed to download", sum(!ok)))
+        stop(sum(!ok), " resources failed to download", call. = FALSE)
+
+    message(paste0(
+        c(
+            "loading from cache ", sQuote(cachepath),
+            if (length(cachepath) > 6) "..."
+        ),
+        collapse="\n    "
+    ))
     cachepath
 }
 
