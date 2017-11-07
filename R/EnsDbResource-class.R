@@ -9,5 +9,5 @@ setMethod(".get1", "EnsDbResource",
     function(x, ...)
 {
     .require("ensembldb")
-    EnsDb(cache(getHub(x)))
+    ensembldb::EnsDb(cache(getHub(x)))
 })
