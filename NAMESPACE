@@ -27,7 +27,6 @@ exportClasses(
     AnnotationHub, AnnotationHubResource
 )
 
-export(readMetadataFromCsv)
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### Export S4 methods for generics not defined in AnnotationHub 
 ###

@@ -6,6 +6,12 @@ BUG FIXES
     o Prompt for permission when downloading many (more than
     AnnotationHubOption("MAX_DOWNLOADS")) resources.
 
+MODIFICATIONS
+
+    o Moved readMetadataFromCsv back to AnnotationHubData.
+
+    o Use AnnotationHubData::makeAnnotationHubMetadata to validate metadata.csv
+
 CHANGES IN VERSION 2.10.0
 ------------------------
 

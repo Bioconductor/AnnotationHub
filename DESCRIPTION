@@ -1,7 +1,7 @@
 Package: AnnotationHub
 Type: Package
 Title: Client to access AnnotationHub resources
-Version: 2.11.1
+Version: 2.11.2
 Authors@R: 
     c(person("Martin", "Morgan", email="martin.morgan@roswellpark.org",
              role="cre"),
@@ -29,7 +29,6 @@ Suggests: IRanges, GenomicRanges, GenomeInfoDb, VariantAnnotation, Rsamtools,
     SummarizedExperiment, ExperimentHub, gdsfmt
 Enhances: AnnotationHubData
 Collate: AnnotationHubOption.R AllGenerics.R Hub-class.R db-utils.R 
-    readMetadataFromCsv.R
     AnnotationHub-class.R 
     AnnotationHubResource-class.R
     BEDResource-class.R

@@ -22,13 +22,13 @@ to standard `Bioconductor` data types, and stored so that they may be
 conveniently served up on demand to users via the AnnotationHub client. While
 data are often manipulated into a more R-friendly form, the data themselves
 retain their raw content and are not filtered or curated like those in
-[ExperimentHub](http://bioconductor.org/packages/ExperimentHub/).  
-Each resource has associated metadata that can be searched through the 
+[ExperimentHub](http://bioconductor.org/packages/ExperimentHub/).
+Each resource has associated metadata that can be searched through the
 `AnnotationHub` client interface.
 
 # New resources
 
-## Family of resources 
+## Family of resources
 
 Multiple, related resources are added to `AnnotationHub` by creating a software
 package similar to the existing annotation packages. The package itself does
@@ -40,33 +40,33 @@ Vignettes and additional `R` code for manipulating the objects are optional.
 
 Creating the package involves the following steps:
 
-1. Notify `Bioconductor` team member:  
+1. Notify `Bioconductor` team member:
    Man page and vignette examples in the software package will not work until
    the data are available in `AnnotationHub`. Adding the data to AWS S3 and the
    metadata to the production database involves assistance from a `Bioconductor`
    team member.  Please read the section "Uploading Data to S3".
 
-2. Building the software package:  
+2. Building the software package:
    Below is an outline of package organization. The files listed are required
-   unless otherwise stated. 
+   unless otherwise stated.
 
 * inst/extdata/
 
-    - metadata.csv: 
+    - metadata.csv:
     This file contains the metadata in the format of one row per resource
     to be added to the `AnnotationHub` database. The file should be generated
     from the code in inst/scripts/make-metadata.R where the final data are
-    written out with write.csv(..., row.names=FALSE). The required column 
-    names and data types are specified in 
-    `AnnotationHub::readMetadataFromCsv()`. See ?`readMetadataFromCsv` for 
-    details.
+    written out with write.csv(..., row.names=FALSE). The required column
+    names and data types are specified in
+    `AnnotationHubData::makeAnnotationHubMetadata`.
+    See ?`AnnotationHubData::makeAnnotationHubMetadata` for details.
 
     If necessary, metadata can be broken up into multiple csv files instead
     having of all records in a single "metadata.csv".
 
 * inst/scripts/
 
-    - make-data.R:  
+    - make-data.R:
     A script describing the steps involved in making the data object(s). This
     includes where the original data were downloaded from, pre-processing, and
     how the final R object was made. Include a description of any steps
@@ -76,16 +76,16 @@ Creating the package involves the following steps:
     manipulation of the data prior to hosting on the web site. For data hosted
     on a public web site with no prior manipultaion this file is not needed.
 
-    - make-metadata.R:   
-    A script to make the metadata.csv file located in inst/extdata of the 
-    package. See ?`readMetadataFromCsv` for a description of the
-    metadata.csv file, expected fields and data types. The
-    `readMetadataFromCsv()` function can be used to validate the metadata.csv 
-    file before submitting the package.
+    - make-metadata.R:
+    A script to make the metadata.csv file located in inst/extdata of the
+    package. See ?`AnnotationHubData::makeAnnotationHubMetadata` for a
+    description of the metadata.csv file, expected fields and data types. The
+    `AnnotationHubData::makeAnnotationHubMetadata()` function can be used to
+    validate the metadata.csv file before submitting the package.
 
 * vignettes/
 
-    OPTIONAL vignette(s) describing analysis workflows. 
+    OPTIONAL vignette(s) describing analysis workflows.
 
 * R/
 
@@ -93,17 +93,17 @@ Creating the package involves the following steps:
 
 * man/
 
-    - package man page:  
+    - package man page:
     OPTIONAL. The package man page serves as a landing point and should briefly
     describe all resources associated with the package. There should be an
     \alias entry for each resource title either on the package man page or
     individual man pages.
- 
-    - resource man pages:  
+
+    - resource man pages:
     OPTIONAL. Man page(s) should describe the resource (raw data source,
-    processing, QC steps) and demonstrate how the data can be loaded through 
-    the `AnnotationHub` interface. For example, replace "SEARCHTERM*" below 
-    with one or more search terms that uniquely identify resources in your 
+    processing, QC steps) and demonstrate how the data can be loaded through
+    the `AnnotationHub` interface. For example, replace "SEARCHTERM*" below
+    with one or more search terms that uniquely identify resources in your
     package.
 
     ```
@@ -113,30 +113,30 @@ Creating the package involves the following steps:
     myfiles[[1]]  ## load the first resource in the list
     ```
 
-* DESCRIPTION / NAMESPACE  
+* DESCRIPTION / NAMESPACE
 The scripts used to generate the metadata will likely use functions from
 AnnotationHub or AnnotationHubData which should be listed in Depends/Imports as
 necessary.
 
 
-3. Data objects:  
-Data are not formally part of the software package and are stored 
+3. Data objects:
+Data are not formally part of the software package and are stored
 separately in AWS S3 buckets. The author should follow instructions in the
 section "Uploading Data to S3"
 
-4. Confirm valid metadata:  
+4. Confirm valid metadata:
 Confirm the data in inst/exdata/metadata.csv are valid by running
 AnnotationHubData:::makeAnnotationHubMetadata() on your package. Please
 address and warnings or errors.
 
-5. Package review:  
+5. Package review:
 Submit the package to the
 [tracker](https://github.com/Bioconductor/Contributions) for review. The
 primary purpose of the package review is to validate the metadata in the csv
 file(s). It is ok if the package fails R CMD build and check because the
-data and metadata are not yet in place. Once the metadata.csv is approved, 
+data and metadata are not yet in place. Once the metadata.csv is approved,
 records are added to the production database. At that point the package man
-pages and vignette can be finalized and the package should pass R CMD build 
+pages and vignette can be finalized and the package should pass R CMD build
 and check.
 
 ## Individual resources
@@ -153,36 +153,36 @@ generation and makes sense when there are plans to update versions or add new
 organisms in the future.
 
 Make sure the OrgDb, TxDb or BSgenome object you want to add does not already
-exist in the  
+exist in the
 [Biocondcutor annotation repository](http://www.bioconductor.org/packages/release/BiocViews.html#___AnnotationData)
 
 Providing just data and metadata files involves the following steps:
 
-1. Notify `Bioconductor` team member:  
-   Adding the data to AWS S3 and the metadata to the production database 
+1. Notify `Bioconductor` team member:
+   Adding the data to AWS S3 and the metadata to the production database
    involves assistance from a `Bioconductor` team member. Please read the
    section "Uploading Data to S3".
 
-2. Prepare the data:  
+2. Prepare the data:
    In the case of an OrgDb object, only the sqlite file is stored in S3.
    See makeOrgPackageFromNCBI() and makeOrgPackage() in the `AnnotationForge`
-   package for help creating the sqlite file. BSgenome objects should be made 
+   package for help creating the sqlite file. BSgenome objects should be made
    according to the steps outline in the
    [BSgenome
-   vignette](http://www.bioconductor.org/packages/3.4/bioc/vignettes/BSgenome/inst/doc/BSgenomeForge.pdf). TxDb objects will be made on-the-fly from a 
+   vignette](http://www.bioconductor.org/packages/3.4/bioc/vignettes/BSgenome/inst/doc/BSgenomeForge.pdf). TxDb objects will be made on-the-fly from a
    GRanges with GenomicFeatures::makeTxDbFromGRanges() when the resource is
    downloaded from `AnnotationHub`. Data should be provided as a GRanges
    object. See GenomicRanges::makeGRangesFromDataFrame() or
    rtracklayer::import() for help creating the GRanges.
 
-3. Generate metadata:  
+3. Generate metadata:
    Prepare a .R file that generates metadata for the resource(s) by calling
    the `AnnotationHubData::AnnotationHubMetadata()` constructor. Argument
    details are found on the ?`AnnotationHubMetadata` man page.
- 
-   As an example, this piece of code generates the metadata for 
+
+   As an example, this piece of code generates the metadata for
    the Vitis vinifera TxDb Timothée Flutre contributed to `AnnotationHub`:
- 
+
 ```{r, TxDb_Metadata, eval=FALSE}
 metadata <- AnnotationHubMetadata(
     Description="Gene Annotation for Vitis vinifera",
@@ -192,7 +192,7 @@ metadata <- AnnotationHubMetadata(
     SourceLastModifiedDate=as.POSIXct("2014-04-17"),
     SourceVersion="2.1",
     RDataPath="community/tflutre/",
-    TaxonomyId=29760L, 
+    TaxonomyId=29760L,
     Title="Vvinifera_CRIBI_IGGP12Xv0_V2.1.gff3.Rdata",
     BiocVersion=package_version("3.3"),
     Coordinate_1_based=TRUE,
@@ -209,16 +209,16 @@ metadata <- AnnotationHubMetadata(
 )
 ```
 
-4. Add data to S3 and metadata to the database:  
+4. Add data to S3 and metadata to the database:
    This last step is done by the `Biocondcutor` team member.
 
 # Additional resources
 
 Metadata for new versions of the data can be added to the same package as they
-become available. 
+become available.
 
 * The titles for the new versions should be unique and not match the title of
-  any resource currently in AnnotationHub. Good practice would be to 
+  any resource currently in AnnotationHub. Good practice would be to
   include the version and / or genome build in the title. If the title is
   not unique, the `AnnotationHub` object will list multiple files with the
   same title. The user will need to use 'rdatadateadded' to determine which
@@ -243,22 +243,22 @@ become available.
 Contact Lori.Shepherd@roswellpark.org or maintainer@bioconductor.org with any
 questions.
 
-# Bug fixes 
+# Bug fixes
 
 A bug fix may involve a change to the metadata, data resource or both.
 
-## Update the resource 
+## Update the resource
 
 * The replacement resource must have the same name as the original and
   be at the same location (path).
 
 * Notify Lori.Shepherd@roswellpark.org that you want to replace the data
-  and make the files available: see section "Uploading Data to S3". 
+  and make the files available: see section "Uploading Data to S3".
 
 ## Update the metadata
 
 New metadata records can be added for new resources but modifying existing
-records is discouraged. Record modification will only be done in the case of 
+records is discouraged. Record modification will only be done in the case of
 bug fixes.
 
 * Notify Lori.Shepherd@roswellpark.org that you want to change the metadata
@@ -270,21 +270,21 @@ bug fixes.
 # Remove resources
 
 When a resource is removed from `AnnotationHub` two things happen:
-the 'rdatadateremoved' field is populated with a date and the 'status' 
+the 'rdatadateremoved' field is populated with a date and the 'status'
 field is populated with a reason why the resource is no longer available. Once
-these changes are made, the `AnnotationHub()` constructor will not list the 
-resource among the available ids. An attempt to extract the resource with 
+these changes are made, the `AnnotationHub()` constructor will not list the
+resource among the available ids. An attempt to extract the resource with
 '[[' and the AH id will return an error along with the status message.
 
 In general, resources are only removed when they are no longer available
-(e.g., moved from web location, no longer provided etc.). 
+(e.g., moved from web location, no longer provided etc.).
 
 To remove a resource from `AnnotationHub` contact Lori.Shepherd@roswellpark.org
 or maintainer@bioconductor.org.
 
 # Versioning
 
-Versioning of resources is handled by the maintainer. If you plan to provide 
+Versioning of resources is handled by the maintainer. If you plan to provide
 incremental updates to a file for the same organism / genome build, we
 recommend including a version in the title of the resource so it is easy
 to distinguish which is most current.
@@ -296,7 +296,7 @@ to determine which file is the most current.
 
 # Visibility
 
-Several metadata fields control which resources are visible when 
+Several metadata fields control which resources are visible when
 a user invokes AnnotationHub(). Records are filtered based on these criteria:
 
 - 'snapshotdate' >= the date of the Bioconductor release being used
@@ -311,7 +311,7 @@ May1, 2017 and in all Bioconductor versions >= 3.6.
 
 # Uploading Data to S3
 
-Instead of providing the data files via dropbox, ftp, etc. we will grant 
+Instead of providing the data files via dropbox, ftp, etc. we will grant
 temporary access to an S3 bucket where you can upload your data. Please
 email Lori.Shepherd@roswellpark.org for access.
 
@@ -319,9 +319,9 @@ You will be given access to the 'AnnotationContributor' user. Ensure that the
 `AWS CLI` is installed on your machine. See instructions for installing `AWS
 CLI` [here](https://aws.amazon.com/cli/). Once you  have requested access you
 will be emailed a set of keys. There are two options to set the profile up for
-AnnotationContributor 
+AnnotationContributor
 
-1.  Update your `.aws/config` file to include the following updating the keys 
+1.  Update your `.aws/config` file to include the following updating the keys
 accordingly:
 
 ```
@@ -338,7 +338,7 @@ appropriate information from above
 aws configure --profile AnnotationContributor
 ```
 
-After the configuration is set you should be able to upload resources using 
+After the configuration is set you should be able to upload resources using
 
 ```
 aws --profile AnnotationContributor s3 cp test_file.txt s3://annotation-contributor/test_file.txt --acl public-read
@@ -347,8 +347,7 @@ aws --profile AnnotationContributor s3 cp test_file.txt s3://annotation-contribu
 
 Please upload the data with the appropriate directory structure, including
 subdirectories as necessary (i.e. top directory must be software package name,
-then if applicable, subdirectories of versions, ...) 
+then if applicable, subdirectories of versions, ...)
 
 Once the upload is complete, email Lori.Shepherd@roswellpark.org to continue the
 process
-
