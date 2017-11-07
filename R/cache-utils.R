@@ -63,7 +63,7 @@
         message("loading from cache ", 
                 paste0(sQuote(cachepath), collapse="\n    "))
     }
-    if (any(need) > max.downloads) {
+    if (sum(need) > max.downloads) {
         if (!interactive()) {
             txt <- sprintf("resources needed (%d) exceeds max.downloads (%d)",
                            sum(need), max.downloads)
