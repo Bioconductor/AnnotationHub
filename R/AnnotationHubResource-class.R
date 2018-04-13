@@ -134,7 +134,12 @@ setMethod(".get1", "GTFFileResource",
     .require("rtracklayer")
     .require("GenomeInfoDb")
     yy <- getHub(x)
-    gtf <- rtracklayer::import(cache(yy), format="gtf", genome=yy$genome, ...)
+    gtf <- try({
+        rtracklayer::import(cache(yy), format="gtf", genome=yy$genome, ...)
+    }, error = function(e) {
+        message("importing gtf without specifying seqinfo")
+        rtracklayer::import(cache(yy), format="gtf", ...)
+    })
     .tidyGRanges(x, gtf)
 })
 
