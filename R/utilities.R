@@ -118,7 +118,6 @@
     })
     
     if (is.null(newSeqinfo)) {
-        message("using guess work to populate seqinfo")
         ## use guess work to populate
         if (guess.circular)
             GenomeInfoDb::isCircular(existingSeqinfo)  <- 
