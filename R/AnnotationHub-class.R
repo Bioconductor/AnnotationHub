@@ -17,7 +17,14 @@ AnnotationHub <-
              proxy=getAnnotationHubOption("PROXY"),
              localHub=FALSE) 
 {
-    connect <- curl::has_internet()
+    if (is.null(proxy)){
+        connect <- curl::has_internet()
+    } else {
+        connect <- TRUE
+        message("Cannot determine internet connection.",
+                "\n If you experience connection issues consider ",
+                "using 'localHub=TRUE'")
+    }
     if (!connect && !localHub){
         message("No internet connection using 'localHub=TRUE'")
         localHub <- !connect
