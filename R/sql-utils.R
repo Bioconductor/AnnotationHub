@@ -20,7 +20,7 @@
          FROM resources, biocversions
          WHERE biocversion == "%s"
          AND biocversions.resource_id == resources.id',
-        biocVersion())
+        BiocManager::version())
     mtchData <- .db_query(conn, query)
     names(ids) <- mtchData[mtchData[[1]] %in% ids,][[2]]
     ids
@@ -58,7 +58,7 @@
          AND rdatapaths.rdataclass != "OrgDb"
          AND biocversions.resource_id == resources.id
          AND rdatapaths.resource_id == resources.id',
-         date, biocVersion())
+         date, BiocManager::version())
     biocIds1 <- .db_query(conn, query1)[[1]]
 
     ## OrgDb sqlite files:
@@ -74,14 +74,15 @@
     ## with the devel version which immediately becomes the new release version.
     ## For this reason, the devel code loads OrgDbs with the release version
     ## e.g.,
-    ##   ifelse(isDevel(), biocversion - 0.1, biocversion)
+    ##   ifelse(isDevel, biocversion - 0.1, biocversion)
     ##
     ## NOTE: Because OrgDbs are valid for a full devel cycle they are
     ##       not filtered by snapshotDate(); the OrgDbs are valid for all
-    ##       snapshotDates for a given biocVersion() 
+    ##       snapshotDates for a given BiocManager::version() 
  
-    biocversion <- as.numeric(as.character(biocVersion()))
-    orgdb_release_version <- ifelse(isDevel(), biocversion - 0.1, biocversion)
+    biocversion <- as.numeric(as.character(BiocManager::version()))
+    isDevel <- BiocManager:::.version_bioc("devel") == biocversion
+    orgdb_release_version <- ifelse(isDevel, biocversion - 0.1, biocversion)
     query2 <- sprintf(
         'SELECT resources.id
          FROM resources, biocversions, rdatapaths

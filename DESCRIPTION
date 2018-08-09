@@ -21,7 +21,7 @@ Description: This package provides a client for the Bioconductor
     access.
 License: Artistic-2.0
 Depends: BiocGenerics (>= 0.15.10)
-Imports: utils, methods, grDevices, RSQLite, BiocInstaller, curl,
+Imports: utils, methods, grDevices, RSQLite, BiocManager, curl,
     AnnotationDbi (>= 1.31.19), S4Vectors, interactiveDisplayBase, httr, yaml
 Suggests: IRanges, GenomicRanges, GenomeInfoDb, VariantAnnotation, Rsamtools,
     rtracklayer, BiocStyle, knitr, AnnotationForge, rBiopaxParser,

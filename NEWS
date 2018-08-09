@@ -1,6 +1,13 @@
 CHANGES IN VERSION 2.12.0
 -------------------------
 
+MODIFICATIONS
+
+    o Updated code from BiocInstaller to BiocManager
+
+CHANGES IN VERSION 2.12.0
+-------------------------
+
 BUG FIXES
 
     o Prompt for permission when downloading many (more than

@@ -61,7 +61,7 @@ ahsub <- subset(ah, ah$genome=='ailMel1')
 
 ## snapshotDate (setter and getter)
 
-## snapshotVersion -- i.e. BiocInstaller::biocVersion()
+## snapshotVersion -- i.e. BiocManager::version()
 
 ## and hubUrl (https://annotationhub.bioconductor.org/)
 

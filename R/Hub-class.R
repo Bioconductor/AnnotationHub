@@ -169,7 +169,7 @@ setReplaceMethod("snapshotDate", "Hub",
         stop("'value' must be a single date or character string")
     })
 
-    ## 'value' must be < biocVersion() release date
+    ## 'value' must be < BiocManager::version() release date
     restrict <- .restrictDateByVersion(dbfile(x))
     dates <- .possibleDates(dbfile(x))
     valid_range <- range(dates[as.POSIXlt(dates) <= as.POSIXlt(restrict)])

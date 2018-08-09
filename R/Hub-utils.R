@@ -87,7 +87,7 @@
 ### --------------------------------------------------------------------------
 ### snapshotDate helpers
 
-## returns the release date for biocVersion()
+## returns the release date for BiocManager::version()
 .biocVersionDate <- function(biocversion) {
     if (length(biocversion) > 1L)
         stop("length(biocversion) must == 1")
@@ -104,10 +104,11 @@
         character()
 }
 
-## single date closest to the release date for biocVersion()
+## single date closest to the release date for BiocManager::version()
 .restrictDateByVersion <- function(path) {
     dates <- as.POSIXlt(.possibleDates(path), format='%Y-%m-%d')
-    restrict <- as.POSIXlt(.biocVersionDate(biocVersion()), format='%Y-%m-%d')
+    restrict <- as.POSIXlt(.biocVersionDate(BiocManager::version()),
+                           format='%Y-%m-%d')
     if (length(restrict))  ## release
         as.character(max(dates[dates <= restrict]))
     else                   ## devel 
@@ -125,7 +126,7 @@
     c(dateAdded, dateModified)
 }
 
-## dates restricted by snapshotDate (and hence biocVersion())
+## dates restricted by snapshotDate (and hence BiocManager::version())
 possibleDates <- function(x) {
     path <- dbfile(x)
     dates <- .possibleDates(path)

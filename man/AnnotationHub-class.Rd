@@ -282,7 +282,7 @@
     \item{}{
       \code{possibleDates(x)}:
       Lists the valid snapshot dates for the version of Bioconductor that
-      is being run (e.g., BiocInstaller::biocVersion()).
+      is being run (e.g., BiocManager::version()).
     }
     \item{}{
       \code{cache(x)} and \code{cache(x) <- NULL}: Adds (downloads) all

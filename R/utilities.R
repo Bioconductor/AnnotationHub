@@ -16,7 +16,7 @@
         require(pkg, quietly=TRUE, character.only=TRUE)
     ), error=handler)
     if (!result)
-        handler(simpleError("use biocLite() to install package?"))
+        handler(simpleError("use BiocManager::install() to install package?"))
     invisible(result)
 }
 
