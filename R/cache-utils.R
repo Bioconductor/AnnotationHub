@@ -51,9 +51,12 @@
     file.path(cache, sqlitefile)
 }
 
-.cache_download_ok <- function(cachepath, max.downloads)
+.cache_download_ok <- function(cachepath, max.downloads, force=FALSE, verbose=FALSE)
 {
-    need <- !file.exists(cachepath)
+    if (force)
+        need <- rep(TRUE, length(cachepath))
+    else
+        need <- !file.exists(cachepath)
     n <- sum(need)
 
     if (n > max.downloads) {
@@ -68,31 +71,34 @@
             stop(txt, call. = FALSE)
         }
     } else {
-        message("downloading ", n, " resources")
+        if (verbose) message("downloading ", n, " resources")
     }
 
     need
 }
 
-.cache_internal <- function(x, cache.root, cache.fun, proxy, max.downloads)
+.cache_internal <- function(x, cache.root, cache.fun, proxy, max.downloads,
+                            force, verbose)
 {
     cachepath <- .named_cache_path(x, cache.root, cache.fun)
-    need <- .cache_download_ok(cachepath, max.downloads)
+    need <- .cache_download_ok(cachepath, max.downloads, force, verbose)
 
     ok <- .hub_resource(
         .hub_data_path(hubUrl(x)), basename(cachepath)[need],
-        cachepath[need], proxy=proxy
+        cachepath[need], proxy=proxy, overwrite=force, verbose=verbose
     )
     if (!all(ok))
         stop(sum(!ok), " resources failed to download", call. = FALSE)
 
-    message(paste0(
-        c(
-            "loading from cache ", sQuote(cachepath),
-            if (length(cachepath) > 6) "..."
-        ),
-        collapse="\n    "
-    ))
+    if (verbose){
+        message(paste0(
+            c(
+                "loading from cache ", sQuote(cachepath),
+                if (length(cachepath) > 6) "..."
+                ),
+            collapse="\n    "
+            ))
+    }
     cachepath
 }
 

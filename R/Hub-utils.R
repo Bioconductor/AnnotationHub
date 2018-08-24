@@ -62,13 +62,13 @@
 
 ## This is the function that gets stuff (metadata AND files) from S3
 .hub_resource <-
-    function(hub, resource, cachepath, proxy, overwrite=FALSE)
+    function(hub, resource, cachepath, proxy, overwrite=FALSE, verbose=FALSE)
 {
     len <- length(resource)
     if (len > 0L) {
         msg <- sprintf("retrieving %d resource%s", len,
                        if (len > 1L) "s" else "")
-        message(msg)
+        if (verbose) message(msg)
     }
 
     if (length(cachepath)) {

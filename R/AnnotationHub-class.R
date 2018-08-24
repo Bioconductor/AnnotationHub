@@ -37,7 +37,7 @@ AnnotationHub <-
 ###
 
 .Hub_get1 <-
-    function(x)
+    function(x, force=FALSE, verbose)
 {
     if (!length(x))
         stop("no records found for the given index")
@@ -64,6 +64,8 @@ AnnotationHub <-
     })
 
     tryCatch({
+        if (missing(verbose)) verbose=TRUE
+        fls <-  cache(getHub(class), force=force, verbose=verbose)
         .get1(class)
     }, error=function(err) {
         stop("failed to load resource",
@@ -79,12 +81,14 @@ AnnotationHub <-
 ###
 
 setMethod("cache", "AnnotationHub",
-    function(x, ...) {
+    function(x, ..., force=FALSE, verbose=FALSE) {
         callNextMethod(x,
                        cache.root=".AnnotationHub", 
                        cache.fun=setAnnotationHubOption, 
                        proxy=getAnnotationHubOption("PROXY"), 
-                       max.downloads=getAnnotationHubOption("MAX_DOWNLOADS"))
+                       max.downloads=getAnnotationHubOption("MAX_DOWNLOADS"),
+                       force=force,
+                       verbose=verbose)
     }
 )
 
