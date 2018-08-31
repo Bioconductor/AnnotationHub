@@ -294,3 +294,12 @@ setMethod(".get1", "H5FileResource",
     .require("rhdf5")
     cache(getHub(x))
 })
+
+## FilePathResource - to download raw file and return path
+setClass("FilePathResource", contains = "AnnotationHubResource")
+
+setMethod(".get1", "FilePathResource",
+    function(x, ...)
+{
+    cache(getHub(x))
+})
