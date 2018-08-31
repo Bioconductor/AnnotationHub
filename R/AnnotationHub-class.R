@@ -37,7 +37,7 @@ AnnotationHub <-
 ###
 
 .Hub_get1 <-
-    function(x, force=FALSE, verbose)
+    function(x, force, verbose)
 {
     if (!length(x))
         stop("no records found for the given index")
@@ -64,7 +64,6 @@ AnnotationHub <-
     })
 
     tryCatch({
-        if (missing(verbose)) verbose=TRUE
         fls <-  cache(getHub(class), force=force, verbose=verbose)
         .get1(class)
     }, error=function(err) {

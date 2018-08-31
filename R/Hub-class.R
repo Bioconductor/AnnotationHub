@@ -114,7 +114,7 @@ setMethod("package", "Hub",
 
 ## FIXME: rather not pass cache.root and cache.fun
 setMethod("cache", "Hub",
-    function(x, ..., cache.root, cache.fun, proxy, max.downloads, force, verbose)
+    function(x, ..., cache.root, cache.fun, proxy, max.downloads, force=FALSE, verbose=FALSE)
         .cache_internal(x, cache.root=cache.root, cache.fun=cache.fun, 
                         proxy=proxy, max.downloads=max.downloads,
                         force=force, verbose=verbose)
@@ -239,13 +239,13 @@ setReplaceMethod("[",
 })
 
 setMethod("[[", c("Hub", "numeric", "missing"),
-    function(x, i, j, ..., force=FALSE, verbose)
+    function(x, i, j, ..., force=FALSE, verbose=TRUE)
 {
     .Hub_get1(x[i], force=force, verbose=verbose)
 })
 
 setMethod("[[", c("Hub", "character", "missing"),
-    function(x, i, j, ..., force=FALSE, verbose)
+    function(x, i, j, ..., force=FALSE, verbose=TRUE)
 {
     if (length(i) != 1L)
         stop("'i' must be length 1")

@@ -51,7 +51,7 @@
     file.path(cache, sqlitefile)
 }
 
-.cache_download_ok <- function(cachepath, max.downloads, force=FALSE, verbose=FALSE)
+.cache_download_ok <- function(cachepath, max.downloads, force, verbose)
 {
     if (force)
         need <- rep(TRUE, length(cachepath))
@@ -93,7 +93,7 @@
     if (verbose){
         message(paste0(
             c(
-                "loading from cache ", sQuote(cachepath),
+                "loading from cache ", sQuote(head(cachepath)),
                 if (length(cachepath) > 6) "..."
                 ),
             collapse="\n    "
