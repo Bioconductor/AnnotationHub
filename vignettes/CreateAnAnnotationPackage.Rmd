@@ -343,6 +343,9 @@ After the configuration is set you should be able to upload resources using
 ```
 aws --profile AnnotationContributor s3 cp test_file.txt s3://annotation-contributor/test_file.txt --acl public-read
 
+# to upload directory
+
+aws --profile AnnotationContributor s3 cp test_dir s3://annotation-contributor/teset_dir --recursive --acl public-read
 ```
 
 Please upload the data with the appropriate directory structure, including
