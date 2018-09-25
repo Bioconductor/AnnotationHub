@@ -17,6 +17,7 @@ importFrom(yaml, yaml.load)
 importFrom(interactiveDisplayBase, display)
 
 importMethodsFrom(AnnotationDbi, dbconn, dbfile)
+importFrom(AnnotationDbi, dbFileConnect)
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### Export S4 classes

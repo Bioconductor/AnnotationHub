@@ -191,8 +191,7 @@ setClass("GRASPResource", contains="SQLiteFileResource")
 setMethod(".get1", "GRASPResource",
     function(x, ...)
 {
-    RSQLite::dbConnect(RSQLite::SQLite(), cache(getHub(x)),
-        flags=RSQLite::SQLITE_RO)
+    dbFileConnect(cache(getHub(x)))
 })
 
 setClass("ZipResource", contains="AnnotationHubResource")

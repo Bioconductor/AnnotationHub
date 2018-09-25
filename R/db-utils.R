@@ -5,7 +5,7 @@
 
 .db_open <- function(path) {
     tryCatch({
-        conn <- dbConnect(SQLite(), path)
+        conn <- dbFileConnect(path)
     }, error=function(err) {
         stop("failed to connect to local data base",
              "\n  database: ", sQuote(path),
