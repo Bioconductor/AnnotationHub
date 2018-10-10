@@ -26,7 +26,7 @@
 
 ## example of hub resource (sometimes convenient)
 ## hub = 'https://annotationhub.bioconductor.org/metadata/annotationhub.sqlite3'
-.hub_cache_resource <- function(hubpath, cachepath, proxy) {
+.hub_cache_resource <- function(hubpath, cachepath, proxy, overwrite=FALSE) {
     ## retrieve file from hub to cache
     tryCatch({
         tmp <- tempfile()
@@ -47,7 +47,7 @@
         }
         if (!all(file.exists(dirname(cachepath))))
             dir.create(dirname(cachepath), recursive=TRUE)
-        file.copy(from=tmp, to=cachepath)
+        file.copy(from=tmp, to=cachepath, overwrite=overwrite)
         file.remove(tmp)
         TRUE
     }, error=function(err) {
@@ -81,7 +81,7 @@
     }
 
     hubpath <- .hub_resource_path(hub, resource)
-    mapply(.hub_cache_resource, hubpath, cachepath, MoreArgs=list(proxy))
+    mapply(.hub_cache_resource, hubpath, cachepath, MoreArgs=list(proxy=proxy, overwrite=overwrite))
 }
 
 ### --------------------------------------------------------------------------
