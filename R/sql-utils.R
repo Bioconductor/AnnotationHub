@@ -82,7 +82,9 @@
  
     biocversion <- as.numeric(as.character(BiocManager::version()))
     isDevel <- BiocManager:::.version_bioc("devel") == biocversion
-    orgdb_release_version <- ifelse(isDevel, biocversion - 0.1, biocversion)
+    orgdb_release_version <- ifelse(getAnnotationHubOption("TESTING"),
+                                    biocversion,
+                                    ifelse(isDevel, biocversion - 0.1, biocversion))
     query2 <- sprintf(
         'SELECT resources.id
          FROM resources, biocversions, rdatapaths

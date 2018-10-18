@@ -28,4 +28,10 @@
         if (nzchar(opt))
             setAnnotationHubOption("PROXY", opt)
     }
+    if (is.null(getAnnotationHubOption("TESTING"))) {
+        opt <- getOption("ANNOTATION_HUB_TESTING", FALSE)
+        opt <- Sys.getenv("ANNOTATION_HUB_TESTING", opt)
+        opt <- as.logical(opt)
+        setAnnotationHubOption("TESTING", opt)
+    }
 }
