@@ -1,13 +1,14 @@
 Package: AnnotationHub
 Type: Package
 Title: Client to access AnnotationHub resources
-Version: 2.13.9
+Version: 2.13.10
 Authors@R: 
     c(person("Martin", "Morgan", email="martin.morgan@roswellpark.org",
              role="cre"),
       person("Marc", "Carlson", role="ctb"),
       person("Dan", "Tenenbaum", role="ctb"),
-      person("Sonali", "Arora", role="ctb"))
+      person("Sonali", "Arora", role="ctb"),
+      person("Lori", "Shepherd", role="ctb"))
 biocViews: Infrastructure, DataImport, GUI, ThirdPartyClient
 Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
 Description: This package provides a client for the Bioconductor
@@ -41,4 +42,5 @@ NeedsCompilation: yes
 Author: Martin Morgan [cre],
   Marc Carlson [ctb],
   Dan Tenenbaum [ctb],
-  Sonali Arora [ctb]
+  Sonali Arora [ctb],
+  Lori Shepherd [ctb]

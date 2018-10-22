@@ -139,11 +139,13 @@ records are added to the production database. At that point the package man
 pages and vignette can be finalized and the package should pass R CMD build
 and check.
 
-## Individual resources
+## Individual resources (DEPRECATED)
 
 Individual objects of a standard class can be added to the hub by providing
 only the data and metadata files or by creating a package as described in the
-`Family of Resources` section.
+`Family of Resources` section. Really adding individual resources is deprecated
+and Bioconductor has moved towards having a package for reference with
+Annotation resources. Exceptions may be made but will be rare.
 
 OrgDb, TxDb and BSgenome objects are well defined `Bioconductor` classes and
 methods to download and process these objects already exist in `AnnotationHub`.
@@ -308,6 +310,11 @@ Once a record is added to AnnotationHub it is visable from that point forward
 until stamped with 'rdatadateremoved'. For example, a record added on
 May 1, 2017 with 'biocVersion' 3.6 will be visible in all snapshots >=
 May1, 2017 and in all Bioconductor versions >= 3.6.
+
+A special filter for OrgDb is utilized. Only one OrgDb is available per
+release/devel cycle. Therefore contributed OrgDb added to a devel cycle are
+masked until the following release. There are options for debugging these masked
+resources. see `?setAnnotationHubOption`
 
 # Uploading Data to S3
 

@@ -49,7 +49,16 @@ setAnnotationHubOption(arg, value)
       well-formed URL as character(1). The URL can be completely
       specified by \code{http://username:password@proxy.dom.com:8080};
       \code{username:password} and port (e.g. \code{:8080}) are optional.}
-  }
+
+    \item{\dQuote{TESTING}:}{logical(1). TRUE/FALSE should the AnnotationHub
+      testing environment be used. AnnotationHub does automatic
+      filtering particularly with regards to OrgDbs. The
+      \code{TESTING=TRUE} setting will allow for all OrgDbs for a given
+      devel version to also be displayed. (This option should really
+      only be set by a OrgDb contributing maintainer for testing and
+      debugging). Default: FALSE.}
+
+   }
 
   Default values may also be determined by system and global R
   environment variables visible \emph{before} the package is loaded. Use
@@ -61,7 +70,7 @@ setAnnotationHubOption(arg, value)
 
 \value{The requested or successfully set option.}
 
-\author{Martin Morgan \url{mtmorgan@fhcrc.org}}
+\author{Martin Morgan \url{mtmorgan@fhcrc.org} and Lori Shepherd}
 
 \examples{
 getAnnotationHubOption("URL")
