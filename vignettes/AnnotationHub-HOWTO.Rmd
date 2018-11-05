@@ -41,7 +41,7 @@ objects for less-model organisms
 library(AnnotationHub)
 ah <- AnnotationHub()
 query(ah, "OrgDb")
-orgdb <- query(ah, "OrgDb")[[1]] 
+orgdb <- query(ah, c("OrgDb", "maintainer@bioconductor.org"))[[1]] 
 ```
 
 The object returned by AnnotationHub is directly usable with the
