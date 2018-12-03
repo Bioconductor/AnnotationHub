@@ -158,3 +158,57 @@
     }
     gr
 }
+
+
+DispatchClassList <- function(){
+
+    matrix(
+    c("FaFile", "Rsamtools::FaFile(); requires rtracklayer",
+      "Rds", "readRDS()",
+      "RDS", "readRDS()",
+      "Rda", "get(load())",
+      "data.frame", "get(load())",
+      "GRanges", "get(load()); requires GenomicRanges",
+      "VCF", "get(load()); requires VariantAnnotation",
+      "ChainFile",
+      "rtracklayer::import.chain(); requires rtracklayer and GenomeInfoDb; before using import.chain internally uses gzfile and writeBin to extract data from file; files saved as chain.gz",
+      "TwoBitFile", "rtracklayer::TwoBitFile(); requires rtracklayer",
+      "GFFFile",
+      "rtracklayer::import(); require rtracklayer and GenomeInfoDB; after import converts to GRanges object",
+      "GFF3File", "rtracklayer::import(); require rtracklayer", 
+      "BigWig", "rtracklayer::BigWigFile(); require rtracklayer",
+      "dbSNPVCFFile",
+      "VariantAnnotation::VcfFile(); require VariantAnnotation; files saved as vcf.gz and vcf.gz.tbi",
+      "SQLiteFile", "AnnotationDbi::loadDb(); files saved as sqlite",
+      "GRASP", "dbFileConnect()",
+      "Zip", "unzip(); returns file path to files",
+      "ChEA", "unzip(); returns data.frame from reading chea-background.csv",
+      "BioPax", "get(load()); require rBiopaxParser",
+      "Pazar",
+      "read.delim(); require GenomicRanges; reads specific columns from file and coverts to GRanges object",
+      "CSVtoGranges",
+      "read.csv(); require GenomicRanges; coverts data.frame to GRanges object",
+      "ExpressionSet", "get(load()); require Biobase",
+      "GDS", "gdsfmt::openfn.gds(); require gdsfmt",
+      "H5File", "require rhdf5; resource downloaded but not loaded; returns file path",
+      "FilePath", "resource downloaded but not loaded; returns file path",
+      "BEDFile",
+      "rtracklayer::import(rtracklayer::BEDFile()); require rtracklayer; converts to GRanges object",
+      "UCSCBroadPeak", "rtracklayer::import(rtracklayer::BEDFile()); require rtracklayer; converts to GRanges object",
+      "UCSCNarrowPeak", "rtracklayer::import(rtracklayer::BEDFile()); require rtracklayer; converts to GRanges object",
+      "UCSCBEDRnaElements", "rtracklayer::import(rtracklayer::BEDFile()); require rtracklayer; converts to GRanges object",
+      "UCSCGappedPeak", "rtracklayer::import(rtracklayer::BEDFile()); require rtracklayer; converts to GRanges object",
+      "EpiMetadata", "read.delim()",
+      "EpiExpressionText", "read.table(); converts to SummarizedExperiment object",
+      "EpichmmModels",
+      "rtracklayer::import(); calls additional helper AnnotationHub:::.mapAbbr2FullName and then converts to GRange object; file assumed to be bed file format",
+      "EpigenomeRoadmapFile", "rtracklayer::import(); converts to GRange object; file assumed to be bed file format",
+      "EpigenomeRoadmapNarrowAllPeaks", "rtracklayer::import(rtracklayer::BEDFile()); require rtracklayer; converts to GRanges object",
+      "EpigenomeRoadmapNarrowFDR", "rtracklayer::import(rtracklayer::BEDFile()); require rtracklayer; converts to GRanges object",
+      "EnsDb", "ensembldb::EnsDb(); require ensembldb",
+      "mzRpwiz", "mzR::openMSfile(); require mzR",
+      "mzRident", "mzR::openIDfile(); require mzR",
+      "MSnSet", "get(load()); require MSnbase",
+      "AAStringSet", "Biostrings::readAAStringSet(); require Biostrings"
+      ),  ncol=2, byrow=TRUE)
+}
