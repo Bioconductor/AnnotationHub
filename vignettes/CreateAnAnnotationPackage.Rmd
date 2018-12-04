@@ -26,9 +26,9 @@ retain their raw content and are not filtered or curated like those in
 Each resource has associated metadata that can be searched through the
 `AnnotationHub` client interface.
 
-# New resources
+# Setting up a package to use AnnotationHub
 
-## Family of resources
+## New AnnotationHub package
 
 Multiple, related resources are added to `AnnotationHub` by creating a software
 package similar to the existing annotation packages. The package itself does
@@ -44,7 +44,9 @@ Creating the package involves the following steps:
    Man page and vignette examples in the software package will not work until
    the data are available in `AnnotationHub`. Adding the data to AWS S3 and the
    metadata to the production database involves assistance from a `Bioconductor`
-   team member.  Please read the section "Uploading Data to S3".
+   team member.  Please read the section "Uploading Data to S3". The
+   metadata.csv file will have to be created before the data can officially be
+   added to the hub (See inst/extdata section below).
 
 2. Building the software package:
    Below is an outline of package organization. The files listed are required
@@ -59,7 +61,8 @@ Creating the package involves the following steps:
     written out with write.csv(..., row.names=FALSE). The required column
     names and data types are specified in
     `AnnotationHubData::makeAnnotationHubMetadata`.
-    See ?`AnnotationHubData::makeAnnotationHubMetadata` for details.
+    See ?`AnnotationHubData::makeAnnotationHubMetadata` for details. Ensure that
+    the above function runs without ERROR.
 
     If necessary, metadata can be broken up into multiple csv files instead
     having of all records in a single "metadata.csv".
@@ -116,7 +119,9 @@ Creating the package involves the following steps:
 * DESCRIPTION / NAMESPACE
 The scripts used to generate the metadata will likely use functions from
 AnnotationHub or AnnotationHubData which should be listed in Depends/Imports as
-necessary.
+necessary. The biocViews should contain terms from
+[AnnotationData](http://bioconductor.org/packages/release/BiocViews.html#___AnnotationData)
+and should also contain the term `AnnotationHub`.
 
 
 3. Data objects:
@@ -139,82 +144,8 @@ records are added to the production database. At that point the package man
 pages and vignette can be finalized and the package should pass R CMD build
 and check.
 
-## Individual resources (DEPRECATED)
 
-Individual objects of a standard class can be added to the hub by providing
-only the data and metadata files or by creating a package as described in the
-`Family of Resources` section. Really adding individual resources is deprecated
-and Bioconductor has moved towards having a package for reference with
-Annotation resources. Exceptions may be made but will be rare.
-
-OrgDb, TxDb and BSgenome objects are well defined `Bioconductor` classes and
-methods to download and process these objects already exist in `AnnotationHub`.
-When adding only one or two objects the overhead of creating a package may be
-unnecessary.  The goal of the package is to provide structure for metadata
-generation and makes sense when there are plans to update versions or add new
-organisms in the future.
-
-Make sure the OrgDb, TxDb or BSgenome object you want to add does not already
-exist in the
-[Biocondcutor annotation repository](http://www.bioconductor.org/packages/release/BiocViews.html#___AnnotationData)
-
-Providing just data and metadata files involves the following steps:
-
-1. Notify `Bioconductor` team member:
-   Adding the data to AWS S3 and the metadata to the production database
-   involves assistance from a `Bioconductor` team member. Please read the
-   section "Uploading Data to S3".
-
-2. Prepare the data:
-   In the case of an OrgDb object, only the sqlite file is stored in S3.
-   See makeOrgPackageFromNCBI() and makeOrgPackage() in the `AnnotationForge`
-   package for help creating the sqlite file. BSgenome objects should be made
-   according to the steps outline in the
-   [BSgenome
-   vignette](http://www.bioconductor.org/packages/3.4/bioc/vignettes/BSgenome/inst/doc/BSgenomeForge.pdf). TxDb objects will be made on-the-fly from a
-   GRanges with GenomicFeatures::makeTxDbFromGRanges() when the resource is
-   downloaded from `AnnotationHub`. Data should be provided as a GRanges
-   object. See GenomicRanges::makeGRangesFromDataFrame() or
-   rtracklayer::import() for help creating the GRanges.
-
-3. Generate metadata:
-   Prepare a .R file that generates metadata for the resource(s) by calling
-   the `AnnotationHubData::AnnotationHubMetadata()` constructor. Argument
-   details are found on the ?`AnnotationHubMetadata` man page.
-
-   As an example, this piece of code generates the metadata for
-   the Vitis vinifera TxDb Timothée Flutre contributed to `AnnotationHub`:
-
-```{r, TxDb_Metadata, eval=FALSE}
-metadata <- AnnotationHubMetadata(
-    Description="Gene Annotation for Vitis vinifera",
-    Genome="IGGP12Xv0",
-    Species="Vitis vinifera",
-    SourceUrl="http://genomes.cribi.unipd.it/DATA/V2/V2.1/V2.1.gff3",
-    SourceLastModifiedDate=as.POSIXct("2014-04-17"),
-    SourceVersion="2.1",
-    RDataPath="community/tflutre/",
-    TaxonomyId=29760L,
-    Title="Vvinifera_CRIBI_IGGP12Xv0_V2.1.gff3.Rdata",
-    BiocVersion=package_version("3.3"),
-    Coordinate_1_based=TRUE,
-    DataProvider="CRIBI",
-    Maintainer="Timothée Flutre <timothee.flutre@supagro.inra.fr",
-    RDataClass="GRanges",
-    DispatchClass="GRanges",
-    SourceType="GFF",
-    RDataDateAdded=as.POSIXct(Sys.time()),
-    Recipe=NA_character_,
-    PreparerClass="None",
-    Tags=c("GFF", "CRIBI", "Gene", "Transcript", "Annotation"),
-    Notes="chrUn renamed to chrUkn"
-)
-```
-
-4. Add data to S3 and metadata to the database:
-   This last step is done by the `Biocondcutor` team member.
-
-# Additional resources
+## Additional resources to existing AnnotationHub package
 
 Metadata for new versions of the data can be added to the same package as they
 become available.
@@ -244,6 +175,25 @@ become available.
 
 Contact Lori.Shepherd@roswellpark.org or maintainer@bioconductor.org with any
 questions.
+
+## Converting a non AnnotationHub annotation package
+
+The concepts and directory structure of the package would stay the same.
+The main steps involved would be
+
+1. Restructure the inst/extdata and inst/scripts to include metadata.csv and
+make-data.R as described in the section above for creating new packages. Ensure the
+metadata.csv file is formatted correctly by running `AnnotationHubData::makeAnnotationHubMetadata()`
+on your package.
+
+2. Add biocViews term "AnnotationHub" to DESCRIPTION
+
+3. Upload the data to S3 and remove the data from the package. See the section
+for Uploading Data to S3 below.
+
+4. Once the data is officially added to the hub, update any code to utilize
+AnnotationHub for retrieving data.
+
 
 # Bug fixes
 
@@ -289,7 +239,8 @@ or maintainer@bioconductor.org.
 Versioning of resources is handled by the maintainer. If you plan to provide
 incremental updates to a file for the same organism / genome build, we
 recommend including a version in the title of the resource so it is easy
-to distinguish which is most current.
+to distinguish which is most current. We also would recommend when uploading the
+data to S3 to have a directory structure accounting for versioning.
 
 If you do not include a version, or make the title unique in some way,
 multiple files with the same title will be listed in the `AnnotationHub`
@@ -350,7 +301,7 @@ After the configuration is set you should be able to upload resources using
 ```
 aws --profile AnnotationContributor s3 cp test_file.txt s3://annotation-contributor/test_file.txt --acl public-read
 
-# to upload directory
+# to upload a full directory use recursive:
 
 aws --profile AnnotationContributor s3 cp test_dir s3://annotation-contributor/teset_dir --recursive --acl public-read
 
