@@ -81,7 +81,7 @@
     ##       snapshotDates for a given BiocManager::version() 
  
     biocversion <- as.numeric(as.character(BiocManager::version()))
-    isDevel <- BiocManager:::.version_bioc("devel") == biocversion
+    isDevel <- BiocManager:::isDevel()
     orgdb_release_version <- ifelse(getAnnotationHubOption("TESTING"),
                                     biocversion,
                                     ifelse(isDevel, biocversion - 0.1, biocversion))
