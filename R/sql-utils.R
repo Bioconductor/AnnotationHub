@@ -61,6 +61,24 @@
          date, BiocManager::version())
     biocIds1 <- .db_query(conn, query1)[[1]]
 
+    ## Add a query to get resources that have been removed
+    ## But were present during a given release
+    ## There is a chance that if the data was removed
+    ## completely from external location that these
+    ## ids won't work
+    query3 <- sprintf(
+        'SELECT resources.id
+         FROM resources, rdatapaths, biocversions
+         WHERE resources.rdatadateadded <= "%s"
+         AND biocversions.biocversion <= "%s"
+         AND resources.rdatadateremoved > "%s"
+         AND resources.status_id == 9
+         AND rdatapaths.rdataclass != "OrgDb"
+         AND biocversions.resource_id == resources.id
+         AND rdatapaths.resource_id == resources.id',
+         date, BiocManager::version(), date)
+    biocIds3 <- .db_query(conn, query3)[[1]]
+    
     ## OrgDb sqlite files:
     ##
     ## OrgDbs are the single resource designed to expire at the end of a
@@ -97,7 +115,7 @@
     biocIds2 <- .db_query(conn, query2)[[1]]
 
     ## make unique and sort 
-    allIds = sort(unique(c(biocIds1, biocIds2)))
+    allIds = sort(unique(c(biocIds1, biocIds2, biocIds3)))
     ## match id to ah_id
     query <- paste0('SELECT ah_id FROM resources ',
                     'WHERE id IN (', paste0(allIds, collapse=","), ')',
