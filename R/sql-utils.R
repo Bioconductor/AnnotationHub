@@ -72,7 +72,6 @@
          WHERE resources.rdatadateadded <= "%s"
          AND biocversions.biocversion <= "%s"
          AND resources.rdatadateremoved > "%s"
-         AND resources.status_id == 9
          AND rdatapaths.rdataclass != "OrgDb"
          AND biocversions.resource_id == resources.id
          AND rdatapaths.resource_id == resources.id',
