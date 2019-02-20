@@ -202,22 +202,22 @@ or can be constructed using functions such as
 `r Biocpkg("GenomicFeatures")`::`makeTxDbFromBiomart()`.
 
 _AnnotationHub_ provides an easy way to work with gene models
-published by Ensembl. Let's see what Ensembl's Release-80 has in terms
+published by Ensembl. Let's see what Ensembl's Release-94 has in terms
 of data for pufferfish, _Takifugu rubripes_.
 
 ```{r takifugu-gene-models}
-query(ah, c("Takifugu", "release-80"))
+query(ah, c("Takifugu", "release-94"))
 ```
 
 We see that there is a GTF file descrbing gene models, as well as
 various DNA sequences. Let's retrieve the GTF and top-level DNA
 sequence files. The GTF file is imported as a _GRanges_ instance, the
-DNA sequence as a compressed, indexed Fasta file
+DNA sequence as a twobit file. 
 
 
 ```{r takifugu-data}
-gtf <- ah[["AH47101"]]
-dna <- ah[["AH47477"]]
+gtf <- ah[["AH64858"]]
+dna <- ah[["AH66116"]]
 
 head(gtf, 3)
 dna
