@@ -3,6 +3,8 @@ import(BiocGenerics)
 import(RSQLite)
 import(S4Vectors)
 import(BiocManager)
+import(BiocFileCache)
+import(rappdirs)
 
 importFrom(stats, setNames)
 importFrom(grDevices, rgb)

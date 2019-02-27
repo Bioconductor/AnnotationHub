@@ -82,7 +82,7 @@ AnnotationHub <-
 setMethod("cache", "AnnotationHub",
     function(x, ..., force=FALSE, verbose=FALSE) {
         callNextMethod(x,
-                       cache.root=".AnnotationHub", 
+                       cache.root="AnnotationHub", 
                        cache.fun=setAnnotationHubOption, 
                        proxy=getAnnotationHubOption("PROXY"), 
                        max.downloads=getAnnotationHubOption("MAX_DOWNLOADS"),
