@@ -43,7 +43,15 @@ removeCache <- function(x){
     
     rnames <- paste(names(cachepath), cachepath, sep=" : ")
     bfc <- .get_cache(x)
-    localFiles <- unname(bfcrpath(bfc, rnames=rnames))
+    tryCatch({
+        localFiles <- unname(bfcrpath(bfc, rnames=rnames))
+    }, error=function(err){
+        stop("Corrupt Cache: resource id",
+             "\n  See vignette section on corrupt cache",
+             "\n  cache: ", bfccache(bfc),
+             "\n  reason: ", conditionMessage(err),
+             call.=FALSE)
+    })
     names(localFiles) <- rnames
     
     if (verbose){
@@ -100,6 +108,16 @@ removeCache <- function(x){
                               vl[[1]][length(vl[[1]])]
                           }, FUN.VALUE=character(1), USE.NAMES=FALSE))
     locFiles = setNames(locFiles, baseFileName)
+    if (any(duplicated(baseFileName))){
+        files <- locFiles[names(locFiles) %in% baseFileName[duplicated(baseFileName)]]
+        stop("Corrupt Cache: resource path",
+             "\n  See vignette section on corrupt cache",
+             "\n  cache: ", bfccache(bfc),
+             "\n  potential duplicate files: ",
+             "\n", paste(files[order(names(files))], "\n"),
+             call.=FALSE)
+    }
+    
     
     allUpdate <- rep(TRUE, length(cachepath))
     fndFiles <-  which(cachepath %in% baseFileName)
@@ -110,9 +128,10 @@ removeCache <- function(x){
         rid <- res %>% collect(Inf) %>% `[[`("rid")
         if (cnt > 1){
             stop("Corrupt Cache: resource path",
-                 "\n  More than one entry in cache for: ",
-                 rpath,
-                 "\n  See vignette section on corrupt cache")
+                 "\n  See vignette section on corrupt cache",
+                 "\n  cache: ", bfccache(bfc),
+                 rpath, call.=FALSE
+                 )
         } else if (cnt == 0){
             TRUE
         } else {

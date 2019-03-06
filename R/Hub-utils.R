@@ -14,9 +14,11 @@
                  "\n  Run again with 'localHub=FALSE'")
         }else if (cnt > 1){
             stop("Corrupt Cache: sqlite file",
-                 "\n  More than one entry in cache for: ",
+                 "\n  See vignette section on corrupt cache",
+                 "\n  cache: ", bfccache(bfc), 
+                 "\n  filename: ",
                  paste0(tolower(.class), ".sqlite3"),
-                 "\n  See vignette section on corrupt cache")
+                 call.=FALSE)
         } else {
             rid <- res %>% collect(Inf) %>% `[[`("rid")
             db_path <- bfcrpath(bfc, rids=rid)
@@ -31,16 +33,18 @@
                               fpath=remote_db, proxy=proxy)
         } else if (cnt > 1){
             stop("Corrupt Cache: sqlite file",
-                 "\n  More than one entry in cache for: ",
+                 "\n  See vignette section on corrupt cache",
+                 "\n  cache: ", bfccache(bfc),
+                 "\n  filename: ",
                  paste0(tolower(.class), ".sqlite3"),
-                 "\n  See vignette section on corrupt cache")
+                  call.=FALSE)
         # found! check if needs update
         } else {
             rid <- res %>% collect(Inf) %>% `[[`("rid")
             db_path <- ifelse(bfcneedsupdate(bfc, rids=rid),
                               bfcdownload(bfc, rid=rid, ask=FALSE,
                                           proxy=proxy),
-                              bfcrpath(bfc, rid=rid))
+                              bfcrpath(bfc, rids=rid))
         }
     }
     unname(db_path)

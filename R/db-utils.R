@@ -73,10 +73,11 @@ setMethod("dbfile", "Hub",
     rid <- res %>% collect(Inf) %>% `[[`("rid")
     
     if (cnt > 1){
-        stop("Cache is corrupt: index file",
-             "\n  More than one entry in cache for: ",
-             index_name,
-             "\n  See vignette section on corrupt cache")
+        stop("Corrupt Cache: index file",
+             "\n  See vignette section on corrupt cache",
+             "\n  cache: ", bfccache(bfc),
+             "\n  filename: ", index_name,
+             call.=FALSE)
     } else {
 
         if (cnt == 1){           
@@ -120,11 +121,12 @@ setMethod("dbfile", "Hub",
                              "\n  Missing entry in cache for: ", index_name,
                              "\n  Consider rerunning with 'localHub=FALSE'"),
                       paste0("Corrupt Cache: index file",
-                             "\n  More than one entry in cache for: ",
-                             index_name,
-                             "\n  See vignette section on corrupt cache"))                 
+                             "\n  See vignette section on corrupt cache",
+                             "\n  cache: ", bfccache(bfc),
+                             "\n  filename: ", index_name
+                             ))                 
                       
-         stop(msg)
+         stop(msg, call.=FALSE)
     } else {
         unname(bfcrpath(bfc, rids=rid))
     }

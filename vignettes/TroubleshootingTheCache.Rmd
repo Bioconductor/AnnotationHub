@@ -1,0 +1,291 @@
+---
+title: "Troubleshoot The Hubs"
+author: "Lori Shepherd"
+date: "Modified: March 2019. Compiled: `r format(Sys.Date(), '%d %b %Y')`"
+output:
+  BiocStyle::html_document:
+    toc: true
+vignette: >
+  % \VignetteIndexEntry{Troubleshooting The Hubs}
+  % \VignetteEngine{knitr::rmarkdown}
+  % \VignetteEncoding{UTF-8}
+---
+
+# Overview
+
+In spring 2019 the Hubs ([AnnotationHub][]/[ExperimentHub][]) upgraded their
+backend to utilize [BiocFileCache][].  This upgrade changed how resources were
+downloaded and saved. While the Hub code itself ensures validity, it is possible
+to access the `BiocFileCache` of resources directly without the Hub front ends,
+which opens up the possibility of having caching problems. This document will
+touch on some troubleshooting for these issues as well as any other frequently
+asked issues. If the question or answer cannot be found here please ask on the
+[Bioconductor Support Site][] or on the mailing list
+`<bioc-devel@r-project.org>` 
+
+# Troubleshooting
+
+## Invalid Cache
+
+An invalid cache ERROR results from a missing sqlite or index file in the Hub's
+BiocFileCache. The Hub code needs these files in order to operate
+correctly. Rerun the Hub constructor (`AnnotationHub()` or `ExperimentHub()`)
+again. If you were trying to run the constructor with `localHub=TRUE`, you
+will have to run `localHub=FALSE` at least once to redownload the Hub sqlite
+file. 
+
+## Corrupt Cache
+
+A corrupt cache ERROR results from multiple entries in the BiocFileCache
+matching a query for a particular file.  This will involve removing one,
+multiple, or all entries for a file. Please see specific section below although
+all follow the same principles.  
+
+### sqlite file
+
+If the sqlite file is the problematic file you should see something like the
+following (maybe be experimenthub.sqlite3 respectively)
+
+```{eval=FALSE}
+> ah = AnnotationHub()
+Error: Corrupt Cache: sqlite file
+  See vignette section on corrupt cache
+  cache: /home/lori/.cache/AnnotationHub
+  filename: annotationhub.sqlite3
+
+```
+You will need to investigate the underlying BiocFileCache for the Hub and remove
+some or all of the files so that there is only a single entry for the
+filename.  Call the BiocFileCache constructor with the path listed as `cache` in
+the ERROR message.
+
+```{eval=FALSE}
+library(BiocFileCache)
+bfc <- BiocFileCache("/home/lori/.cache/AnnotationHub")
+```
+Now we can query the BiocFileCache using the `filename` of the ERROR message.
+This shows the number of entries for the filename. There should only be one row
+
+```{eval=FALSE}
+res <- bfcquery(bfc, "annotationhub.sqlite3", field="rname", exact=TRUE)
+res
+# A tibble: 2 x 10
+  rid   rname create_time access_time rpath rtype fpath last_modified_t… etag 
+  <chr> <chr> <chr>       <chr>       <chr> <chr> <chr> <chr>            <chr>
+1 BFC1  anno… 2019-03-05… 2019-03-06… /hom… web   http… 2019-02-19 19:1… NA   
+2 BFC13 anno… 2019-03-06… 2019-03-06… /hom… rela… /hom… NA               NA   
+# … with 1 more variable: expires <dbl>
+
+```
+
+You will need to deterime if you can validate which entry should remain by
+evaluating the entries in the cache; [dplyr package][] methods may be useful for
+parsing the tibble res object.
+
+If you can identify which entry should be kept - remove the other entries in
+the cache or rename the rname by calling the BiocFileCache functions bfcremove
+or bfcupdate with the rid of the offending entries 
+
+```{eval=FALSE}
+library(dplyr)
+res %>% select(rid, rname, rpath, fpath)
+
+# example of rename the rname
+bfcupdate(bfc, rids="BFC13", rname="What I am renaming the rname to")
+
+# example remove
+bfcremove(bfc, rids="BFC13")
+
+```
+If you cannot figure out which entry should be kept I recommend removing all
+entries so that a fresh redownload can occur. Then call the Hub constructor.
+
+```{eval=FALSE}
+bfcremove(bfc, rids=res$rid)
+ah = AnnotationHub()
+```
+
+
+### index file
+
+If the index file is the problematic file you should see something like the
+following (maybe be experimenthub.index.rds respectively)
+
+```{eval=FALSE}
+> ah = AnnotationHub()
+snapshotDate(): 2019-02-19
+Error: Corrupt Cache: index file
+  See vignette section on corrupt cache
+  cache: /home/lori/.cache/AnnotationHub
+  filename: annotationhub.index.rds
+
+```
+You will need to investigate the underlying BiocFileCache for the Hub and remove
+some or all of the files so that there is only a single entry for the
+filename.  Call the BiocFileCache constructor with the path listed as `cache` in
+the ERROR message.
+
+```{eval=FALSE}
+library(BiocFileCache)
+bfc <- BiocFileCache("/home/lori/.cache/AnnotationHub")
+```
+Now we can query the BiocFileCache using the `filename` of the ERROR message.
+This shows the number of entries for the filename. There should only be one row
+
+```{eval=FALSE}
+res <- bfcquery(bfc, "annotationhub.index.rds", field="rname", exact=TRUE)
+res
+# A tibble: 2 x 10
+  rid   rname create_time access_time rpath rtype fpath last_modified_t… etag 
+  <chr> <chr> <chr>       <chr>       <chr> <chr> <chr> <chr>            <chr>
+1 BFC2  anno… 2019-03-05… 2019-03-05… /hom… rela… 66d4…               NA NA   
+2 BFC14 anno… 2019-03-06… 2019-03-06… /hom… rela… /hom…               NA NA   
+# … with 1 more variable: expires <dbl>
+
+```
+
+You will need to deterime if you can validate which entry should remain by
+evaluating the entries in the cache; [dplyr package][] methods may be useful for
+parsing the tibble res object.
+
+If you can identify which entry should be kept - remove the other entries in
+the cache or rename the rname by calling the BiocFileCache functions bfcremove
+or bfcupdate with the rid of the offending entries 
+
+```{eval=FALSE}
+library(dplyr)
+res %>% select(rid, rname, rpath, fpath)
+
+# example of rename the rname
+bfcupdate(bfc, rids="BFC14", rname="What I am renaming the rname to")
+
+# example remove
+bfcremove(bfc, rids="BFC14")
+
+```
+If you cannot figure out which entry should be kept I recommend removing all
+entries so that a fresh redownload can occur. Then call the Hub constructor.
+
+```{eval=FALSE}
+bfcremove(bfc, rids=res$rid)
+ah = AnnotationHub()
+```
+
+### resource path
+
+If the resource path is a problem, this indicates that there may be duplicate
+files in the cache. There may only exist at any given time one downloaded file
+path per resource as indicated by the filename schema "<random
+identifier>_<resource id>`.  This ERROR indicates duplicate values `_<resource id>` 
+
+The ERROR should look similar to 
+```{eval=FALSE}
+Error: Corrupt Cache: resource path
+  See vignette section on corrupt cache
+  cache: /home/lori/.cache/AnnotationHub
+  potential duplicate files: 
+499d6769cf1d_5012 
+66d42a51a258_5012 
+
+```
+
+You will need to investigate the underlying BiocFileCache for the Hub and remove
+some or all of the files so that there is only a single entry for the
+resource path.  Call the BiocFileCache constructor with the path listed as `cache` in
+the ERROR message.
+
+```{eval=FALSE}
+library(BiocFileCache)
+bfc <- BiocFileCache("/home/lori/.cache/AnnotationHub")
+```
+
+Now we can query the BiocFileCache using the `duplicate files` of the ERROR message.
+
+```{eval=FALSE}
+res <- bfcquery(bfc, "5012", field="rpath", exact=FALSE)
+res
+# A tibble: 2 x 10
+  rid   rname create_time access_time rpath rtype fpath last_modified_t… etag 
+  <chr> <chr> <chr>       <chr>       <chr> <chr> <chr> <chr>            <chr>
+1 BFC3  AH50… 2019-03-05… 2019-03-05… /hom… web   http… 2014-03-28 09:2… dd0c…
+2 BFC19 dup … 2019-03-06… 2019-03-06… /hom… web   http… 2014-03-28 09:2… dd0c…
+# … with 1 more variable: expires <dbl>
+```
+
+You will need to deterime if you can validate which entry should remain by
+evaluating the entries in the cache; [dplyr package][] methods may be useful for
+parsing the tibble res object.
+
+If you can identify which entry should be kept - remove the other entries in
+the cache or rename the rname by calling the BiocFileCache functions
+bfcremove. If you cannot the best appropate is to remove the resource and
+redownload a new entry.
+
+```{eval=FALSE}
+# remove single entry
+bfcremove(bfc, rids="BFC19")
+
+# remove all
+bfcremove(bfc, rids=res$rid)
+```
+
+### resource id
+
+If the resource id is problematic, it generally means that there are entries in
+the BiocFileCache with the same `rname`. You would see an ERROR similar to the
+following:
+```{eval=FALSE}
+> cache(ah[1:4])
+adding rname 'AH5015 : 5015'
+Error: Corrupt Cache: resource id
+  See vignette section on corrupt cache
+  cache: /home/lori/.cache/AnnotationHub
+  reason: not all 'rnames' found or unique.
+
+```
+You will need to investigate the underlying BiocFileCache for the Hub and remove
+or rename resources so there are no duplicate rnames in the cache. 
+
+```{eval=FALSE}
+library(BiocFileCache)
+bfc <- BiocFileCache("/home/lori/.cache/AnnotationHub")
+bfcinfo(bfc) %>% dplyr::select(rname)
+```
+
+You can remove with `bfcremove` and can rename with `bfcupdate`.  
+
+
+
+## Corrupt Database
+
+A corrupt hub database ERROR results from an invalid hub sqlite file. Perhaps
+the original download was interrupted or the file was overwritten.
+
+You will have to remove the currently downloaded sqlite file so it can be
+redownloaded. 
+
+The output you received looked something similar to the following:
+```{eval=FALSE}
+> ah = AnnotationHub()
+Error: Corrupt Hub Database; See vignette section on corrupt database
+  database: '/home/lori/.cache/AnnotationHub/66d467fcefa5_annotationhub.sqlite3'
+  reason: missing tables
+
+```
+The simplest solution is to remove the file listed as the `database:` in the
+above output.
+
+```{eval=FALSE}
+# from the example above
+file.remove('/home/lori/.cache/AnnotationHub/66d467fcefa5_annotationhub.sqlite3')
+```
+
+Rerunning the constructor should now redownload a valid database object. 
+
+
+
+[Bioconductor Support Site]: https://support.bioconductor.org/
+[AnnotationHub]: https://bioconductor.org/packages/AnnotationHub/
+[ExperimentHub]: https://bioconductor.org/packages/ExperimentHub/
+[BiocFileCache]: https://bioconductor.org/packages/BiocFileCache/
+[dplyr]: https://www.rdocumentation.org/packages/dplyr/versions/0.7.8

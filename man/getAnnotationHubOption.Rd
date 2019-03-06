@@ -30,8 +30,8 @@ setAnnotationHubOption(arg, value)
       hub. Default: \url{https://annotationhub.bioconductor.org}}
 
     \item{\dQuote{CACHE}:}{character(1). The location of the hub
-      cache. Default: \dQuote{.AnnotationHub} in the user home
-      directory.}
+      cache. Default: \dQuote{AnnotationHub} in the user's directory
+      established by \code{rappdir::user_cache_dir}.}
 
     \item{\dQuote{MAX_DOWNLOADS}:}{numeric(1). The integer number of
       downloads allowed before triggering an error. This is to help
