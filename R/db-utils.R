@@ -30,90 +30,6 @@
     dbGetQuery(path, query)
 }
 
-.db_current <- function(path, hub, proxy)
-{
-    tryCatch({
-        url <- paste0(hub, '/metadata/database_timestamp')
-        onlineTime <- as.POSIXct(content(GET(url, proxy)))
-
-        db_path <- .db_get_db(path, hub, proxy)
-        sql <- "SELECT * FROM timestamp"
-        localTime <- as.POSIXct(.db_query(db_path, sql)[[1]])
-        onlineTime == localTime
-    }, error=function(e) {
-        warning("database may not be current",
-                "\n  database: ", sQuote(path),
-                "\n  reason: ", conditionMessage(e),
-                call.=FALSE)
-        ## TRUE even though not current, e.g., no internet connection
-        TRUE
-    })
-}
-
-
-## Helpers to get a fresh metadata DB connection
-.db_get_db <- function(path, hub, proxy) {
-    ## download or cache
-    tryCatch({
-        need <- !file.exists(path)
-        .hub_resource(.hub_metadata_path(hub), basename(path)[need], 
-                      path[need], proxy)
-    }, error=function(err) {
-        stop("failed to create local data base",
-             "\n  database: ", sQuote(path),
-             "\n  reason: ", conditionMessage(err),
-             call.=FALSE)
-    })
-    path
-}
-
-.db_is_valid <- function(path) {
-    conn <- .db_open(path)
-    on.exit(.db_close(conn))
-    ## Some very minor testing to make sure metadata DB is intact.
-    tryCatch({
-        ## required tables present?
-        expected <- c("biocversions", "input_sources", "location_prefixes",
-                      "rdatapaths", "recipes", "resources", "statuses",
-                      "tags", "timestamp")
-        if (!all(expected %in% dbListTables(conn)))
-            stop("missing tables")
-        ## any resources?
-        sql <- "SELECT COUNT(id) FROM resources"
-        if (.db_query(conn, sql)[[1]] == 0L)
-            warning("empty 'resources' table; database may be corrupt")
-    }, error=function(err) {
-        stop("database is corrupt; remove it and try again",
-             "\n  database: ", sQuote(path),
-             "\n  reason: ", conditionMessage(err),
-             call.=FALSE)
-    })
-    TRUE
-}
-
-.db_get <- function(path, hub, proxy) {
-    update <- !file.exists(path)
-    if (!update && !file.size(path)) {
-        file.remove(path)
-        update <- TRUE
-    }
-    if (!update && !.db_current(path, hub, proxy)) {
-        file.remove(path)
-        update <- TRUE
-    }
-    if (update)
-        message("updating metadata: ", appendLF=FALSE)
-    db_path <- .db_get_db(path, hub, proxy)
-    .db_is_valid(db_path)
-    db_path
-}
-
-.db_index_file <- function(x)
-    file.path(hubCache(x), "index.rds")
-
-.db_index_load <- function(x)
-    readRDS(.db_index_file(x))[names(x)]
-
 .db_uid0 <- function(path, .date){
     tryCatch({
         uid <- .uid0(path, .date)
@@ -126,37 +42,14 @@
     })
 }
 
-.db_create_index <- function(x) {
-    fl <- .db_index_file(x)
 
-    if (file.exists(fl)) {
-        if (file.mtime(fl) > file.mtime(dbfile(x)) &&
-            length(x) == length(readRDS(fl)))
-            return(fl)
-    }
- 
-    tryCatch({
-        tbl <- .resource_table(x)
-        tbl <- setNames(do.call("paste", c(tbl, sep="\r")), rownames(tbl))
-        saveRDS(tbl, fl)
-    }, error=function(err) {
-        stop("failed to create index",
-             "\n  hubCache(): ", hubCache(x),
-             "\n  reason: ", conditionMessage(err))
-    })
+setMethod("dbconn", "Hub",
+    function(x) .db_open(dbfile(x))
+)
 
-    fl
-}
-.db_index <- function(x) slot(x, ".db_index")
-`.db_index<-` <- function(x, ..., value) 
-{
-    if (length(value) > 1L)
-        stop("'value' must be length 1")
-    if (!is(value, "character"))
-        stop("'value' must be a character")
-    slot(x, ".db_index") <- value
-    x
-}
+setMethod("dbfile", "Hub", 
+    function(x) x@.db_path
+)
 
 .db_uid <- function(x) slot(x, ".db_uid")
 `.db_uid<-` <- function(x, ..., value)
@@ -169,10 +62,84 @@
     x
 }
 
-setMethod("dbconn", "Hub",
-    function(x) .db_open(dbfile(x))
-)
+.db_create_index <- function(x) {
 
-setMethod("dbfile", "Hub", 
-    function(x) x@.db_path
-)
+    bfc <- .get_cache(x)
+    index_name <- paste0(tolower(as.character(class(x))),
+                                ".index.rds")
+    res <- bfcquery(bfc, index_name,
+                    field="rname", exact=TRUE)
+    cnt <- bfccount(res)
+    rid <- res %>% collect(Inf) %>% `[[`("rid")
+    
+    if (cnt > 1){
+        stop("Cache is corrupt: index file",
+             "\n  More than one entry in cache for: ",
+             index_name,
+             "\n  See vignette section on corrupt cache")
+    } else {
+
+        if (cnt == 1){           
+            index_path <- bfcrpath(bfc, rids=rid)
+            if (file.exists(index_path)) {
+                if (file.mtime(index_path) > file.mtime(dbfile(x)) &&
+                    length(x) == length(readRDS(index_path)))
+                    return(index_path)
+                }
+            }
+        }
+     
+        tryCatch({
+            tbl <- .resource_table(x)
+            tbl <- setNames(do.call("paste", c(tbl, sep="\r")), rownames(tbl))
+            index_path <- ifelse(cnt == 0,
+                                 bfcnew(bfc, rname=index_name, ext="_hub_index.rds"),
+                                 bfcrpath(bfc, rids=rid))
+            saveRDS(tbl, unname(index_path))
+        }, error=function(err) {
+            stop("failed to create index",
+                 "\n  hubCache(): ", hubCache(x),
+                 "\n  reason: ", conditionMessage(err))
+        })
+    unname(index_path)   
+}
+    
+.db_index_file <- function(x){
+    bfc <- .get_cache(x)
+    index_name <- paste0(tolower(as.character(class(x))),
+                                ".index.rds")
+    res <- bfcquery(bfc, index_name,
+                    field="rname", exact=TRUE)
+    cnt <- bfccount(res)
+    rid <- res %>% collect(Inf) %>% `[[`("rid")
+    if (cnt != 1){
+
+        msg <- switch(as.character(cnt),
+                      "0"=
+                      paste0("Invalid Cache: index file",
+                             "\n  Missing entry in cache for: ", index_name,
+                             "\n  Consider rerunning with 'localHub=FALSE'"),
+                      paste0("Corrupt Cache: index file",
+                             "\n  More than one entry in cache for: ",
+                             index_name,
+                             "\n  See vignette section on corrupt cache"))                 
+                      
+         stop(msg)
+    } else {
+        unname(bfcrpath(bfc, rids=rid))
+    }
+}
+    
+.db_index_load <- function(x)
+    readRDS(.db_index_file(x))[names(x)]
+
+.db_index <- function(x) slot(x, ".db_index")
+`.db_index<-` <- function(x, ..., value) 
+{
+    if (length(value) > 1L)
+        stop("'value' must be length 1")
+    if (!is(value, "character"))
+        stop("'value' must be a character")
+    slot(x, ".db_index") <- value
+    x
+}

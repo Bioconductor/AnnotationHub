@@ -1,62 +1,71 @@
-
-
-.cache_path <- function(hub, path, cache.root=NULL, cache.fun=NULL)
-{
-    cache <- hubCache(hub)
-    ## FIXME: when would 'cache' be missing?
-    if (missing(cache)) {
-        if (any(is.null(cache.root) | is.null(cache.fun)))
-            stop("'cache.root' and 'cache.fun' must be set if cache is missing")
-
-        ## this section replaces .cache_path_default
-        if (file.exists(cache) && file.info(cache)$isdir)
-            return(cache)
-
-        if (file.exists(cache) && !file.info(cache)$isdir) {
-            txt <- sprintf("default cache exists but is not a directory\n  %s",
-                           sQuote(cache))
-            warning(txt)
-            cache <- NULL
-        }
-
-        if (!is.null(cache) && interactive()) {
-            txt <- sprintf("create cache at %s?", sQuote(cache))
-            ans <- .ask(txt, values=c("y", "n"))
-            if (ans == "n") {
-                cache <- file.path(tempdir(), cache.root)
-                message(sprintf("using temporary cache %s", sQuote(cache)))
-            }
-        } else {
-            cache <- file.path(tempfile())
-        }
-        ## FIXME:
-        cache.fun("CACHE", cache)
-    } else if (missing(path)) {
-        cache
-    } else {
-        file.path(cache, path)
-    }
-}
-
 .create_cache <-
-    function(cache, .class)
+    function(.class, url, cache, proxy, localHub=FALSE)
 {
-    if (file.exists(cache)) {
-        if (!file.info(cache)$isdir)
-            stop("cache ", sQuote(cache), " exists but is not a directory")
-    } else
-        dir.create(cache, recursive=TRUE)
-
-    sqlitefile <- paste0(tolower(.class), ".sqlite3")
-    file.path(cache, sqlitefile)
+    hub_bfc <- BiocFileCache(cache=cache)
+    db_path <- .updateHubDB(hub_bfc, .class, url, proxy, localHub)
+    .db_is_valid(db_path)
+    db_path
 }
 
-.cache_download_ok <- function(cachepath, max.downloads, force, verbose)
+removeCache <- function(x){
+    bfc <- .get_cache(x)
+    removebfc(bfc)
+    
+}
+
+.get_cache <-
+    function(hub)
 {
-    if (force)
+    BiocFileCache(cache=hubCache(hub))
+}
+
+
+.named_cache_path <- function(x) 
+{
+    stopifnot(is(x, "Hub"))
+    path <- .datapathIds(x)
+    path
+}
+
+
+.cache_internal <- function(x, proxy, max.downloads,
+                            force, verbose)
+{
+    cachepath <- .named_cache_path(x)
+    need <- .cache_download_ok(x, cachepath, max.downloads, force, verbose)
+   
+    ok <- .hub_resource(x, as.character(cachepath)[need],
+        cachepath[need], proxy=proxy, verbose=verbose
+    )
+
+    if (!all(ok))
+        stop(sum(!ok), " resources failed to download", call. = FALSE)
+    
+    rnames <- paste(names(cachepath), cachepath, sep=" : ")
+    bfc <- .get_cache(x)
+    localFiles <- unname(bfcrpath(bfc, rnames=rnames))
+    names(localFiles) <- rnames
+    
+    if (verbose){
+        message(paste0(
+            c(
+                "loading from cache ", sQuote(head(rnames)),
+                if (length(rnames) > 6) "..."
+                ),
+            collapse="\n    "
+            ))
+    }
+    localFiles
+}
+
+.cache_download_ok <- function(x, cachepath, max.downloads, force, verbose)
+{
+    if (force){
         need <- rep(TRUE, length(cachepath))
-    else
-        need <- !file.exists(cachepath)
+    } else {
+        bfc <- .get_cache(x)
+        need <- .updateEntry(bfc, cachepath)    
+    }   
     n <- sum(need)
 
     if (n > max.downloads) {
@@ -77,60 +86,48 @@
     need
 }
 
-.cache_internal <- function(x, cache.root, cache.fun, proxy, max.downloads,
-                            force, verbose)
+.updateEntry <- function(bfc, cachepath)
 {
-    cachepath <- .named_cache_path(x, cache.root, cache.fun)
-    need <- .cache_download_ok(cachepath, max.downloads, force, verbose)
 
-    ok <- .hub_resource(
-        .hub_data_path(hubUrl(x)), basename(cachepath)[need],
-        cachepath[need], proxy=proxy, overwrite=force, verbose=verbose
-    )
-    if (!all(ok))
-        stop(sum(!ok), " resources failed to download", call. = FALSE)
-
-    if (verbose){
-        message(paste0(
-            c(
-                "loading from cache ", sQuote(head(cachepath)),
-                if (length(cachepath) > 6) "..."
-                ),
-            collapse="\n    "
-            ))
+    locFiles <- dir(bfccache(bfc))
+    locFiles <- locFiles[!(endsWith(locFiles, ".sqlite") |
+                           endsWith(locFiles, ".sqlite3")|
+                           endsWith(locFiles, "_index.rds"))]
+ 
+    baseFileName <-   as.numeric(vapply(locFiles,
+                          FUN=function(x){
+                              vl <- strsplit(x,split="_")
+                              vl[[1]][length(vl[[1]])]
+                          }, FUN.VALUE=character(1), USE.NAMES=FALSE))
+    locFiles = setNames(locFiles, baseFileName)
+    
+    allUpdate <- rep(TRUE, length(cachepath))
+    fndFiles <-  which(cachepath %in% baseFileName)
+    
+    Update <- function(rpath, bfc){
+        res <- bfcquery(bfc, rpath, fields="rpath", exact=TRUE)
+        cnt <- bfccount(res)
+        rid <- res %>% collect(Inf) %>% `[[`("rid")
+        if (cnt > 1){
+            stop("Corrupt Cache: resource path",
+                 "\n  More than one entry in cache for: ",
+                 rpath,
+                 "\n  See vignette section on corrupt cache")
+        } else if (cnt == 0){
+            TRUE
+        } else {
+            bfcneedsupdate(bfc, rids=rid)
+         }
     }
-    cachepath
-}
-
-.named_cache_path <- function(x, cache.root, cache.fun) 
-{
-    stopifnot(is(x, "Hub"))
-    path <- .datapathIds(x)
-    setNames(.cache_path(x, path, cache.root, cache.fun), names(path))
-}
-
-removeCache <- function(x)
-{
-    reply <- .ask("Delete cache file", c("y", "n"))
-    cache <- hubCache(x)
-    if (reply == "y") {
-      rv <- tryCatch({
-          if (file.exists(cache)) {
-              status <- unlink(cache, recursive=TRUE, force=TRUE)
-              if (status == 1)
-                  stop("'unlink()' failed to remove directory")
-          }
-
-          TRUE
-      }, error=function(err) {
-          warning("'clearCache()' failed",
-              "\n  database: ", sQuote(cache),
-              "\n  reason: ", conditionMessage(err),
-              call.=FALSE)
-
-          FALSE
-      })
-    } else rv <- FALSE
-
-    rv
+    if (length(fndFiles) > 0){
+        update <- vapply(locFiles[which(as.numeric(names(locFiles)) %in%
+                                        cachepath[fndFiles])],
+                         FUN=Update, FUN.VALUE=logical(1), USE.NAMES=TRUE,
+                         bfc=bfc)
+        if (anyNA(update))
+            update[is.na(update)] = TRUE
+    
+        allUpdate[fndFiles] <- update
+    }
+    allUpdate    
 }

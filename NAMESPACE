@@ -20,6 +20,8 @@ importFrom(interactiveDisplayBase, display)
 
 importMethodsFrom(AnnotationDbi, dbconn, dbfile)
 importFrom(AnnotationDbi, dbFileConnect)
+importFrom(dplyr,"%>%")
+importFrom(dplyr,collect)
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### Export S4 classes
@@ -49,7 +51,7 @@ export(
     hubUrl, hubCache, hubDate,
     snapshotDate, "snapshotDate<-",
     getHub, listResources, loadResources,
-    package
+    package, convertHub
 )
 
 exportMethods(

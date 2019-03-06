@@ -46,7 +46,6 @@ setGeneric("loadResources", signature="hub",
     function(hub, package, filterBy=character()) 
         standardGeneric("loadResources")
 )
-
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### AnnotationHubResource objects
 ###

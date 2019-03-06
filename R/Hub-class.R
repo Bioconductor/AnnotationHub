@@ -20,9 +20,13 @@ setClass("Hub",
 ###
 
 .Hub <- function(.class, url, cache, proxy, localHub=FALSE, ...) {
-    db_path <- .create_cache(cache, .class)
+ 
+    # create or use cache location
+    # download hub sqlite file and add/update to BiocFileCache for tracking
+    db_path <- .create_cache(.class, url, cache, proxy, localHub)
+
+    # find snapshot date
     if (!localHub){
-        db_path <- .db_get(db_path, url, proxy)
         tryCatch({
             db_date <- .restrictDateByVersion(db_path)
         }, error=function(err) {
@@ -31,12 +35,10 @@ setClass("Hub",
                  "\n  Consider rerunning with 'localHub=TRUE'")
         })
     } else {
-        if (!file.exists(db_path))
-            stop("Local database does not exist.",
-                 "\n  Repeat call with 'localHub=FALSE'")   
         dates <-.possibleDates(db_path)
         db_date <- dates[length(dates)]
     }
+    
     db_uid <- .db_uid0(db_path, db_date)
     hub <- new(.class, cache=cache, hub=url, date=db_date, 
                .db_path=db_path, .db_uid=db_uid, ...)
@@ -46,25 +48,15 @@ setClass("Hub",
     if (!localHub){
         index <- .db_create_index(hub)
         .db_index(hub) <- index 
-    } else{        
-        index <- file.path(dirname(db_path), "index.rds")
-        if (!file.exists(index))
-            stop("Index file not created.",
-                 "\n  Repeat call with 'localHub=FALSE'")
+    } else{
+        
+        index <- .db_index_file(hub)
         .db_index(hub) <- index
         hub <- .subsethub(hub)
     }    
     hub
 }
 
-.subsethub <- function(hub){
-    myX = .named_cache_path(hub)
-    locFiles = setdiff(dir(hubCache(hub)),
-        c("annotationhub.sqlite3", "index.rds"))
-    dx = which(basename(myX) %in% locFiles)
-    files = names(myX[dx])
-    hub[files]
-}
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### Validity
@@ -88,6 +80,22 @@ setValidity("Hub",
     }
 )
 
+.subsethub <- function(hub){
+    myX <- .named_cache_path(hub)
+    locFiles <- dir(hubCache(hub))
+    locFiles <- locFiles[!(endsWith(locFiles, ".sqlite") |
+                           endsWith(locFiles, ".sqlite3")|
+                           endsWith(locFiles, "_index.rds"))]
+    resource_num <- vapply(locFiles,
+                           function(x){ vl <- strsplit(x, "_");
+                                        vl[[1]][length(vl[[1]])] },
+                           character(1))
+    dx = which(as.character(myX) %in% resource_num)
+    files = names(myX[dx])
+    hub[files]
+}
+
+
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### Accessors
 ###
@@ -106,55 +114,6 @@ setMethod("hubDate", "Hub",
 
 setMethod("package", "Hub",
     function(x) character() 
-)
-
-### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### cache methods
-###
-
-## FIXME: rather not pass cache.root and cache.fun
-setMethod("cache", "Hub",
-    function(x, ..., cache.root, cache.fun, proxy, max.downloads, force=FALSE, verbose=FALSE)
-        .cache_internal(x, cache.root=cache.root, cache.fun=cache.fun, 
-                        proxy=proxy, max.downloads=max.downloads,
-                        force=force, verbose=verbose)
-)
-
-setReplaceMethod("cache", "Hub",
-    function(x, ..., value)
-{
-    stopifnot(identical(value, NULL))
-    cachepath <- .cache_path(x, .datapathIds(x))
-    result <- unlink(cachepath)
-    status <- file.exists(cachepath)
-    if (any(status))
-        warning("failed to unlink cache files:\n  ",
-                paste(sQuote(.cache_path(x)[status]), collapse="\n  "))
-    x
-})
-
-### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### Accessor-like methods 
-###
-
-setMethod("mcols", "Hub", function(x) DataFrame(.resource_table(x)))
-
-setMethod("names", "Hub",
-    function(x)
-{
-    as.character(names(.db_uid(x)))
-})
-
-setMethod("fileName", signature=(object="Hub"),
-    function(object, ...)
-{
-    cachepath <- .named_cache_path(object)
-    cachepath[!file.exists(cachepath)] <- NA_character_
-    cachepath
-})
-
-setMethod("length", "Hub",
-    function(x) length(.db_uid(x))
 )
 
 setMethod("snapshotDate", "Hub", function(x) x@date)
@@ -185,9 +144,43 @@ setReplaceMethod("snapshotDate", "Hub",
         .db_uid=.db_uid0(x@.db_path, value))
 })
 
+
+setMethod("length", "Hub",
+    function(x) length(.db_uid(x))
+)
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### Accessor-like methods 
+###
+
+setMethod("mcols", "Hub", function(x) DataFrame(.resource_table(x)))
+
+setMethod("names", "Hub",
+    function(x)
+{
+    as.character(names(.db_uid(x)))
+})
+
+setMethod("fileName", signature=(object="Hub"),
+    function(object, ...)
+{
+    cachepath <- .named_cache_path(object)
+    rnames <- paste(names(cachepath), cachepath, sep=" : ")
+    bfc <- .get_cache(object)
+    dx <- rep(NA_character_, length(rnames))
+    fnd <- which(rnames %in% bfcinfo(bfc)$rname) 
+    dx[fnd] <- unname(bfcrpath(bfc, rnames=rnames[fnd]))
+    names(dx) <- names(cachepath)
+    dx
+    
+})
+
+
+
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### Subsetting 
 ###
+
 
 setMethod("[", c("Hub", "numeric", "missing"),
     function(x, i, j, ..., drop=TRUE) 
@@ -238,6 +231,7 @@ setReplaceMethod("[",
     x
 })
 
+
 setMethod("[[", c("Hub", "numeric", "missing"),
     function(x, i, j, ..., force=FALSE, verbose=TRUE)
 {
@@ -254,6 +248,35 @@ setMethod("[[", c("Hub", "character", "missing"),
         stop(recordStatus(x, i)$status)
     .Hub_get1(x[idx], force=force, verbose=verbose)
 })
+
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### cache methods
+###
+
+setMethod("cache", "Hub",
+    function(x, ..., proxy, max.downloads, force=FALSE, verbose=FALSE)
+        .cache_internal(x, 
+                        proxy=proxy, max.downloads=max.downloads,
+                        force=force, verbose=verbose)
+)
+
+
+# removes all files except for databases
+setReplaceMethod("cache", "Hub",
+    function(x, ..., value)
+{
+    stopifnot(identical(value, NULL))
+    bfc <- .get_cache(x)
+    rids <- BiocFileCache:::.get_all_rids(bfc)
+    keep <- c(bfcrid(bfcquery(bfc, "annotationhub.sqlite3", fields="rname", exact=TRUE)),
+              bfcrid(bfcquery(bfc, "annotationhub.index.rds", fields="rname", exact=TRUE)))
+    rmid <- setdiff(rids, keep)
+    if (length(rmid) > 0){
+        bfcremove(bfc, rids=rmid)
+    }    
+})
+
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### $, query() and subset() methods
@@ -318,47 +341,6 @@ as.list.Hub <- function(x, ..., use.names=TRUE) {
 ###
 
 setMethod("as.list", "Hub", as.list.Hub)
-
-### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### Combining
-###
-
-setMethod("c", "Hub",
-    function(x, ..., recursive=FALSE)
-{
-    if (!identical(recursive, FALSE)) 
-        stop("'recursive' argument not supported")
-    if (missing(x)) 
-        args <- unname(list(...))
-    else args <- unname(list(x, ...))
-
-    .test <- function(args, fun, what) {
-        ans <- unique(vapply(args, fun, character(1)))
-        if (length(ans) != 1L)
-            stop(sprintf("'%s' differs between arguments", what))
-    }
-    .test(args, hubCache, "hubCache")
-    .test(args, hubUrl, "hubUrl")
-    .test(args, snapshotDate, "snapshotDate")
-    .test(args, dbfile, "dbfile")
-
-    db_uid <- unlist(lapply(unname(args), .db_uid))
-    if (length(db_uid) == 0 && is.null(names(db_uid)))
-        names(db_uid) <- character()
-    udb_uid <- unique(db_uid)
-    idx <- match(udb_uid, db_uid)
-    .db_uid <- setNames(udb_uid, names(db_uid)[idx])
-    initialize(args[[1]], .db_uid=.db_uid)
-})
-
-## FIXME:
-## trace (as below) wasn't working (not sure why)
-## trace(subset, browser(), signature='AnnotationHub')
-## debug(AnnotationHub:::.subset)
-## Tests:
-## library(AnnotationHub);debug(AnnotationHub:::.subset);ah = AnnotationHub()
-## ahs <- subset(ah, ah$genome=='ailMel1')
-## ahs <- subset(ah, ah$rdataclass=='VCF')
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### Show 
@@ -486,6 +468,7 @@ setMethod("display", signature(object="Hub"),
           function(object) .display(object)
 )
 
+
 setMethod("recordStatus", "Hub",
     function(hub, record) {
         if (!is.character(record))
@@ -501,4 +484,36 @@ setMethod("recordStatus", "Hub",
         if (nrow(status) == 0L)
             status <- "record not found in database"
         data.frame(record=record, status=status)
+})
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### Combining
+###
+
+setMethod("c", "Hub",
+    function(x, ..., recursive=FALSE)
+{
+    if (!identical(recursive, FALSE)) 
+        stop("'recursive' argument not supported")
+    if (missing(x)) 
+        args <- unname(list(...))
+    else args <- unname(list(x, ...))
+
+    .test <- function(args, fun, what) {
+        ans <- unique(vapply(args, fun, character(1)))
+        if (length(ans) != 1L)
+            stop(sprintf("'%s' differs between arguments", what))
+    }
+    .test(args, hubCache, "hubCache")
+    .test(args, hubUrl, "hubUrl")
+    .test(args, snapshotDate, "snapshotDate")
+    .test(args, dbfile, "dbfile")
+
+    db_uid <- unlist(lapply(unname(args), .db_uid))
+    if (length(db_uid) == 0 && is.null(names(db_uid)))
+        names(db_uid) <- character()
+    udb_uid <- unique(db_uid)
+    idx <- match(udb_uid, db_uid)
+    .db_uid <- setNames(udb_uid, names(db_uid)[idx])
+    initialize(args[[1]], .db_uid=.db_uid)
 })
