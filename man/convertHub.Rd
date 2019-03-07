@@ -18,12 +18,12 @@ convertHub(oldcachepath=NULL,
   \item{oldcachepath}{character(1) complete file path location of the
     old hub to be converted. If left as \code{NULL}, will use the
     default path of the old code, which for unix systems was in a user's
-    home directory '\home\username\' and for windows users was in a
-    user's AppData directory '\home\username\AppData'. 
+    home directory "~\\" and for windows users was in a
+    user's AppData directory "~\\AppData".} 
   \item{newcachepath}{character(1) complete file path to the new
     location for the cache. If left as \code{NULL}, will use the new
     default path which utilizes the \code{rappdir::user_cache_dir} to
-    deterime the appropriate caching location. 
+    deterime the appropriate caching location.} 
   \item{hubType}{Either AnnotationHub or ExperimentHub. By default
     assumes AnnotationHub.}
   \item{proxy}{proxy connection allowing Internet access, usually
@@ -43,6 +43,6 @@ convertHub(oldcachepath=NULL,
 \dontrun{convertHub()}
 }
 \author{Lori Shepherd}
-\seealso{\code{\link{AnnotationHub-objects}},
+\seealso{\code{\link{AnnotationHub}},
   \code{\link{getAnnotationHubOption}}}
 \keyword{utilities}

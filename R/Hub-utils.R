@@ -280,13 +280,13 @@ convertHub <- function(oldcachepath=NULL, newcachepath=NULL,
         if(hubType=="AnnotationHub"){
             hub <- AnnotationHub()
         }else{
-            hub <- ExperimentHub()
+            hub <- ExperimentHub::ExperimentHub()
         }
     } else {
         if(hubType=="AnnotationHub"){
             hub <- AnnotationHub(cache=newcachepath)
         }else{
-            hub <- ExperimentHub(cache=newcachepath)
+            hub <- ExperimentHub::ExperimentHub(cache=newcachepath)
         }
     }
  

@@ -102,11 +102,17 @@ removeCache <- function(x){
                            endsWith(locFiles, ".sqlite3")|
                            endsWith(locFiles, "_index.rds"))]
  
-    baseFileName <-   as.numeric(vapply(locFiles,
+    baseFileName <-   suppressWarnings(as.numeric(vapply(locFiles,
                           FUN=function(x){
                               vl <- strsplit(x,split="_")
                               vl[[1]][length(vl[[1]])]
-                          }, FUN.VALUE=character(1), USE.NAMES=FALSE))
+                          }, FUN.VALUE=character(1), USE.NAMES=FALSE)))
+    if(any(is.na(baseFileName))){
+        dx <- is.na(baseFileName)
+        baseFileName <- baseFileName[!dx]
+        locFiles <- locFiles[!dx]
+    }
+        
     locFiles = setNames(locFiles, baseFileName)
     if (any(duplicated(baseFileName))){
         files <- locFiles[names(locFiles) %in% baseFileName[duplicated(baseFileName)]]
