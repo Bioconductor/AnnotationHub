@@ -150,7 +150,8 @@ removeCache <- function(x){
                          FUN=Update, FUN.VALUE=logical(1), USE.NAMES=TRUE,
                          bfc=bfc)
         if (anyNA(update))
-            update[is.na(update)] = TRUE
+            # if no caching information use local file
+            update[is.na(update)] = FALSE
     
         allUpdate[fndFiles] <- update
     }
