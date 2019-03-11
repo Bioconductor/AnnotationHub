@@ -1,9 +1,35 @@
 CHANGES IN VERSION 2.15.0
 -------------------------
 
+SIGNIFICANT USER-VISIBLE CHANGES
+
+    o The Hubs have been updated to use BiocFileCache as a backend utility for
+    managing and downloading resources. This allows for file specific caching
+    mechanism. This change is a significant user change as it changed the
+    default directories for the Hubs (AnnotationHub/ExperimentHub) as well as
+    the base directory no longer being hidden.
+
 NEW FEATURES
 
     o (2.15.2) Add function to list currently available DispatchClass
+
+USER-VISIBLE MODIFICATIONS
+
+    o (2.15.3)  Bioconductor will no longer accept random, Individual resources
+    without an accompanied package.
+    o (2.15.4)  We also encourage the use of AnnotationHub rather than very
+    large annotation packages. We added sections for users wishing to convert
+    existing packages to use AnnotationHub as well.
+    o (2.15.7) There were substantial updates to Rsamtools. Rsamtools no longer
+    supports razip files. These files have been removed from the hub and
+    vignette updated to use the twobit and gff files
+
+BUG FIXES
+    o (2.15.5) Fixed bug. If resources are removed from the hub, this should
+    only be reflected in the devel branch but still be available in release
+    branch. The filter for exposed resources was refined to respect
+    datadateremoved
+
 
 CHANGES IN VERSION 2.12.0
 -------------------------
@@ -41,9 +67,9 @@ NEW FEATURES
 MODIFICATIONS
 
     o Modified tags vector when passed to display to improve speed of display
-    querying 
+    querying
 
-    o Moved readMetadataFromCsv from AnnotationHubData. 
+    o Moved readMetadataFromCsv from AnnotationHubData.
 
     o Removed listResources and loadResource from AnnotationHub; not implemented
     and only valid in ExperimentHub
@@ -76,16 +102,16 @@ MODIFICATIONS
     o edits to .get1,GenomicScores-method and .get1,GenomicScoresResource-method
 
     o work on biocVersion and snapshotDate relationship:
-      - snapshotDate() must be <= biocVersion() release date 
+      - snapshotDate() must be <= biocVersion() release date
       - possibleDates() are now filtered by snapshotDate()
 
     o remove GenomicScoresResource; Robert Castelo will handle loading these
     resources in his GenomicScores software package
 
-    o Changed show method for hub object 
+    o Changed show method for hub object
       - removed sourcelastmodifieddate
       - added rdatadateadded
- 
+
 
 BUG FIXES
 
@@ -139,28 +165,28 @@ NEW FEATURES
     o create 'Hub' VIRTUAL class
       - add new .Hub() base constructor for all hubs
       - add getAnnotationHubOption() and setAnnotationHubOption()
-      - promote cache() to generic 
+      - promote cache() to generic
       - add getHub() getter for AnnotationHubResource class
       - add getUrl(), getCache(), getDate() getters
       - export as few db helpers as possible
 
-    o add 'EpigenomeRoadmapNarrowAllPeaks' and 
+    o add 'EpigenomeRoadmapNarrowAllPeaks' and
       'EpigenomeRoadmapNarrowFDR' classes
 
 MODIFICATIONS
 
-    o distinguish between broad and narrow peak files in 
+    o distinguish between broad and narrow peak files in
       EpigenomeRoadmapFileResource dispatch class
 
     o don't use cache for AnnotationHub SQLite connection
-      - originally introduced so could be closed if needed, but 
-        creates complexity
+      - originally introduced so could be closed if needed, but
+	creates complexity
       - instead, open / close connection around individual queries (not a
-        performance concern)
+	performance concern)
       - expose hub, cache, proxy in AnnotationHub constructor
       - document dbconn,Hub-method, dbfile,Hub-method, .db_close
 
-    o snapshotDate now uses timestamp (last date any row was modified) instead 
+    o snapshotDate now uses timestamp (last date any row was modified) instead
       of rdatadateadded
 
     o .require fails rather than emits warning
@@ -169,9 +195,9 @@ MODIFICATIONS
 
     o work on removed records and biocVersion
       - .uid0() was reorganized and no longer groups by record_id
-      - metadata is returned for records with 
-        biocversion field <= current biocVersion
-        instead of an exact match with the current version
+      - metadata is returned for records with
+	biocversion field <= current biocVersion
+	instead of an exact match with the current version
       - metadata is not returned for removed records
 
 BUG FIXES
@@ -184,8 +210,8 @@ CHANGES IN VERSION 2.2.0
 
 SIGNIFICANT USER-VISIBLE CHANGES
 
-    o seqinfo(GRanges) for all genomes supported by GenomeInfoDb now 
-      contain seqlengths. 
+    o seqinfo(GRanges) for all genomes supported by GenomeInfoDb now
+      contain seqlengths.
 
 
 CHANGES IN VERSION 2.1.21
@@ -195,7 +221,7 @@ SIGNIFICANT USER-VISIBLE CHANGES
 
     o fileName() returns the cache path on the disk for a file that
       has been cached and NA for files which have not been cached.
- 
+
     o The error message (when file is not downloaded from the hub)
       displays the AnnotationHub name, title, and reason for failure.
 
@@ -227,13 +253,13 @@ NEW FEATURES
     behaviors, new ways of finding and downloading data)
 
     o The metadata has also been cleaned up and made more
-    consistent/searchable 
+    consistent/searchable
 
     o The recipes that are used to populate these data have also been
-    cleaned up.  
+    cleaned up.
 
     o There is also a new vignette to explain how to use the new
-    AnnotationHub in detail 
+    AnnotationHub in detail
 
 IMPROVEMENTS SINCE LAST TIME
 
@@ -246,7 +272,7 @@ IMPROVEMENTS SINCE LAST TIME
     method, but it can *also* be searched entirely from the command
     line.  This allows you to use it in examples and scripts in a way
     that is friendlier for reproducible research.
-    
+
     o For users who want to contribute valuable new annotation
     resources to the AnnotationHub, it is now possible to write a
     recipe and test that it works for yourself.  Then once you are
