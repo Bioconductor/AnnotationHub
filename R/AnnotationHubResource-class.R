@@ -22,6 +22,10 @@ setMethod("getHub", "AnnotationHubResource",
     function(x) x@hub
 )
 
+setMethod("isLocalHub", "AnnotationHubResource",
+    function(x) x@isLocalHub
+)
+
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ###  Show 
 ###
