@@ -305,10 +305,20 @@ setReplaceMethod("cache", "Hub",
 {
     stopifnot(identical(value, NULL))
     bfc <- .get_cache(x)
-    rids <- BiocFileCache:::.get_all_rids(bfc)
+    ids <- x@.db_uid
+    rnames <- paste(names(ids), ids, sep= " : ")
+    rids <- vapply(rnames,
+                   function(x, bfc){
+                       tbl <- bfcquery(bfc, query=x, field="rname", exact=TRUE);
+                       bfcid <- BiocFileCache:::.get_tbl_rid(tbl)
+                       ifelse(length(bfcid)==0, NA_character_, bfcid)
+                   },
+                   character(1), bfc=bfc, USE.NAMES=FALSE)
     keep <- c(bfcrid(bfcquery(bfc, "annotationhub.sqlite3", fields="rname", exact=TRUE)),
               bfcrid(bfcquery(bfc, "annotationhub.index.rds", fields="rname", exact=TRUE)))
     rmid <- setdiff(rids, keep)
+    if (any(is.na(rmid)))
+        rmid <- rmid[!is.na(rmid)]
     if (length(rmid) > 0){
         bfcremove(bfc, rids=rmid)
     }
