@@ -334,7 +334,7 @@ Rerunning the constructor should now redownload a valid database object.
 ## Cannot retrieve resource
 
 This occurs when using a Hub object designated to only access locally downloaded
-files (ex. `AnnotationHub(localHub=TRUE)`) and a resource cannot be found in
+files (ex. hub <- `AnnotationHub(localHub=TRUE)`) and a resource cannot be found in
 the current BiocFileCache database. The ERROR looks similar to
 ```
 Error: Cannot retrieve resource
@@ -342,9 +342,9 @@ Error: Cannot retrieve resource
   Requested resource not found in local cache:
     AH66165 : 72911
 ```
-The options are to rerun the constructor with
-`AnnotationHub(localHub=FALSE)` so the file can be downloaded. If this cannot be
-done because of internet access or other issues, the resource will not be
+The options are to change the Hub object to `isLocalHub=FALSE`
+(`isLocalHub(hub)<-FALSE`) so the file can be downloaded. If this cannot be done
+because of internet access or other issues, the resource will not be
 available. If this was part of a subset to download, remove the resource id from
 the subset.
 
