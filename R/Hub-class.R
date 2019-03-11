@@ -277,7 +277,8 @@ setMethod("[[", c("Hub", "character", "missing"),
     if (is.na(idx)){
         if (isLocalHub(x)){
             if(recordStatus(x, i)$status == "Public")
-                stop("File not downloaded. Run with 'localHub=FALSE'",
+                stop("File not previously downloaded.",
+                     "\n  Run with 'localHub=FALSE'",
                      call.=FALSE)
         }
         stop(recordStatus(x, i)$status, call.=FALSE)
