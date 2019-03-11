@@ -121,6 +121,30 @@ setMethod("isLocalHub", "Hub",
     function(x) x@isLocalHub
 )
 
+setReplaceMethod("isLocalHub", "Hub",
+    function(x, value)
+{
+    stopifnot(value %in% c(TRUE, FALSE))
+    # not a no op
+    if (isLocalHub(x) != value){
+        # switch from FALSE to TRUE
+        if (value){
+            x@isLocalHub <- value
+            x <- .subsethub(x)
+        # switch from TRUE to FALSE
+        }else{
+            db_path <- x@.db_path
+            db_date <- .restrictDateByVersion(db_path)
+            db_uid <- .db_uid0(db_path, db_date)
+            x <- new(as.character(class(x)), cache=hubCache(x), hub=hubUrl(x),
+                     date=db_date, .db_path=db_path, .db_uid=db_uid,
+                     isLocalHub=value)
+        }
+    }
+    invisible(x)
+})
+
+
 setMethod("snapshotDate", "Hub", function(x) x@date)
 
 setReplaceMethod("snapshotDate", "Hub",
@@ -250,8 +274,14 @@ setMethod("[[", c("Hub", "character", "missing"),
     if (length(i) != 1L)
         stop("'i' must be length 1")
     idx <- match(i, names(.db_uid(x)))
-    if (is.na(idx))
-        stop(recordStatus(x, i)$status)
+    if (is.na(idx)){
+        if (isLocalHub(x)){
+            if(recordStatus(x, i)$status == "Public")
+                stop("File not downloaded. Run with 'localHub=FALSE'",
+                     call.=FALSE)
+        }
+        stop(recordStatus(x, i)$status, call.=FALSE)
+    }
     .Hub_get1(x[idx], force=force, verbose=verbose)
 })
 

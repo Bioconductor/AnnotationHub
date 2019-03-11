@@ -51,14 +51,15 @@ export(
     hubUrl, hubCache, hubDate,
     snapshotDate, "snapshotDate<-",
     getHub, listResources, loadResources,
-    package, convertHub
+    package, convertHub,
+    isLocalHub, "isLocalHub<-"
 )
 
 exportMethods(
     cache, "cache<-", query,
     hubUrl, hubCache, hubDate, 
     snapshotDate, "snapshotDate<-",
-    getHub
+    getHub, isLocalHub, "isLocalHub<-"
 )
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
