@@ -120,7 +120,7 @@ removeCache <- function(x){
              "\n  See vignette section on corrupt cache",
              "\n  cache: ", bfccache(bfc),
              "\n  potential duplicate files: ",
-             "\n", paste(files[order(names(files))], "\n"),
+             "\n    ", paste0(files[order(names(files))], collapse="\n    "),
              call.=FALSE)
     }
 

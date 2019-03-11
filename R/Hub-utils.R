@@ -185,7 +185,7 @@ possibleDates <- function(x) {
             stop("Corrupt Cache: resource id",
                  "\n  More than one entry in cache for: ",
                  rnames,
-                 "\n  See vignette section on corrupt cache")
+                 "\n  See vignette section on corrupt cache", call.=FALSE)
         } else if (cnt == 0){
             bfcadd(bfc, rname=rnames, fpath=hubpath, proxy=proxy)
         } else {
@@ -305,8 +305,8 @@ convertHub <- function(oldcachepath=NULL, newcachepath=NULL,
     if (length(notFnd) != 0){
         warning("The following files could not be re-downloaded.",
                 "\n  They appear to have been removed from the Hub.",
-                "\n",
-                paste(file.path(oldcachepath, notFnd), "\n"))
+                "\n      ",
+                paste0(file.path(oldcachepath, notFnd), collapse = "\n      "))
     }    
 
     # should their be an option to 
