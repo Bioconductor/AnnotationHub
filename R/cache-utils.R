@@ -10,7 +10,7 @@
 removeCache <- function(x){
     bfc <- .get_cache(x)
     removebfc(bfc)
-    
+
 }
 
 .get_cache <-
@@ -20,7 +20,7 @@ removeCache <- function(x){
 }
 
 
-.named_cache_path <- function(x) 
+.named_cache_path <- function(x)
 {
     stopifnot(is(x, "Hub"))
     path <- .datapathIds(x)
@@ -33,14 +33,14 @@ removeCache <- function(x){
 {
     cachepath <- .named_cache_path(x)
     need <- .cache_download_ok(x, cachepath, max.downloads, force, verbose)
-   
+
     ok <- .hub_resource(x, as.character(cachepath)[need],
         cachepath[need], proxy=proxy, verbose=verbose
     )
 
     if (!all(ok))
         stop(sum(!ok), " resources failed to download", call. = FALSE)
-    
+
     rnames <- paste(names(cachepath), cachepath, sep=" : ")
     bfc <- .get_cache(x)
     tryCatch({
@@ -53,7 +53,7 @@ removeCache <- function(x){
              call.=FALSE)
     })
     names(localFiles) <- rnames
-    
+
     if (verbose){
         message(paste0(
             c(
@@ -72,8 +72,8 @@ removeCache <- function(x){
         need <- rep(TRUE, length(cachepath))
     } else {
         bfc <- .get_cache(x)
-        need <- .updateEntry(bfc, cachepath)    
-    }   
+        need <- .updateEntry(bfc, cachepath)
+    }
     n <- sum(need)
 
     if (n > max.downloads) {
@@ -101,7 +101,7 @@ removeCache <- function(x){
     locFiles <- locFiles[!(endsWith(locFiles, ".sqlite") |
                            endsWith(locFiles, ".sqlite3")|
                            endsWith(locFiles, "_index.rds"))]
- 
+
     baseFileName <-   suppressWarnings(as.numeric(vapply(locFiles,
                           FUN=function(x){
                               vl <- strsplit(x,split="_")
@@ -112,7 +112,7 @@ removeCache <- function(x){
         baseFileName <- baseFileName[!dx]
         locFiles <- locFiles[!dx]
     }
-        
+
     locFiles = setNames(locFiles, baseFileName)
     if (any(duplicated(baseFileName))){
         files <- locFiles[names(locFiles) %in% baseFileName[duplicated(baseFileName)]]
@@ -123,11 +123,12 @@ removeCache <- function(x){
              "\n", paste(files[order(names(files))], "\n"),
              call.=FALSE)
     }
-    
-    
+
+
     allUpdate <- rep(TRUE, length(cachepath))
+    names(allUpdate) <- as.character(cachepath)
     fndFiles <-  which(cachepath %in% baseFileName)
-    
+
     Update <- function(rpath, bfc){
         res <- bfcquery(bfc, rpath, fields="rpath", exact=TRUE)
         cnt <- bfccount(res)
@@ -142,18 +143,20 @@ removeCache <- function(x){
             TRUE
         } else {
             bfcneedsupdate(bfc, rids=rid)
-         }
+        }
     }
     if (length(fndFiles) > 0){
-        update <- vapply(locFiles[which(as.numeric(names(locFiles)) %in%
-                                        cachepath[fndFiles])],
+
+        cachepath[fndFiles]
+
+        update <- vapply(locFiles[match(cachepath[fndFiles], names(locFiles))],
                          FUN=Update, FUN.VALUE=logical(1), USE.NAMES=TRUE,
                          bfc=bfc)
         if (anyNA(update))
             # if no caching information use local file
             update[is.na(update)] = FALSE
-    
-        allUpdate[fndFiles] <- update
+
+        allUpdate[match(names(update), names(allUpdate))] <- update
     }
-    allUpdate    
+    allUpdate
 }

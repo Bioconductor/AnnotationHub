@@ -24,7 +24,7 @@ which opens up the possibility of having caching problems. This document will
 touch on some troubleshooting for these issues as well as any other frequently
 asked issues. If the question or answer cannot be found here please ask on the
 [Bioconductor Support Site][] or on the mailing list
-`<bioc-devel@r-project.org>` 
+`<bioc-devel@r-project.org>`
 
 # Troubleshooting
 
@@ -35,14 +35,14 @@ BiocFileCache. The Hub code needs these files in order to operate
 correctly. Rerun the Hub constructor (`AnnotationHub()` or `ExperimentHub()`)
 again. If you were trying to run the constructor with `localHub=TRUE`, you
 will have to run `localHub=FALSE` at least once to redownload the Hub sqlite
-file. 
+file.
 
 ## Corrupt Cache
 
 A corrupt cache ERROR results from multiple entries in the BiocFileCache
 matching a query for a particular file.  This will involve removing one,
 multiple, or all entries for a file. Please see specific section below although
-all follow the same principles.  
+all follow the same principles.
 
 ### sqlite file
 
@@ -73,10 +73,10 @@ This shows the number of entries for the filename. There should only be one row
 res <- bfcquery(bfc, "annotationhub.sqlite3", field="rname", exact=TRUE)
 res
 # A tibble: 2 x 10
-  rid   rname create_time access_time rpath rtype fpath last_modified_t… etag 
+  rid   rname create_time access_time rpath rtype fpath last_modified_t… etag
   <chr> <chr> <chr>       <chr>       <chr> <chr> <chr> <chr>            <chr>
-1 BFC1  anno… 2019-03-05… 2019-03-06… /hom… web   http… 2019-02-19 19:1… NA   
-2 BFC13 anno… 2019-03-06… 2019-03-06… /hom… rela… /hom… NA               NA   
+1 BFC1  anno… 2019-03-05… 2019-03-06… /hom… web   http… 2019-02-19 19:1… NA
+2 BFC13 anno… 2019-03-06… 2019-03-06… /hom… rela… /hom… NA               NA
 # … with 1 more variable: expires <dbl>
 
 ```
@@ -87,7 +87,7 @@ parsing the tibble res object.
 
 If you can identify which entry should be kept - remove the other entries in
 the cache or rename the rname by calling the BiocFileCache functions bfcremove
-or bfcupdate with the rid of the offending entries 
+or bfcupdate with the rid of the offending entries
 
 ```
 library(dplyr)
@@ -139,10 +139,10 @@ This shows the number of entries for the filename. There should only be one row
 res <- bfcquery(bfc, "annotationhub.index.rds", field="rname", exact=TRUE)
 res
 # A tibble: 2 x 10
-  rid   rname create_time access_time rpath rtype fpath last_modified_t… etag 
+  rid   rname create_time access_time rpath rtype fpath last_modified_t… etag
   <chr> <chr> <chr>       <chr>       <chr> <chr> <chr> <chr>            <chr>
-1 BFC2  anno… 2019-03-05… 2019-03-05… /hom… rela… 66d4…               NA NA   
-2 BFC14 anno… 2019-03-06… 2019-03-06… /hom… rela… /hom…               NA NA   
+1 BFC2  anno… 2019-03-05… 2019-03-05… /hom… rela… 66d4…               NA NA
+2 BFC14 anno… 2019-03-06… 2019-03-06… /hom… rela… /hom…               NA NA
 # … with 1 more variable: expires <dbl>
 
 ```
@@ -153,7 +153,7 @@ parsing the tibble res object.
 
 If you can identify which entry should be kept - remove the other entries in
 the cache or rename the rname by calling the BiocFileCache functions bfcremove
-or bfcupdate with the rid of the offending entries 
+or bfcupdate with the rid of the offending entries
 
 ```
 library(dplyr)
@@ -179,16 +179,16 @@ ah = AnnotationHub()
 If the resource path is a problem, this indicates that there may be duplicate
 files in the cache. There may only exist at any given time one downloaded file
 path per resource as indicated by the filename schema "<random
-identifier>_<resource id>`.  This ERROR indicates duplicate values `_<resource id>` 
+identifier>_<resource id>`.  This ERROR indicates duplicate values `_<resource id>`
 
-The ERROR should look similar to 
+The ERROR should look similar to
 ```
 Error: Corrupt Cache: resource path
   See vignette section on corrupt cache
   cache: /home/lori/.cache/AnnotationHub
-  potential duplicate files: 
-499d6769cf1d_5012 
-66d42a51a258_5012 
+  potential duplicate files:
+499d6769cf1d_5012
+66d42a51a258_5012
 
 ```
 
@@ -208,7 +208,7 @@ Now we can query the BiocFileCache using the `duplicate files` of the ERROR mess
 res <- bfcquery(bfc, "5012", field="rpath", exact=FALSE)
 res
 # A tibble: 2 x 10
-  rid   rname create_time access_time rpath rtype fpath last_modified_t… etag 
+  rid   rname create_time access_time rpath rtype fpath last_modified_t… etag
   <chr> <chr> <chr>       <chr>       <chr> <chr> <chr> <chr>            <chr>
 1 BFC3  AH50… 2019-03-05… 2019-03-05… /hom… web   http… 2014-03-28 09:2… dd0c…
 2 BFC19 dup … 2019-03-06… 2019-03-06… /hom… web   http… 2014-03-28 09:2… dd0c…
@@ -232,6 +232,52 @@ bfcremove(bfc, rids="BFC19")
 bfcremove(bfc, rids=res$rid)
 ```
 
+If the query resulted in only one entry, there is likely a file in your cache
+location that has the format similar to the entry in the cache and will have to
+be removed or renamed. An example
+
+```
+Error: Corrupt Cache: resource path
+  See vignette section on corrupt cache
+  cache: /home/lori/.cache/AnnotationHub
+  potential duplicate files:
+45b42ba7aaa1_38317
+7a4726896632_38317
+```
+
+But when you do the query there is only one value
+
+```
+> res <- bfcquery(bfc, "38317", field="rpath", exact=FALSE)
+> res
+# A tibble: 1 x 10
+  rid   rname create_time access_time rpath rtype fpath last_modified_t… etag
+  <chr> <chr> <chr>       <chr>       <chr> <chr> <chr> <chr>            <chr>
+1 BFC37 AH32… 2019-03-08… 2019-03-08… /hom… web   http… 2013-07-25 07:0… 11c3…
+# … with 1 more variable: expires <dbl>
+```
+
+The file path of the valid entry is
+
+```
+> bfcinfo(bfc, rid="BFC37") %>% dplyr::select(rpath)
+# A tibble: 1 x 1
+  rpath
+  <chr>
+1 /home/lori/.cache/AnnotationHub/45b42ba7aaa1_38317
+```
+
+Therefore we would want to move or rename the file `7a4726896632_38317`.
+
+```
+> fl <- file.path(hubCache(ah), "7a4726896632_38317")
+> fl
+[1] "/home/lori/.cache/AnnotationHub/7a4726896632_38317"
+
+> unlink(fl)
+```
+
+
 ### resource id
 
 If the resource id is problematic, it generally means that there are entries in
@@ -247,7 +293,7 @@ Error: Corrupt Cache: resource id
 
 ```
 You will need to investigate the underlying BiocFileCache for the Hub and remove
-or rename resources so there are no duplicate rnames in the cache. 
+or rename resources so there are no duplicate rnames in the cache.
 
 ```
 library(BiocFileCache)
@@ -255,7 +301,7 @@ bfc <- BiocFileCache("/home/lori/.cache/AnnotationHub")
 bfcinfo(bfc) %>% dplyr::select(rname)
 ```
 
-You can remove with `bfcremove` and can rename with `bfcupdate`.  
+You can remove with `bfcremove` and can rename with `bfcupdate`.
 
 
 
@@ -265,7 +311,7 @@ A corrupt hub database ERROR results from an invalid hub sqlite file. Perhaps
 the original download was interrupted or the file was overwritten.
 
 You will have to remove the currently downloaded sqlite file so it can be
-redownloaded. 
+redownloaded.
 
 The output you received looked something similar to the following:
 ```
@@ -283,7 +329,7 @@ above output.
 file.remove('/home/lori/.cache/AnnotationHub/66d467fcefa5_annotationhub.sqlite3')
 ```
 
-Rerunning the constructor should now redownload a valid database object. 
+Rerunning the constructor should now redownload a valid database object.
 
 
 
