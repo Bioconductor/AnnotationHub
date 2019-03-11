@@ -32,17 +32,30 @@ removeCache <- function(x){
                             force, verbose)
 {
     cachepath <- .named_cache_path(x)
-    need <- .cache_download_ok(x, cachepath, max.downloads, force, verbose)
-
-    ok <- .hub_resource(x, as.character(cachepath)[need],
-        cachepath[need], proxy=proxy, verbose=verbose
-    )
-
-    if (!all(ok))
-        stop(sum(!ok), " resources failed to download", call. = FALSE)
-
+    localHub <- isLocalHub(x)
     rnames <- paste(names(cachepath), cachepath, sep=" : ")
     bfc <- .get_cache(x)
+
+    if(!localHub){
+        need <- .cache_download_ok(x, cachepath, max.downloads, force, verbose)
+
+        ok <- .hub_resource(x, as.character(cachepath)[need],
+                            cachepath[need], proxy=proxy, verbose=verbose
+                            )
+
+        if (!all(ok))
+            stop(sum(!ok), " resources failed to download", call. = FALSE)
+    }else{
+        incache <- bfcinfo(bfc)$rname
+        if(!all(rnames %in% incache))
+            stop("Cannot retrieve resource",
+                 "\n  Rerun constructor with 'localHub=FALSE' or exclude ID",
+                 "\n  Requested resource not found in local cache:",
+                 "\n    ", paste0(rnames[!(rnames %in% incache)],
+                                  collapse="\n    "),
+                 call.=FALSE)
+    }
+
     tryCatch({
         localFiles <- unname(bfcrpath(bfc, rnames=rnames))
     }, error=function(err){
