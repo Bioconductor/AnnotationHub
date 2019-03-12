@@ -315,7 +315,10 @@ setReplaceMethod("cache", "Hub",
                    },
                    character(1), bfc=bfc, USE.NAMES=FALSE)
     keep <- c(bfcrid(bfcquery(bfc, "annotationhub.sqlite3", fields="rname", exact=TRUE)),
-              bfcrid(bfcquery(bfc, "annotationhub.index.rds", fields="rname", exact=TRUE)))
+              bfcrid(bfcquery(bfc, "annotationhub.index.rds", fields="rname", exact=TRUE)),
+              bfcrid(bfcquery(bfc, "experimenthub.sqlite3", fields="rname", exact=TRUE)),
+              bfcrid(bfcquery(bfc, "experimenthub.index.rds", fields="rname", exact=TRUE))
+              )
     rmid <- setdiff(rids, keep)
     if (any(is.na(rmid)))
         rmid <- rmid[!is.na(rmid)]
