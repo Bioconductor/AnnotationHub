@@ -19,12 +19,10 @@ test_cache_datapathIds <- function() {
     checkIdentical(result, setNames(integer(), character()))
 }
 
-test_max_download <- function() {
+test_cache_download_ok<- function() {
     FUN <- AnnotationHub:::.cache_download_ok
     hub <- AnnotationHub()
     
-    checkIdentical(rep(TRUE, 0), FUN(hub, rep(tempfile(), 0), 4,force=FALSE, verbose=FALSE))
-    checkIdentical(rep(TRUE, 3), FUN(hub, rep(tempfile(), 3), 4,force=FALSE, verbose=FALSE))
-    checkIdentical(rep(TRUE, 3), FUN(hub, rep(tempfile(), 3), 3,force=FALSE, verbose=FALSE))
+    checkIdentical(rep(TRUE, 3), unname(FUN(hub, rep(tempfile(), 3), 3,force=FALSE, verbose=FALSE)))
 
 }

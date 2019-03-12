@@ -29,6 +29,10 @@
 \alias{package}
 \alias{package,Hub-method}
 \alias{removeCache}
+\alias{isLocalHub}
+\alias{isLocalHub,Hub-method}
+\alias{isLocalHub<-}
+\alias{isLocalHub<-,Hub-method}
 
 \alias{possibleDates}
 \alias{snapshotDate}
@@ -139,6 +143,10 @@
     \item{}{
       \code{hubUrl(x)}:
       Gets the URL for the online hub.
+    }
+   \item{}{
+      \code{isLocalHub(x)}:
+      Get whether or not constructor was called with \code{localHub=TRUE}.
     }
     \item{}{
       \code{length(x)}:
