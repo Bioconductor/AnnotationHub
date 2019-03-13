@@ -110,7 +110,8 @@
   \code{AnnotationHub} records can be added (and sometimes removed) at
   any time. \code{snapshotDate()} restricts hub records to those
   available at the time of the snapshot. \code{possibleDates()} lists
-  snapshot dates valid for the current version of Bioconductor.
+  snapshot dates valid for the current version of Bioconductor. You can
+  check the status of a past record using \code{recordStatus()}.
 
   The location of the local cache can be found (and updated) with
   \code{getAnnotationHubCache} and \code{setAnnotationHubCache}; 
@@ -334,7 +335,8 @@
   }
 }
 
-\author{Martin Morgan, Marc Carlson, Sonali Arora, and Dan Tenenbaum}
+\author{Martin Morgan, Marc Carlson, Sonali Arora, Dan Tenenbaum, and
+  Lori Shepherd}
 
 \examples{
   ## create an AnnotationHub object

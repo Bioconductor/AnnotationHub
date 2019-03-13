@@ -39,7 +39,7 @@ convertHub(oldcachepath=NULL,
   also prints status messages for downloading files and any files that
   were not redownloaded.}
 \examples{
-# To transition over to new default location
+# To transition over from old default to new default location
 \dontrun{convertHub()}
 }
 \author{Lori Shepherd}

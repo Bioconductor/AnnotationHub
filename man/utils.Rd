@@ -16,7 +16,7 @@
    methods contact Lori Shepherd \email{Lori.Shepherd@RoswellPark.org}
    to request a new DispatchClass be added
 }
-
+\author{Lori Shepherd}
 \examples{
 
   DispatchClassList()
