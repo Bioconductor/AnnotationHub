@@ -310,7 +310,7 @@
       Gets the file system location of the local AnnotationHub cache.
     }
     \item{}{
-      \code{removeCache(x)}:
+      \code{removeCache(x, ask=TRUE)}:
       Removes local AnnotationHub database and all related resources. After
       calling this function, the user will have to download any AnnotationHub
       resources again.

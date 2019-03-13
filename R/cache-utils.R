@@ -7,10 +7,9 @@
     db_path
 }
 
-removeCache <- function(x){
+removeCache <- function(x, ask=TRUE){
     bfc <- .get_cache(x)
-    removebfc(bfc)
-
+    removebfc(bfc, ask=ask)
 }
 
 .get_cache <-
