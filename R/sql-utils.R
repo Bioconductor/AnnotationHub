@@ -96,11 +96,13 @@
     ##       not filtered by snapshotDate(); the OrgDbs are valid for all
     ##       snapshotDates for a given BiocManager::version() 
  
-    biocversion <- as.numeric(as.character(BiocManager::version()))
     isDevel <- BiocManager:::isDevel()
     orgdb_release_version <- ifelse(getAnnotationHubOption("TESTING"),
-                                    biocversion,
-                                    ifelse(isDevel, biocversion - 0.1, biocversion))
+                                    as.character(BiocManager::version()),
+                                    ifelse(isDevel,
+                                           as.character(BiocManager:::.version_bioc("release")),
+                                           as.character(BiocManager::version())))
+
     query2 <- sprintf(
         'SELECT resources.id
          FROM resources, biocversions, rdatapaths
