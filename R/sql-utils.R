@@ -5,7 +5,7 @@
 {
     tbl <- .db_query(dbfile(x), query)
     ridx <- match(names(x), tbl$ah_id)
-    cidx <- match("ah_id", names(tbl)) 
+    cidx <- match("ah_id", names(tbl))
     rownames(tbl) <- tbl$ah_id
     tbl[ridx, -cidx, drop=FALSE]
 }
@@ -39,7 +39,7 @@
     ## they are removed from the web or by author request. The
     ## snapshot date can be changed by the user. We want to return records
     ## with no rdatadateremoved and with rdatadateadded <= snapshot.
-    ## All OrgDbs are omitted in the first filter and selectively 
+    ## All OrgDbs are omitted in the first filter and selectively
     ## exposed in the second filter.
     ##   NOTE: biocversions filter distinguishes between release and devel;
     ##   this is not caught by rdatadate added filter because the timestamp
@@ -77,7 +77,7 @@
          AND rdatapaths.resource_id == resources.id',
          date, BiocManager::version(), date)
     biocIds3 <- .db_query(conn, query3)[[1]]
-    
+
     ## OrgDb sqlite files:
     ##
     ## OrgDbs are the single resource designed to expire at the end of a
@@ -86,7 +86,7 @@
     ## duration of a release cycle both release and devel share the same
     ## OrgDb packages. Before the next release, new files are built, added
     ## to devel, propagated to release and so on.
-    ## 
+    ##
     ## When new sqlite files are added to the hub they are stamped
     ## with the devel version which immediately becomes the new release version.
     ## For this reason, the devel code loads OrgDbs with the release version
@@ -95,13 +95,15 @@
     ##
     ## NOTE: Because OrgDbs are valid for a full devel cycle they are
     ##       not filtered by snapshotDate(); the OrgDbs are valid for all
-    ##       snapshotDates for a given BiocManager::version() 
- 
-    biocversion <- as.numeric(as.character(BiocManager::version()))
-    isDevel <- BiocManager:::.version_bioc("devel") == biocversion
+    ##       snapshotDates for a given BiocManager::version()
+
+    isDevel <- BiocManager:::isDevel()
     orgdb_release_version <- ifelse(getAnnotationHubOption("TESTING"),
-                                    biocversion,
-                                    ifelse(isDevel, biocversion - 0.1, biocversion))
+                                    as.character(BiocManager::version()),
+                                    ifelse(isDevel,
+                                           as.character(BiocManager:::.version_bioc("release")),
+                                           as.character(BiocManager::version())))
+
     query2 <- sprintf(
         'SELECT resources.id
          FROM resources, biocversions, rdatapaths
@@ -113,7 +115,7 @@
          orgdb_release_version)
     biocIds2 <- .db_query(conn, query2)[[1]]
 
-    ## make unique and sort 
+    ## make unique and sort
     allIds = sort(unique(c(biocIds1, biocIds2, biocIds3)))
     ## match id to ah_id
     query <- paste0('SELECT ah_id FROM resources ',
@@ -126,7 +128,7 @@
 ## FIXME: On one hand it's convenient to have helpers for each of these fields.
 ##        Yet the main (only?) use case is probably mcols() and show() in
 ##        which case we want all of these and it's inefficient to search
-##        the same table multiple times for the different fields. 
+##        the same table multiple times for the different fields.
 
 ## helper to retrieve tags
 .tags <- function(x) {
@@ -146,7 +148,7 @@
     .db_query(dbfile(x), query)
 }
 
-## helper for extracting rdatapath 
+## helper for extracting rdatapath
 .rdatapath <- function(x) {
     query <- sprintf(
         'SELECT DISTINCT rdatapath, resource_id AS id FROM rdatapaths
@@ -183,7 +185,7 @@
 
 .sourcelastmodifieddate <- function(x) {
     query <- sprintf(
-        'SELECT DISTINCT sourcelastmodifieddate, resource_id AS id 
+        'SELECT DISTINCT sourcelastmodifieddate, resource_id AS id
          FROM input_sources
          WHERE resource_id IN (%s)',
         .id_as_single_string(x))
@@ -198,7 +200,7 @@
     lst <- vapply(split(tbl[[1]], tbl[["id"]]), paste0,
                   character(1), collapse=", ")
     lst <- lst[match(uid, names(lst))]
-    setNames(lst, names(uid))           # allows for x with no tags 
+    setNames(lst, names(uid))           # allows for x with no tags
 }
 
 .collapse_as_list <- function(x, FUN)
@@ -207,7 +209,7 @@
     tbl <- FUN(x)
     lst <- split(tbl[[1]], tbl$id)
     lst <- lst[match(uid, names(lst))]
-    setNames(lst, names(uid))           # allows for x with no tags 
+    setNames(lst, names(uid))           # allows for x with no tags
 }
 
 ## Used in mcols()
@@ -260,7 +262,7 @@
     setNames(result[[2]], result[[1]])
 }
 
-## 
+##
 .dataclass <- function(x)
 {
     query <- sprintf(
@@ -272,7 +274,7 @@
     .query_as_data.frame(x, query)[[1]]
 }
 
-## 
+##
 .title_data.frame <-
     function(x)
 {
@@ -289,7 +291,7 @@
     query <- sprintf(
         "SELECT %s FROM resources
          WHERE resources.id IN (%s)
-         GROUP BY %s ORDER BY COUNT(%s) DESC LIMIT %d", 
+         GROUP BY %s ORDER BY COUNT(%s) DESC LIMIT %d",
         column, .id_as_single_string(x), column, column, limit)
     .db_query(dbfile(x), query)[[column]]
 }
@@ -300,7 +302,7 @@
     query <- sprintf(
         "SELECT %s FROM resources, %s
          WHERE resources.id IN (%s) AND %s.resource_id == resources.id
-         GROUP BY %s ORDER BY COUNT(%s) DESC LIMIT %d", 
+         GROUP BY %s ORDER BY COUNT(%s) DESC LIMIT %d",
         column, table,
         .id_as_single_string(x), table,
         column, column, limit)
@@ -360,7 +362,7 @@
 ## LIMIT 20
 
 
-## SELECT id FROM 
+## SELECT id FROM
 ## (SELECT * FROM
 ## (SELECT * FROM resources where rdatadateadded <= "2013-03-19")
 ## AS res GROUP BY title ORDER BY rdatadateadded DESC limit 1);
