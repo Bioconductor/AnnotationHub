@@ -21,7 +21,7 @@
                  call.=FALSE)
         } else {
             rid <- res %>% collect(Inf) %>% `[[`("rid")
-            db_path <- bfcrpath(bfc, rids=rid)
+            db_path <- bfcpath(bfc, rids=rid)
         }
     # Checking remote file for updates
     } else{
@@ -44,7 +44,7 @@
             db_path <- ifelse(bfcneedsupdate(bfc, rids=rid),
                               bfcdownload(bfc, rid=rid, ask=FALSE,
                                           proxy=proxy),
-                              bfcrpath(bfc, rids=rid))
+                              bfcpath(bfc, rids=rid))
         }
     }
     unname(db_path)

@@ -81,7 +81,7 @@ setMethod("dbfile", "Hub",
     } else {
 
         if (cnt == 1){           
-            index_path <- bfcrpath(bfc, rids=rid)
+            index_path <- bfcpath(bfc, rids=rid)
             if (file.exists(index_path)) {
                 if (file.mtime(index_path) > file.mtime(dbfile(x)) &&
                     length(x) == length(readRDS(index_path)))
@@ -95,7 +95,7 @@ setMethod("dbfile", "Hub",
             tbl <- setNames(do.call("paste", c(tbl, sep="\r")), rownames(tbl))
             index_path <- ifelse(cnt == 0,
                                  bfcnew(bfc, rname=index_name, ext="_hub_index.rds"),
-                                 bfcrpath(bfc, rids=rid))
+                                 bfcpath(bfc, rids=rid))
             saveRDS(tbl, unname(index_path))
         }, error=function(err) {
             stop("failed to create index",
@@ -128,7 +128,7 @@ setMethod("dbfile", "Hub",
                       
          stop(msg, call.=FALSE)
     } else {
-        unname(bfcrpath(bfc, rids=rid))
+        unname(bfcpath(bfc, rids=rid))
     }
 }
     

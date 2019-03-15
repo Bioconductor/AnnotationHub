@@ -199,7 +199,7 @@ setMethod("fileName", signature=(object="Hub"),
     bfc <- .get_cache(object)
     dx <- rep(NA_character_, length(rnames))
     fnd <- which(rnames %in% bfcinfo(bfc)$rname)
-    dx[fnd] <- unname(bfcrpath(bfc, rnames=rnames[fnd]))
+    dx[fnd] <- unname(bfcpath(bfc, rnames=rnames[fnd]))
     names(dx) <- names(cachepath)
     dx
 

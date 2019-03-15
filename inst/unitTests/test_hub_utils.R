@@ -15,7 +15,7 @@ test_updatehub <- function(){
                                          url=getAnnotationHubOption("URL"),
                                          proxy=getAnnotationHubOption("PROXY"),
                                          localHub=TRUE)
-    checkIdentical(unname(bfcrpath(bfc, rids=bfcrid(res))), path)
+    checkIdentical(unname(bfcpath(bfc, rids=bfcrid(res))), path)
 
 }
 
