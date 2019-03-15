@@ -56,7 +56,7 @@ removeCache <- function(x, ask=TRUE){
     }
 
     tryCatch({
-        localFiles <- unname(bfcrpath(bfc, rnames=rnames))
+        localFiles <- bfcinfo(bfc)$rpath[match(rnames, bfcinfo(bfc)$rname)]
     }, error=function(err){
         stop("Corrupt Cache: resource id",
              "\n  See vignette section on corrupt cache",

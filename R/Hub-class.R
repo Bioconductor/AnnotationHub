@@ -198,8 +198,9 @@ setMethod("fileName", signature=(object="Hub"),
     rnames <- paste(names(cachepath), cachepath, sep=" : ")
     bfc <- .get_cache(object)
     dx <- rep(NA_character_, length(rnames))
-    fnd <- which(rnames %in% bfcinfo(bfc)$rname)
-    dx[fnd] <- unname(bfcrpath(bfc, rnames=rnames[fnd]))
+    bfc_rname <- bfcinfo(bfc)$rname
+    fnd <- which(rnames %in% bfc_rname)
+    dx[fnd] <- bfcinfo(bfc)$rpath[match(rnames[fnd], bfc_rname)]
     names(dx) <- names(cachepath)
     dx
 
