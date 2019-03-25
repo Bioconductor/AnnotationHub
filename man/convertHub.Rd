@@ -44,5 +44,6 @@ convertHub(oldcachepath=NULL,
 }
 \author{Lori Shepherd}
 \seealso{\code{\link{AnnotationHub}},
-  \code{\link{getAnnotationHubOption}}}
+  \code{\link{getAnnotationHubOption}},
+  \code{\link{getInfoOnIds}}}
 \keyword{utilities}

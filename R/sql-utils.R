@@ -11,7 +11,7 @@
     ## they are removed from the web or by author request. The
     ## snapshot date can be changed by the user. We want to return records
     ## with no rdatadateremoved and with rdatadateadded <= snapshot.
-    ## All OrgDbs are omitted in the first filter and selectively 
+    ## All OrgDbs are omitted in the first filter and selectively
     ## exposed in the second filter.
     ##   NOTE: biocversions filter distinguishes between release and devel;
     ##   this is not caught by rdatadate added filter because the timestamp
@@ -57,7 +57,7 @@
     ## duration of a release cycle both release and devel share the same
     ## OrgDb packages. Before the next release, new files are built, added
     ## to devel, propagated to release and so on.
-    ## 
+    ##
     ## When new sqlite files are added to the hub they are stamped
     ## with the devel version which immediately becomes the new release version.
     ## For this reason, the devel code loads OrgDbs with the release version
@@ -66,8 +66,8 @@
     ##
     ## NOTE: Because OrgDbs are valid for a full devel cycle they are
     ##       not filtered by snapshotDate(); the OrgDbs are valid for all
-    ##       snapshotDates for a given BiocManager::version() 
- 
+    ##       snapshotDates for a given BiocManager::version()
+
     biocversion <- as.numeric(as.character(BiocManager::version()))
     isDevel <- BiocManager:::isDevel()
     orgdb_release_version <- ifelse(getAnnotationHubOption("TESTING"),
@@ -84,7 +84,7 @@
          orgdb_release_version)
     biocIds2 <- .db_query(conn, query2)[[1]]
 
-    ## make unique and sort 
+    ## make unique and sort
     allIds = sort(unique(c(biocIds1, biocIds2, biocIds3)))
     ## match id to ah_id
     query <- paste0('SELECT ah_id FROM resources ',
@@ -123,7 +123,7 @@
 {
     tbl <- .db_query(dbfile(x), query)
     ridx <- match(names(x), tbl$ah_id)
-    cidx <- match("ah_id", names(tbl)) 
+    cidx <- match("ah_id", names(tbl))
     rownames(tbl) <- tbl$ah_id
     tbl[ridx, -cidx, drop=FALSE]
 }
@@ -136,7 +136,7 @@
     lst <- vapply(split(tbl[[1]], tbl[["id"]]), paste0,
                   character(1), collapse=", ")
     lst <- lst[match(uid, names(lst))]
-    setNames(lst, names(uid))           # allows for x with no tags 
+    setNames(lst, names(uid))           # allows for x with no tags
 }
 
 .collapse_as_list <- function(x, FUN)
@@ -145,7 +145,7 @@
     tbl <- FUN(x)
     lst <- split(tbl[[1]], tbl$id)
     lst <- lst[match(uid, names(lst))]
-    setNames(lst, names(uid))           # allows for x with no tags 
+    setNames(lst, names(uid))           # allows for x with no tags
 }
 
 ## helper to retrieve tags
@@ -166,7 +166,7 @@
     .db_query(dbfile(x), query)
 }
 
-## helper for extracting rdatapath 
+## helper for extracting rdatapath
 .rdatapath <- function(x) {
     query <- sprintf(
         'SELECT DISTINCT rdatapath, resource_id AS id FROM rdatapaths
@@ -203,7 +203,7 @@
 
 .sourcelastmodifieddate <- function(x) {
     query <- sprintf(
-        'SELECT DISTINCT sourcelastmodifieddate, resource_id AS id 
+        'SELECT DISTINCT sourcelastmodifieddate, resource_id AS id
          FROM input_sources
          WHERE resource_id IN (%s)',
         .id_as_single_string(x))
@@ -254,7 +254,7 @@
     query <- sprintf(
         "SELECT %s FROM resources
          WHERE resources.id IN (%s)
-         GROUP BY %s ORDER BY COUNT(%s) DESC LIMIT %d", 
+         GROUP BY %s ORDER BY COUNT(%s) DESC LIMIT %d",
         column, .id_as_single_string(x), column, column, limit)
     .db_query(dbfile(x), query)[[column]]
 }
@@ -265,7 +265,7 @@
     query <- sprintf(
         "SELECT %s FROM resources, %s
          WHERE resources.id IN (%s) AND %s.resource_id == resources.id
-         GROUP BY %s ORDER BY COUNT(%s) DESC LIMIT %d", 
+         GROUP BY %s ORDER BY COUNT(%s) DESC LIMIT %d",
         column, table,
         .id_as_single_string(x), table,
         column, column, limit)
@@ -283,4 +283,19 @@
         .id_as_single_string(x))
     result <- .db_query(dbfile(x), query)
     setNames(result[[2]], result[[1]])
+}
+
+.IdsInfo <- function(x)
+{
+    query <-
+        'SELECT DISTINCT resources.ah_id, rdatapaths.id, resources.title, rdatapaths.rdataclass, statuses.status, biocversions.biocversion, resources.rdatadateadded, resources.rdatadateremoved
+         FROM resources, rdatapaths, statuses, biocversions
+         WHERE resources.id == rdatapaths.resource_id
+         AND resources.status_id == statuses.id
+         AND biocversions.resource_id == resources.id'
+    mat <- .db_query(dbfile(x), query)
+    nms <- names(mat)
+    nms[which(nms == "id")] = "fetch_id"
+    names(mat) <- nms
+    mat
 }

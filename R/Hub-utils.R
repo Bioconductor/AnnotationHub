@@ -292,7 +292,7 @@ convertHub <- function(oldcachepath=NULL, newcachepath=NULL,
  
     mapping_ids <- .named_cache_path(hub)
     cachepath <- mapping_ids[which(mapping_ids %in% as.numeric(download_files))]
-   
+
     dxFnd <- as.numeric(download_files) %in% mapping_ids
     notFnd <- download_files[!dxFnd]
 
@@ -304,10 +304,12 @@ convertHub <- function(oldcachepath=NULL, newcachepath=NULL,
 
     if (length(notFnd) != 0){
         warning("The following files could not be re-downloaded.",
-                "\n  They appear to have been removed from the Hub.",
                 "\n      ",
-                paste0(file.path(oldcachepath, notFnd), collapse = "\n      "))
-    }    
+                paste0(file.path(oldcachepath, notFnd), collapse = "\n      "),
+        #    alldatainfo <- .IdsInfo(hub)
+        #    datainfo <- alldatainfo[match(notFnd, alldatainfo$fetch_id),]
+                "\n  For more information on these files, See: ?getInfoOnIds")
+    }
 
     # should their be an option to 
     # delete old cache and files?
@@ -315,4 +317,27 @@ convertHub <- function(oldcachepath=NULL, newcachepath=NULL,
 
     
     hubCache(hub)
+}
+
+
+getInfoOnIds <- function(hub, ids, type=c("fetch_id", "ah_id")) {
+
+    type <- match.arg(type)
+    if (missing(ids))
+        stop("Please select at least one valid id for 'ids'")
+    alldatainfo <- .IdsInfo(hub)
+
+    dx <- switch(type,
+                 fetch_id = match(ids, alldatainfo$fetch_id),
+                 match(ids, alldatainfo$ah_id))
+
+    if(any(is.na(dx))){
+        stop("Not all ids found in database.",
+             "\n  Try removing the following:",
+             "\n      ",
+             paste(ids[is.na(dx)], collapse="\n      "),
+             "\n  Or try changing argument 'type'. Currently running with:",
+             "\n    ", type)
+    }
+    alldatainfo[dx,]
 }
