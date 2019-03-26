@@ -15,7 +15,7 @@
         }else if (cnt > 1){
             stop("Corrupt Cache: sqlite file",
                  "\n  See vignette section on corrupt cache",
-                 "\n  cache: ", bfccache(bfc), 
+                 "\n  cache: ", bfccache(bfc),
                  "\n  filename: ",
                  paste0(tolower(.class), ".sqlite3"),
                  call.=FALSE)
@@ -89,12 +89,12 @@
     if (length(biocversion) > 1L)
         stop("length(biocversion) must == 1")
 
-    yaml <- httr::content(GET("http://bioconductor.org/config.yaml"), 
+    yaml <- httr::content(GET("http://bioconductor.org/config.yaml"),
                     encoding="UTF-8", as="text")
     obj <- yaml.load(yaml)
     release_dates <- obj$release_dates
     version_date <- release_dates[biocversion == names(release_dates)]
-    ## convert to snapshot format 
+    ## convert to snapshot format
     if (length(version_date))
         as.character(as.POSIXlt(version_date[[1]], format='%m/%d/%Y'))
     else
@@ -108,11 +108,11 @@
                            format='%Y-%m-%d')
     if (length(restrict))  ## release
         as.character(max(dates[dates <= restrict]))
-    else                   ## devel 
+    else                   ## devel
         as.character(max(dates))
 }
 
-## all possible dates 
+## all possible dates
 .possibleDates <- function(path) {
     conn <- .db_open(path)
     on.exit(.db_close(conn))
@@ -200,11 +200,11 @@ possibleDates <- function(x) {
                 call.=FALSE)
         FALSE
     })
-    
+
 }
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### Subsetting 
+### Subsetting
 ###
 
 .Hub_get1 <-
@@ -248,7 +248,7 @@ possibleDates <- function(x) {
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### converting Legacy to New 
+### converting Legacy to New
 ###
 
 convertHub <- function(oldcachepath=NULL, newcachepath=NULL,
@@ -257,15 +257,15 @@ convertHub <- function(oldcachepath=NULL, newcachepath=NULL,
                        max.downloads=getAnnotationHubOption("MAX_DOWNLOADS"),
                        force=FALSE, verbose=TRUE)
 {
-    
+
     hubType <- match.arg(hubType)
-        
+
     if (is.null(oldcachepath)){
         .CACHE_ROOT_orig <- ifelse(hubType=="AnnotationHub", ".AnnotationHub", ".ExperimentHub")
         path <- switch(.Platform$OS.type, unix = path.expand("~/"),
                        windows= file.path(gsub("\\\\", "/",
                            Sys.getenv("HOME")), "AppData"))
-        
+
         oldcachepath <- file.path(path, .CACHE_ROOT_orig)
     }
     orig_files <- dir(oldcachepath)
@@ -273,7 +273,7 @@ convertHub <- function(oldcachepath=NULL, newcachepath=NULL,
                               c("annotationhub.sqlite3", "experimenthub.sqlite3",
                                 "index.rds"))
 
-    
+
     if(verbose) message("Attempting to redownload: ", length(download_files), " hub resources")
 
     if(is.null(newcachepath)){
@@ -289,7 +289,7 @@ convertHub <- function(oldcachepath=NULL, newcachepath=NULL,
             hub <- ExperimentHub::ExperimentHub(cache=newcachepath)
         }
     }
- 
+
     mapping_ids <- .named_cache_path(hub)
     cachepath <- mapping_ids[which(mapping_ids %in% as.numeric(download_files))]
 
@@ -297,10 +297,17 @@ convertHub <- function(oldcachepath=NULL, newcachepath=NULL,
     notFnd <- download_files[!dxFnd]
 
     subHub <- hub[which(hub$ah_id %in% names(cachepath))]
-    
-    .cache_internal(subHub, 
-                    proxy=proxy, max.downloads=max.downloads,
-                    force=force, verbose=verbose)
+
+    tryCatch({
+        .cache_internal(subHub,
+                        proxy=proxy, max.downloads=max.downloads,
+                        force=force, verbose=verbose)
+    }, error = function(err) {
+        warning("Not all resources downloaded correctly.",
+                "It may be beneficial to rerun 'convertHub()'",
+                "\n  reason: ", conditionMessage(err),
+                call.=FALSE)
+    })
 
     if (length(notFnd) != 0){
         warning("The following files could not be re-downloaded.",
@@ -311,10 +318,10 @@ convertHub <- function(oldcachepath=NULL, newcachepath=NULL,
                 "\n  For more information on these files, See: ?getInfoOnIds")
     }
 
-    # should their be an option to 
+    # should their be an option to
     # delete old cache and files?
     # could get complicated if older files not found etc.
 
-    
+
     hubCache(hub)
 }
