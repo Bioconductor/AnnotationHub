@@ -333,6 +333,61 @@ setReplaceMethod("cache", "Hub",
 ### $, query() and subset() methods
 ###
 
+setMethod("getInfoOnIds", "missing",
+    function(hub, ids)
+{
+    ids <- names(.db_uid(hub))
+    getInfoOnIds(hub, ids)
+})
+
+setMethod("getInfoOnIds", "character",
+    function(hub, ids)
+{
+    alldatainfo <- .IdsInfo(hub)
+    dx <- match(ids, alldatainfo$ah_id)
+    if(any(is.na(dx))){
+        stop("Not all ids found in database.",
+             "\n  Try removing the following:",
+             "\n      ",
+             paste(ids[is.na(dx)], collapse="\n      "))
+    }
+    res <- alldatainfo[dx,]
+    res$fileSize <- getSize(hub, res)
+    res
+})
+
+setMethod("getInfoOnIds", "numeric",
+    function(hub, ids)
+{
+    alldatainfo <- .IdsInfo(hub)
+    dx <- match(ids, alldatainfo$fetch_id)
+    if(any(is.na(dx))){
+        stop("Not all ids found in database.",
+             "\n  Try removing the following:",
+             "\n      ",
+             paste(ids[is.na(dx)], collapse="\n      "))
+    }
+    res <- alldatainfo[dx,]
+    res$fileSize <- getSize(hub, res)
+    res
+})
+
+getSize <- function(hub, tbl)
+{
+    id <- tbl$fetch_id
+    urls <- paste(hubUrl(hub), "fetch", id, sep=.Platform$file.sep)
+    vapply(urls,
+           FUN=function(url){
+               tryCatch({
+                   headers(HEAD(url))$`content-length`
+               }, error = function(err){
+                   NA_character_
+               })
+           },
+           FUN.VALUE=character(1),
+           USE.NAMES=FALSE)
+}
+
 setMethod("$", "Hub",
     function(x, name)
 {

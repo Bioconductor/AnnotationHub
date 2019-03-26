@@ -318,26 +318,3 @@ convertHub <- function(oldcachepath=NULL, newcachepath=NULL,
     
     hubCache(hub)
 }
-
-
-getInfoOnIds <- function(hub, ids, type=c("fetch_id", "ah_id")) {
-
-    type <- match.arg(type)
-    if (missing(ids))
-        stop("Please select at least one valid id for 'ids'")
-    alldatainfo <- .IdsInfo(hub)
-
-    dx <- switch(type,
-                 fetch_id = match(ids, alldatainfo$fetch_id),
-                 match(ids, alldatainfo$ah_id))
-
-    if(any(is.na(dx))){
-        stop("Not all ids found in database.",
-             "\n  Try removing the following:",
-             "\n      ",
-             paste(ids[is.na(dx)], collapse="\n      "),
-             "\n  Or try changing argument 'type'. Currently running with:",
-             "\n    ", type)
-    }
-    alldatainfo[dx,]
-}

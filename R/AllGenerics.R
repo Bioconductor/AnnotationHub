@@ -52,6 +52,10 @@ setGeneric("loadResources", signature="hub",
     function(hub, package, filterBy=character()) 
         standardGeneric("loadResources")
 )
+setGeneric("getInfoOnIds", signature="ids",
+    function(hub, ids) standardGeneric("getInfoOnIds")
+)
+
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### AnnotationHubResource objects
 ###

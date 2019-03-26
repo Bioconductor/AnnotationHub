@@ -13,7 +13,7 @@ importFrom(utils, packageVersion, read.csv, read.delim, unzip,
 )
 importFrom(httr, 
     GET, content, parse_url, progress, write_disk,
-    stop_for_status, status_code, use_proxy
+    stop_for_status, status_code, use_proxy, HEAD, headers
 )
 importFrom(yaml, yaml.load)
 importFrom(interactiveDisplayBase, display)
@@ -52,14 +52,14 @@ export(
     snapshotDate, "snapshotDate<-",
     getHub, listResources, loadResources,
     package, convertHub,
-    isLocalHub, "isLocalHub<-"
+    isLocalHub, "isLocalHub<-", getInfoOnIds
 )
 
 exportMethods(
     cache, "cache<-", query,
     hubUrl, hubCache, hubDate, 
     snapshotDate, "snapshotDate<-",
-    getHub, isLocalHub, "isLocalHub<-"
+    getHub, isLocalHub, "isLocalHub<-", getInfoOnIds
 )
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -72,7 +72,7 @@ export(
     getAnnotationHubOption, setAnnotationHubOption, 
     possibleDates, mcols,
     .httr_proxy, .hub_option_key, .db_close,
-    recordStatus, DispatchClassList, getInfoOnIds
+    recordStatus, DispatchClassList
 )
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
