@@ -28,7 +28,7 @@ test_hub_cache_resource <- function(){
     namescachepath <- names(cachepath)
     bfc <- AnnotationHub:::.get_cache(ah)
     proxy <- getAnnotationHubOption("PROXY")
-    # valid    
+    # valid
     checkTrue(AnnotationHub:::.hub_cache_resource(hubpath,
                                                   namescachepath,
                                                   cachepath,
@@ -40,5 +40,5 @@ test_hub_cache_resource <- function(){
                                                        cachepath,
                                                        bfc,
                                                        proxy), FALSE)
-                                                 
+
 }
