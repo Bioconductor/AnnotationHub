@@ -1,7 +1,7 @@
 ---
 title: "Creating An AnnotationHub Package"
 author: "Valerie Obenchain and Lori Shepherd"
-date: "Modified: October 2016. Compiled: `r format(Sys.Date(), '%d %b %Y')`"
+date: "Modified: March 2019. Compiled: `r format(Sys.Date(), '%d %b %Y')`"
 output:
   BiocStyle::html_document:
     toc: true
@@ -312,4 +312,77 @@ subdirectories as necessary (i.e. top directory must be software package name,
 then if applicable, subdirectories of versions, ...)
 
 Once the upload is complete, email Lori.Shepherd@roswellpark.org to continue the
-process
+process. To add the data officially the data will need to be uploaded and the
+metadata.csv file will need to be created in the github repository.
+
+# Example metadata.csv file and more information
+
+As described above the metadata.csv file (or multiple metadata.csv files) will
+need to be created before the data can be added to the database. To ensure
+proper formatting one should run `AnnotationHubData::makeAnnotationHubMetadata`
+on the package with any/all metadata files, and address any ERRORs that
+occur. Each object uploaded to S3 should have an entry in the metadata
+file. Briefly, a description of the metadata columns required:
+
+* Title: 'character(1)'. Name of the resource. This can be the exact file name
+  (if self-describing) or a more complete description.
+* Description: 'character(1)'. Brief description of the resource, similar to the
+  'Description' field in a package DESCRIPTION file.
+* BiocVersion: 'character(1)'. The first Bioconductor version the resource was
+  made available for. Unless removed from the hub, the resource will be
+  available for all versions greater than or equal to this field. This generally
+  is the current devel version of Bioconductor.
+* Genome: 'character(1)'. Genome. Can be NA.
+* SourceType: 'character(1)'. Format of original data, e.g., FASTA, BAM, BigWig,
+  etc. 'getValidSourceType()' list currently acceptable values. If nothing seems
+  appropiate for your data reach out to lori.shepherd@roswellpark.org
+* SourceUrl: 'character(1)'. Location of original data files. Multiple urls
+  should be provided as a comma separated string. If the data is simulated we
+  recommend putting either a lab url or the url of the Bioconductor package.
+* SourceVersion: 'character(1)'. Version of original data.
+* Species: 'character(1)'. Species. For help on valid species see
+  'getSpeciesList, validSpecies, or suggestSpecies.' Can be NA.
+* TaxonomyId: 'character(1)'. Taxonomy ID. There are checks for valid taxonomyId
+  given the Species which produce warnings. See GenomeInfoDb::loadTaxonomyDb()
+  for full validation table. Can be NA.
+* Coordinate_1_based: 'logical'. TRUE if data are 1-based. Can be NA.
+* DataProvider: 'character(1)'. Name of company or institution that supplied the
+  original (raw) data.
+* Maintainer: 'character(1)'. Maintainer name and email in the following format:
+  Maintainer Name <username@address>.
+* RDataClass: 'character(1)'. R / Bioconductor class the data are stored in,
+  e.g., GRanges, SummarizedExperiment, ExpressionSet etc.
+* DispatchClass: 'character(1)'. Determines how data are loaded into R. The
+  value for this field should be 'Rda' if the data were serialized with 'save()'
+  and 'Rds' if serialized with 'saveRDS'. The filename should have the
+  appropriate 'rda' or 'rds' extension. The function
+  'AnnotationHub::DispatchClassList()' will output a matrix of currently
+  implemented DispatchClass and brief description of utility. If a predefine
+  class does not seem appropriate contact lori.shepherd@roswellpark.org
+* Location_Prefix: 'character(1)'. Do not include this field if data are stored
+  in the Bioconductor AWS S3; it will be generated automatically. If data will
+  be accessed from a location other than AWS S3 this field should be the base
+  url.
+* RDataPath: 'character(1)'.This field should be the remainder of the path to
+  the resource. The 'Location_Prefix' will be prepended to 'RDataPath' for the
+  full path to the resource.  If the resource is stored in Bioconductor's AWS S3
+  buckets, it should start with the name of the package associated with the
+  metadata and should not start with a leading slash. It should include the
+  resource file name.
+* Tags: 'character() vector'.  'Tags' are search terms used to define a subset
+  of resources in a 'Hub' object, e.g, in a call to 'query'.
+
+Any additional columns in the metadata.csv file will be ignored but could be
+included for internal reference.
+
+This is a bad example because these annotations are already in the hubs but it
+should give you an idea of the format. Let's say I have a package myAnnotations
+and I upload two annotation files for dog and cow with information extracted from
+ensembl.  You would want the following saved as a csv (comma seperated output)
+but for easier view we show in a table:
+
+
+Title | Description | BiocVersion | Genome | SourceType | SourceUrl | SourceVersion | Species | TaxonomyId | Coordinate_1_based | DataProvider | Maintainer | RDataClass | DispatchClass | RDataPath
+---------------|----------------------------------------------|-----|-------------|-----|----------------------------------------------------------------------------------------------------|------------|-------------|------|------|---------|-------------------------------------------------------|-----------|----------|--------------------------------------------------------------------------
+Dog Annotation | Gene Annotation for Canis lupus from ensembl | 3.9 | Canis lupus | GTF | ftp://ftp.ensembl.org/pub/release-95/gtf/canis_lupus_dingo/Canis_lupus_dingo.ASM325472v1.95.gtf.gz | release-95 | Canis lupus | 9612 | true | ensembl | Bioconductor Maintainer <maintainer@bioconductor.org> | character | FilePath | myAnnotations/canis_lupus_dingo.ASM325472v1.95.gtf.gz
+Cow Annotation | Gene Annotation for Bos taurus from ensemble | 3.9 | Bos taurus  | GTF | ftp://ftp.ensembl.org/pub/release-74/gtf/bos_taurus/Bos_taurus.UMD3.1.74.gtf.gz | release-74 | Bos taurus | 9913 | true | ensembl | Bioconductor Maintainer <maintainer@bioconductor.org> | character | FilePath | myAnnotations/Bos_taurus.UMD3.1.74.gtf.gz
