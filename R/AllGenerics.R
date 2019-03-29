@@ -25,6 +25,12 @@ setGeneric("snapshotDate<-", signature="x",
 setGeneric("package", signature="x",
     function(x, value) standardGeneric("package")
 )
+setGeneric("isLocalHub", signature="x",
+    function(x) standardGeneric("isLocalHub")
+)
+setGeneric("isLocalHub<-", signature="x",
+    function(x, value) standardGeneric("isLocalHub<-")
+)
 ## cache returns either the path to the URL or the local path (in a cache)
 ## along the way it downloads the resource that it locates 
 ## Already expecting multiple ids from .dataPathIds(), (potentially)
@@ -45,6 +51,9 @@ setGeneric("listResources", signature="hub",
 setGeneric("loadResources", signature="hub",
     function(hub, package, filterBy=character()) 
         standardGeneric("loadResources")
+)
+setGeneric("getInfoOnIds", signature="ids",
+    function(hub, ids) standardGeneric("getInfoOnIds")
 )
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -1,103 +1,100 @@
-## and hubUrl (https://annotationhub.bioconductor.org/)
-
-.hub_metadata_path <-
-    function(hub)
+.updateHubDB <-
+    function(bfc, .class, url, proxy, localHub)
 {
-    paste(hub, "metadata", sep="/")
-}
+    res <- bfcquery(bfc, paste0(tolower(.class), ".sqlite3"),
+                    field="rname", exact=TRUE)
+    cnt <- bfccount(res)
+    if (is.null(proxy)) proxy=""
 
-## The following helper was previously not used (and now is), but we
-## do need a way to have a path for the data that is separate from the
-## path for the .sqlite metadata (they don't need to always be at the
-## same server) - IOW these should be decoupled anyhow).
-.hub_data_path <-
-    function(hub)
-{
-##    "http://gamay:9393/fetch"
-##    "https://annotationhub.bioconductor.org/fetch"
-    sprintf("%s/fetch", hub)
-}
-
-.hub_resource_path <-
-    function(hub, resource)
-{
-    sprintf("%s/%s", hub, resource)
-}
-
-## example of hub resource (sometimes convenient)
-## hub = 'https://annotationhub.bioconductor.org/metadata/annotationhub.sqlite3'
-.hub_cache_resource <- function(hubpath, cachepath, proxy, overwrite=FALSE) {
-    ## retrieve file from hub to cache
-    tryCatch({
-        tmp <- tempfile()
-        ## Download the resource in a way that supports https
-        if (interactive() && (packageVersion("httr") > "1.0.0")) {
-            response <-
-                GET(hubpath, progress(), write_disk(tmp), proxy)
-            cat("\n") ## line break after progress bar
+    # Using localHub (no internet)
+    if (localHub){
+        if (cnt == 0){
+            stop("Invalid Cache: sqlite file",
+                 "\n  Hub has not been added to cache",
+                 "\n  Run again with 'localHub=FALSE'")
+        }else if (cnt > 1){
+            stop("Corrupt Cache: sqlite file",
+                 "\n  See vignette section on corrupt cache",
+                 "\n  cache: ", bfccache(bfc),
+                 "\n  filename: ",
+                 paste0(tolower(.class), ".sqlite3"),
+                 call.=FALSE)
         } else {
-            response <- GET(hubpath, write_disk(tmp), proxy)
+            rid <- res %>% collect(Inf) %>% `[[`("rid")
+            db_path <- bfcpath(bfc, rids=rid)
         }
-        if (length(status_code(response)))  
-        {
-            # FTP requests return empty status code, see
-            # https://github.com/hadley/httr/issues/190
-            if (status_code(response) != 302L)
-                stop_for_status(response)
+    # Checking remote file for updates
+    } else{
+        # hub database yet to be added to cache
+        if (cnt == 0){
+            remote_db <- paste0(url, "/metadata/", tolower(.class), ".sqlite3")
+            db_path <- bfcadd(bfc,
+                              rname=paste0(tolower(.class), ".sqlite3"),
+                              fpath=remote_db, proxy=proxy)
+        } else if (cnt > 1){
+            stop("Corrupt Cache: sqlite file",
+                 "\n  See vignette section on corrupt cache",
+                 "\n  cache: ", bfccache(bfc),
+                 "\n  filename: ",
+                 paste0(tolower(.class), ".sqlite3"),
+                  call.=FALSE)
+        # found! check if needs update
+        } else {
+            rid <- res %>% collect(Inf) %>% `[[`("rid")
+            db_path <- ifelse(bfcneedsupdate(bfc, rids=rid),
+                              bfcdownload(bfc, rid=rid, ask=FALSE,
+                                          proxy=proxy),
+                              bfcpath(bfc, rids=rid))
         }
-        if (!all(file.exists(dirname(cachepath))))
-            dir.create(dirname(cachepath), recursive=TRUE)
-        file.copy(from=tmp, to=cachepath, overwrite=overwrite)
-        file.remove(tmp)
-        TRUE
+    }
+    unname(db_path)
+}
+
+
+.db_is_valid <- function(path) {
+    conn <- .db_open(path)
+    on.exit(.db_close(conn))
+    ## Some very minor testing to make sure metadata DB is intact.
+    tryCatch({
+        ## required tables present?
+        expected <- c("biocversions", "input_sources", "location_prefixes",
+                      "rdatapaths", "recipes", "resources", "statuses",
+                      "tags", "timestamp")
+        if (!all(expected %in% dbListTables(conn)))
+            stop("missing tables")
+        ## any resources?
+        sql <- "SELECT COUNT(id) FROM resources"
+        if (.db_query(conn, sql)[[1]] == 0L)
+            warning("empty 'resources' table; database may be corrupt")
     }, error=function(err) {
-        warning("download failed",
-                "\n  hub path: ", sQuote(hubpath),
-                "\n  cache path: ", sQuote(cachepath),
-                "\n  reason: ", conditionMessage(err),
-                call.=FALSE)
-        FALSE
+        stop("Corrupt Hub Database",
+             "\n  See vignette section on corrupt database",
+             "\n  database: ", sQuote(path),
+             "\n  reason: ", conditionMessage(err),
+             call.=FALSE)
     })
+    TRUE
 }
 
-## This is the function that gets stuff (metadata AND files) from S3
-.hub_resource <-
-    function(hub, resource, cachepath, proxy, overwrite=FALSE, verbose=FALSE)
-{
-    len <- length(resource)
-    if (len > 0L) {
-        msg <- sprintf("retrieving %d resource%s", len,
-                       if (len > 1L) "s" else "")
-        if (verbose) message(msg)
-    }
 
-    if (length(cachepath)) {
-        test <- file.exists(cachepath)
-        if (!overwrite && any(test)) {
-            bad <- cachepath[test]
-            stop("download destination(s) exists",
-                 "\n  ", paste(sQuote(bad), collapse="\n  "))
-        }
-    }
 
-    hubpath <- .hub_resource_path(hub, resource)
-    mapply(.hub_cache_resource, hubpath, cachepath, MoreArgs=list(proxy=proxy, overwrite=overwrite))
-}
+
 
 ### --------------------------------------------------------------------------
 ### snapshotDate helpers
+###
 
 ## returns the release date for BiocManager::version()
 .biocVersionDate <- function(biocversion) {
     if (length(biocversion) > 1L)
         stop("length(biocversion) must == 1")
 
-    yaml <- content(GET("http://bioconductor.org/config.yaml"), 
+    yaml <- httr::content(GET("http://bioconductor.org/config.yaml"),
                     encoding="UTF-8", as="text")
     obj <- yaml.load(yaml)
     release_dates <- obj$release_dates
     version_date <- release_dates[biocversion == names(release_dates)]
-    ## convert to snapshot format 
+    ## convert to snapshot format
     if (length(version_date))
         as.character(as.POSIXlt(version_date[[1]], format='%m/%d/%Y'))
     else
@@ -111,11 +108,11 @@
                            format='%Y-%m-%d')
     if (length(restrict))  ## release
         as.character(max(dates[dates <= restrict]))
-    else                   ## devel 
+    else                   ## devel
         as.character(max(dates))
 }
 
-## all possible dates 
+## all possible dates
 .possibleDates <- function(path) {
     conn <- .db_open(path)
     on.exit(.db_close(conn))
@@ -132,4 +129,199 @@ possibleDates <- function(x) {
     dates <- .possibleDates(path)
     restrict <- .restrictDateByVersion(path)
     dates[as.POSIXlt(dates) <= as.POSIXlt(restrict)]
+}
+
+## The following helper was previously not used (and now is), but we
+## do need a way to have a path for the data that is separate from the
+## path for the .sqlite metadata (they don't need to always be at the
+## same server) - IOW these should be decoupled anyhow).
+.hub_data_path <-
+    function(huburl)
+{
+##    "http://gamay:9393/fetch"
+##    "https://annotationhub.bioconductor.org/fetch"
+    sprintf("%s/fetch", huburl)
+}
+
+# make full fetch for each resource needed
+.hub_resource_path <-
+    function(hub, resource)
+{
+##    "https://annotationhub.bioconductor.org/fetch/5012"
+    sprintf("%s/%s", hub, resource)
+}
+
+## This is the function that gets stuff (metadata AND files) from S3
+.hub_resource <-
+    function(x, resource, cachepath, proxy, verbose=FALSE)
+{
+    len <- length(resource)
+    if (len > 0L) {
+        msg <- sprintf("retrieving %d resource%s", len,
+                       if (len > 1L) "s" else "")
+        if (verbose) message(msg)
+    }
+    hub <-  .hub_data_path(hubUrl(x))
+    bfc <- .get_cache(x)
+    hubpath <- .hub_resource_path(hub, resource)
+    mapply(.hub_cache_resource, hubpath, names(cachepath), cachepath, MoreArgs=list(proxy=proxy,
+                                                        bfc=bfc))
+}
+
+
+## example of hub resource (sometimes convenient)
+## hub = 'https://annotationhub.bioconductor.org/metadata/annotationhub.sqlite3'
+.hub_cache_resource <- function(hubpath, namescachepath, cachepath, bfc, proxy)
+{
+
+    if (is.null(proxy)) proxy=""
+
+    tryCatch({
+        rnames <- paste(namescachepath, cachepath, sep=" : ")
+        res <- bfcquery(bfc, rnames, fields="rname", exact=TRUE)
+        cnt <- bfccount(res)
+        rid <- res %>% collect(Inf) %>% `[[`("rid")
+        if (cnt > 1){
+            stop("Corrupt Cache: resource id",
+                 "\n  More than one entry in cache for: ",
+                 rnames,
+                 "\n  See vignette section on corrupt cache", call.=FALSE)
+        } else if (cnt == 0){
+            bfcadd(bfc, rname=rnames, fpath=hubpath, proxy=proxy)
+        } else {
+            bfcdownload(bfc, rid=rid, ask=FALSE, proxy=proxy)
+        }
+        TRUE
+    }, error=function(err) {
+        warning("download failed",
+                "\n  hub path: ", sQuote(hubpath),
+                "\n  cache resource: ", sQuote(rnames),
+                "\n  reason: ", conditionMessage(err),
+                call.=FALSE)
+        FALSE
+    })
+
+}
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### Subsetting
+###
+
+.Hub_get1 <-
+    function(x, force, verbose)
+{
+    if (!length(x))
+        stop("no records found for the given index")
+    if (length(x) != 1L)
+        stop("'i' must be length 1")
+
+    ## Add 'Resource' postfix to DispatchClass name
+    className <- sprintf("%sResource", .dataclass(x))
+    if (is.null(getClassDef(className))) {
+        msg <- sprintf("'%s' not available in this version of the
+            package; use BiocManager::install() to update?",
+            names(x))
+        stop(paste(strwrap(msg, exdent=2), collapse="\n"), call.=FALSE)
+    }
+
+    tryCatch({
+        class <- new(className, hub=x)
+    }, error=function(err) {
+        stop("failed to create 'HubResource' instance",
+             "\n  name: ", names(x),
+             "\n  title: ", x$title,
+             "\n  reason: ", conditionMessage(err),
+             call.=FALSE)
+    })
+
+    tryCatch({
+        fls <-  cache(getHub(class), force=force, verbose=verbose)
+        .get1(class)
+    }, error=function(err) {
+        stop("failed to load resource",
+             "\n  name: ", names(x),
+             "\n  title: ", x$title,
+             "\n  reason: ", conditionMessage(err),
+             call.=FALSE)
+    })
+}
+
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### converting Legacy to New
+###
+
+convertHub <- function(oldcachepath=NULL, newcachepath=NULL,
+                       hubType=c("AnnotationHub", "ExperimentHub"),
+                       proxy=getAnnotationHubOption("PROXY"),
+                       max.downloads=getAnnotationHubOption("MAX_DOWNLOADS"),
+                       force=FALSE, verbose=TRUE)
+{
+
+    hubType <- match.arg(hubType)
+
+    if (is.null(oldcachepath)){
+        .CACHE_ROOT_orig <- ifelse(hubType=="AnnotationHub", ".AnnotationHub", ".ExperimentHub")
+        path <- switch(.Platform$OS.type, unix = path.expand("~/"),
+                       windows= file.path(gsub("\\\\", "/",
+                           Sys.getenv("HOME")), "AppData"))
+
+        oldcachepath <- file.path(path, .CACHE_ROOT_orig)
+    }
+    orig_files <- dir(oldcachepath)
+    download_files <- setdiff(orig_files,
+                              c("annotationhub.sqlite3", "experimenthub.sqlite3",
+                                "index.rds"))
+
+
+    if(verbose) message("Attempting to redownload: ", length(download_files), " hub resources")
+
+    if(is.null(newcachepath)){
+        if(hubType=="AnnotationHub"){
+            hub <- AnnotationHub()
+        }else{
+            hub <- ExperimentHub::ExperimentHub()
+        }
+    } else {
+        if(hubType=="AnnotationHub"){
+            hub <- AnnotationHub(cache=newcachepath)
+        }else{
+            hub <- ExperimentHub::ExperimentHub(cache=newcachepath)
+        }
+    }
+
+    mapping_ids <- .named_cache_path(hub)
+    cachepath <- mapping_ids[which(mapping_ids %in% as.numeric(download_files))]
+
+    dxFnd <- as.numeric(download_files) %in% mapping_ids
+    notFnd <- download_files[!dxFnd]
+
+    subHub <- hub[which(hub$ah_id %in% names(cachepath))]
+
+    tryCatch({
+        .cache_internal(subHub,
+                        proxy=proxy, max.downloads=max.downloads,
+                        force=force, verbose=verbose)
+    }, error = function(err) {
+        warning("Not all resources downloaded correctly.",
+                "It may be beneficial to rerun 'convertHub()'",
+                "\n  reason: ", conditionMessage(err),
+                call.=FALSE)
+    })
+
+    if (length(notFnd) != 0){
+        warning("The following files could not be re-downloaded.",
+                "\n      ",
+                paste0(file.path(oldcachepath, notFnd), collapse = "\n      "),
+        #    alldatainfo <- .IdsInfo(hub)
+        #    datainfo <- alldatainfo[match(notFnd, alldatainfo$fetch_id),]
+                "\n  For more information on these files, See: ?getInfoOnIds")
+    }
+
+    # should their be an option to
+    # delete old cache and files?
+    # could get complicated if older files not found etc.
+
+
+    hubCache(hub)
 }

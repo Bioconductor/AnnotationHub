@@ -3,6 +3,8 @@ import(BiocGenerics)
 import(RSQLite)
 import(S4Vectors)
 import(BiocManager)
+import(BiocFileCache)
+import(rappdirs)
 
 importFrom(stats, setNames)
 importFrom(grDevices, rgb)
@@ -11,13 +13,15 @@ importFrom(utils, packageVersion, read.csv, read.delim, unzip,
 )
 importFrom(httr, 
     GET, content, parse_url, progress, write_disk,
-    stop_for_status, status_code, use_proxy
+    stop_for_status, status_code, use_proxy, HEAD, headers
 )
 importFrom(yaml, yaml.load)
 importFrom(interactiveDisplayBase, display)
 
 importMethodsFrom(AnnotationDbi, dbconn, dbfile)
 importFrom(AnnotationDbi, dbFileConnect)
+importFrom(dplyr,"%>%")
+importFrom(dplyr,collect)
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### Export S4 classes
@@ -47,14 +51,15 @@ export(
     hubUrl, hubCache, hubDate,
     snapshotDate, "snapshotDate<-",
     getHub, listResources, loadResources,
-    package
+    package, convertHub,
+    isLocalHub, "isLocalHub<-", getInfoOnIds
 )
 
 exportMethods(
     cache, "cache<-", query,
     hubUrl, hubCache, hubDate, 
     snapshotDate, "snapshotDate<-",
-    getHub
+    getHub, isLocalHub, "isLocalHub<-", getInfoOnIds
 )
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -1,4 +1,4 @@
-.CACHE_ROOT <- ".AnnotationHub"
+.CACHE_ROOT <- "AnnotationHub"
 
 .onLoad <- function(libname, pkgname, ...) {
     ## options from getOption or Sys.env or default, in that order
@@ -15,10 +15,8 @@
         setAnnotationHubOption("URL", opt)
     }
     if (is.null(getAnnotationHubOption("CACHE"))) {
-        path <- switch(.Platform$OS.type, unix = path.expand("~/"),
-                       windows= file.path(gsub("\\\\", "/",
-                       Sys.getenv("HOME")), "AppData"))
-        opt <- getOption("ANNOTATION_HUB_CACHE", file.path(path, .CACHE_ROOT))
+        path <- user_cache_dir(appname=.CACHE_ROOT)
+        opt <- getOption("ANNOTATION_HUB_CACHE", path)
         opt <- Sys.getenv("ANNOTATION_HUB_CACHE", opt)
         setAnnotationHubOption("CACHE", opt)
     }

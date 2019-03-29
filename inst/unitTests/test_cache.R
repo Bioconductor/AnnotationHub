@@ -1,37 +1,43 @@
-test_cache_datapathIds <- function() {
-    ## map hub identifiers AH123 to cached identifier(s)
-    hub <- AnnotationHub()
+########################################################
+# couldn't implement
+#   do to ERROR in BiocManager::version()
+#   when repeating calls to different cache location
+#########################################################
+test_cache <- function(){
+    cache <- tempfile()
+    dir.create(cache)
+    ah <- AnnotationHub(cache=cache)
+    checkTrue(dir.exists(cache))
+    locfiles <- dir(cache)
+    checkTrue(file.exists(file.path(cache, "BiocFileCache.sqlite")))
+    checkTrue(any(endsWith(locfiles, "annotationhub.sqlite3")))
+    checkTrue(any(endsWith(locfiles, "hub_index.rds")))
+    temp <- AnnotationHub:::.create_cache(.class="AnnotationHub",
+                                          url=getAnnotationHubOpion("URL"),
+                                          cache=cache,
+                                          proxy=getAnnotationHubOption("PROXY"),
+                                          localHub=FALSE)
+    checkIdentical(hubCache(ah), dirname(temp))
+    bfc <- BiocFileCache(cache)
+    checkIdentical(length(bfc), 2L)
 
-    ## 1:1 mapping
-    result <- AnnotationHub:::.datapathIds(hub["AH28854"])
-    checkIdentical(result, structure(34294L, .Names = "AH28854"))
+    bfc2 <- AnnotationHub:::.get_cache(ah)
+    checkIdentical(bfc, bfc2)
 
-    ## 1:several mapping
-    #result <- AnnotationHub:::.datapathIds(hub["AH169"])
-    #checkIdentical(result,
-    #               structure(c(169L, 14130L), .Names = c("AH169", "AH169")))
-    # Removed old ra zip files that needed index
-    #   Currently no id associated with two files in 3.9
-
-    
-    ## unknown identifier
-    result <- AnnotationHub:::.datapathIds(hub["AH0"])
-    checkIdentical(result, setNames(integer(), character()))
+    removeCache(ah, ask=FALSE)
 }
 
-test_max_download <- function() {
+test_cache_download_ok_maxdownloads<- function() {
     FUN <- AnnotationHub:::.cache_download_ok
+    hub <- AnnotationHub()
 
-    checkIdentical(rep(TRUE, 0), FUN(rep(tempfile(), 0), 4,force=FALSE, verbose=FALSE))
-    checkIdentical(rep(TRUE, 3), FUN(rep(tempfile(), 3), 4,force=FALSE, verbose=FALSE))
-    checkIdentical(rep(TRUE, 3), FUN(rep(tempfile(), 3), 3,force=FALSE, verbose=FALSE))
-
-    file.create(fl <- tempfile())
-    checkIdentical(c(TRUE, FALSE), FUN(c(tempfile(), fl), 2,force=FALSE, verbose=FALSE))
-    checkIdentical(c(TRUE, FALSE, TRUE), FUN(c(tempfile(), fl, tempfile()), 2,force=FALSE, verbose=FALSE))
-
-    if (!interactive()) {
-        checkException(FUN(rep(tempfile(), 3), 2,force=FALSE, verbose=FALSE))
-        checkException(FUN(c(tempfile(), fl, tempfile(), tempfile()), 2,force=FALSE, verbose=FALSE))
+    checkIdentical(rep(TRUE, 3), unname(FUN(hub, rep(tempfile(), 3), 3,force=FALSE, verbose=FALSE)))
+    cachepath <- AnnotationHub:::.named_cache_path(hub[1:3])
+    paths <- cache(hub[1:3])
+    checkIdentical(rep(FALSE,3), unname(FUN(hub, cachepath, 3, force=FALSE, verbose=FALSE)))
+    checkIdentical(rep(TRUE, 3), unname(FUN(hub, cachepath, 3, force=TRUE,
+                                            verbose=FALSE)))
+    if (!interactive()){
+        checkException(FUN(hub, cachepath, max.downloads=2, force=TRUE, verbose=FALSE))
     }
 }

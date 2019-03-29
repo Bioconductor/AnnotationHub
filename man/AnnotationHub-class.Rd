@@ -29,6 +29,10 @@
 \alias{package}
 \alias{package,Hub-method}
 \alias{removeCache}
+\alias{isLocalHub}
+\alias{isLocalHub,Hub-method}
+\alias{isLocalHub<-}
+\alias{isLocalHub<-,Hub-method}
 
 \alias{possibleDates}
 \alias{snapshotDate}
@@ -106,7 +110,8 @@
   \code{AnnotationHub} records can be added (and sometimes removed) at
   any time. \code{snapshotDate()} restricts hub records to those
   available at the time of the snapshot. \code{possibleDates()} lists
-  snapshot dates valid for the current version of Bioconductor.
+  snapshot dates valid for the current version of Bioconductor. You can
+  check the status of a past record using \code{recordStatus()}.
 
   The location of the local cache can be found (and updated) with
   \code{getAnnotationHubCache} and \code{setAnnotationHubCache}; 
@@ -139,6 +144,10 @@
     \item{}{
       \code{hubUrl(x)}:
       Gets the URL for the online hub.
+    }
+   \item{}{
+      \code{isLocalHub(x)}:
+      Get whether or not constructor was called with \code{localHub=TRUE}.
     }
     \item{}{
       \code{length(x)}:
@@ -302,7 +311,7 @@
       Gets the file system location of the local AnnotationHub cache.
     }
     \item{}{
-      \code{removeCache(x)}:
+      \code{removeCache(x, ask=TRUE)}:
       Removes local AnnotationHub database and all related resources. After
       calling this function, the user will have to download any AnnotationHub
       resources again.
@@ -326,7 +335,8 @@
   }
 }
 
-\author{Martin Morgan, Marc Carlson, Sonali Arora, and Dan Tenenbaum}
+\author{Martin Morgan, Marc Carlson, Sonali Arora, Dan Tenenbaum, and
+  Lori Shepherd}
 
 \examples{
   ## create an AnnotationHub object
