@@ -352,7 +352,7 @@ setMethod("getInfoOnIds", "character",
              paste(ids[is.na(dx)], collapse="\n      "))
     }
     res <- alldatainfo[dx,]
-    res$fileSize <- getSize(hub, res)
+    res$file_size <- getSize(hub, res)
     res
 })
 
@@ -368,7 +368,7 @@ setMethod("getInfoOnIds", "numeric",
              paste(ids[is.na(dx)], collapse="\n      "))
     }
     res <- alldatainfo[dx,]
-    res$fileSize <- getSize(hub, res)
+    res$file_size <- getSize(hub, res)
     res
 })
 
