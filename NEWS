@@ -3,15 +3,15 @@ CHANGES IN VERSION 2.15.0
 
 SIGNIFICANT USER-VISIBLE CHANGES
 
-    o The Hubs have been updated to use BiocFileCache as a backend utility for
-    managing and downloading resources. This allows for file specific caching
-    mechanism. This change is a significant user change as it changed the
-    default directories for the Hubs (AnnotationHub/ExperimentHub) as well as
-    the base directory no longer being hidden.
+    o (2.15.9) The Hubs have been updated to use BiocFileCache as a backend
+    utility for managing and downloading resources. This allows for file
+    specific caching mechanism. This change is a significant user change as it
+    changed the default directories for the Hubs (AnnotationHub/ExperimentHub)
+    as well as the base directory no longer being hidden.
 
 NEW FEATURES
 
-    o (2.15.8) Add helper function to get additional information on
+    o (2.15.9) Add helper function to get additional information on
     resources. getInfoOnIds
     o (2.15.2) Add function to list currently available DispatchClass
 
