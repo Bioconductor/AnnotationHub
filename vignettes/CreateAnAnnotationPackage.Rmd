@@ -334,7 +334,7 @@ file. Briefly, a description of the metadata columns required:
   is the current devel version of Bioconductor.
 * Genome: 'character(1)'. Genome. Can be NA.
 * SourceType: 'character(1)'. Format of original data, e.g., FASTA, BAM, BigWig,
-  etc. 'getValidSourceType()' list currently acceptable values. If nothing seems
+  etc. 'getValidSourceTypes()' list currently acceptable values. If nothing seems
   appropiate for your data reach out to lori.shepherd@roswellpark.org
 * SourceUrl: 'character(1)'. Location of original data files. Multiple urls
   should be provided as a comma separated string. If the data is simulated we
