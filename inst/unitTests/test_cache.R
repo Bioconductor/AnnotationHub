@@ -17,7 +17,7 @@ test_cache <- function(){
                                           cache=cache,
                                           proxy=getAnnotationHubOption("PROXY"),
                                           localHub=FALSE)
-    checkIdentical(hubCache(ah), dirname(temp))
+    checkIdentical(normalizePath(hubCache(ah),winslash="/"), dirname(temp))
     bfc <- BiocFileCache(cache)
     checkIdentical(length(bfc), 2L)
 
