@@ -66,6 +66,19 @@ setMethod(".get1", "FaFileResource",
     Rsamtools::FaFile(file=fa[1],index=fa[2])
 })
 
+## BamFile 
+
+#' @import AnnotationHub
+setClass("BamFileResource", contains="AnnotationHubResource")
+
+setMethod(".get1", "BamFileResource",
+          function(x, ...)
+          {
+            .require("Rsamtools")
+            bam <- cache(getHub(x))
+            Rsamtools::BamFile(file = bam[1], index = bam[2])
+          })
+
 ## Rds / RDS
 
 ## Michael's AHCytoData is the only package (I think) that uses RDS.
