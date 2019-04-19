@@ -68,7 +68,6 @@ setMethod(".get1", "FaFileResource",
 
 ## BamFile 
 
-#' @import AnnotationHub
 setClass("BamFileResource", contains="AnnotationHubResource")
 
 setMethod(".get1", "BamFileResource",
