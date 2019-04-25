@@ -11,6 +11,7 @@ SIGNIFICANT USER-VISIBLE CHANGES
 
 NEW FEATURES
 
+    o (2.15.15) Added BamFile Resource method
     o (2.15.9) Add helper function to get additional information on
     resources. getInfoOnIds
     o (2.15.2) Add function to list currently available DispatchClass

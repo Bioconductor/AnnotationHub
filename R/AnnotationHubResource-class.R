@@ -7,7 +7,7 @@ setClass("AnnotationHubResource", representation(hub="Hub"))
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### Accessors 
+### Accessors
 ###
 
 setMethod("hubCache", "AnnotationHubResource",
@@ -15,7 +15,7 @@ setMethod("hubCache", "AnnotationHubResource",
 )
 
 setMethod("hubUrl", "AnnotationHubResource",
-    function(x) hubUrl(x@hub) 
+    function(x) hubUrl(x@hub)
 )
 
 setMethod("getHub", "AnnotationHubResource",
@@ -27,7 +27,7 @@ setMethod("isLocalHub", "AnnotationHubResource",
 )
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-###  Show 
+###  Show
 ###
 
 setMethod("show", "AnnotationHubResource",
@@ -65,6 +65,21 @@ setMethod(".get1", "FaFileResource",
     fa <- cache(getHub(x))
     Rsamtools::FaFile(file=fa[1],index=fa[2])
 })
+
+setClass("BamFileResource", contains="AnnotationHubResource")
+
+setMethod(".get1", "BamFileResource",
+    function(x, ...)
+{
+    .require("Rsamtools")
+    bam <- cache(getHub(x))
+    index <- paste(bam[2],"bai",sep=".")
+    if (file.exists(index)) unlink(index)
+    file.symlink(bam[2], index)
+    Rsamtools::BamFile(file=bam[1],index=index)
+})
+
+
 
 ## Rds / RDS
 
@@ -122,7 +137,7 @@ setMethod(".get1", "ChainFileResource",
 setClass("TwoBitFileResource", contains="AnnotationHubResource")
 
 setMethod(".get1", "TwoBitFileResource",
-    function(x, ...) 
+    function(x, ...)
 {
     .require("rtracklayer")
     bit <- cache(getHub(x))
@@ -159,13 +174,13 @@ setMethod(".get1", "BigWigFileResource",
 {
     .require("rtracklayer")
     er <- cache(getHub(x))
-    rtracklayer::BigWigFile(er) 
+    rtracklayer::BigWigFile(er)
 })
 
 setClass("dbSNPVCFFileResource", contains="AnnotationHubResource")
 
 setMethod(".get1", "dbSNPVCFFileResource",
-    function(x, ...) 
+    function(x, ...)
 {
     .require("VariantAnnotation")
     withCallingHandlers({
@@ -176,11 +191,11 @@ setMethod(".get1", "dbSNPVCFFileResource",
             ## warning() something different, or...
             invokeRestart("muffleWarning")
     })
-    VariantAnnotation::VcfFile(file=er[1],index=er[2]) 
+    VariantAnnotation::VcfFile(file=er[1],index=er[2])
 })
 ## SQLiteFile
 
-setClass("SQLiteFileResource", contains="AnnotationHubResource") 
+setClass("SQLiteFileResource", contains="AnnotationHubResource")
 
 setMethod(".get1", "SQLiteFileResource",
     function(x, ...)
@@ -215,11 +230,11 @@ setMethod(".get1", "ChEAResource",
     function(x, ...)
 {
     fl <- callNextMethod(x, filenames="chea-background.csv")
-    read.csv(fl, header=FALSE, stringsAsFactors=FALSE, 
-        col.names=c("s.no","TranscriptionFactor", "TranscriptionFactor-PubmedID", 
+    read.csv(fl, header=FALSE, stringsAsFactors=FALSE,
+        col.names=c("s.no","TranscriptionFactor", "TranscriptionFactor-PubmedID",
         "TranscriptionFactorTarget", "PubmedID", "Experiment", "CellType",
         "Species","DateAdded"))
-}) 
+})
 
 setClass("BioPaxResource", contains="RdaResource")
 
@@ -229,7 +244,7 @@ setMethod(".get1", "BioPaxResource",
     .require("rBiopaxParser")
     callNextMethod(x, ...)
 })
- 
+
 setClass("PazarResource", contains="AnnotationHubResource")
 
 setMethod(".get1", "PazarResource",
@@ -253,7 +268,7 @@ setMethod(".get1", "PazarResource",
     }
     dat
 })
- 
+
 
 setClass("CSVtoGrangesResource", contains="AnnotationHubResource")
 

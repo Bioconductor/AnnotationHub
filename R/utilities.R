@@ -164,6 +164,7 @@ DispatchClassList <- function(){
 
     matrix(
     c("FaFile", "Rsamtools::FaFile(); requires rtracklayer",
+      "BamFile", "Rsamtools::BamFile(); requires rtracklayer",
       "Rds", "readRDS()",
       "RDS", "readRDS()",
       "Rda", "get(load())",
