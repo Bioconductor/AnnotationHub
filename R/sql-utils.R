@@ -21,16 +21,24 @@
     ##   Bioconductor was valid.
     ##   NOTE: The 'date' variable is the snapshotDate().
 
+    # Ran into an issue comparing BiocVersion once we hit 3.10
+    # 3.10 got truncated to 3.1 and missed values
+    bioc_value <- .db_query(conn,
+                            "SELECT DISTINCT biocversion FROM biocversions")[[1]]
+    indx <- package_version(bioc_value) <= BiocManager::version()
+    if (sum(indx) != 0) bioc_value <- bioc_value[indx]
+    bioc_value <- paste(dQuote(bioc_value), collapse=",")
+
     query1 <- sprintf(
         'SELECT resources.id
          FROM resources, rdatapaths, biocversions
          WHERE resources.rdatadateadded <= "%s"
-         AND biocversions.biocversion <= "%s"
+         AND biocversions.biocversion IN (%s)
          AND resources.rdatadateremoved IS NULL
          AND rdatapaths.rdataclass != "OrgDb"
          AND biocversions.resource_id == resources.id
          AND rdatapaths.resource_id == resources.id',
-         date, BiocManager::version())
+         date, bioc_value)
     biocIds1 <- .db_query(conn, query1)[[1]]
 
     ## Add a query to get resources that have been removed
@@ -42,12 +50,12 @@
         'SELECT resources.id
          FROM resources, rdatapaths, biocversions
          WHERE resources.rdatadateadded <= "%s"
-         AND biocversions.biocversion <= "%s"
+         AND biocversions.biocversion IN (%s)
          AND resources.rdatadateremoved > "%s"
          AND rdatapaths.rdataclass != "OrgDb"
          AND biocversions.resource_id == resources.id
          AND rdatapaths.resource_id == resources.id',
-         date, BiocManager::version(), date)
+         date, bioc_value, date)
     biocIds3 <- .db_query(conn, query3)[[1]]
     ## OrgDb sqlite files:
     ##
