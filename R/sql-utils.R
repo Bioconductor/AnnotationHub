@@ -27,7 +27,7 @@
                             "SELECT DISTINCT biocversion FROM biocversions")[[1]]
     indx <- package_version(bioc_value) <= BiocManager::version()
     if (sum(indx) != 0) bioc_value <- bioc_value[indx]
-    bioc_value <- paste(dQuote(bioc_value), collapse=",")
+    bioc_value <- paste(paste0('"', bioc_value, '"'), collapse=",")
 
     query1 <- sprintf(
         'SELECT resources.id
