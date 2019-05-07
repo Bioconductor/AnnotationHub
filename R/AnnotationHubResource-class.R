@@ -73,9 +73,19 @@ setMethod(".get1", "BamFileResource",
 {
     .require("Rsamtools")
     bam <- cache(getHub(x))
+    # BamFile expects a index file with the ".bai" ending. Otherwise, an 
+    # error is thrown
     index <- paste(bam[2],"bai",sep=".")
     if (file.exists(index)) unlink(index)
-    file.symlink(bam[2], index)
+    # symlinking does not work on Windows without admin user priviliges
+    if(Sys.info()["sysname"] == "Windows"){
+        link <- file.link(bam[2], index)
+    } else {
+        link <- file.symlink(bam[2], index)
+    }
+    if(link == FALSE){
+        warning("index file could not be linked.")
+    }
     Rsamtools::BamFile(file=bam[1],index=index)
 })
 
