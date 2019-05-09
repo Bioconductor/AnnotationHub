@@ -73,10 +73,7 @@ setMethod(".get1", "BamFileResource",
 {
     .require("Rsamtools")
     bam <- cache(getHub(x))
-    index <- paste(bam[2],"bai",sep=".")
-    if (file.exists(index)) unlink(index)
-    file.symlink(bam[2], index)
-    Rsamtools::BamFile(file=bam[1],index=index)
+    Rsamtools::BamFile(file=bam[1],index=bam[2])
 })
 
 
