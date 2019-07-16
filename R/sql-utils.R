@@ -75,23 +75,38 @@
     ## NOTE: Because OrgDbs are valid for a full devel cycle they are
     ##       not filtered by snapshotDate(); the OrgDbs are valid for all
 
-    isDevel <- BiocManager:::isDevel()
-    orgdb_release_version <- ifelse(getAnnotationHubOption("TESTING"),
-                                    as.character(BiocManager::version()),
-                                    ifelse(isDevel,
-                                           as.character(BiocManager:::.version_bioc("release")),
-                                           as.character(BiocManager::version())))
+    if(curl::has_internet() | !getAnnotationHubOption("LOCALHUB")){
+        isDevel <- BiocManager:::isDevel()
+        orgdb_release_version <-
+            if (getAnnotationHubOption("TESTING") || !isDevel) {
+                BiocManager::version()
+            } else {
+                BiocManager:::.version_bioc("release")
+            }
 
-    query2 <- sprintf(
-        'SELECT resources.id
-         FROM resources, biocversions, rdatapaths
-         WHERE biocversions.biocversion == "%s"
-         AND rdatapaths.rdataclass == "OrgDb"
-         AND resources.rdatadateremoved IS NULL
-         AND biocversions.resource_id == resources.id
-         AND rdatapaths.resource_id == resources.id',
-         orgdb_release_version)
-    biocIds2 <- .db_query(conn, query2)[[1]]
+        query2 <- sprintf(
+            'SELECT resources.id
+            FROM resources, biocversions, rdatapaths
+            WHERE biocversions.biocversion == "%s"
+            AND rdatapaths.rdataclass == "OrgDb"
+            AND resources.rdatadateremoved IS NULL
+            AND biocversions.resource_id == resources.id
+            AND rdatapaths.resource_id == resources.id',
+            orgdb_release_version)
+        biocIds2 <- .db_query(conn, query2)[[1]]
+    }else{
+        query2 <- sprintf(
+            'SELECT resources.id
+            FROM resources, biocversions, rdatapaths
+            WHERE biocversions.biocversion == "%s"
+            AND rdatapaths.rdataclass == "OrgDb"
+            AND resources.rdatadateremoved IS NULL
+            AND biocversions.resource_id == resources.id
+            AND rdatapaths.resource_id == resources.id',
+            bioc_value)
+        biocIds2 <- .db_query(conn, query2)[[1]]
+    }
+
 
     ## make unique and sort
     allIds = sort(unique(c(biocIds1, biocIds2, biocIds3)))

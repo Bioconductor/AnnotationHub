@@ -32,4 +32,10 @@
         opt <- as.logical(opt)
         setAnnotationHubOption("TESTING", opt)
     }
+    if (is.null(getAnnotationHubOption("LOCALHUB"))) {
+        opt <- getOption("ANNOTATION_HUB_LOCALHUB", FALSE)
+        opt <- Sys.getenv("ANNOTATION_HUB_LOCALHUB", opt)
+        opt <- as.logical(opt)
+        setAnnotationHubOption("LOCALHUB", opt)
+    }
 }
