@@ -75,7 +75,7 @@
     ## NOTE: Because OrgDbs are valid for a full devel cycle they are
     ##       not filtered by snapshotDate(); the OrgDbs are valid for all
 
-    if(curl::has_internet() | !getAnnotationHubOption("LOCALHUB")){
+    if(curl::has_internet() | !getAnnotationHubOption("LOCAL")){
         isDevel <- BiocManager:::isDevel()
         orgdb_release_version <-
             if (getAnnotationHubOption("TESTING") || !isDevel) {

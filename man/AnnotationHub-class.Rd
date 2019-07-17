@@ -124,7 +124,7 @@
       \code{AnnotationHub(..., hub=getAnnotationHubOption("URL"), 
         cache=getAnnotationHubOption("CACHE"),
         proxy=getAnnotationHubOption("PROXY"),
-        localHub=getAnnotationHubOption("LOCALHUB"))}:
+        localHub=getAnnotationHubOption("LOCAL"))}:
 
       Create an \code{AnnotationHub} instance, possibly updating the
       current database of records.

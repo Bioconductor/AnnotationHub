@@ -15,7 +15,7 @@ AnnotationHub <-
     function(..., hub=getAnnotationHubOption("URL"),
              cache=getAnnotationHubOption("CACHE"),
              proxy=getAnnotationHubOption("PROXY"),
-             localHub=getAnnotationHubOption("LOCALHUB"))
+             localHub=getAnnotationHubOption("LOCAL"))
 {
     if (is.null(proxy)){
         connect <- curl::has_internet()

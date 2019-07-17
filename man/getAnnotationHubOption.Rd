@@ -58,7 +58,7 @@ setAnnotationHubOption(arg, value)
       only be set by a OrgDb contributing maintainer for testing and
       debugging). Default: FALSE.}
 
-    \item{\dQuote{LOCALHUB}:}{logical(1). TRUE/FALSE should the AnnotationHub
+    \item{\dQuote{LOCAL}:}{logical(1). TRUE/FALSE should the AnnotationHub
       create a hub consisting only of previously downloaded resourcesd.
       Default: FALSE.}
 
