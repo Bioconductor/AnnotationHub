@@ -39,10 +39,10 @@ setAnnotationHubOption <- function(arg, value)
             stop(paste(strwrap(txt, exdent=2), collapse="\n"))
         }
     }, TESTING={
-        stopifnot(isTRUE(value) | isFALSE(value))
+        stopifnot(isTRUE(value) || isFALSE(value))
         value
     }, LOCAL={
-        stopifnot(isTRUE(value) | isFALSE(value))
+        stopifnot(isTRUE(value) || isFALSE(value))
         value
     })
 }
