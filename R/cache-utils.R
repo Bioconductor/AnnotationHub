@@ -67,13 +67,7 @@ removeCache <- function(x, ask=TRUE){
     names(localFiles) <- rnames
 
     if (verbose){
-        message(paste0(
-            c(
-                "loading from cache ", sQuote(head(rnames)),
-                if (length(rnames) > 6) "..."
-                ),
-            collapse="\n    "
-            ))
+        message("loading from cache")
     }
     localFiles
 }

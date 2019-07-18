@@ -3,6 +3,7 @@ CHANGES IN VERSION 2.17.0
 
 NEW FEATURES
 
+    o (2.17.6) remove debugging message of loading resource (`AH: 1`) 
     o (2.17.5) system environment variable to control localHub option for
     creating hub based only on previously downloaded resources
 
