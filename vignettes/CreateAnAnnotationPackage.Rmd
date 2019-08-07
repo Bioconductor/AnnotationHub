@@ -1,7 +1,7 @@
 ---
 title: "Creating An AnnotationHub Package"
 author: "Valerie Obenchain and Lori Shepherd"
-date: "Modified: March 2019. Compiled: `r format(Sys.Date(), '%d %b %Y')`"
+date: "Modified: Aug 2019. Compiled: `r format(Sys.Date(), '%d %b %Y')`"
 output:
   BiocStyle::html_document:
     toc: true
@@ -40,13 +40,13 @@ Vignettes and additional `R` code for manipulating the objects are optional.
 
 Creating the package involves the following steps:
 
-1. Notify `Bioconductor` team member:
+1. Notify `Bioconductor` team member. <br>
    Man page and vignette examples in the software package will not work until
    the data are available in `AnnotationHub`. Adding the data to AWS S3 and the
    metadata to the production database involves assistance from a `Bioconductor`
-   team member.  Please read the section "Uploading Data to S3". The
-   metadata.csv file will have to be created before the data can officially be
-   added to the hub (See inst/extdata section below).
+   team member. The metadata.csv file will have to be created before the data
+   can officially be added to the hub (See inst/extdata section below). Please
+   read the section of "Storage of Data Files".
 
 2. Building the software package:
    Below is an outline of package organization. The files listed are required
@@ -126,8 +126,8 @@ and should also contain the term `AnnotationHub`.
 
 3. Data objects:
 Data are not formally part of the software package and are stored
-separately in AWS S3 buckets. The author should follow instructions in the
-section "Uploading Data to S3"
+separately in a publicly accessible hosted site or by Bioconductor in an AWS S3
+buckets. The author should read the following section on "Storage of Data Files".
 
 4. Confirm valid metadata:
 Confirm the data in inst/exdata/metadata.csv are valid by running
@@ -157,7 +157,8 @@ become available.
   same title. The user will need to use 'rdatadateadded' to determine which
   is the most current.
 
-* Make data available: see section on "Uploading Data to S3"
+* Make data available: either on publicly accessible site or see section on
+  "Uploading Data to S3"
 
 * Update make-metadata.R with the new metadata information
 
@@ -188,8 +189,8 @@ on your package.
 
 2. Add biocViews term "AnnotationHub" to DESCRIPTION
 
-3. Upload the data to S3 and remove the data from the package. See the section
-for Uploading Data to S3 below.
+3. Upload the data to S3 or place on a publicly accessible site and remove the
+data from the package. See the section on "Storage of Data Files" below.
 
 4. Once the data is officially added to the hub, update any code to utilize
 AnnotationHub for retrieving data.
@@ -226,7 +227,9 @@ the 'rdatadateremoved' field is populated with a date and the 'status'
 field is populated with a reason why the resource is no longer available. Once
 these changes are made, the `AnnotationHub()` constructor will not list the
 resource among the available ids. An attempt to extract the resource with
-'[[' and the AH id will return an error along with the status message.
+'[[' and the AH id will return an error along with the status message. The
+function `getInfoOnIds` will display metadata information for any resource
+including resources still in the database but no longer available.
 
 In general, resources are only removed when they are no longer available
 (e.g., moved from web location, no longer provided etc.).
@@ -240,7 +243,8 @@ Versioning of resources is handled by the maintainer. If you plan to provide
 incremental updates to a file for the same organism / genome build, we
 recommend including a version in the title of the resource so it is easy
 to distinguish which is most current. We also would recommend when uploading the
-data to S3 to have a directory structure accounting for versioning.
+data to S3 or your publicly accessible site to have a directory structure
+accounting for versioning.
 
 If you do not include a version, or make the title unique in some way,
 multiple files with the same title will be listed in the `AnnotationHub`
@@ -267,7 +271,27 @@ release/devel cycle. Therefore contributed OrgDb added to a devel cycle are
 masked until the following release. There are options for debugging these masked
 resources. see `?setAnnotationHubOption`
 
-# Uploading Data to S3
+# Storage of Data Files
+
+The data should not be included in the package. This keeps the package light
+weight and quick for a user to install. This allows the user to investigate functions and
+documentation without downloading large data files and only proceeding with the
+download when necessary. There are two options for storing data: Bioconductor
+AWS S3 buckets or hosting the data elsewhere on a publicly accessible site. See
+information below and choose the options that fits best for your situation.
+
+## Hosting Data on a Publicly Accessible Site
+
+Data can be accessed through the hubs from any publicly accessible site. The
+metadata.csv file[s] created will need the column `Location_Prefix` to indicate
+the hosted site. See more in the description of the metadata columns/fields
+below but as a quick example if the link to the data file is
+`ftp://mylocalserver/singlecellExperiments/dataSet1.Rds` an example breakdown of
+the `Location_Prefix` and `RDataPath` for this entry in the metadata.csv file
+would be `ftp://mylocalserver/` for the `Location_Prefix` and
+`singlecellExperiments/dataSet1.Rds` for the `RDataPath`.
+
+## Uploading Data to S3
 
 Instead of providing the data files via dropbox, ftp, etc. we will grant
 temporary access to an S3 bucket where you can upload your data. Please
@@ -299,17 +323,20 @@ aws configure --profile AnnotationContributor
 After the configuration is set you should be able to upload resources using
 
 ```
-aws --profile AnnotationContributor s3 cp test_file.txt s3://annotation-contributor/test_file.txt --acl public-read
-
-# to upload a full directory use recursive:
+# To upload a full directory use recursive:
 
 aws --profile AnnotationContributor s3 cp test_dir s3://annotation-contributor/teset_dir --recursive --acl public-read
+
+# To upload a single file
+
+aws --profile AnnotationContributor s3 cp test_file.txt s3://annotation-contributor/test_file.txt --acl public-read
 
 ```
 
 Please upload the data with the appropriate directory structure, including
 subdirectories as necessary (i.e. top directory must be software package name,
-then if applicable, subdirectories of versions, ...)
+then if applicable, subdirectories of versions, ...).  Please also do not forget
+to use the flag `--acl public-read`; This allows read access to the data file. 
 
 Once the upload is complete, email Lori.Shepherd@roswellpark.org to continue the
 process. To add the data officially the data will need to be uploaded and the
@@ -321,7 +348,7 @@ As described above the metadata.csv file (or multiple metadata.csv files) will
 need to be created before the data can be added to the database. To ensure
 proper formatting one should run `AnnotationHubData::makeAnnotationHubMetadata`
 on the package with any/all metadata files, and address any ERRORs that
-occur. Each object uploaded to S3 should have an entry in the metadata
+occur. Each data object uploaded to S3 should have an entry in the metadata
 file. Briefly, a description of the metadata columns required:
 
 * Title: 'character(1)'. Name of the resource. This can be the exact file name
@@ -331,7 +358,7 @@ file. Briefly, a description of the metadata columns required:
 * BiocVersion: 'character(1)'. The first Bioconductor version the resource was
   made available for. Unless removed from the hub, the resource will be
   available for all versions greater than or equal to this field. This generally
-  is the current devel version of Bioconductor.
+  is the current `devel version` of Bioconductor.
 * Genome: 'character(1)'. Genome. Can be NA.
 * SourceType: 'character(1)'. Format of original data, e.g., FASTA, BAM, BigWig,
   etc. 'getValidSourceTypes()' list currently acceptable values. If nothing seems
@@ -351,14 +378,18 @@ file. Briefly, a description of the metadata columns required:
 * Maintainer: 'character(1)'. Maintainer name and email in the following format:
   Maintainer Name <username@address>.
 * RDataClass: 'character(1)'. R / Bioconductor class the data are stored in,
-  e.g., GRanges, SummarizedExperiment, ExpressionSet etc.
+  e.g., GRanges, SummarizedExperiment, ExpressionSet etc. If the file is loaded
+  or read into R what is the class of the object.
 * DispatchClass: 'character(1)'. Determines how data are loaded into R. The
   value for this field should be 'Rda' if the data were serialized with 'save()'
   and 'Rds' if serialized with 'saveRDS'. The filename should have the
-  appropriate 'rda' or 'rds' extension. The function
-  'AnnotationHub::DispatchClassList()' will output a matrix of currently
-  implemented DispatchClass and brief description of utility. If a predefine
-  class does not seem appropriate contact lori.shepherd@roswellpark.org
+  appropriate 'rda' or 'rds' extension. There are other available DispathClass
+  types and the function 'AnnotationHub::DispatchClassList()' will output a
+  matrix of currently implemented DispatchClass and brief description of
+  utility. If a predefine class does not seem appropriate contact
+  lori.shepherd@roswellpark.org. A all purpose DispathClass is `FilePath` that
+  instead of trying to load the file into R, will only return the path to the
+  locally downloaded file.
 * Location_Prefix: 'character(1)'. Do not include this field if data are stored
   in the Bioconductor AWS S3; it will be generated automatically. If data will
   be accessed from a location other than AWS S3 this field should be the base
@@ -375,10 +406,25 @@ file. Briefly, a description of the metadata columns required:
 Any additional columns in the metadata.csv file will be ignored but could be
 included for internal reference.
 
+More on Location_Prefix and RDataPath. These two fields make up the complete
+file path url for downloading the data file. If using the Bioconductor AWS S3 bucket the
+Location_Prefix should not be included in the metadata file[s] as this field
+will be populated automatically.  The RDataPath will be the directory structure
+you uploaded to S3. If you uploaded a directory `MyAnnotation/`, and that
+directory had a subdirectory `v1/` that contained two files `counts.rds` and
+`coldata.rds`, your metadata file will contain two rows and the RDataPaths would
+be `MyAnnotation/v1/counts.rds` and `MyAnnotation/v1/coldata.rds`.  If you
+host your data on a publicly accessible site you must include a base url as the
+`Location_Prefix`. If your data file was at
+`ftp://myinstiututeserver/biostats/project2/counts.rds`, your metadata file will
+have one row and the `Location_Prefix` would be `ftp://myinstiututeserver/` and
+the `RDataPath` would be `biostats/project2/counts.rds`.
+
+
 This is a bad example because these annotations are already in the hubs but it
 should give you an idea of the format. Let's say I have a package myAnnotations
 and I upload two annotation files for dog and cow with information extracted from
-ensembl.  You would want the following saved as a csv (comma seperated output)
+ensembl to S3.  You would want the following saved as a csv (comma seperated output)
 but for easier view we show in a table:
 
 

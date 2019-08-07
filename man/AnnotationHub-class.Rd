@@ -407,6 +407,6 @@
   recordStatus(ah, "TEST")
   recordStatus(ah, "AH7220")
 }
-
+\seealso{\code{\link{getInfoOnIds}}}
 \keyword{classes}
 \keyword{methods}
