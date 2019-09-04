@@ -41,7 +41,9 @@
         # found! check if needs update
         } else {
             rid <- res %>% collect(Inf) %>% `[[`("rid")
-            db_path <- ifelse(bfcneedsupdate(bfc, rids=rid),
+            check_update <- bfcneedsupdate(bfc, rids=rid)
+            if(is.na(check_update)) check_update = TRUE
+            db_path <- ifelse(check_update,
                               bfcdownload(bfc, rid=rid, ask=FALSE,
                                           proxy=proxy),
                               bfcpath(bfc, rids=rid))
