@@ -12,6 +12,8 @@ BUG FIXES
     o (2.17.4) Fix localHub when no internet connection.  The internal use of
     isDevel was preventing Hub creation when no internet connection. Fixed by
     checking connection. This code pretained to orgDb filters
+    o (2.17.8) On chance of very first download of hub failure, next call to
+    construtor will redownload 
 
 CHANGES IN VERSION 2.15.0
 -------------------------
