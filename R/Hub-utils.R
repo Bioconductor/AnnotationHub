@@ -79,7 +79,66 @@
 }
 
 
+#
+# Redownload Hub sqlite file helper
+#
 
+refreshHub <- function(..., hub, cache, proxy,
+                       hubClass=c("AnnotationHub", "ExperimentHub"))
+{
+
+    if(missing(hubClass))
+        stop("Please specify hubClass: AnnotationHub or ExperimentHub")
+
+    .class <- match.arg(hubClass)
+
+    if(tolower(.class) == "annotationhub"){
+        if(missing(hub)) hub <- getAnnotationHubOption("URL")
+        if(missing(cache)) cache <- getAnnotationHubOption("CACHE")
+        if(missing(proxy)) proxy <- getAnnotationHubOption("PROXY")
+    }else{
+        if(missing(hub)) hub <- ExperimentHub::getExperimentHubOption("URL")
+        if(missing(cache)) cache <- ExperimentHub::getExperimentHubOption("CACHE")
+        if(missing(proxy)) proxy <- ExperimentHub::getExperimentHubOption("PROXY")
+    }
+    localHub <- FALSE
+
+
+    if (is.null(proxy)){
+        connect <- curl::has_internet()
+    } else {
+        connect <- TRUE
+        message("Cannot determine internet connection.",
+                "\n This operations requires internet connection.",
+                "\n If you experience connection issues please try again later")
+    }
+    if(!connect) stop("This function requires internet connection")
+
+    bfc <- BiocFileCache(cache=cache)
+    res <- bfcquery(bfc, paste0(tolower(.class), ".sqlite3"),
+                    field="rname", exact=TRUE)
+    cnt <- bfccount(res)
+    if (is.null(proxy)) proxy=""
+
+    if (cnt == 0){
+        remote_db <- paste0(url, "/metadata/", tolower(.class), ".sqlite3")
+        db_path <- bfcadd(bfc,
+                          rname=paste0(tolower(.class), ".sqlite3"),
+                          fpath=remote_db, proxy=proxy)
+    } else if (cnt > 1){
+        stop("Corrupt Cache: sqlite file",
+             "\n  See vignette section on corrupt cache",
+             "\n  cache: ", bfccache(bfc),
+             "\n  filename: ",
+             paste0(tolower(.class), ".sqlite3"),
+             call.=FALSE)
+    } else {
+        rid <- res %>% collect(Inf) %>% `[[`("rid")
+        bfc_path <- bfcdownload(bfc, rid=rid, ask=FALSE,
+                                proxy=proxy)
+    }
+    .Hub(.class, url=hub, cache=cache, proxy=proxy, localHub=localHub, ...)
+}
 
 
 ### --------------------------------------------------------------------------

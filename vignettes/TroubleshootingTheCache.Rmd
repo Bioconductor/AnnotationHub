@@ -1,7 +1,7 @@
 ---
 title: "Troubleshoot The Hubs"
 author: "Lori Shepherd"
-date: "Modified: March 2019. Compiled: `r format(Sys.Date(), '%d %b %Y')`"
+date: "Modified: Sept 2019. Compiled: `r format(Sys.Date(), '%d %b %Y')`"
 output:
   BiocStyle::html_document:
     toc: true
@@ -108,6 +108,15 @@ bfcremove(bfc, rids=res$rid)
 ah = AnnotationHub()
 ```
 
+#### redownload of sqlite file
+
+A force redownload of the sqlite hub file can be achieved through the refreshHub
+function. To specify which of the Bioconductor Hubs to redownload use the
+hubClass argument with either AnnotationHub or ExperimentHub.
+
+```
+ah2 = refreshHub(hubClass="AnnotationHub")
+```
 
 ### index file
 

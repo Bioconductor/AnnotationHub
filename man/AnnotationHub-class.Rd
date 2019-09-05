@@ -10,9 +10,10 @@
 % Constructor
 \alias{.Hub}
 \alias{AnnotationHub}
+\alias{refreshHub}
 
 % Accessor-like methods
-\alias{mcols,Hub-method} 
+\alias{mcols,Hub-method}
 
 \alias{cache}
 \alias{cache,Hub-method}
@@ -20,8 +21,8 @@
 \alias{cache<-}
 \alias{cache<-,Hub-method}
 
-\alias{hubUrl} 
-\alias{hubUrl,Hub-method} 
+\alias{hubUrl}
+\alias{hubUrl,Hub-method}
 \alias{hubCache}
 \alias{hubCache,Hub-method}
 \alias{hubDate}
@@ -57,13 +58,13 @@
 \alias{[[,Hub,character,missing-method}
 \alias{[[,Hub,numeric,missing-method}
 
-\alias{[,Hub,character,missing-method} 
-\alias{[,Hub,logical,missing-method} 
-\alias{[,Hub,numeric,missing-method} 
+\alias{[,Hub,character,missing-method}
+\alias{[,Hub,logical,missing-method}
+\alias{[,Hub,numeric,missing-method}
 
-\alias{[<-,Hub,character,missing,Hub-method} 
-\alias{[<-,Hub,logical,missing,Hub-method} 
-\alias{[<-,Hub,numeric,missing,Hub-method} 
+\alias{[<-,Hub,character,missing,Hub-method}
+\alias{[<-,Hub,logical,missing,Hub-method}
+\alias{[<-,Hub,numeric,missing,Hub-method}
 
 \alias{subset,Hub-method}
 
@@ -95,7 +96,8 @@
   Use \code{AnnotationHub()} to retrieve information about all records
   in the hub. If working offline, add argument \code{localHub=TRUE} to
   work with a local, non-updated hub; It will only have resources
-  available that have previously been downloaded. 
+  available that have previously been downloaded. To force redownload of
+  the hub, \code{refreshHub(hubClass="AnnotationHub")} can be utilized.
 
   Discover records in a hub using \code{mcols()}, \code{query()},
   \code{subset()}, \code{[}, and \code{display()}.
@@ -114,17 +116,17 @@
   check the status of a past record using \code{recordStatus()}.
 
   The location of the local cache can be found (and updated) with
-  \code{getAnnotationHubCache} and \code{setAnnotationHubCache}; 
+  \code{getAnnotationHubCache} and \code{setAnnotationHubCache};
   \code{removeCache} removes all cache resources.
 }
 
 \section{Constructors}{
   \describe{
     \item{}{
-      \code{AnnotationHub(..., hub=getAnnotationHubOption("URL"), 
-        cache=getAnnotationHubOption("CACHE"),
-        proxy=getAnnotationHubOption("PROXY"),
-        localHub=getAnnotationHubOption("LOCAL"))}:
+      \code{AnnotationHub(..., hub=getAnnotationHubOption("URL"),
+	cache=getAnnotationHubOption("CACHE"),
+	proxy=getAnnotationHubOption("PROXY"),
+	localHub=getAnnotationHubOption("LOCAL"))}:
 
       Create an \code{AnnotationHub} instance, possibly updating the
       current database of records.
@@ -170,34 +172,34 @@
       Get the metadata columns describing each record. Columns include:
       \describe{
 
-        \item{title}{Record title, frequently the file name of the
-          object.}
+	\item{title}{Record title, frequently the file name of the
+	  object.}
 
-        \item{dataprovider}{Original provider of the resource, e.g.,
-          Ensembl, UCSC.}
+	\item{dataprovider}{Original provider of the resource, e.g.,
+	  Ensembl, UCSC.}
 
-        \item{species}{The species for which the record is most
-          relevant, e.g., \sQuote{Homo sapiens}.}
+	\item{species}{The species for which the record is most
+	  relevant, e.g., \sQuote{Homo sapiens}.}
 
-        \item{taxonomyid}{NCBI taxonomy identifier of the species.}
+	\item{taxonomyid}{NCBI taxonomy identifier of the species.}
 
-        \item{genome}{Genome build relevant to the record, e.g., hg19.}
+	\item{genome}{Genome build relevant to the record, e.g., hg19.}
 
-        \item{description}{Textual description of the resource,
-          frequently automatically generated from file path and other
-          information available when the record was created.}
+	\item{description}{Textual description of the resource,
+	  frequently automatically generated from file path and other
+	  information available when the record was created.}
 
-        \item{tags}{Single words added to the record to facilitate
-          identification, e.g,. TCGA, Roadmap.}
+	\item{tags}{Single words added to the record to facilitate
+	  identification, e.g,. TCGA, Roadmap.}
 
-        \item{rdataclass}{The class of the R object used to represent
-          the object when imported into R, e.g., \code{GRanges},
-          \code{VCFFile}.}
+	\item{rdataclass}{The class of the R object used to represent
+	  the object when imported into R, e.g., \code{GRanges},
+	  \code{VCFFile}.}
 
-        \item{sourceurl}{Original URL of the resource.}
+	\item{sourceurl}{Original URL of the resource.}
 
-        \item{sourectype}{Format of the original resource, e.g., BED
-          file.}
+	\item{sourectype}{Format of the original resource, e.g., BED
+	  file.}
       }
     }
 
@@ -246,15 +248,15 @@
       logical \code{`&`} across columns.
       e.g., \code{query(x, c("Homo sapiens", "hg19", "GTF"))}.
       \describe{
-        \item{\code{pattern}}{A character vector of patterns to search
-          (via \code{grepl}) for in any of the \code{mcols()} columns.}
-        \item{\code{ignore.case}}{A logical(1) vector indicating whether
-          the search should ignore case (TRUE) or not (FALSE).}
-        \item{\code{pattern.op}}{Any function of two arguments,
-          describing how matches across pattern elements are to be
-          combined. The default \code{`&`} requires that only records
-          with \emph{all} elements of \code{pattern} in their metadata
-          columns are returned. \code{`&`}, \code{`|`} and \code{`!`}
+	\item{\code{pattern}}{A character vector of patterns to search
+	  (via \code{grepl}) for in any of the \code{mcols()} columns.}
+	\item{\code{ignore.case}}{A logical(1) vector indicating whether
+	  the search should ignore case (TRUE) or not (FALSE).}
+	\item{\code{pattern.op}}{Any function of two arguments,
+	  describing how matches across pattern elements are to be
+	  combined. The default \code{`&`} requires that only records
+	  with \emph{all} elements of \code{pattern} in their metadata
+	  columns are returned. \code{`&`}, \code{`|`} and \code{`!`}
 	  are most notably available. See \code{"?&"} or
 	  \code{?base::Ops} for more information.}
       }
@@ -266,7 +268,7 @@
       expression can reference columns of \code{mcols(x)}, and should
       return a logical vector of length \code{length(x)}.
       e.g., \code{subset(x, species == "Homo sapiens" &
-        genome=="GRCh38")}.
+	genome=="GRCh38")}.
     }
     \item{}{
       \code{display(object)}:
@@ -276,7 +278,7 @@
     }
     \item{}{
       \code{recordStatus(hub, record)}:
-      Returns a \code{data.frame} of the record id and status. \code{hub} must 
+      Returns a \code{data.frame} of the record id and status. \code{hub} must
       be a \code{Hub} object and \code{record} must be a \code{character(1)}.
       Can be used to discover why a resource was removed from the hub.
     }
@@ -301,7 +303,7 @@
       resources in \code{x}, or removes all local resources
       corresponding to the records in \code{x} from the cache. In this case,
       \code{x} would typically be a small subset of AnnotationHub resources.
-    } 
+    }
     \item{}{
       \code{hubUrl(x)}:
       Gets the URL for the online AnnotationHub.
@@ -309,6 +311,14 @@
     \item{}{
       \code{hubCache(x)}:
       Gets the file system location of the local AnnotationHub cache.
+    }
+    \item{}{
+      \code{refreshHub(..., hub, cache, proxy,
+	hubClass=c("AnnotationHub", "ExperimentHub"))}:
+      Force redownload of Hub sqlite file. This returns a Hub object as
+      if calling the constructor (ie. AnnotationHub()). For force
+      redownload specifically for AnnotationHub the base call should be
+      \code{refreshHub(hubClass="AnnotationHub")}
     }
     \item{}{
       \code{removeCache(x, ask=TRUE)}:
@@ -358,8 +368,8 @@
   ## from which resources, is data available?
   head(sort(table(ah$dataprovider), decreasing=TRUE))
 
-  ## from which species, is data available ? 
-  head(sort(table(ah$species),decreasing=TRUE)) 
+  ## from which species, is data available ?
+  head(sort(table(ah$species),decreasing=TRUE))
 
   ## what web service and local cache does this AnnotationHub point to?
   hubUrl(ah)
@@ -367,15 +377,15 @@
 
   ### Examples ###
 
-  ## One can  search the hub for multiple strings 
+  ## One can  search the hub for multiple strings
   ahs2 <- query(ah, c("GTF", "77","Ensembl", "Homo sapiens"))
-  
-  ## information about the file can be retrieved using 
+
+  ## information about the file can be retrieved using
   ahs2[1]
 
   ## one can further extract information from this show method
   ## like the sourceurl using:
-  ahs2$sourceurl 
+  ahs2$sourceurl
   ahs2$description
   ahs2$title
 
@@ -386,13 +396,13 @@
 
   ## the gtf file is returned as a GenomicRanges object and contains
   ## data about which organism it belongs to, its seqlevels and seqlengths
-  seqinfo(gr) 
+  seqinfo(gr)
 
-  ## each GenomicRanges contains a metadata slot which can be used to get 
-  ## the name of the hub object and other associated metadata. 
-  metadata(gr) 
+  ## each GenomicRanges contains a metadata slot which can be used to get
+  ## the name of the hub object and other associated metadata.
+  metadata(gr)
   ah[metadata(gr)$AnnotationHubName]
-   
+
   ## And we can also use "[" to restrict the things that are in the
   ## AnnotationHub object (by position, character, or logical vector).
   ## Here is a demo of position:
