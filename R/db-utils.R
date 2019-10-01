@@ -30,9 +30,9 @@
     dbGetQuery(path, query)
 }
 
-.db_uid0 <- function(path, .date){
+.db_uid0 <- function(path, .date, localHub){
     tryCatch({
-        uid <- .uid0(path, .date)
+        uid <- .uid0(path, .date, localHub)
         sort(uid)
     }, error=function(err) {
         stop("failed to connect to local data base",

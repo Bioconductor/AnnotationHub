@@ -40,7 +40,7 @@ setClass("Hub",
         db_date <- dates[length(dates)]
     }
 
-    db_uid <- .db_uid0(db_path, db_date)
+    db_uid <- .db_uid0(db_path, db_date, localHub)
     hub <- new(.class, cache=cache, hub=url, date=db_date,
                .db_path=db_path, .db_uid=db_uid, isLocalHub=localHub, ...)
 
@@ -135,7 +135,7 @@ setReplaceMethod("isLocalHub", "Hub",
         }else{
             db_path <- x@.db_path
             db_date <- .restrictDateByVersion(db_path)
-            db_uid <- .db_uid0(db_path, db_date)
+            db_uid <- .db_uid0(db_path, db_date, value)
             x <- new(as.character(class(x)), cache=hubCache(x), hub=hubUrl(x),
                      date=db_date, .db_path=db_path, .db_uid=db_uid,
                      isLocalHub=value)
@@ -166,12 +166,24 @@ setReplaceMethod("snapshotDate", "Hub",
         as.POSIXlt(value) < min(valid_range))
         stop("'value' must be in the range of possibleDates(x)")
 
-    new(class(x), cache=hubCache(x), hub=hubUrl(x),
-        date=as.character(value),
-        .db_path=x@.db_path,
-        .db_index=x@.db_index,
-        .db_uid=.db_uid0(x@.db_path, value),
-        isLocalHub=isLocalHub(x))
+    localHub <- isLocalHub(x)
+    hub <- new(class(x), cache=hubCache(x), hub=hubUrl(x),
+               date=as.character(value),
+               .db_path=x@.db_path,
+               .db_index=x@.db_index,
+               .db_uid=.db_uid0(x@.db_path, value, localHub),
+               isLocalHub=localHub)
+
+    if (!localHub){
+        index <- .db_create_index(hub)
+        .db_index(hub) <- index
+    } else{
+
+        index <- .db_index_file(hub)
+        .db_index(hub) <- index
+        hub <- .subsethub(hub)
+    }
+    hub
 })
 
 

@@ -1,6 +1,6 @@
 ## This function filters the local annotationhub.sqlite metadata db and
 ## defines the subset exposed by AnnotationHub().
-.uid0 <- function(path, date)
+.uid0 <- function(path, date, localHub)
 {
     conn <- .db_open(path)
     on.exit(.db_close(conn))
@@ -75,7 +75,7 @@
     ## NOTE: Because OrgDbs are valid for a full devel cycle they are
     ##       not filtered by snapshotDate(); the OrgDbs are valid for all
 
-    if(curl::has_internet() || !getAnnotationHubOption("LOCAL")){
+    if(curl::has_internet() || !localHub){
         isDevel <- BiocManager:::isDevel()
         orgdb_release_version <-
             if (getAnnotationHubOption("TESTING") || !isDevel) {
@@ -103,7 +103,7 @@
             AND resources.rdatadateremoved IS NULL
             AND biocversions.resource_id == resources.id
             AND rdatapaths.resource_id == resources.id',
-            bioc_value)
+            BiocManager::version())
         biocIds2 <- .db_query(conn, query2)[[1]]
     }
 
