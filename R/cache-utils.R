@@ -64,7 +64,7 @@ removeCache <- function(x, ask=TRUE){
              "\n  reason: ", conditionMessage(err),
              call.=FALSE)
     })
-    names(localFiles) <- rnames
+    names(localFiles) <- names(cachepath)
 
     if (verbose){
         message("loading from cache")
