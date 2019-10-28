@@ -94,7 +94,7 @@ removeCache <- function(x, ask=TRUE){
             stop(txt, call. = FALSE)
         }
     } else {
-        if (verbose) message("downloading ", n, " resources")
+        if (verbose && (n > 0)) message("downloading ", n, " resources")
     }
 
     need
