@@ -1,9 +1,19 @@
+CHANGES IN VERSION 2.19.0
+-------------------------
+
+USER-VISIBLE MODIFICATIONS
+
+    o (2.19.1) Improve ERROR message when resource isn't found. Also involved
+    updating RecordStatus function. If resource hasn't been completely removed
+    from database, gives when the resource was removed. If the resource is
+    available but after the snapshot date being utilized, specialized message.
+
 CHANGES IN VERSION 2.17.0
 -------------------------
 
 NEW FEATURES
 
-    o (2.17.6) remove debugging message of loading resource (`AH: 1`) 
+    o (2.17.6) remove debugging message of loading resource (`AH: 1`)
     o (2.17.5) system environment variable to control localHub option for
     creating hub based only on previously downloaded resources
     o (2.17.9) Allow force redownload of Hub sqlite file with refreshHub
@@ -16,7 +26,7 @@ BUG FIXES
     isDevel was preventing Hub creation when no internet connection. Fixed by
     checking connection. This code pretained to orgDb filters
     o (2.17.8) On chance of very first download of hub failure, next call to
-    construtor will redownload 
+    construtor will redownload
     o (2.17.10) Fix ability to use hubs when offline
     o (2.17.11) Add BiocVersion to Imports. Fixes bug with R CMD check when
     testing if library can be loaded off search path. BiocManager doesn't Import

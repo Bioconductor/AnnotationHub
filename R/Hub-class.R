@@ -288,13 +288,24 @@ setMethod("[[", c("Hub", "character", "missing"),
         stop("'i' must be length 1")
     idx <- match(i, names(.db_uid(x)))
     if (is.na(idx)){
+        status = recordStatus(x, i)
         if (isLocalHub(x)){
-            if(recordStatus(x, i)$status == "Public")
+            if(status$status == "Public")
                 stop("File not previously downloaded.",
                      "\n  Run with 'localHub=FALSE'",
                      call.=FALSE)
         }
-        stop(recordStatus(x, i)$status, call.=FALSE)
+        if (status$status == "Public" && (as.Date(status$dateadded) >=
+                as.Date(snapshotDate(x))))
+            stop(status$record, " added after current Hub snapshot date.\n",
+                 "  added: ", as.character(status$dateadded), "\n",
+                 "  snapshote date: ",  as.character(snapshotDate(x)),
+                 call.=FALSE)
+
+        msg <- paste0(status$status, "\n")
+        if(!is.null(status$dateremoved))
+            msg <- paste0(msg, "   Resource removed on: ", status$dateremoved)
+        stop(msg, call.=FALSE)
     }
     .Hub_get1(x[idx], force=force, verbose=verbose)
 })
@@ -594,14 +605,23 @@ setMethod("recordStatus", "Hub",
         if (length(record) != 1L)
             stop("'record' must be length 1")
 
-        conn <- dbconn(hub)
-        query <- paste0("SELECT status FROM statuses WHERE id IN ",
-                        "(SELECT status_id FROM resources WHERE ah_id = '",
-                        record, "')")
-        status=.db_query(conn, query)
+        query <- paste0("SELECT DISTINCT resources.ah_id, statuses.status, ",
+                        "resources.rdatadateadded, resources.rdatadateremoved ",
+                        "FROM resources, statuses ",
+                        "WHERE resources.status_id == statuses.id ",
+                        "AND ah_id = '", record, "'")
+
+        status=.db_query(dbfile(hub), query)
         if (nrow(status) == 0L)
-            status <- "record not found in database"
-        data.frame(record=record, status=status)
+            return(data.frame(record=record, status="record not found in database"))
+        if(is.na(status$rdatadateremoved)){
+            return(data.frame(record=record, status=status$status,
+                              dateadded=status$rdatadateadded))
+        }else{
+            return(data.frame(record=record, status=status$status,
+                              dateadded=status$rdatadateadded,
+                              dateremoved=status$rdatadateremoved))
+        }
 })
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
