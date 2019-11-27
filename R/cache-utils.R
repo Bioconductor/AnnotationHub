@@ -1,7 +1,7 @@
 .create_cache <-
-    function(.class, url, cache, proxy, localHub=FALSE)
+    function(.class, url, cache, proxy, localHub=FALSE, ask=TRUE)
 {
-    hub_bfc <- BiocFileCache(cache=cache)
+    hub_bfc <- BiocFileCache(cache=cache, ask=ask)
     db_path <- .updateHubDB(hub_bfc, .class, url, proxy, localHub)
     .db_is_valid(db_path)
     db_path

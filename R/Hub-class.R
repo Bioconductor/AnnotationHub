@@ -20,11 +20,11 @@ setClass("Hub",
 ### Constructor for subclasses
 ###
 
-.Hub <- function(.class, url, cache, proxy, localHub=FALSE, ...) {
+.Hub <- function(.class, url, cache, proxy, localHub=FALSE, ask=TRUE, ...) {
 
     # create or use cache location
     # download hub sqlite file and add/update to BiocFileCache for tracking
-    db_path <- .create_cache(.class, url, cache, proxy, localHub)
+    db_path <- .create_cache(.class, url, cache, proxy, localHub, ask)
 
     # find snapshot date
     if (!localHub){

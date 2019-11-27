@@ -15,7 +15,8 @@ AnnotationHub <-
     function(..., hub=getAnnotationHubOption("URL"),
              cache=getAnnotationHubOption("CACHE"),
              proxy=getAnnotationHubOption("PROXY"),
-             localHub=getAnnotationHubOption("LOCAL"))
+             localHub=getAnnotationHubOption("LOCAL"),
+             ask=getAnnotationHubOption("ASK"))
 {
     if (is.null(proxy)){
         connect <- curl::has_internet()
@@ -29,7 +30,7 @@ AnnotationHub <-
         message("No internet connection using 'localHub=TRUE'")
         localHub <- !connect
     }
-    .Hub("AnnotationHub", hub, cache, proxy, localHub, ...)
+    .Hub("AnnotationHub", hub, cache, proxy, localHub, ask, ...)
 }
 
 

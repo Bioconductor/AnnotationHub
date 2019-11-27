@@ -1,6 +1,13 @@
 CHANGES IN VERSION 2.19.0
 -------------------------
 
+NEW FEATURES
+
+    o (2.19.2) Adds option ask to constructor. Default: True. Ask will ask user
+    to create default AnnotationHub location and if in an non interactive
+    session utilize a temporary directory. If False, the default directory is
+    created and utilized without prompting.
+
 USER-VISIBLE MODIFICATIONS
 
     o (2.19.1) Improve ERROR message when resource isn't found. Also involved

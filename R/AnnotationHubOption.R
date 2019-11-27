@@ -8,7 +8,7 @@
 .AH_hub_options <- new.env(parent=emptyenv())
 
 .hub_option_key <- function(key0=c("URL", "CACHE", "PROXY", "MAX_DOWNLOADS",
-                                "LOCAL", "TESTING"))
+                                "LOCAL", "TESTING", "ASK"))
     match.arg(key0)
 
 getAnnotationHubOption <- function(arg) {
@@ -42,6 +42,9 @@ setAnnotationHubOption <- function(arg, value)
         stopifnot(isTRUE(value) || isFALSE(value))
         value
     }, LOCAL={
+        stopifnot(isTRUE(value) || isFALSE(value))
+        value
+    }, ASK={
         stopifnot(isTRUE(value) || isFALSE(value))
         value
     })
