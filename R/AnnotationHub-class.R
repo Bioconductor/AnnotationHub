@@ -6,7 +6,7 @@
 setClass("AnnotationHub", contains="Hub")
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### Constructor 
+### Constructor
 ###
 
 ## Add code to check : https://annotationhub.bioconductor.org/metadata/highest_id
@@ -21,8 +21,8 @@ AnnotationHub <-
         connect <- curl::has_internet()
     } else {
         connect <- TRUE
-        message("Cannot determine internet connection.",
-                "\n If you experience connection issues consider ",
+        message("Cannot determine internet connection.\n",
+                "If you experience connection issues consider ",
                 "using 'localHub=TRUE'")
     }
     if (!connect && !localHub){
@@ -38,26 +38,15 @@ AnnotationHub <-
 ###
 
 setMethod("cache", "AnnotationHub",
-    function(x, ..., force=FALSE, verbose=FALSE) {
-        callNextMethod(x,
-                       cache.root="AnnotationHub", 
-                       cache.fun=setAnnotationHubOption, 
-                       proxy=getAnnotationHubOption("PROXY"), 
-                       max.downloads=getAnnotationHubOption("MAX_DOWNLOADS"),
-                       force=force,
-                       verbose=verbose)
-    }
-)
-
-### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### show method
-###
-
-setMethod("show", "AnnotationHub", function(object) 
+    function(x, ..., force=FALSE, verbose=FALSE)
 {
-    len <- length(object)
-    cat(sprintf("%s with %d record%s\n", class(object), len,
-                ifelse(len == 1L, "", "s")))
-    cat("# snapshotDate():", snapshotDate(object), "\n")
-    callNextMethod(object)
+    callNextMethod(
+        x,
+        cache.root="AnnotationHub",
+        cache.fun=setAnnotationHubOption,
+        proxy=getAnnotationHubOption("PROXY"),
+        max.downloads=getAnnotationHubOption("MAX_DOWNLOADS"),
+        force=force,
+        verbose=verbose
+    )
 })

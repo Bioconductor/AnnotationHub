@@ -81,7 +81,6 @@
 
 % show method:
 \alias{show,Hub-method}
-\alias{show,AnnotationHub-method}
 \alias{show,AnnotationHubResource-method}
 
 

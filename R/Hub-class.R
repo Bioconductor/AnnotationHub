@@ -556,6 +556,12 @@ setMethod("as.list", "Hub", as.list.Hub)
 
 setMethod("show", "Hub", function(object)
 {
+    len <- length(object)
+    cat(
+        class(object), " with ", len, " record", ifelse(len==1L, "", "s"), "\n",
+        "# snapshotDate(): ", snapshotDate(object), "\n",
+        sep = ""
+    )
     if (length(object) == 1)
         .show1(object)
     else
