@@ -56,6 +56,10 @@ setGeneric("getInfoOnIds", signature="ids",
     function(hub, ids) standardGeneric("getInfoOnIds")
 )
 
+setGeneric("removeResources", signature="ids",
+    function(hub, ids) standardGeneric("removeResources")
+)
+
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### AnnotationHubResource objects
 ###
