@@ -52,12 +52,12 @@ export(
     hubUrl, hubCache, hubDate,
     snapshotDate, "snapshotDate<-",
     getHub, listResources, loadResources,
-    package, convertHub,
+    package, convertHub, removeResources,
     isLocalHub, "isLocalHub<-", getInfoOnIds
 )
 
 exportMethods(
-    cache, "cache<-", query,
+    cache, "cache<-", query, removeResources,
     hubUrl, hubCache, hubDate, 
     snapshotDate, "snapshotDate<-",
     getHub, isLocalHub, "isLocalHub<-", getInfoOnIds

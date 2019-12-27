@@ -349,8 +349,115 @@ setReplaceMethod("cache", "Hub",
     if (length(rmid) > 0){
         bfcremove(bfc, rids=rmid)
     }
+
+    # reset hub = important especially if using localHub
+    # will not reset original object but will reset subsetting object
+    localHub <- isLocalHub(x)
+    db_path <- x@.db_path
+    if (!localHub){
+        db_date <- .restrictDateByVersion(db_path)
+    } else {
+        dates <-.possibleDates(db_path)
+        db_date <- dates[length(dates)]
+    }
+    db_uid <- .db_uid0(db_path, db_date, localHub)
+    hub <- new(as.character(class(x)), cache=hubCache(x), hub=hubUrl(x),
+               date=db_date, .db_path=db_path, .db_uid=db_uid,
+               isLocalHub=localHub)
+    if (!localHub){
+        index <- .db_create_index(hub)
+        .db_index(hub) <- index
+    } else{
+        index <- .db_index_file(hub)
+        .db_index(hub) <- index
+        hub <- .subsethub(hub)
+    }
+    hub
 })
 
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### Removing Resources from downloaded cache
+###
+
+setMethod("removeResources", "missing",
+    function(hub, ids)
+{
+    ids <- names(.db_uid(hub))
+    message("Removing all resources from cache")
+    suppressMessages(removeResources(hub, ids))
+})
+
+setMethod("removeResources", "character",
+    function(hub, ids)
+{
+    alldatainfo <- .IdsInfo(hub)
+    dx <- match(ids, alldatainfo$ah_id)
+    if(any(is.na(dx))){
+        message("Not all ids found in database.",
+                "\n  Ignoring the following:",
+                "\n      ",
+                paste(ids[is.na(dx)], collapse="\n      "))
+    }
+
+    if(length(dx[!is.na(dx)]) > 0L){
+
+        ids <- ids[!is.na(dx)]
+        bfc <-  BiocFileCache(cache=hubCache(hub))
+        rnames <- bfcinfo(bfc)$rname
+        cachepath <- .named_cache_path(hub)
+        cachepath <- cachepath[(names(cachepath) %in% ids)]
+        Toremove <- paste(names(cachepath), cachepath, sep=" : ")
+        if (length(Toremove) > 0){
+            bfc_ids <- bfcinfo(bfc)[match(Toremove, rnames),]$rid
+            if (any(is.na(bfc_ids))){
+                message("The following are not locally downloaded:",
+                        "\n      ",
+                        paste(names(cachepath)[which(is.na(bfc_ids))]),
+                        collapse="\n      ")
+                cachepath <- cachepath[which(!is.na(bfc_ids))]
+                bfc_ids <- bfc_ids[which(!is.na(bfc_ids))]
+            }
+            if (length(bfc_ids) > 0){
+
+                message("Removing the following from cache:",
+                        "\n      ",
+                        paste(names(cachepath), collapse = "\n      "))
+                bfc <- bfcremove(x=bfc, rids=bfc_ids)
+
+                # reset hub cache - useful if local
+                localHub <- isLocalHub(hub)
+                db_path <- hub@.db_path
+                if (!localHub){
+                    db_date <- .restrictDateByVersion(db_path)
+                } else {
+                    dates <-.possibleDates(db_path)
+                    db_date <- dates[length(dates)]
+                }
+                db_uid <- .db_uid0(db_path, db_date, localHub)
+                hub <- new(as.character(class(hub)), cache=hubCache(hub), hub=hubUrl(hub),
+                           date=db_date, .db_path=db_path, .db_uid=db_uid,
+                           isLocalHub=localHub)
+                if (!localHub){
+                    index <- .db_create_index(hub)
+                    .db_index(hub) <- index
+                } else{
+                    index <- .db_index_file(hub)
+                    .db_index(hub) <- index
+                    hub <- .subsethub(hub)
+                }
+            }
+        } else {
+            message("Resources were not locally cached.",
+                    "\n    Nothing to remove.")
+        }
+    } else {
+
+        stop("No valid ids to remove.")
+
+    }
+    invisible(hub)
+})
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### $, query() and subset() methods
@@ -660,66 +767,4 @@ setMethod("c", "Hub",
     idx <- match(udb_uid, db_uid)
     .db_uid <- setNames(udb_uid, names(db_uid)[idx])
     initialize(args[[1]], .db_uid=.db_uid)
-})
-
-
-### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### Removing
-###
-
-setMethod("removeResources", "missing",
-    function(hub, ids)
-{
-    ids <- names(.db_uid(hub))
-    message("Removing all resources from cache")
-    suppressMessages(removeResources(hub, ids))
-})
-
-setMethod("removeResources", "character",
-    function(hub, ids)
-{
-    alldatainfo <- .IdsInfo(hub)
-    dx <- match(ids, alldatainfo$ah_id)
-    if(any(is.na(dx))){
-        message("Not all ids found in database.",
-                "\n  Ignoring the following:",
-                "\n      ",
-                paste(ids[is.na(dx)], collapse="\n      "))
-    }
-
-    if(length(dx[!is.na(dx)]) > 0L){
-
-        ids <- ids[!is.na(dx)]
-        bfc <-  BiocFileCache(cache=hubCache(hub))
-        rnames <- bfcinfo(bfc)$rname
-        cachepath <- .named_cache_path(hub)
-        cachepath <- cachepath[(names(cachepath) %in% ids)]
-        Toremove <- paste(names(cachepath), cachepath, sep=" : ")
-        if (length(Toremove) > 0){
-            bfc_ids <- bfcinfo(bfc)[match(Toremove, rnames),]$rid
-            message("Removing the following from cache:",
-                    "\n      ",
-                    paste(names(cachepath), collapse = "\n      "))
-            bfc <- bfcremove(x=bfc, rids=bfc_ids)
-
-            # reset cache - useful if local
-            db_path <- hub@.db_path
-            db_date <- .restrictDateByVersion(db_path)
-            db_uid <- .db_uid0(db_path, db_date, isLocalHub(hub))
-            # This is not updating? why?
-            # would like the cache to be updated to remove the newly
-            # removed resources (if localHub=TRUE)
-            hub <- new(as.character(class(hub)), cache=hubCache(hub), hub=hubUrl(hub),
-                       date=db_date, .db_path=db_path, .db_uid=db_uid,
-                       isLocalHub=isLocalHub(hub))
-        } else {
-            message("Resources were not locally cached.",
-                    "\n    Nothing to remove.")
-        }
-    } else {
-
-        stop("No valid ids to remove.")
-
-    }
-    invisible(hub)
 })
