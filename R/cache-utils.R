@@ -148,7 +148,15 @@ removeCache <- function(x, ask=TRUE){
         } else if (cnt == 0){
             TRUE
         } else {
-            bfcneedsupdate(bfc, rids=rid)
+            tryCatch({
+                bfcneedsupdate(bfc, rids=rid)
+            }, error=function(e){
+                ahidnf <- res %>% collect(Inf) %>% `[[`("rname") %>%
+                    strsplit(split=" : ") %>% `[[`(1) %>% `[`(1)
+                warning("Could not check id: ",ahidnf," for updates.",
+                        "\n  Using previously cached version.")
+                setNames(FALSE, rid)
+            })
         }
     }
     if (length(fndFiles) > 0){
