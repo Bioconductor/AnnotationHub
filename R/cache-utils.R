@@ -153,7 +153,7 @@ removeCache <- function(x, ask=TRUE){
             }, error=function(e){
                 ahidnf <- res %>% collect(Inf) %>% `[[`("rname") %>%
                     strsplit(split=" : ") %>% `[[`(1) %>% `[`(1)
-                warning("Could not check id: ",ahidnf," for updates.",
+                message("Could not check id: ",ahidnf," for updates.",
                         "\n  Using previously cached version.")
                 setNames(FALSE, rid)
             })
