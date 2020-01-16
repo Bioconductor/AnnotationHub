@@ -150,7 +150,7 @@ refreshHub <- function(..., hub, cache, proxy,
     if (length(biocversion) > 1L)
         stop("length(biocversion) must == 1")
 
-    yaml <- httr::content(GET("http://bioconductor.org/config.yaml"),
+    yaml <- httr::content(GET("https://bioconductor.org/config.yaml"),
                     encoding="UTF-8", as="text")
     obj <- yaml.load(yaml)
     release_dates <- obj$release_dates
