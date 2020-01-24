@@ -413,8 +413,8 @@ setMethod("removeResources", "character",
             if (any(is.na(bfc_ids))){
                 message("The following are not locally downloaded:",
                         "\n      ",
-                        paste(names(cachepath)[which(is.na(bfc_ids))]),
-                        collapse="\n      ")
+                        paste(names(cachepath)[which(is.na(bfc_ids))],
+                        collapse="\n      "))
                 cachepath <- cachepath[which(!is.na(bfc_ids))]
                 bfc_ids <- bfc_ids[which(!is.na(bfc_ids))]
             }
