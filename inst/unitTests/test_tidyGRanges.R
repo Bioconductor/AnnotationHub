@@ -11,8 +11,8 @@ test_tidyGRanges <- function() {
                    GenomeInfoDb::isCircular(gr1))
 
     # case -2 genome not supported by GenomeInfoDb::Seqinfo
-    gr2 <- AnnotationHub:::.tidyGRanges(gr=gr, metadata=FALSE, genome="calJac3")
-    checkIdentical(setNames(rep("calJac3", 5), chr), GenomeInfoDb::genome(gr2))
+    gr2 <- AnnotationHub:::.tidyGRanges(gr=gr, metadata=FALSE, genome="NotFound")
+    checkIdentical(setNames(rep("NotFound", 5), chr), GenomeInfoDb::genome(gr2))
     checkIdentical(setNames(rep(c(FALSE, TRUE), c(4, 1)), chr),
                GenomeInfoDb::isCircular(gr2))
 
