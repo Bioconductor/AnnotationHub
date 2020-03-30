@@ -3,6 +3,9 @@ CHANGES IN VERSION 2.19.0
 
 NEW FEATURES
 
+    o (2.19.8) trycatch around bfcneedsupdate/bfcdownload for sqlite database to
+    prevent error when internet is spotty and databse source cannot be checked
+    for a newer version.
     o (2.19.4) trycatch around bfcneedsupdate call will prevent error when
     internet is spotty and resource cannot be checked for a newer version.
     o (2.19.3) New function removeResources for removing locally downloaded
