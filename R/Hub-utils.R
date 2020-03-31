@@ -52,10 +52,10 @@
 
                 warning("Could not check database for updates.\n",
                         "  Database source currently unreachable.\n",
-                        "  Using previously cached version.")
-                db_path <- bfcpath(bfc, rids=rid)
+                        "  This should only be a temporary interruption. \n",
+                        "  Using previously cached version.", call.=FALSE)
             })
-
+            db_path <- bfcpath(bfc, rids=rid)
         }
     }
     unname(db_path)
