@@ -1,16 +1,18 @@
 Package: AnnotationHub
 Type: Package
 Title: Client to access AnnotationHub resources
-Version: 2.19.9
+Version: 2.19.10
 Authors@R: 
-    c(person("Martin", "Morgan", email="martin.morgan@roswellpark.org",
+    c(person("Bioconductor Package", "Maintainer", email="maintainer@bioconductor.org",
              role="cre"),
+      person("Martin", "Morgan", role="aut"),
       person("Marc", "Carlson", role="ctb"),
       person("Dan", "Tenenbaum", role="ctb"),
       person("Sonali", "Arora", role="ctb"),
-      person("Lori", "Shepherd", role="ctb"))
+      person("Valerie", "Oberchain", role="ctb"),
+      person("Kayla", "Morrell", role="ctb"),
+      person("Lori", "Shepherd", role="aut"))
 biocViews: Infrastructure, DataImport, GUI, ThirdPartyClient
-Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
 Description: This package provides a client for the Bioconductor
     AnnotationHub web resource. The AnnotationHub web resource
     provides a central location where genomic files (e.g., VCF, bed,
@@ -40,8 +42,3 @@ Collate: AnnotationHubOption.R AllGenerics.R Hub-class.R db-utils.R
     utilities.R sql-utils.R Hub-utils.R cache-utils.R zzz.R
 VignetteBuilder: knitr
 NeedsCompilation: yes
-Author: Martin Morgan [cre],
-  Marc Carlson [ctb],
-  Dan Tenenbaum [ctb],
-  Sonali Arora [ctb],
-  Lori Shepherd [ctb]
