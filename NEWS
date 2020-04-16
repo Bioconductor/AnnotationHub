@@ -3,6 +3,7 @@ CHANGES IN VERSION 2.19.0
 
 NEW FEATURES
 
+    o (2.19.8) Fixed messages to be more informative
     o (2.19.8) trycatch around bfcneedsupdate/bfcdownload for sqlite database to
     prevent error when internet is spotty and databse source cannot be checked
     for a newer version.
