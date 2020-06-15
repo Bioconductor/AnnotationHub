@@ -117,7 +117,7 @@
          NULL
     })
     
-    if (is.null(newSeqinfo)) {
+    if (is.null(newSeqinfo) || !all(GenomeInfoDb::seqlevels(gr) %in% GenomeInfoDb::seqlevels(newSeqinfo))) {
         ## use guess work to populate
         if (guess.circular)
             GenomeInfoDb::isCircular(existingSeqinfo)  <- 
