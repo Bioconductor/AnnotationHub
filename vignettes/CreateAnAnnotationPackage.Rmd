@@ -169,12 +169,12 @@ become available.
 
 * Bump package version and commit to git
 
-* Notify Lori.Shepherd@Roswellpark.org that an update is ready and
+* Notify hubs@bioconductor.org that an update is ready and
   a team member will add the new metadata to the production database;
   new resources will not be visible in AnnotationHub until
   the metadata are added to the database.
 
-Contact Lori.Shepherd@roswellpark.org or maintainer@bioconductor.org with any
+Contact hubs@bioconductor.org or maintainer@bioconductor.org with any
 questions.
 
 ## Converting a non AnnotationHub annotation package
@@ -205,7 +205,7 @@ A bug fix may involve a change to the metadata, data resource or both.
 * The replacement resource must have the same name as the original and
   be at the same location (path).
 
-* Notify Lori.Shepherd@roswellpark.org that you want to replace the data
+* Notify hubs@bioconductor.org that you want to replace the data
   and make the files available: see section "Uploading Data to S3".
 
 ## Update the metadata
@@ -214,7 +214,7 @@ New metadata records can be added for new resources but modifying existing
 records is discouraged. Record modification will only be done in the case of
 bug fixes.
 
-* Notify Lori.Shepherd@roswellpark.org that you want to change the metadata
+* Notify hubs@bioconductor.org that you want to change the metadata
 
 * Update make-metadata.R and regenerate the metadata.csv file
 
@@ -234,7 +234,7 @@ including resources still in the database but no longer available.
 In general, resources are only removed when they are no longer available
 (e.g., moved from web location, no longer provided etc.).
 
-To remove a resource from `AnnotationHub` contact Lori.Shepherd@roswellpark.org
+To remove a resource from `AnnotationHub` contact hubs@bioconductor.org
 or maintainer@bioconductor.org.
 
 # Versioning
@@ -295,7 +295,7 @@ would be `ftp://mylocalserver/` for the `Location_Prefix` and
 
 Instead of providing the data files via dropbox, ftp, etc. we will grant
 temporary access to an S3 bucket where you can upload your data. Please
-email Lori.Shepherd@roswellpark.org for access.
+email hubs@bioconductor.org for access.
 
 You will be given access to the 'AnnotationContributor' user. Ensure that the
 `AWS CLI` is installed on your machine. See instructions for installing `AWS
@@ -338,7 +338,7 @@ subdirectories as necessary (i.e. top directory must be software package name,
 then if applicable, subdirectories of versions, ...).  Please also do not forget
 to use the flag `--acl public-read`; This allows read access to the data file. 
 
-Once the upload is complete, email Lori.Shepherd@roswellpark.org to continue the
+Once the upload is complete, email hubs@bioconductor.org to continue the
 process. To add the data officially the data will need to be uploaded and the
 metadata.csv file will need to be created in the github repository.
 
@@ -362,7 +362,7 @@ file. Briefly, a description of the metadata columns required:
 * Genome: 'character(1)'. Genome. Can be NA.
 * SourceType: 'character(1)'. Format of original data, e.g., FASTA, BAM, BigWig,
   etc. 'getValidSourceTypes()' list currently acceptable values. If nothing seems
-  appropiate for your data reach out to lori.shepherd@roswellpark.org
+  appropiate for your data reach out to hubs@bioconductor.org
 * SourceUrl: 'character(1)'. Location of original data files. Multiple urls
   should be provided as a comma separated string. If the data is simulated we
   recommend putting either a lab url or the url of the Bioconductor package.
@@ -387,7 +387,7 @@ file. Briefly, a description of the metadata columns required:
   types and the function 'AnnotationHub::DispatchClassList()' will output a
   matrix of currently implemented DispatchClass and brief description of
   utility. If a predefine class does not seem appropriate contact
-  lori.shepherd@roswellpark.org. A all purpose DispathClass is `FilePath` that
+  hubs@bioconductor.org. A all purpose DispathClass is `FilePath` that
   instead of trying to load the file into R, will only return the path to the
   locally downloaded file.
 * Location_Prefix: 'character(1)'. Do not include this field if data are stored
