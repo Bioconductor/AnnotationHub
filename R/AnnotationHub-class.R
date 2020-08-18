@@ -22,8 +22,12 @@ AnnotationHub <-
         connect <- !is.null(curl::nslookup("annotationhub.bioconductor.org", error=FALSE))
     } else {
         connect <- TRUE
-        message("Assuming valid proxy connection through '", proxy, "'",
-                "\n  If you experience connection issues consider ",
+        message("Assuming valid proxy connection through '",
+                ifelse(is(proxy,"request"),
+                       paste(unlist(proxy), collapse=":"),
+                       proxy),
+                "'",
+                "\n If you experience connection issues consider ",
                 "using 'localHub=TRUE'")
     }
     if (!connect && !localHub){
