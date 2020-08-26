@@ -1,7 +1,7 @@
 Package: AnnotationHub
 Type: Package
 Title: Client to access AnnotationHub resources
-Version: 2.21.3
+Version: 2.21.4
 Authors@R: 
     c(person("Bioconductor Package", "Maintainer", email="maintainer@bioconductor.org",
              role="cre"),
@@ -41,4 +41,5 @@ Collate: AnnotationHubOption.R AllGenerics.R Hub-class.R db-utils.R
     EnsDbResource-class.R 
     utilities.R sql-utils.R Hub-utils.R cache-utils.R zzz.R
 VignetteBuilder: knitr
+BugReports: https://github.com/Bioconductor/AnnotationHub/issues
 NeedsCompilation: yes
