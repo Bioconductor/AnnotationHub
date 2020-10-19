@@ -1,8 +1,15 @@
 CHANGES IN VERSION 2.21.0
 -------------------------
+BUG FIX
 
+    o (2.21.5) Fix documentation for setting AnnotationHubOptions
+    o (2.21.3) Fix printing of proxy when present
+    
 USER-VISIBLE MODIFICATIONS
 
+    o (2.21.6) Make internet connection test less stringent
+    o (2.21.4) Add link to github for reporting issues
+    o (2.21.2) Update to reference hubs@bioconductor.org for help 
     o (2.21.1) Update .tidyGRanges to account for incorrect or missing genomes
 
 
