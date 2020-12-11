@@ -200,7 +200,7 @@
     .db_query(dbfile(x), query)
 }
 
-## helper for extracting rdatapath
+## helper for extracting version_id
 .version <- function(x) {
     query <- sprintf(
         'SELECT DISTINCT version_id, resource_id AS id FROM rdatapaths
@@ -331,5 +331,13 @@
     nms <- names(mat)
     nms[which(nms == "id")] = "fetch_id"
     names(mat) <- nms
+    mat
+}
+
+.getversions <- function(hub, id)
+{
+    query <- paste0(
+        "SELECT DISTINCT resources.ah_id, rdatapaths.version_id, resources.title, resources.description, rdatapaths.rdataclass, resources.species, resources.genome, resources.taxonomyid, input_sources.sourcesize, input_sources.sourceurl, input_sources.sourceversion, input_sources.sourcemd5, input_sources.sourcelastmodifieddate, input_sources.sourcetype, statuses.status, biocversions.biocversion, resources.rdatadateadded, resources.rdatadateremoved FROM resources, rdatapaths, statuses, biocversions, input_sources WHERE resources.id == rdatapaths.resource_id AND resources.status_id == statuses.id AND biocversions.resource_id == resources.id AND input_sources.resource_id == resources.id AND resources.ah_id LIKE '%",id,"%'")
+    mat <- AnnotationHub:::.db_query(dbfile(hub), query)
     mat
 }

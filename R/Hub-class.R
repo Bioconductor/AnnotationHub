@@ -518,6 +518,14 @@ getSize <- function(hub, tbl)
            USE.NAMES=FALSE)
 }
 
+setMethod("getVersionsOfId", "character",
+    function(hub, id)
+{
+    id <- sub('\\..*', '',id)
+    versionsTbl <- .getversions(hub, id)
+    versionsTbl
+})
+
 setMethod("$", "Hub",
     function(x, name)
 {
@@ -642,10 +650,15 @@ setMethod("as.list", "Hub", as.list.Hub)
     rsrc <- .resource_table(object)
     size <- .collapse_as_string(object, .sourcesize)
     date <- .collapse_as_string(object, .sourcelastmodifieddate)
+    id <- sub('\\..*', '',names(object)[[1]])
+    version <- sub('.*\\.', '',names(object)[[1]])
+    tbl <- getVersionsOfId(object, id)
 
-    cat("# names(): ", sub('\\..*', '',names(object)[[1]]), "\n", sep="")
-    cat(.pprintf1("version", sub('.*\\.', '',names(object)[[1]])))
+    cat("# names(): ", id, "\n", sep="")
+    cat(.pprintf1("version", version))
     cat(.pprintf1("versionid", rsrc[["version_id"]]))
+    cat(.pprintf1("other versions available",(dim(tbl)[1] > 1)))
+    cat(.pprintf1("most recent hub version",(max(gsub('.*\\.', '',tbl$ah_id))==version)))
     if (length(package(object)) > 0L)
         cat("# package(): ", package(object)[[1]], "\n", sep="")
     cat(.pprintf1("dataprovider", rsrc[["dataprovider"]]))

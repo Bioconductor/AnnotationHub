@@ -55,9 +55,11 @@ setGeneric("loadResources", signature="hub",
 setGeneric("getInfoOnIds", signature="ids",
     function(hub, ids) standardGeneric("getInfoOnIds")
 )
-
 setGeneric("removeResources", signature="ids",
     function(hub, ids) standardGeneric("removeResources")
+)
+setGeneric("getVersionsOfId", signature="id",
+    function(hub, id) standardGeneric("getVersionsOfId")
 )
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
