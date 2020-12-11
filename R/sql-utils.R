@@ -129,6 +129,7 @@
     tbl[["tags"]] <- I(.collapse_as_list(x, .tags))
     tbl[["rdataclass"]] <- .collapse_as_string(x, .rdataclass)
     tbl[["rdatapath"]] <- .collapse_as_string(x, .rdatapath)
+    tbl[["version_id"]] <- .collapse_as_string(x, .version)
     tbl[["sourceurl"]] <- .collapse_as_string(x, .sourceurl)
     tbl[["sourcetype"]] <- .collapse_as_string(x, .sourcetype)
     tbl
@@ -194,6 +195,15 @@
 .rdatapath <- function(x) {
     query <- sprintf(
         'SELECT DISTINCT rdatapath, resource_id AS id FROM rdatapaths
+         WHERE resource_id IN (%s)',
+        .id_as_single_string(x))
+    .db_query(dbfile(x), query)
+}
+
+## helper for extracting rdatapath
+.version <- function(x) {
+    query <- sprintf(
+        'SELECT DISTINCT version_id, resource_id AS id FROM rdatapaths
          WHERE resource_id IN (%s)',
         .id_as_single_string(x))
     .db_query(dbfile(x), query)

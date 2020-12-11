@@ -618,8 +618,9 @@ setMethod("as.list", "Hub", as.list.Hub)
     shown <- c("dataprovider", "species", "rdataclass", "title")
     cols <- paste(setdiff(names(mcols(object[0])), shown), collapse=", ")
     cat(.pprintf0("# additional mcols(): %s", cols), "\n")
-    cat(.pprintf0("# retrieve records with, e.g., 'object[[\"%s\"]]'",
-                  names(object)[[1]]), "\n")
+    cat(.pprintf0("# retrieve most up-to-date records with, e.g., 'object[[\"%s\"]]'",
+                  sub('\\..*', '',names(object)[[1]])), "\n")
+
 
     if (len <- length(object)) {
         nhead <- get_showHeadLines()
@@ -642,7 +643,9 @@ setMethod("as.list", "Hub", as.list.Hub)
     size <- .collapse_as_string(object, .sourcesize)
     date <- .collapse_as_string(object, .sourcelastmodifieddate)
 
-    cat("# names(): ", names(object)[[1]], "\n", sep="")
+    cat("# names(): ", sub('\\..*', '',names(object)[[1]]), "\n", sep="")
+    cat(.pprintf1("version", sub('.*\\.', '',names(object)[[1]])))
+    cat(.pprintf1("versionid", rsrc[["version_id"]]))
     if (length(package(object)) > 0L)
         cat("# package(): ", package(object)[[1]], "\n", sep="")
     cat(.pprintf1("dataprovider", rsrc[["dataprovider"]]))
