@@ -245,6 +245,14 @@ setMethod("[", c("Hub", "logical", "missing"),
 setMethod("[", c("Hub", "character", "missing"),
     function(x, i, j, ..., drop=TRUE)
 {
+    dx <- which(startsWith(sub('.*\\.', '',i), "AH") |
+                startsWith(sub('.*\\.', '',i), "EH"))
+    if(length(dx) != 0){
+        ext <- vapply(i[dx],
+                      FUN=AnnotationHub:::.find_max_ver,FUN.VALUE=character(1), hub=hub,
+                      USE.NAMES=FALSE)
+        i[dx] = paste0(i[dx], ".", ext)
+    }
     idx <- na.omit(match(i, names(.db_uid(x))))
     .db_uid(x) <- .db_uid(x)[idx]
     x
@@ -658,7 +666,7 @@ setMethod("as.list", "Hub", as.list.Hub)
     cat(.pprintf1("version", version))
     cat(.pprintf1("versionid", rsrc[["version_id"]]))
     cat(.pprintf1("other versions available",(dim(tbl)[1] > 1)))
-    cat(.pprintf1("most recent hub version",(max(gsub('.*\\.', '',tbl$ah_id))==version)))
+    cat(.pprintf1("most recent hub version",(.find_max_ver(object,id)==version)))
     if (length(package(object)) > 0L)
         cat("# package(): ", package(object)[[1]], "\n", sep="")
     cat(.pprintf1("dataprovider", rsrc[["dataprovider"]]))

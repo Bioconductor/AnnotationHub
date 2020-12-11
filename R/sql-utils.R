@@ -341,3 +341,9 @@
     mat <- AnnotationHub:::.db_query(dbfile(hub), query)
     mat
 }
+
+.find_max_ver <- function(hub, id)
+{
+    tbl <- .getversions(hub, id)
+    max(gsub('.*\\.', '',tbl$ah_id))
+}
