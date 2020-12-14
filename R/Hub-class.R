@@ -294,6 +294,16 @@ setMethod("[[", c("Hub", "character", "missing"),
 {
     if (length(i) != 1L)
         stop("'i' must be length 1")
+
+    dx <- which(startsWith(sub('.*\\.', '',i), "AH") |
+                startsWith(sub('.*\\.', '',i), "EH"))
+    if(length(dx) != 0){
+        ext <- vapply(i[dx],
+                      FUN=AnnotationHub:::.find_max_ver,FUN.VALUE=character(1), hub=hub,
+                      USE.NAMES=FALSE)
+        i[dx] = paste0(i[dx], ".", ext)
+    }
+
     idx <- match(i, names(.db_uid(x)))
     if (is.na(idx)){
         status = recordStatus(x, i)
@@ -661,12 +671,13 @@ setMethod("as.list", "Hub", as.list.Hub)
     id <- sub('\\..*', '',names(object)[[1]])
     version <- sub('.*\\.', '',names(object)[[1]])
     tbl <- getVersionsOfId(object, id)
+    recent <- (.find_max_ver(object,id)==version)
 
     cat("# names(): ", id, "\n", sep="")
     cat(.pprintf1("version", version))
     cat(.pprintf1("versionid", rsrc[["version_id"]]))
     cat(.pprintf1("other versions available",(dim(tbl)[1] > 1)))
-    cat(.pprintf1("most recent hub version",(.find_max_ver(object,id)==version)))
+    cat(.pprintf1("most recent hub version",recent))
     if (length(package(object)) > 0L)
         cat("# package(): ", package(object)[[1]], "\n", sep="")
     cat(.pprintf1("dataprovider", rsrc[["dataprovider"]]))
@@ -682,7 +693,7 @@ setMethod("as.list", "Hub", as.list.Hub)
     cat(.pprintf1("sourcesize", size))
     cat(.pprintf0("# $tags: %s", rsrc[["tags"]]), "\n")
     cat(.pprintf0("# retrieve record with 'object[[\"%s\"]]'",
-                  names(object)[[1]]), "\n")
+                  ifelse(recent,id, names(object)[[1]])), "\n")
 }
 
 setMethod("show", "Hub", function(object)
