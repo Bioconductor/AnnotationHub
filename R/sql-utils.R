@@ -1,6 +1,6 @@
 ## This function filters the local annotationhub.sqlite metadata db and
 ## defines the subset exposed by AnnotationHub().
-.uid0 <- function(path, date, localHub)
+.uid0 <- function(path, date, localHub, allVersions)
 {
     conn <- .db_open(path)
     on.exit(.db_close(conn))
@@ -115,6 +115,15 @@
                     'WHERE id IN (', paste0(allIds, collapse=","), ')',
                     'ORDER BY id')
     names(allIds) <- .db_query(conn, query)[[1]]
+
+    ## now filter for allVersions
+    if (!allVersions){
+        mainId <- unique(sub('\\..*', '',names(allIds)))
+        maxVer <- vapply(mainId, FUN=.find_max_ver,
+                         FUN.VALUE=character(1), USE.NAMES=FALSE, path=conn)
+        verIds <- paste0(mainId, ".", maxVer)
+        allIds <- allIds[names(allIds) %in% verIds]
+    }
     allIds
 }
 
@@ -334,16 +343,24 @@
     mat
 }
 
-.getversions <- function(hub, id)
+.getversions <- function(path, id)
 {
     query <- paste0(
         "SELECT DISTINCT resources.ah_id, rdatapaths.version_id, resources.title, resources.description, rdatapaths.rdataclass, resources.species, resources.genome, resources.taxonomyid, input_sources.sourcesize, input_sources.sourceurl, input_sources.sourceversion, input_sources.sourcemd5, input_sources.sourcelastmodifieddate, input_sources.sourcetype, statuses.status, biocversions.biocversion, resources.rdatadateadded, resources.rdatadateremoved FROM resources, rdatapaths, statuses, biocversions, input_sources WHERE resources.id == rdatapaths.resource_id AND resources.status_id == statuses.id AND biocversions.resource_id == resources.id AND input_sources.resource_id == resources.id AND resources.ah_id LIKE '%",id,"%'")
-    mat <- AnnotationHub:::.db_query(dbfile(hub), query)
+    if (is(path, "Hub")){
+        conn <- dbfile(hub)
+    } else if (class(path) == "character"){
+        conn <- .db_open(path)
+        on.exit(.db_close(conn))
+    }else{
+        conn <- path
+    }
+    mat <- .db_query(conn, query)
     mat
 }
 
-.find_max_ver <- function(hub, id)
+.find_max_ver <- function(path, id)
 {
-    tbl <- .getversions(hub, id)
+    tbl <- .getversions(path, id)
     max(gsub('.*\\.', '',tbl$ah_id))
 }

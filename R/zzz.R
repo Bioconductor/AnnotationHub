@@ -44,4 +44,10 @@
         opt <- as.logical(opt)
         setAnnotationHubOption("ASK", opt)
     }
+    if (is.null(getAnnotationHubOption("ALL"))) {
+        opt <- getOption("ANNOTATION_HUB_ALL", FALSE)
+        opt <- Sys.getenv("ANNOTATION_HUB_ALL", opt)
+        opt <- as.logical(opt)
+        setAnnotationHubOption("ALL", opt)
+    }
 }

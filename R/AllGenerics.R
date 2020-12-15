@@ -31,6 +31,12 @@ setGeneric("isLocalHub", signature="x",
 setGeneric("isLocalHub<-", signature="x",
     function(x, value) standardGeneric("isLocalHub<-")
 )
+setGeneric("allVersions", signature="x",
+    function(x) standardGeneric("allVersions")
+)
+setGeneric("allVersions<-", signature="x",
+    function(x, value) standardGeneric("allVersions<-")
+)
 ## cache returns either the path to the URL or the local path (in a cache)
 ## along the way it downloads the resource that it locates 
 ## Already expecting multiple ids from .dataPathIds(), (potentially)

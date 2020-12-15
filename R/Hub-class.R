@@ -12,7 +12,8 @@ setClass("Hub",
         .db_path="character",
         .db_index="character",
         .db_uid="integer",
-        isLocalHub="logical"
+        isLocalHub="logical",
+        allVersions="logical"
     )
 )
 
@@ -20,7 +21,8 @@ setClass("Hub",
 ### Constructor for subclasses
 ###
 
-.Hub <- function(.class, url, cache, proxy, localHub=FALSE, ask=TRUE, ...) {
+.Hub <- function(.class, url, cache, proxy, localHub=FALSE, ask=TRUE,
+                 allVersions=FALSE, ...) {
 
     # create or use cache location
     # download hub sqlite file and add/update to BiocFileCache for tracking
@@ -40,9 +42,10 @@ setClass("Hub",
         db_date <- dates[length(dates)]
     }
 
-    db_uid <- .db_uid0(db_path, db_date, localHub)
+    db_uid <- .db_uid0(db_path, db_date, localHub, allVersions)
     hub <- new(.class, cache=cache, hub=url, date=db_date,
-               .db_path=db_path, .db_uid=db_uid, isLocalHub=localHub, ...)
+               .db_path=db_path, .db_uid=db_uid,
+               isLocalHub=localHub, allVersions=allVersions, ...)
 
     message("snapshotDate(): ", snapshotDate(hub))
 
@@ -138,12 +141,15 @@ setReplaceMethod("isLocalHub", "Hub",
             db_uid <- .db_uid0(db_path, db_date, value)
             x <- new(as.character(class(x)), cache=hubCache(x), hub=hubUrl(x),
                      date=db_date, .db_path=db_path, .db_uid=db_uid,
-                     isLocalHub=value)
+                     isLocalHub=value, allVersions=allVersions(x))
         }
     }
     invisible(x)
 })
 
+setMethod("allVersions", "Hub",
+    function(x) x@allVersions
+)
 
 setMethod("snapshotDate", "Hub", function(x) x@date)
 
@@ -172,7 +178,7 @@ setReplaceMethod("snapshotDate", "Hub",
                .db_path=x@.db_path,
                .db_index=x@.db_index,
                .db_uid=.db_uid0(x@.db_path, value, localHub),
-               isLocalHub=localHub)
+               isLocalHub=localHub, allVersions=allVersions)
 
     if (!localHub){
         index <- .db_create_index(hub)

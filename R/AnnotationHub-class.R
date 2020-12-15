@@ -16,7 +16,8 @@ AnnotationHub <-
              cache=getAnnotationHubOption("CACHE"),
              proxy=getAnnotationHubOption("PROXY"),
              localHub=getAnnotationHubOption("LOCAL"),
-             ask=getAnnotationHubOption("ASK"))
+             ask=getAnnotationHubOption("ASK"),
+             allVersions=getAnnotationHubOption("ALL"))
 {
     if (is.null(proxy)){
         connect <- suppressWarnings(tryCatch({
@@ -39,7 +40,7 @@ AnnotationHub <-
         message("Cannot connect to AnnotationHub server, using 'localHub=TRUE' instead")
         localHub <- !connect
     }
-    .Hub("AnnotationHub", hub, cache, proxy, localHub, ask, ...)
+    .Hub("AnnotationHub", hub, cache, proxy, localHub, ask, allVersions, ...)
 }
 
 
