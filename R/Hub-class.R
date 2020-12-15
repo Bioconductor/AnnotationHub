@@ -460,16 +460,17 @@ setMethod("removeResources", "character",
                 # reset hub cache - useful if local
                 localHub <- isLocalHub(hub)
                 db_path <- hub@.db_path
+                allVersions = allVersions(hub)
                 if (!localHub){
                     db_date <- .restrictDateByVersion(db_path)
                 } else {
                     dates <-.possibleDates(db_path)
                     db_date <- dates[length(dates)]
                 }
-                db_uid <- .db_uid0(db_path, db_date, localHub)
+                db_uid <- .db_uid0(db_path, db_date, localHub, allVersions)
                 hub <- new(as.character(class(hub)), cache=hubCache(hub), hub=hubUrl(hub),
                            date=db_date, .db_path=db_path, .db_uid=db_uid,
-                           isLocalHub=localHub)
+                           isLocalHub=localHub, allVersions=allVersions)
                 if (!localHub){
                     index <- .db_create_index(hub)
                     .db_index(hub) <- index
