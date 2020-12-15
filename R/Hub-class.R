@@ -178,7 +178,7 @@ setReplaceMethod("snapshotDate", "Hub",
                .db_path=x@.db_path,
                .db_index=x@.db_index,
                .db_uid=.db_uid0(x@.db_path, value, localHub),
-               isLocalHub=localHub, allVersions=allVersions)
+               isLocalHub=localHub, allVersions=allVersions(x))
 
     if (!localHub){
         index <- .db_create_index(hub)
@@ -255,7 +255,7 @@ setMethod("[", c("Hub", "character", "missing"),
                 startsWith(sub('.*\\.', '',i), "EH"))
     if(length(dx) != 0){
         ext <- vapply(i[dx],
-                      FUN=AnnotationHub:::.find_max_ver,FUN.VALUE=character(1), hub=hub,
+                      FUN=AnnotationHub:::.find_max_ver,FUN.VALUE=character(1), path=x,
                       USE.NAMES=FALSE)
         i[dx] = paste0(i[dx], ".", ext)
     }
@@ -305,7 +305,7 @@ setMethod("[[", c("Hub", "character", "missing"),
                 startsWith(sub('.*\\.', '',i), "EH"))
     if(length(dx) != 0){
         ext <- vapply(i[dx],
-                      FUN=AnnotationHub:::.find_max_ver,FUN.VALUE=character(1), hub=hub,
+                      FUN=AnnotationHub:::.find_max_ver,FUN.VALUE=character(1), path=hub,
                       USE.NAMES=FALSE)
         i[dx] = paste0(i[dx], ".", ext)
     }
@@ -319,12 +319,20 @@ setMethod("[[", c("Hub", "character", "missing"),
                      "\n  Run with 'localHub=FALSE'",
                      call.=FALSE)
         }
-        if (status$status == "Public" && (as.Date(status$dateadded) >=
+
+        if (status$status == "Public" && (as.Date(status$dateadded) >
                 as.Date(snapshotDate(x))))
             stop(status$record, " added after current Hub snapshot date.\n",
                  "  added: ", as.character(status$dateadded), "\n",
                  "  snapshote date: ",  as.character(snapshotDate(x)),
                  call.=FALSE)
+
+        if (status$status == "Public" && !(i %in% names(x@.db_uid))){
+            msg <- paste0(status$record, " is not in current list of ids.\n")
+            if(sub('\\..*', '',i) %in% sub('\\..*','',names(x@.db_uid)))
+                  msg <- paste0(msg, "  Try using allVersions=TRUE in hub constructor to list all versions of resources.")
+            stop(msg)
+        }
 
         msg <- paste0(status$status, "\n")
         if(!is.null(status$dateremoved))
