@@ -14,7 +14,7 @@
                  "\n  Run again with 'localHub=FALSE'")
         }else if (cnt > 1){
             stop("Corrupt Cache: sqlite file",
-                 "\n  See vignette section on corrupt cache",
+                 "\n  See AnnotationHub's TroubleshootingTheCache vignette section on corrupt cache",
                  "\n  cache: ", bfccache(bfc),
                  "\n  filename: ",
                  paste0(tolower(.class), ".sqlite3"),
@@ -33,7 +33,7 @@
                               fpath=remote_db, proxy=proxy)
         } else if (cnt > 1){
             stop("Corrupt Cache: sqlite file",
-                 "\n  See vignette section on corrupt cache",
+                 "\n  See AnnotationHub's TroubleshootingTheCache vignette section on corrupt cache",
                  "\n  cache: ", bfccache(bfc),
                  "\n  filename: ",
                  paste0(tolower(.class), ".sqlite3"),
@@ -79,7 +79,7 @@
             warning("empty 'resources' table; database may be corrupt")
     }, error=function(err) {
         stop("Corrupt Hub Database",
-             "\n  See vignette section on corrupt database",
+             "\n  See AnnotationHub's TroubleshootingTheCache vignette section on corrupt database",
              "\n  database: ", sQuote(path),
              "\n  reason: ", conditionMessage(err),
              call.=FALSE)
@@ -136,7 +136,7 @@ refreshHub <- function(..., hub, cache, proxy,
                           fpath=remote_db, proxy=proxy)
     } else if (cnt > 1){
         stop("Corrupt Cache: sqlite file",
-             "\n  See vignette section on corrupt cache",
+             "\n  See AnnotationHub's TroubleshootingTheCache vignette section on corrupt cache",
              "\n  cache: ", bfccache(bfc),
              "\n  filename: ",
              paste0(tolower(.class), ".sqlite3"),
@@ -255,7 +255,7 @@ possibleDates <- function(x) {
             stop("Corrupt Cache: resource id",
                  "\n  More than one entry in cache for: ",
                  rnames,
-                 "\n  See vignette section on corrupt cache", call.=FALSE)
+                 "\n  See AnnotationHub's TroubleshootingTheCache vignette section on corrupt cache", call.=FALSE)
         } else if (cnt == 0){
             bfcadd(bfc, rname=rnames, fpath=hubpath, proxy=proxy)
         } else {
