@@ -68,7 +68,7 @@ man pages describing the resources, and a vignette. It may also contain supporti
 existing `Bioconductor` experimental data packages or annotation packages except
 the data is stored in AWS S3 buckets or publicly accessibly sites instead of
 the `data/` or `inst/extdata/` directory of the package. This keeps the package
-a light weight and allows users to download only necessary data files.
+light weight and allows users to download only necessary data files.
 
 
 Below are the steps required for creating the package and adding new resources:
@@ -83,7 +83,7 @@ the Bioconductor AWS S3 Bucket. Adding the data to AWS S3 and the
 metadata to the production database involves assistance from a `Bioconductor`
 team member. The metadata.csv file will have to be created before the data can
 officially be added to the hub (See inst/extdata section below). Please read the
-section of "Storage of Data Files".
+section on "Storage of Data Files".
 
 ### Building the package
 
@@ -101,7 +101,8 @@ unless otherwise stated.
 
 - `metadata.csv`:
   This file contains the metadata in the format of one row per resource
-  to be added to the Hub database. The file should be generated
+  to be added to the Hub database (each row corresponds to one data file on S3 or other
+  publically hosted database). The file should be generated
   from the code in inst/scripts/make-metadata.R where the final data are
   written out with `write.csv(..., row.names=FALSE)`. The required column
   names and data types are specified in
@@ -109,13 +110,14 @@ unless otherwise stated.
   `AnnotationHubData::makeAnnotationHubMetadata`. See
   ?`ExperimentHubData::makeExperimentHubMetadata` or
   ?`AnnotationHubData::makeAnnotationHubMetadata` for details.
-  **Ensure that the above function runs without ERROR.**
+  Ensuring that the above function runs without ERROR is also a validation step
+  for the metadata file.
 
   An example data experiment package metadata.csv file can be found [here](https://github.com/Bioconductor/GSE62944/blob/master/inst/extdata/metadata.csv)
   
     If necessary, metadata can be broken up into multiple csv files instead
     having of all records in a single "metadata.csv". The requirement is the
-    necessary columns and the csv format.
+    necessary required columns and using csv format.
 
 
 #### `inst/scripts/`
@@ -303,8 +305,8 @@ become available.
   include the version and / or genome build in the title. If the title is
   not unique, the `AnnotationHub` or `ExperimentHub` object will list multiple
   files with the same title. The user will need to use 'rdatadateadded' to
-  determine which is the most current and could be confusing for the end user or
-  implementation in code.
+  determine which is the most current or infer from the id numbers which could
+  lead to confusion.
 
 * Make data available: either on publicly accessible site or see section on
   "Uploading Data to S3".
@@ -352,6 +354,9 @@ data from the package. See the section on "Storage of Data Files" below.
 4. Once the data is officially added to the hub, update any code to utilize
 AnnotationHub or ExperimentHub for retrieving data.
 
+5. Push all changes with a version bump back to Bioconductor
+git.bioconductor.org location
+
 
 
 
@@ -371,7 +376,9 @@ A bug fix may involve a change to the metadata, data resource or both.
   and make the files available: see section "Uploading Data to S3".
 
 * If a file is replaced on S3 directly, the old file will no longer be
-  accessible.
+  accessible. This could affect reproducibility of end users' research if the
+  old file has already been utilized. This approach should be done with caution.
+
 
 ## Update the metadata
 
@@ -437,7 +444,8 @@ accounting for versioning.
 If you do not include a version, or make the title unique in some way,
 multiple files with the same title will be listed in the `ExperimentHub` or
 `AnnotationHub` object. The user will have to use the 'rdatadateadded' metadata field
-to determine which file is the most current.
+to determine which file is the most current or try an infer from ids which can
+lead to confusion.
 
 
 
