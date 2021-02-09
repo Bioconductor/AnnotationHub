@@ -1,3 +1,20 @@
+CHANGES IN VERSION 2.23.0
+-------------------------
+
+USER-VISIBLE MODIFICATIONS
+
+    o (2.23.2) Create a new all encompassing vignette that references both
+    ExpeirmentHub and AnnotationHub. Reference this one vignette in all four
+    related packages instead of trying to maintain multiple vigenttes that were
+    essentially the same. This also involves removing CreateAnAnnotationPackage
+    
+MODIFICATIONS
+
+    o (2.23.1) Fixed ERROR message to better indicate vignette troubleshooting
+    document and fixed reference in Troubleshooting vignette. These ERRORs are
+    triggered by both AnnotationHub and ExperimentHub so clarified the
+    Troubleshooting document is in AnnotationHub. 
+
 CHANGES IN VERSION 2.21.0
 -------------------------
 BUG FIX

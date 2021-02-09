@@ -74,7 +74,7 @@ setMethod("dbfile", "Hub",
 
     if (cnt > 1){
         stop("Corrupt Cache: index file",
-             "\n  See vignette section on corrupt cache",
+             "\n  See AnnotationHub's TroubleshootingTheCache vignette section on corrupt cache",
              "\n  cache: ", bfccache(bfc),
              "\n  filename: ", index_name,
              call.=FALSE)
@@ -121,7 +121,7 @@ setMethod("dbfile", "Hub",
                              "\n  Missing entry in cache for: ", index_name,
                              "\n  Consider rerunning with 'localHub=FALSE'"),
                       paste0("Corrupt Cache: index file",
-                             "\n  See vignette section on corrupt cache",
+                             "\n  See  AnnotationHub's TroubleshootingTheCache vignette section on corrupt cache",
                              "\n  cache: ", bfccache(bfc),
                              "\n  filename: ", index_name
                              ))

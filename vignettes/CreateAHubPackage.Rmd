@@ -1,0 +1,673 @@
+---
+title: "Creating A Hub Package: ExperimentHub or AnnotationHub"
+author: "Valerie Obenchain and Lori Shepherd"
+date: "Modified: Feb 2021. Compiled: `r format(Sys.Date(), '%d %b %Y')`"
+output:
+  BiocStyle::html_document:
+    toc: true
+vignette: >
+  % \VignetteIndexEntry{Creating A Hub Package: ExperimentHub or AnnotationHub}
+  % \VignetteEngine{knitr::rmarkdown}
+  % \VignetteEncoding{UTF-8}
+---
+
+
+# Overview
+
+First, One must decide if an ExperimentHub or AnnotationHub package is
+appropriate. 
+
+
+The `AnnotationHubData` package provides tools to acquire, annotate, convert
+and store data for use in Bioconductor's `AnnotationHub`. BED files from the
+Encode project, gtf files from Ensembl, or annotation tracks from UCSC, are
+examples of data that can be downloaded, described with metadata, transformed
+to standard `Bioconductor` data types, and stored so that they may be
+conveniently served up on demand to users via the AnnotationHub client. While
+data are often manipulated into a more R-friendly form, the data themselves
+retain their raw content and are not normally filtered or curated like those in
+[ExperimentHub](http://bioconductor.org/packages/ExperimentHub/).
+Each resource has associated metadata that can be searched through the
+`AnnotationHub` client interface.
+
+
+`ExperimentHubData` provides tools to add or modify resources in
+Bioconductor's `ExperimentHub`. This 'hub' houses curated data from courses,
+publications, or experiments. It is often convenient to store data to be used in
+package examples, testings, or vignettes in the ExpeirmentHub. The resources can
+be files of raw data or more often are `R` / `Bioconductor` objects such as
+GRanges, SummarizedExperiment, data.frame etc.  Each resource has associated
+metadata that can be searched through the `ExperimentHub` client interface. 
+
+
+It is advisable to create a seperate package for annotations or experiment data
+rather than an all encompasing package of data and code. However, it is
+sometimes understandable to have a Software package that also serves as the
+package front end for the hubs. Althought this is generally not recommened; if
+you think you have a use case please reach out to hubs@bioconductor.org to
+confirm before proceeding with a single package rather than the accompanied
+package approach.  
+
+
+
+
+
+
+# Setting up a package to use a Hub
+
+
+
+
+
+## New Hub package
+
+Related resources are added to `AnnotationHub` or `ExperimentHub` by
+creating a package. The package should minimally contain the resource metadata,
+man pages describing the resources, and a vignette. It may also contain supporting
+`R` functions the author wants to provide. This is a similar design to the
+existing `Bioconductor` experimental data packages or annotation packages except
+the data is stored in AWS S3 buckets or publicly accessibly sites instead of
+the `data/` or `inst/extdata/` directory of the package. This keeps the package
+light weight and allows users to download only necessary data files.
+
+
+Below are the steps required for creating the package and adding new resources:
+
+
+### Notify `Bioconductor` team member
+
+The man page and vignette examples in the package will not work until
+the data are available in `AnnotationHub` or `ExperimentHub`. If you are not
+hosting the data on a stable web server (github does not suffice), you may use
+the Bioconductor AWS S3 Bucket. Adding the data to AWS S3 and the
+metadata to the production database involves assistance from a `Bioconductor`
+team member. The metadata.csv file will have to be created before the data can
+officially be added to the hub (See inst/extdata section below). Please read the
+section on "Storage of Data Files".
+
+### Building the package
+
+When a resource is downloaded from one of the hubs the associated
+package is loaded in the workspace making the man pages and vignettes readily
+available. Because documentation plays an important role in understanding these
+resources please take the time to develop clear man pages and a
+detailed vignette. These documents provide essential background to the user and
+guide appropriate use the of resources.
+
+Below is an outline of package organization. The files listed are required
+unless otherwise stated.
+
+#### `inst/extdata/`
+
+- `metadata.csv`:
+  This file contains the metadata in the format of one row per resource
+  to be added to the Hub database (each row corresponds to one data file on S3 or other
+  publically hosted database). The file should be generated
+  from the code in inst/scripts/make-metadata.R where the final data are
+  written out with `write.csv(..., row.names=FALSE)`. The required column
+  names and data types are specified in
+  `ExperimentHubData::makeExperimentHubMetadata` or
+  `AnnotationHubData::makeAnnotationHubMetadata`. See
+  ?`ExperimentHubData::makeExperimentHubMetadata` or
+  ?`AnnotationHubData::makeAnnotationHubMetadata` for details.
+  Ensuring that the above function runs without ERROR is also a validation step
+  for the metadata file.
+
+  An example data experiment package metadata.csv file can be found [here](https://github.com/Bioconductor/GSE62944/blob/master/inst/extdata/metadata.csv)
+  
+    If necessary, metadata can be broken up into multiple csv files instead
+    having of all records in a single "metadata.csv". The requirement is the
+    necessary required columns and using csv format.
+
+
+#### `inst/scripts/`
+
+- `make-data.R`:
+  A script describing the steps involved in making the data object(s). It can be
+  code, sudo-code, or text but should include where the original data were
+  downloaded from, pre-processing, and how the final R object was made. Include
+  a description of any steps performed outside of `R` with third party
+  software. Output of the script should be files on disk ready to be pushed to
+  S3. If data are to be hosted on a personal web site instead of S3, this file
+  should explain any manipulation of the data prior to hosting on the web
+  site. For data hosted on a public web site with no prior manipultaion this
+  file is not needed. For experimental data objects, It is encouraged to
+  serialize Data objects with `save()` with the .rda extension on the filename
+  but not strictly necessary. If the data is provided in another format an
+  appropriate loading method may need to be implemented. Please advise when
+  reaching out for "Uploading Data to S3". 
+
+- `make-metadata.R`:
+  A script to make the metadata.csv file located in inst/extdata of the
+  package. See ?`ExperimentHubData::makeExperimentHubMetadata` or
+  ?`AnnotationHubData::makeAnnotationHubMetadata` for a description of expected
+  fields and data types. The `ExperimentHubData::makeExperimentHubMetadata()` or
+  `AnnotationHubData::makeAnnotationHubMetadata()` can be used to validate the
+  metadata.csv file before submitting the package.
+
+
+#### `vignettes/`
+
+- One or more vignettes describing analysis workflows or use cases. It could
+  minimally show how to access the resources from the hub.
+
+
+#### `R/`
+
+
+- `R/*.R`: Optional. Functions to enhance data exploration.
+
+
+**For ExperimentHub resources only:**
+- `zzz.R`: Optional. You can include a `.onLoad()` function in a zzz.R file that
+  exports each resource name (i.e., metadata.csv field `title`) into a function. This allows the data
+  to be loaded by name, e.g., `resouce123()`.
+
+    ```{r, eval=FALSE}
+    .onLoad <- function(libname, pkgname) {
+	fl <- system.file("extdata", "metadata.csv", package=pkgname)
+	titles <- read.csv(fl, stringsAsFactors=FALSE)$Title
+	createHubAccessors(pkgname, titles)
+    }
+    ```
+
+    `ExperimentHub::createHubAccessors()` and
+    `ExperimentHub:::.hubAccessorFactory()` provide internal
+    detail. The resource-named function has a single 'metadata'
+    argument. When metadata=TRUE, the metadata are loaded (equivalent
+    to single-bracket method on an ExperimentHub object) and when
+    FALSE the full resource is loaded (equivalent to double-bracket
+    method).
+
+
+#### `man/`
+
+- package man page:
+  The package man page serves as a landing point and should briefly describe
+  all resources associated with the package. There should be an \alias
+  entry for each resource title either on the package man page or individual
+  man pages. While this is optional, it is strongle recommended.
+
+- resource man pages:
+  Resources can be documented on the same page, grouped by common type
+  or have their own dedicated man pages. Man page(s) should describe the
+  resource (raw data source, processing, QC steps) and demonstrate how the data
+  can be loaded through the standard hub interface.
+  
+  Data can be accessed via the standard ExperimentHub or AnnotationHub interface with
+  single and double-bracket methods. Queries are often useful for finding
+  resources. For example you could replace packagename with the name of this package
+  being developed, e.g.,
+
+    ```{r, eval=FALSE}
+    library(ExperimentHub)
+    eh <- ExperimentHub()
+    myfiles <- query(eh, "PACKAGENAME")
+    myfiles[[1]]        ## load the first resource in the list
+    myfiles[["EH123"]]  ## load by EH id
+    ```
+
+    You can use multiple search queries to further filter resources. For
+    example, replace "SEARCHTERM*" below with one or more search terms that
+    uniquely identify resources in your package.
+
+    ```
+    library(AnnotationHub)
+    hub <- AnnotationHub()
+    myfiles <- query(hub, "SEARCHTERM1", "SEARCHTERM2")
+    myfiles[[1]]  ## load the first resource in the list
+    ```
+
+- **ExperimentHub packages only** If a `.onLoad()` function is used to export each resource as a function
+  also document that method of loading, e.g.,
+
+    ```{r, eval=FALSE}
+    resourceA(metadata = FALSE) ## data are loaded
+    resourceA(metadata = TRUE)  ## metadata are displayed
+    ```
+- Package authors are encouraged to use the `ExperimentHub::listResources()` and
+  `ExperimentHub::loadResource()` functions in their man pages and vignette.
+  These helpers are designed to facilitate data discovery within a specific
+  package vs within all of ExperimentHub.
+
+
+#### `DESCRIPTION` / `NAMESPACE`
+
+- The package should depend on and fully import AnnotationHub or ExperimentHub. If using the
+  suggested `.onLoad()` function for ExperimentHub, import the utils package in the DESCRIPTION
+  file and selectively importFrom(utils, read.csv) in the NAMESPACE.
+
+
+- If making an Experiment Data Hub package, the biocViews should contain terms
+  from
+  [ExperimentData](http://bioconductor.org/packages/release/BiocViews.html#___ExperimentData)
+  and should also contain the term `ExperimentHub`.
+
+  If making an Annotation Hub package, the biocViews should contain terms from
+[AnnotationData](http://bioconductor.org/packages/release/BiocViews.html#___AnnotationData)
+and should also contain the term `AnnotationHub`.
+
+  If the case where a software package was appropriate rather than a seperate
+  annotation or experiment data package, the biocViews term should include only
+  [Software](http://bioconductor.org/packages/release/BiocViews.html#___Software)
+  terms but must include either `AnnotationHubSoftware` or
+  `ExperimentHubSoftware`.
+  
+
+### Data objects
+
+Data are not formally part of the software package and are stored
+separately in a publicly accessible hosted site or by Bioconductor in an AWS S3
+buckets. The author should read the following section on "Storage of Data Files".
+
+
+### Confirm Valid Metadata
+
+When you are satisfied with the representation of your resources in
+your metadata.csv (or other aptly named csv file) the `Bioconductor` team
+member will add the metadata to the production database. Confirm the metadata
+csv files in inst/extdata/ are valid by by running either
+ExperimentHubData::makeExperimentHubMetadata() or
+AnnotationHubData::makeAnnotationHubData() on your package. Please address and
+warnings or errors.
+
+
+### Package review
+
+Once the data are in AWS S3 or public site and the metadata have been added to the
+production database the man pages and vignette can be finalized. When the
+package passes R CMD build and check it can be submitted to the
+[package tracker](https://github.com/Bioconductor/Contributions) for
+review. The package should be submitted without any of the data that is now
+located remotely; This keeps the package light weight and minimual size while still
+providing access to key large data files now stored remotely If the data files
+were added to the github repository please see [removing large data files and
+clean git
+tree](http://bioconductor.org/developers/how-to/git/remove-large-data/) to
+remove the large files and reduce package size.
+
+Many times these data package are created as a suppliment to a software
+package. There is a process for submitting [mulitple package under the same
+issue](https://github.com/Bioconductor/Contributions#submitting-related-packages).
+
+
+
+
+
+
+## Additional resources to existing Hub package
+
+Metadata for new versions of the data can be added to the same package as they
+become available.
+
+* The titles for the new versions should be unique and not match the title of
+  any resource currently in the Hub. Good practice would be to
+  include the version and / or genome build in the title. If the title is
+  not unique, the `AnnotationHub` or `ExperimentHub` object will list multiple
+  files with the same title. The user will need to use 'rdatadateadded' to
+  determine which is the most current or infer from the id numbers which could
+  lead to confusion.
+
+* Make data available: either on publicly accessible site or see section on
+  "Uploading Data to S3".
+
+* Update make-metadata.R with the new metadata information
+
+* Generate a new metadata.csv file. The package should contain
+  metadata for all versions of the data in ExperimentHub or AnnotationHub so the
+  old file should remain.  When adding a new   version it might be helpful to
+  write a new csv file named by version, e.g., metadata_v84.csv, metadata_85.csv
+  etc.
+  
+* Bump package version and commit to git
+
+* Notify hubs@bioconductor.org that an update is ready and
+  a team member will add the new metadata to the production database;
+  new resources will not be visible in AnnotationHub or ExperimentHub until
+  the metadata are added to the database.
+
+Contact hubs@bioconductor.org or maintainer@bioconductor.org with any
+questions.
+
+
+
+
+
+
+## Converting a non AnnotationHub annotation package or non ExperimentHub
+   experiment data package to utilizing the Hub.
+
+The concepts and directory structure of the package would stay the same.
+The main steps involved would be
+
+1. Restructure the inst/extdata and inst/scripts to include metadata.csv and
+make-data.R as described in the section above for creating new packages. Ensure the
+metadata.csv file is formatted correctly by running
+`AnnotationHubData::makeAnnotationHubMetadata()` or
+`ExperimentHubData::makeExperimentHubMetadata()` on your package.
+
+2. Add biocViews term "AnnotationHub" or "ExperimentHub" to DESCRIPTION
+
+3. Upload the data to S3 or place on a publicly accessible site and remove the
+data from the package. See the section on "Storage of Data Files" below.
+
+4. Once the data is officially added to the hub, update any code to utilize
+AnnotationHub or ExperimentHub for retrieving data.
+
+5. Push all changes with a version bump back to Bioconductor
+git.bioconductor.org location
+
+
+
+
+
+
+
+# Bug fixes
+
+A bug fix may involve a change to the metadata, data resource or both.
+
+## Update the resource
+
+* The replacement resource must have the same name as the original and
+  be at the same location (path).
+
+* Notify hubs@bioconductor.org that you want to replace the data
+  and make the files available: see section "Uploading Data to S3".
+
+* If a file is replaced on S3 directly, the old file will no longer be
+  accessible. This could affect reproducibility of end users' research if the
+  old file has already been utilized. This approach should be done with caution.
+
+
+## Update the metadata
+
+New metadata records can be added for new resources but modifying existing
+records is discouraged. Record modification will only be done in the case of
+bug fixes and has to be done manually on the database by a core team member.
+
+* Update make-metadata.R and regenerate the metadata.csv file if necessary
+
+* Bump the package version and commit to git
+
+* Notify hubs@bioconductor.org that you want to change the metadata for
+  resources. The core team member will likely need the current AH/EH ids for the
+  resources that need updating and a summary of what fields in the metadata file
+  changed. **NOTE:** Large chanes to the metadata may require the core team
+  member to remove the resources entirely from the database and re-add resulting
+  in new AH/EH ids.
+
+
+
+
+
+
+# Remove resources
+
+Removing resources should be done with caution. The intent is that resources in the
+Hubs be 'reproducible' research by providing a stable snapshot
+of the data. Data made available in Bioconductor version x.y.z should be
+available for all versions greater than x.y.z. Unfortunately this is not
+always possible. If you find it necessary to remove data from AnnotationHub/ExperimentHub
+please contact hubs@bioconductor.org or maintainer@bioconductor.org for
+assistance.
+
+When a resource is removed from ExperimentHub or AnnotationHub two things happen:
+the 'rdatadateremoved' field is populated with a date and the 'status'
+field is populated with a reason why the resource is no longer available. Once
+these changes are made, the `ExperimentHub()` or `AnnotationHub()` constructor
+will not list the resource among the available ids. An attempt to extract the resource with
+'[[' and the EH/AH id will return an error along with the status message. The
+function `getInfoOnIds()` will display metadata information for any resource
+including resources still in the database but no longer available.
+
+In general, resources are only removed when they are no longer available
+(e.g., moved from web location, no longer provided etc.).
+
+To remove a resource from `AnnotationHub` contact hubs@bioconductor.org
+or maintainer@bioconductor.org.
+
+
+
+
+
+
+# Versioning
+
+Versioning of resources is handled by the maintainer. If you plan to provide
+incremental updates to a file for the same organism / genome build, we
+recommend including a version in the title of the resource so it is easy
+to distinguish which is most current. We also would recommend when uploading the
+data to S3 or your publicly accessible site to have a directory structure
+accounting for versioning.
+
+If you do not include a version, or make the title unique in some way,
+multiple files with the same title will be listed in the `ExperimentHub` or
+`AnnotationHub` object. The user will have to use the 'rdatadateadded' metadata field
+to determine which file is the most current or try an infer from ids which can
+lead to confusion.
+
+
+
+
+
+# Visibility
+
+Several metadata fields control which resources are visible when
+a user invokes ExperimentHub()/AnnotationHub(). Records are filtered based on these criteria:
+
+- 'snapshotdate' >= the date of the Bioconductor release being used
+- 'rdatadateadded'  >= today's date
+- 'rdatadateremoved' is NULL / NA
+- 'biocVersion' is <= to the Bioconductor version being used
+
+Once a record is added to ExperimentHub/AnnotationHub it is visable from that point forward
+until stamped with 'rdatadateremoved'. For example, a record added on
+May 1, 2017 with 'biocVersion' 3.6 will be visible in all snapshots >=
+May 1, 2017 and in all Bioconductor versions >= 3.6.
+
+A special filter for OrgDb is utilized in AnnotationHub. Only one OrgDb is available per
+release/devel cycle. Therefore contributed OrgDb added to a devel cycle are
+masked until the following release. There are options for debugging these masked
+resources. see `?setAnnotationHubOption`
+
+
+
+
+
+# Storage of Data Files
+
+The data should not be included in the package. This keeps the package light
+weight and quick for a user to install. This allows the user to investigate functions and
+documentation without downloading large data files and only proceeding with the
+download when necessary. There are two options for storing data: Bioconductor
+AWS S3 buckets or hosting the data elsewhere on a publicly accessible site. See
+information below and choose the options that fits best for your situation.
+
+## Hosting Data on a Publicly Accessible Site
+
+Data can be accessed through the hubs from any publicly accessible site. The
+metadata.csv file[s] created will need the column `Location_Prefix` to indicate
+the hosted site. See more in the description of the metadata columns/fields
+below but as a quick example if the link to the data file is
+`ftp://mylocalserver/singlecellExperiments/dataSet1.Rds` an example breakdown of
+the `Location_Prefix` and `RDataPath` for this entry in the metadata.csv file
+would be `ftp://mylocalserver/` for the `Location_Prefix` and
+`singlecellExperiments/dataSet1.Rds` for the `RDataPath`. Github is not an
+acceptable hosting platform for data.
+
+## Uploading Data to S3
+
+Instead of providing the data files via dropbox, ftp, github, etc. we will grant
+temporary access to an S3 bucket where you can upload your data. Please
+email hubs@bioconductor.org for access.
+
+You will be given access to the 'AnnotationContributor' user. Ensure that the
+`AWS CLI` is installed on your machine. See instructions for installing `AWS
+CLI` [here](https://aws.amazon.com/cli/). Once you  have requested access you
+will be emailed a set of keys. There are two options to set the profile up for
+AnnotationContributor
+
+1.  Update your `.aws/config` file to include the following updating the keys
+accordingly:
+
+```
+[profile AnnotationContributor]
+output = text
+region = us-east-1
+aws_access_key_id = ****
+aws_secret_access_key = ****
+```
+2. If you can't find the `.aws/config` file,  Run the following command entering
+appropriate information from above
+
+```
+aws configure --profile AnnotationContributor
+```
+
+After the configuration is set you should be able to upload resources using
+
+```
+# To upload a full directory use recursive:
+
+aws --profile AnnotationContributor s3 cp test_dir s3://annotation-contributor/teset_dir --recursive --acl public-read
+
+# To upload a single file
+
+aws --profile AnnotationContributor s3 cp test_file.txt s3://annotation-contributor/test_file.txt --acl public-read
+
+```
+
+Please upload the data with the appropriate directory structure, including
+subdirectories as necessary (i.e. top directory must be software package name,
+then if applicable, subdirectories of versions, ...).  Please also do not forget
+to use the flag `--acl public-read`; This allows read access to the data file. 
+
+Once the upload is complete, email hubs@bioconductor.org to continue the
+process. To add the data officially the data will need to be uploaded and the
+metadata.csv file will need to be created in the github repository.
+
+# Validating
+
+The best way to validate record metadata is to  read inst/extdata/metadata.csv
+(or aptly named csv file in inst/extdata) using the
+`AnnotationHubData::makeAnnotationHubMetadata()` or
+`ExperimentHubData::makeExperimentHubMetadata()`. If that is successful the
+metadata should be valid and able to be entered into the database.
+
+
+
+
+# Example metadata.csv file and more information
+
+As described above the metadata.csv file (or multiple metadata.csv files) will
+need to be created before the data can be added to the database. To ensure
+proper formatting one should run `AnnotationHubData::makeAnnotationHubMetadata`
+or `ExperimentHubData::makeExperimentHubMetadata`
+on the package with any/all metadata files, and address any ERRORs that
+occur. Each data object uploaded to S3 should have an entry (row) in the metadata
+file. Briefly, a description of the metadata columns required:
+
+* Title: 'character(1)'. Name of the resource. This can be the exact file name
+  (if self-describing) or a more complete description.
+* Description: 'character(1)'. Brief description of the resource, similar to the
+  'Description' field in a package DESCRIPTION file.
+* BiocVersion: 'character(1)'. The first Bioconductor version the resource was
+  made available for. Unless removed from the hub, the resource will be
+  available for all versions greater than or equal to this field. This generally
+  is the current **devel version** of Bioconductor.
+* Genome: 'character(1)'. Genome. Can be NA.
+* SourceType: 'character(1)'. Format of original data, e.g., FASTA, BAM, BigWig,
+  etc. 'AnnotationHubData::getValidSourceTypes()' list currently acceptable values. If nothing seems
+  appropiate for your data reach out to hubs@bioconductor.org
+* SourceUrl: 'character(1)'. Location of original data files. Multiple urls
+  should be provided as a comma separated string. If the data is simulated we
+  recommend putting either a lab url or the url of the Bioconductor package.
+* SourceVersion: 'character(1)'. Version of original data.
+* Species: 'character(1)'. Species. For help on valid species see
+  'getSpeciesList, validSpecies, or suggestSpecies.' Can be NA.
+* TaxonomyId: 'character(1)'. Taxonomy ID. There are checks for valid taxonomyId
+  given the Species which produce warnings. See GenomeInfoDb::loadTaxonomyDb()
+  for full validation table. Can be NA.
+* Coordinate_1_based: 'logical'. TRUE if data are 1-based. Can be NA.
+* DataProvider: 'character(1)'. Name of company or institution that supplied the
+  original (raw) data.
+* Maintainer: 'character(1)'. Maintainer name and email in the following format:
+  Maintainer Name <username@address>.
+* RDataClass: 'character(1)'. R / Bioconductor class the data are stored in,
+  e.g., GRanges, SummarizedExperiment, ExpressionSet etc. If the file is loaded
+  or read into R what is the class of the object.
+* DispatchClass: 'character(1)'. Determines how data are loaded into R. The
+  value for this field should be 'Rda' if the data were serialized with 'save()'
+  and 'Rds' if serialized with 'saveRDS'. The filename should have the
+  appropriate 'rda' or 'rds' extension. There are other available DispathClass
+  types and the function 'AnnotationHub::DispatchClassList()' will output a
+  matrix of currently implemented DispatchClass and brief description of
+  utility. If a predefine class does not seem appropriate contact
+  hubs@bioconductor.org. An all purpose DispathClass is `FilePath` that
+  instead of trying to load the file into R, will only return the path to the
+  locally downloaded file.
+* Location_Prefix: 'character(1)'. **Do not** include this field if data are stored
+  in the Bioconductor AWS S3; it will be generated automatically. If data will
+  be accessed from a location other than AWS S3 this field should be the base
+  url.
+* RDataPath: 'character(1)'.This field should be the remainder of the path to
+  the resource. The 'Location_Prefix' will be prepended to 'RDataPath' for the
+  full path to the resource.  If the resource is stored in Bioconductor's AWS S3
+  buckets, it should start with the name of the package associated with the
+  metadata and should not start with a leading slash. It should include the
+  resource file name.
+* Tags: 'character() vector'.  'Tags' are search terms used to define a subset
+  of resources in a 'Hub' object, e.g, in a call to 'query'. Multiple 'Tags' are
+  specified as a colon separated string, e.g., tags for two resources would look
+  "tag1:tag2". The tags in the database are a combination of any individually
+  listed 'Tag' provided here in the metadata file as well as any biocViews terms
+  listed in the DESCRIPTION of the package
+  
+
+Any additional columns in the metadata.csv file will be ignored but could be
+included for internal reference.
+
+More on Location_Prefix and RDataPath. These two fields make up the complete
+file path url for downloading the data file. If using the Bioconductor AWS S3 bucket the
+Location_Prefix should not be included in the metadata file[s] as this field
+will be populated automatically.  The RDataPath will be the directory structure
+you uploaded to S3. If you uploaded a directory `MyAnnotation/`, and that
+directory had a subdirectory `v1/` that contained two files `counts.rds` and
+`coldata.rds`, your metadata file will contain two rows and the RDataPaths would
+be `MyAnnotation/v1/counts.rds` and `MyAnnotation/v1/coldata.rds`.  If you
+host your data on a publicly accessible site you must include a base url as the
+`Location_Prefix`. If your data file was at
+`ftp://myinstiututeserver/biostats/project2/counts.rds`, your metadata file will
+have one row and the `Location_Prefix` would be `ftp://myinstiututeserver/` and
+the `RDataPath` would be `biostats/project2/counts.rds`.
+
+
+This is a bad example because these annotations are already in the hubs but it
+should give you an idea of the format for AnnotationHub. Let's say I have a package myAnnotations
+and I upload two annotation files for dog and cow with information extracted from
+ensembl to S3.  You would want the following saved as a csv (comma seperated output)
+but for easier view we show in a table:
+
+
+Title | Description | BiocVersion | Genome | SourceType | SourceUrl | SourceVersion | Species | TaxonomyId | Coordinate_1_based | DataProvider | Maintainer | RDataClass | DispatchClass | RDataPath
+---------------|----------------------------------------------|-----|-------------|-----|----------------------------------------------------------------------------------------------------|------------|-------------|------|------|---------|-------------------------------------------------------|-----------|----------|--------------------------------------------------------------------------
+Dog Annotation | Gene Annotation for Canis lupus from ensembl | 3.9 | Canis lupus | GTF | ftp://ftp.ensembl.org/pub/release-95/gtf/canis_lupus_dingo/Canis_lupus_dingo.ASM325472v1.95.gtf.gz | release-95 | Canis lupus | 9612 | true | ensembl | Bioconductor Maintainer <maintainer@bioconductor.org> | character | FilePath | myAnnotations/canis_lupus_dingo.ASM325472v1.95.gtf.gz
+Cow Annotation | Gene Annotation for Bos taurus from ensemble | 3.9 | Bos taurus | GTF | ftp://ftp.ensembl.org/pub/release-74/gtf/bos_taurus/Bos_taurus.UMD3.1.74.gtf.gz | release-74 | Bos taurus | 9913 | true | ensembl | Bioconductor Maintainer <maintainer@bioconductor.org> | character | FilePath | myAnnotations/Bos_taurus.UMD3.1.74.gtf.gz
+
+
+
+
+This is a dummy example but hopefully it will give you an idea of the format for
+ExperimentHub.
+Let's say I have a package myExperimentPackage and I upload two files one a
+SummarizedExperiments of expression data saved as a .rda and the other a sqlite
+database both considered simulated data.
+You would want the following saved as a csv (comma seperated output)
+but for easier view we show in a table:
+
+
+Title | Description | BiocVersion | Genome | SourceType | SourceUrl | SourceVersion | Species | TaxonomyId | Coordinate_1_based | DataProvider | Maintainer | RDataClass | DispatchClass | RDataPath
+---------------|----------------------------------------------|-----|-------------|-----|----------------------------------------------------------------------------------------------------|------------|-------------|------|------|---------|-------------------------------------------------------|-----------|----------|--------------------------------------------------------------------------
+Simulated Expression Data  | Simulated Expression values for 12 samples and 12000 probles | 3.9 | NA   | Simulated | http://mylabshomepage | v1 | NA | NA | NA | http://bioconductor.org/packages/myExperimentPackage | Bioconductor Maintainer <maintainer@bioconductor.org> | SummarizedExperiment | Rda | myExperimentPackage/SEobject.rda
+Simulated Database | Simulated Database containing gene mappings | 3.9 | hg19 | Simulated | http://bioconductor.org/packages/myExperimentPackage | v2 | Home sapiens | 9606 | NA | http://bioconductor.org/packages/myExperimentPackage | Bioconductor Maintainer <maintainer@bioconductor.org> | SQLiteConnection | SQLiteFile | myExperimentPackage/mydatabase.sqlite

@@ -264,31 +264,6 @@ setMethod("[", c("Hub", "character", "missing"),
     x
 })
 
-setReplaceMethod("[", c("Hub", "numeric", "missing", "Hub"),
-    function(x, i, j, ..., value)
-{
-    .db_uid(x)[i] <- .db_uid(value)
-    x
-})
-
-setReplaceMethod("[", c("Hub", "logical", "missing", "Hub"),
-    function(x, i, j, ..., value)
-{
-    .db_uid(x)[i] <- .db_uid(value)
-    x
-})
-
-setReplaceMethod("[",
-    c("Hub", "character", "missing", "Hub"),
-    function(x, i, j, ..., value)
-{
-    idx <- match(i, names(.db_uid(x)))
-    isNA <- is.na(idx)
-    .db_uid(x)[idx[!isNA]] <- .db_uid(value)[!isNA]
-    x
-})
-
-
 setMethod("[[", c("Hub", "numeric", "missing"),
     function(x, i, j, ..., force=FALSE, verbose=TRUE)
 {

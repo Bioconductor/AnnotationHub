@@ -228,6 +228,14 @@ library(AnnotationDbi)  ## if not already loaded
 txdb <- loadDb("/locationToFile/mytxdb.sqlite")
 ```
 
+# Creating an AnnotationHub Package or Converting to an AnnotationHub Package
+
+Please see AnnotationHub Vignette "CreateAHubPackage".
+```
+vignette("CreateAHubPackage", package="AnnotationHub")
+```
+
+
 # Session info
 
 ```{r sessionInfo}

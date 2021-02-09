@@ -52,7 +52,7 @@ following (maybe be experimenthub.sqlite3 respectively)
 ```
 > ah = AnnotationHub()
 Error: Corrupt Cache: sqlite file
-  See vignette section on corrupt cache
+  See AnnotationHub's TroubleshootingTheCache vignette section on corrupt cache
   cache: /home/lori/.cache/AnnotationHub
   filename: annotationhub.sqlite3
 
@@ -127,7 +127,7 @@ following (maybe be experimenthub.index.rds respectively)
 > ah = AnnotationHub()
 snapshotDate(): 2019-02-19
 Error: Corrupt Cache: index file
-  See vignette section on corrupt cache
+  See AnnotationHub's TroubleshootingTheCache vignette section on corrupt cache
   cache: /home/lori/.cache/AnnotationHub
   filename: annotationhub.index.rds
 
@@ -193,7 +193,7 @@ identifier>_<resource id>`.  This ERROR indicates duplicate values `_<resource i
 The ERROR should look similar to
 ```
 Error: Corrupt Cache: resource path
-  See vignette section on corrupt cache
+  See AnnotationHub's TroubleshootingTheCache vignette section on corrupt cache
   cache: /home/lori/.cache/AnnotationHub
   potential duplicate files:
 499d6769cf1d_5012
@@ -247,7 +247,7 @@ be removed or renamed. An example
 
 ```
 Error: Corrupt Cache: resource path
-  See vignette section on corrupt cache
+  See AnnotationHub's TroubleshootingTheCache vignette section on corrupt cache
   cache: /home/lori/.cache/AnnotationHub
   potential duplicate files:
 45b42ba7aaa1_38317
@@ -279,7 +279,7 @@ The file path of the valid entry is
 Therefore we would want to move or rename the file `7a4726896632_38317`.
 
 ```
-> fl <- file.path(hubCache(ah), "7a4726896632_38317")
+> fl <- file.path(bfccache(bfc), "7a4726896632_38317")
 > fl
 [1] "/home/lori/.cache/AnnotationHub/7a4726896632_38317"
 
@@ -296,7 +296,7 @@ following:
 > cache(ah[1:4])
 adding rname 'AH5015 : 5015'
 Error: Corrupt Cache: resource id
-  See vignette section on corrupt cache
+  See AnnotationHub's TroubleshootingTheCache vignette section on corrupt cache
   cache: /home/lori/.cache/AnnotationHub
   reason: not all 'rnames' found or unique.
 
@@ -325,7 +325,7 @@ redownloaded.
 The output you received looked something similar to the following:
 ```
 > ah = AnnotationHub()
-Error: Corrupt Hub Database; See vignette section on corrupt database
+Error: Corrupt Hub Database; See AnnotationHub's TroubleshootingTheCache vignette section on corrupt database
   database: '/home/lori/.cache/AnnotationHub/66d467fcefa5_annotationhub.sqlite3'
   reason: missing tables
 
