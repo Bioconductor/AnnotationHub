@@ -367,10 +367,10 @@ setReplaceMethod("cache", "Hub",
         dates <-.possibleDates(db_path)
         db_date <- dates[length(dates)]
     }
-    db_uid <- .db_uid0(db_path, db_date, localHub)
+    db_uid <- .db_uid0(db_path, db_date, localHub, allVersions(x))
     hub <- new(as.character(class(x)), cache=hubCache(x), hub=hubUrl(x),
                date=db_date, .db_path=db_path, .db_uid=db_uid,
-               isLocalHub=localHub)
+               isLocalHub=localHub, allVersions=allVersions(x))
     if (!localHub){
         index <- .db_create_index(hub)
         .db_index(hub) <- index
