@@ -198,7 +198,7 @@ possibleDates <- function(x) {
     path <- dbfile(x)
     dates <- .possibleDates(path)
     restrict <- .restrictDateByVersion(path)
-    dates[as.POSIXlt(dates) <= as.POSIXlt(restrict)]
+    unique(dates[as.POSIXlt(dates) <= as.POSIXlt(restrict)])
 }
 
 ## The following helper was previously not used (and now is), but we
