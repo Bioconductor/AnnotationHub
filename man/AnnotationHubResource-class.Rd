@@ -13,6 +13,7 @@
 \alias{hubCache,AnnotationHubResource-method}
 \alias{hubUrl,AnnotationHubResource-method}
 \alias{isLocalHub,AnnotationHubResource-method}
+\alias{allVersions,AnnotationHubResource-method}
 
 \title{AnnotationHubResource objects and their related methods and functions}
 

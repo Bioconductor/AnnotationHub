@@ -53,14 +53,16 @@ export(
     snapshotDate, "snapshotDate<-",
     getHub, listResources, loadResources,
     package, convertHub, removeResources,
-    isLocalHub, "isLocalHub<-", getInfoOnIds, getVersionsOfId
+    isLocalHub, "isLocalHub<-", getInfoOnIds, getVersionsOfId,
+    allVersions, "allVersions<-"
 )
 
 exportMethods(
     cache, "cache<-", query, removeResources,
     hubUrl, hubCache, hubDate, 
     snapshotDate, "snapshotDate<-",
-    getHub, isLocalHub, "isLocalHub<-", getInfoOnIds, getVersionsOfId
+    getHub, isLocalHub, "isLocalHub<-", getInfoOnIds, getVersionsOfId,
+    allVersions, "allVersions<-"
 )
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

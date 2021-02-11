@@ -149,7 +149,22 @@ setReplaceMethod("isLocalHub", "Hub",
 
 setMethod("allVersions", "Hub",
     function(x) x@allVersions
-)
+    )
+
+setReplaceMethod("allVersions", "Hub",
+    function(x, value)
+{
+    stopifnot(value %in% c(TRUE, FALSE))
+    if (allVersions(x) != value){
+        db_path <- x@.db_path
+        db_date <- .restrictDateByVersion(db_path)
+        db_uid <- .db_uid0(db_path, db_date,isLocalHub(x) , value)
+        x <- new(as.character(class(x)), cache=hubCache(x), hub=hubUrl(x),
+                 date=db_date, .db_path=db_path, .db_uid=db_uid,
+                 isLocalHub=isLocalHub(x), allVersions=value)
+    }
+    invisible(x)
+})
 
 setMethod("snapshotDate", "Hub", function(x) x@date)
 

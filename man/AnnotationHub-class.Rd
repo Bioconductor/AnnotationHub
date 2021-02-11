@@ -34,6 +34,10 @@
 \alias{isLocalHub,Hub-method}
 \alias{isLocalHub<-}
 \alias{isLocalHub<-,Hub-method}
+\alias{allVersions}
+\alias{allVersions,Hub-method}
+\alias{allVersions<-}
+\alias{allVersions<-,Hub-method}
 
 \alias{possibleDates}
 \alias{snapshotDate}
@@ -152,7 +156,14 @@
     }
    \item{}{
       \code{isLocalHub(x)}:
-      Get whether or not constructor was called with \code{localHub=TRUE}.
+      Get whether or not constructor was called with
+    \code{localHub=TRUE}. Default is FALSE.
+    }
+   \item{}{
+      \code{allVersions(x)}:
+      Get whether or not all versions of a resource are displayed or
+    only the most recent. The default is only the most recent controlled
+    in constructor with \code{allVersions=TRUE}. Default is FALSE.
     }
     \item{}{
       \code{length(x)}:
