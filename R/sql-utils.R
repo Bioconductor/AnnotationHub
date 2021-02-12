@@ -120,7 +120,7 @@
     if (!allVersions){
         mainId <- unique(sub('\\..*', '',names(allIds)))
         maxVer <- vapply(mainId, FUN=.find_max_ver,
-                         FUN.VALUE=character(1), USE.NAMES=FALSE, path=conn)
+                         FUN.VALUE=character(1), USE.NAMES=FALSE, path=conn, date=date)
         verIds <- paste0(mainId, ".", maxVer)
         allIds <- allIds[names(allIds) %in% verIds]
     }
@@ -343,12 +343,31 @@
     mat
 }
 
-.getversions <- function(path, id)
+.getversions <- function(path, id, date)
 {
+    if (missing(date)){
+        if (is(path, "Hub")){
+            db_path <- dbfile(path)
+        } else if (class(path) == "character"){
+           db_path <- path
+        }else{
+            db_path <- RSQLite::dbGetInfo(path)$dbname
+        }
+        date <- .restrictDateByVersion(db_path)
+    } else {
+        if (length(date) != 1L)
+            stop("'date' must be a single date or character string")
+        tryCatch({
+            fmt_value <- as.POSIXlt(date)
+        }, error=function(err) {
+            stop("'date' must be a single date or character string")
+        })
+    }
+
     query <- paste0(
-        "SELECT DISTINCT resources.ah_id, rdatapaths.version_id, resources.title, resources.description, rdatapaths.rdataclass, resources.species, resources.genome, resources.taxonomyid, input_sources.sourcesize, input_sources.sourceurl, input_sources.sourceversion, input_sources.sourcemd5, input_sources.sourcelastmodifieddate, input_sources.sourcetype, statuses.status, biocversions.biocversion, resources.rdatadateadded, resources.rdatadateremoved FROM resources, rdatapaths, statuses, biocversions, input_sources WHERE resources.id == rdatapaths.resource_id AND resources.status_id == statuses.id AND biocversions.resource_id == resources.id AND input_sources.resource_id == resources.id AND resources.ah_id LIKE '%",id,"%'")
+        "SELECT DISTINCT resources.ah_id, rdatapaths.version_id, resources.title, resources.description, rdatapaths.rdataclass, resources.species, resources.genome, resources.taxonomyid, input_sources.sourcesize, input_sources.sourceurl, input_sources.sourceversion, input_sources.sourcemd5, input_sources.sourcelastmodifieddate, input_sources.sourcetype, statuses.status, biocversions.biocversion, resources.rdatadateadded, resources.rdatadateremoved FROM resources, rdatapaths, statuses, biocversions, input_sources WHERE resources.id == rdatapaths.resource_id AND resources.status_id == statuses.id AND biocversions.resource_id == resources.id AND input_sources.resource_id == resources.id AND resources.rdatadateadded <= '", date, "'AND resources.ah_id LIKE '%",id,"%'")
     if (is(path, "Hub")){
-        conn <- dbfile(hub)
+        conn <- dbfile(path)
     } else if (class(path) == "character"){
         conn <- .db_open(path)
         on.exit(.db_close(conn))
@@ -359,8 +378,8 @@
     mat
 }
 
-.find_max_ver <- function(path, id)
+.find_max_ver <- function(path, id, date)
 {
-    tbl <- .getversions(path, id)
+    tbl <- .getversions(path, id, date)
     max(gsub('.*\\.', '',tbl$ah_id))
 }

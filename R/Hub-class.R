@@ -544,8 +544,10 @@ getSize <- function(hub, tbl)
 setMethod("getVersionsOfId", "character",
     function(hub, id)
 {
+    stopifnot(length(id) == 1L)
     id <- sub('\\..*', '',id)
-    versionsTbl <- .getversions(hub, id)
+    allDates <- .possibleDates(dbfile(hub))
+    versionsTbl <- .getversions(hub, id, date=allDates[length(allDates)])
     versionsTbl
 })
 
