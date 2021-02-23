@@ -158,6 +158,7 @@ setReplaceMethod("allVersions", "Hub",
     if (allVersions(x) != value){
         db_path <- x@.db_path
         db_date <- .restrictDateByVersion(db_path)
+        message("Resetting snapshotDate to: ", db_date)
         db_uid <- .db_uid0(db_path, db_date,isLocalHub(x) , value)
         x <- new(as.character(class(x)), cache=hubCache(x), hub=hubUrl(x),
                  date=db_date, .db_path=db_path, .db_uid=db_uid,

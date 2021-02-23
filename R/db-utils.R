@@ -33,7 +33,6 @@
 .db_uid0 <- function(path, .date, localHub, allVersions){
     tryCatch({
         uid <- .uid0(path, .date, localHub, allVersions)
-        sort(uid)
     }, error=function(err) {
         stop("failed to connect to local data base",
              "\n  database: ", sQuote(path),

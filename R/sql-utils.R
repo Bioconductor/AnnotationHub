@@ -124,7 +124,9 @@
         verIds <- paste0(mainId, ".", maxVer)
         allIds <- allIds[names(allIds) %in% verIds]
     }
-    allIds
+
+    ## sort by ID
+    allIds[order(as.numeric(substring(first=3, sub('\\..*', '',names(allIds)))))]
 }
 
 
