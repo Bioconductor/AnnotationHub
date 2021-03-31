@@ -20,7 +20,7 @@ setClass("Hub",
 ### Constructor for subclasses
 ###
 
-.Hub <- function(.class, url, cache, proxy, localHub=FALSE, ask=TRUE, ...) {
+.Hub <- function(.class, url, cache, proxy, localHub=FALSE, ask=interactive(), ...) {
 
     # create or use cache location
     # download hub sqlite file and add/update to BiocFileCache for tracking

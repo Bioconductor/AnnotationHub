@@ -15,7 +15,7 @@
         setAnnotationHubOption("URL", opt)
     }
     if (is.null(getAnnotationHubOption("CACHE"))) {
-        path <- user_cache_dir(appname=.CACHE_ROOT)
+        path <- tools::R_user_dir(.CACHE_ROOT, which="cache")
         opt <- getOption("ANNOTATION_HUB_CACHE", path)
         opt <- Sys.getenv("ANNOTATION_HUB_CACHE", opt)
         setAnnotationHubOption("CACHE", opt)
@@ -39,9 +39,29 @@
         setAnnotationHubOption("LOCAL", opt)
     }
     if (is.null(getAnnotationHubOption("ASK"))) {
-        opt <- getOption("ANNOTATION_HUB_ASK", TRUE)
+        opt <- getOption("ANNOTATION_HUB_ASK", interactive())
         opt <- Sys.getenv("ANNOTATION_HUB_ASK", opt)
         opt <- as.logical(opt)
         setAnnotationHubOption("ASK", opt)
     }
+
+    cacheChange <- "2.23.2"
+    pkgVersion <- as.character(packageVersion(pkgname))
+
+    if (utils::compareVersion(cacheChange, pkgVersion) < 0){
+        require(rappdirs)
+        olddefault <- rappdirs::user_cache_dir(appname=.CACHE_ROOT)
+        newlocation <- tools::R_user_dir(.CACHE_ROOT, which="cache")
+
+        if (dir.exists(olddefault) && (length(list.files(olddefault)) != 0)){
+            msg <- sprintf(
+                "As of %s (> %s), The default caching location has changed. To avoid redownloading previously cached files and use previouly existing default cache see AnnotationHub vignette TroubleshootingTheCache section: 'Default Caching Location Update' . This message will not be displayed after Bioconductor 3.14",
+                pkgname,
+                cacheChange)
+
+            packageStartupMessage(paste(strwrap(msg, exdent=2), collapse="\n"))
+        }
+    }
+
+
 }

@@ -358,6 +358,65 @@ available. If this was part of a subset to download, remove the resource id from
 the subset.
 
 
+# Default Caching Location Update
+
+
+As of AnnotationHub version > 2.23.2, the default caching location has
+changed. The default cache is now controlled by the function `tools::R_user_dir`
+instead of `rappdirs::user_cache_dir`.  Users who have utilized the default
+AnnotationHub, to continue using the created cache, must move the cache and its
+files to the new default location or create a system environment variable to
+point to the old location. 
+
+## Option 1: Move cache and files to new location
+
+The following steps can be used to move the files to the new location:
+
+1. Determine the old location by running the following in R
+   `rappdirs::user_cache_dir(appname="AnnotationHub")`
+
+2. Determine the new location by running the following in R
+   `tools::R_user_dir("AnnotationHub", which="cache")`
+
+3. Move the files to the new location. You can do this manually or do the
+following steps in R. Remember if you have a lot of cached files, this may take
+awhile.
+
+```{r, eval=FALSE}
+	olddir <- path.expand(rappdirs::user_cache_dir(appname="AnnotationHub"))
+	newdir <- tools::R_user_dir("AnnotationHub", which="cache")
+	dir.create(path=newdir, recursive=TRUE)
+	files <- list.files(olddir, full.names =TRUE)
+	moveres <- vapply(files,
+		FUN=function(fl){
+		  filename = basename(fl)
+		  newname = file.path(newdir, filename)
+		  file.rename(fl, newname)
+		},
+		FUN.VALUE = logical(1))
+	if(all(moveres)) unlink(olddir, recursive=TRUE)
+
+```
+
+## Option 2:  Create a system environment variable
+
+A user may set the system environment variable `ANNOTATION_HUB_CACHE` to control
+the default location of the cache. Setting system environment variables can vary
+depending on the operating system; we suggest using google to find appropriate
+instructures per your operating system. 
+
+You will want to set the variable to the results of running the following in R: 
+
+```{r, eval=FALSE}
+
+       path.expand(rappdirs::user_cache_dir(appname="AnnotationHub"))
+```
+ 
+**NOTE:** R has `Sys.setenv` however that will only set the variable for that R
+  session. It would not be available or recognized in future R sessions. It is
+  important to set the variable as a global user-wide or system-wide 
+  environment variable so it persists in all future logins to your system. 
+
 
 
 
