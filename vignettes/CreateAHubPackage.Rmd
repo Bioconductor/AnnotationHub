@@ -207,6 +207,9 @@ unless otherwise stated.
     myfiles[["EH123"]]  ## load by EH id
     ```
 
+    NOTE: As a developer, resources should be accessed within your package using
+    the Hub id, e.g., `myfiles[["EH123"]].
+
     You can use multiple search queries to further filter resources. For
     example, replace "SEARCHTERM*" below with one or more search terms that
     uniquely identify resources in your package.
