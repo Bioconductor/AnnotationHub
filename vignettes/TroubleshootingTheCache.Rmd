@@ -364,7 +364,7 @@ the subset.
 As of AnnotationHub version > 2.23.2, the default caching location has
 changed. The default cache is now controlled by the function `tools::R_user_dir`
 instead of `rappdirs::user_cache_dir`.  Users who have utilized the default
-AnnotationHub, to continue using the created cache, must move the cache and its
+AnnotationHub location, to continue using the created cache, must move the cache and its
 files to the new default location,  create a system environment variable to
 point to the old location, or delete and start a new cache. 
 
