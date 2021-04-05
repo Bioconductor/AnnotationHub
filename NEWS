@@ -1,3 +1,18 @@
+CHANGES IN VERSION 2.99.0
+-------------------------
+
+MAJOR UPDATES
+
+    o (2.99.0) The default caching location has changed. Instead of
+    rappdirs::user_cache_dir using tools::R_user_dir. To avoid conflicting
+    caches, a user will have to manage an old cache location before
+    proceeding. Information for handling an old cache location is provided in
+    the vignette.
+    o (2.99.0) Another major change, a default caching location is automatically
+    created in a non interactive session instead of using a temporary
+    location. In an interactive session, a user is still prompted for
+    permission.
+
 CHANGES IN VERSION 2.23.0
 -------------------------
 
