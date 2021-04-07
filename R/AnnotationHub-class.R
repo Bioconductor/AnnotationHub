@@ -22,10 +22,10 @@ AnnotationHub <-
     if ((cache == R_user_dir("AnnotationHub", which="cache")) && (Sys.getenv("ANNOTATION_HUB_CACHE")=="")){
         olddefault = rappdirs::user_cache_dir(appname="AnnotationHub")
         if (dir.exists(olddefault) && (length(list.files(olddefault)) != 0)){
-            stop("As of AnnotationHub (>2.23.2), default caching location has changed.\n",
+            warning("DEPRECATION: As of AnnotationHub (>2.23.2), default caching location has changed.\n",
                  "  Problematic cache: ", path.expand(olddefault), "\n",
-                 "  To continue with default caching location, \n",
                  "  See AnnotationHub vignette TroubleshootingTheCache section on 'Default Caching Location Update'\n")
+            cache = olddefault
         }
     }
 
