@@ -24,7 +24,7 @@ AnnotationHub <-
         if (dir.exists(olddefault) && (length(list.files(olddefault)) != 0)){
             warning("DEPRECATION: As of AnnotationHub (>2.23.2), default caching location has changed.\n",
                  "  Problematic cache: ", path.expand(olddefault), "\n",
-                 "  See AnnotationHub vignette TroubleshootingTheCache section on 'Default Caching Location Update'\n")
+                 "  See https://bioconductor.org/packages/devel/bioc/vignettes/AnnotationHub/inst/doc/TroubleshootingTheCache.html#default-caching-location-update\n")
             cache = olddefault
         }
     }
