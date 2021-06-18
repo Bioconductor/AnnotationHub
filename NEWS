@@ -1,3 +1,13 @@
+CHANGES IN VERSION 3.0.0
+-------------------------
+
+USER-VISIBLE MODIFICATIONS
+    o (3.0.1) If there is a duplicate entry in the hub cache for a resource, hub
+    code will no longer produce an ERROR. If the duplicate resource was not
+    requested the duplicate is ignored. If the duplicate resource is requested,
+    produce a warning for corrupt cache and continue with first found entry.
+
+
 CHANGES IN VERSION 2.99.0
 -------------------------
 

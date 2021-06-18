@@ -120,16 +120,20 @@ removeCache <- function(x, ask=TRUE){
     }
 
     locFiles = setNames(locFiles, baseFileName)
-    if (any(duplicated(baseFileName))){
-        files <- locFiles[names(locFiles) %in% baseFileName[duplicated(baseFileName)]]
-        stop("Corrupt Cache: resource path",
-             "\n  See AnnotationHub's TroubleshootingTheCache vignette section on corrupt cache",
-             "\n  cache: ", bfccache(bfc),
-             "\n  potential duplicate files: ",
-             "\n    ", paste0(files[order(names(files))], collapse="\n    "),
-             call.=FALSE)
-    }
 
+    if (any(duplicated(baseFileName))){
+        files <- locFiles[names(locFiles) %in%
+                          baseFileName[duplicated(baseFileName)]]
+        if(any(unname(cachepath) %in% names(files)))
+            warning("Corrupt Cache: resource path",
+                 "\n  See AnnotationHub's TroubleshootingTheCache vignette section on corrupt cache",
+                 "\n  cache: ", bfccache(bfc),
+                 "\n  potential duplicate files: ",
+                 "\n    ", paste0(files[order(names(files))],
+                                  collapse="\n    "),
+                 "\nContinuing with first found cached file",
+                 call.=FALSE)
+    }   
 
     allUpdate <- rep(TRUE, length(cachepath))
     names(allUpdate) <- as.character(cachepath)
