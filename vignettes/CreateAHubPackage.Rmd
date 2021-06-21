@@ -165,9 +165,9 @@ unless otherwise stated.
 
     ```{r, eval=FALSE}
     .onLoad <- function(libname, pkgname) {
-	fl <- system.file("extdata", "metadata.csv", package=pkgname)
-	titles <- read.csv(fl, stringsAsFactors=FALSE)$Title
-	createHubAccessors(pkgname, titles)
+       fl <- system.file("extdata", "metadata.csv", package=pkgname)
+       titles <- read.csv(fl, stringsAsFactors=FALSE)$Title
+       createHubAccessors(pkgname, titles)
     }
     ```
 
@@ -572,7 +572,9 @@ occur. Each data object uploaded to S3 should have an entry (row) in the metadat
 file. Briefly, a description of the metadata columns required:
 
 * Title: 'character(1)'. Name of the resource. This can be the exact file name
-  (if self-describing) or a more complete description.
+  (if self-describing) or a more complete description. For ExperimentHub resources, 
+  the title can be used to generate the function name to load the resource, so
+  spaces should be avoided in this case.
 * Description: 'character(1)'. Brief description of the resource, similar to the
   'Description' field in a package DESCRIPTION file.
 * BiocVersion: 'character(1)'. The first Bioconductor version the resource was
