@@ -22,7 +22,7 @@ AnnotationHub <-
     if ((cache == R_user_dir("AnnotationHub", which="cache")) && (Sys.getenv("ANNOTATION_HUB_CACHE")=="")){
         olddefault = rappdirs::user_cache_dir(appname="AnnotationHub")
         if (dir.exists(olddefault) && (length(list.files(olddefault)) != 0)){
-            .Deprecated(msg=paste0("DEPRECATION: As of AnnotationHub (>2.23.2), default caching location has changed.\n",
+            stop(msg=paste0("DEFUNCT: As of AnnotationHub (>2.23.2), default caching location has changed.\n",
                  "  Problematic cache: ", path.expand(olddefault), "\n",
                  "  See https://bioconductor.org/packages/devel/bioc/vignettes/AnnotationHub/inst/doc/TroubleshootingTheCache.html#default-caching-location-update\n"))
             cache = olddefault

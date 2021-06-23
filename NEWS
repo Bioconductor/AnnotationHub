@@ -1,6 +1,13 @@
 CHANGES IN VERSION 3.1.0
 -------------------------
 
+MAJOR UPDATES
+
+    o (3.1.2) In accordance with the deprecated caching location, upgraded to
+    error/defunct from warning/deprecated in preparaion for removal of
+    dependency next release
+
+
 USER-VISIBLE MODIFICATIONS
 
     o (3.1.1) If there is a duplicate entry in the hub cache for a resource, hub
