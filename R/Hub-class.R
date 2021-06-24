@@ -274,7 +274,8 @@ setMethod("[[", c("Hub", "character", "missing"),
                 as.Date(snapshotDate(x))))
             stop(status$record, " added after current Hub snapshot date.\n",
                  "  added: ", as.character(status$dateadded), "\n",
-                 "  snapshote date: ",  as.character(snapshotDate(x)),
+                 "  snapshot date: ",  as.character(snapshotDate(x)), "\n",
+                 "  To access this resource update your version of Bioconductor",
                  call.=FALSE)
 
         msg <- paste0(status$status, "\n")
