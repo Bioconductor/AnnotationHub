@@ -230,9 +230,9 @@ txdb <- loadDb("/locationToFile/mytxdb.sqlite")
 
 # Creating an AnnotationHub Package or Converting to an AnnotationHub Package
 
-Please see AnnotationHub Vignette "CreateAHubPackage".
+Please see HubPub Vignette "CreateAHubPackage".
 ```
-vignette("CreateAHubPackage", package="AnnotationHub")
+vignette("CreateAHubPackage", package="HubPub")
 ```
 
 

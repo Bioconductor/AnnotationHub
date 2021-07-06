@@ -30,7 +30,7 @@ Imports: utils, methods, grDevices, RSQLite, BiocManager, BiocVersion, curl, rap
 Suggests: IRanges, GenomicRanges, GenomeInfoDb, VariantAnnotation, Rsamtools,
     rtracklayer, BiocStyle, knitr, AnnotationForge, rBiopaxParser,
     RUnit, GenomicFeatures, MSnbase, mzR, Biostrings,
-    SummarizedExperiment, ExperimentHub, gdsfmt, rmarkdown
+    SummarizedExperiment, ExperimentHub, gdsfmt, rmarkdown, HubPub
 Enhances: AnnotationHubData
 Collate: AnnotationHubOption.R AllGenerics.R Hub-class.R db-utils.R 
     AnnotationHub-class.R 
