@@ -682,8 +682,10 @@ setMethod("show", "Hub", function(object)
     object[idx]
 }
 
-setMethod("display", signature(object="Hub"),
-          function(object) .display(object)
+setMethod("display", signature(object="Hub"), function(object) {
+        .Deprecated(msg = "display,Hub-method is deprecated.")
+        .display(object)
+    }
 )
 
 

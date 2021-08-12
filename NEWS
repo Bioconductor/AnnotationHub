@@ -15,6 +15,7 @@ USER-VISIBLE MODIFICATIONS
     requested the duplicate is ignored. If the duplicate resource is requested,
     produce a warning for corrupt cache and continue with first found entry.
     o (3.1.3) Fix typo in message display 
+    o (3.1.5) Deprecate the `display,Hub-method`
 
 CHANGES IN VERSION 2.99.0
 -------------------------
