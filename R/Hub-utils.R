@@ -210,7 +210,7 @@ possibleDates <- function(x) {
 {
 ##    "http://gamay:9393/fetch"
 ##    "https://annotationhub.bioconductor.org/fetch"
-    sprintf("%s/fetch", huburl)
+    sprintf("%s/azure", huburl)
 }
 
 # make full fetch for each resource needed
@@ -234,6 +234,8 @@ possibleDates <- function(x) {
     hub <-  .hub_data_path(hubUrl(x))
     bfc <- .get_cache(x)
     hubpath <- .hub_resource_path(hub, resource)
+    ## debugging message while testing azure
+    message(hubpath)
     mapply(.hub_cache_resource, hubpath, names(cachepath), cachepath, MoreArgs=list(proxy=proxy,
                                                         bfc=bfc))
 }
