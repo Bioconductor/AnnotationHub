@@ -238,7 +238,7 @@ gtf)
 ```{r takifugu-txdb}
 library(GenomicFeatures)         # for makeTxDbFromGRanges
 txdb <- makeTxDbFromGRanges(gtf_subset)
-````
+```
 
 and to use that in conjunction with the DNA sequences, e.g., to find
 exon sequences of all annotated genes.
