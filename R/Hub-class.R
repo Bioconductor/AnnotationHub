@@ -278,6 +278,18 @@ setMethod("[[", c("Hub", "character", "missing"),
                  "  To access this resource update your version of Bioconductor",
                  call.=FALSE)
 
+        if (status$status == "Public"){
+            details = getInfoOnIds(x,i)
+            if(details$rdataclass == "OrgDb")
+                stop(details$ah_id, " is an OrgDb resource.\n",
+                     "  orgDb resources are generated for specific biocversions.\n",
+                     "  Requested resource works with biocversion: ",
+                     details$biocversion,"\n",
+                     "  To find a resource appropriate for your biocversion try the following query:\n",
+                     "      query(ah,'", details$title, "')",
+                     call.=FALSE)
+        }
+
         msg <- paste0(status$status, "\n")
         if(!is.null(status$dateremoved))
             msg <- paste0(msg, "   Resource removed on: ", status$dateremoved)
