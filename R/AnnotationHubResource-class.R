@@ -83,7 +83,7 @@ setMethod(".get1", "BamFileResource",
 ## Michael's AHCytoData is the only package (I think) that uses RDS.
 ## Added Rds to be compatible with Rda naming scheme.
 setClass("RdsResource", contains="AnnotationHubResource")
-setMethod(".get1", "RdsResource", function(x, ...) readRDS(cache(getHub(x))))
+setMethod(".get1", "RdsResource", function(x, ...) updateObject(readRDS(cache(getHub(x)))))
 
 setClass("RDSResource", contains="RdsResource")
 setMethod(".get1", "RDSResource", function(x, ...) callNextMethod(x, ...))
@@ -94,7 +94,7 @@ setClass("RdaResource", contains="AnnotationHubResource")
 setMethod(".get1", "RdaResource",
     function(x, ...)
 {
-    get(load(cache(getHub(x))))
+    updateObject(get(load(cache(getHub(x)))))
 })
 
 setClass("data.frameResource", contains="RdaResource")
