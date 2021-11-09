@@ -1,3 +1,14 @@
+CHANGES IN VERSION 3.3.0
+-------------------------
+
+USER-VISIBLE MODIFICATIONS
+
+    o (3.1.2) Remove TESTING option as only needed to expose devel orgdb
+    o (3.1.2) Change filter for orgdbs. orgdbs at release time will be stamped
+    with devel (to be release) and then manually have biocversion added for the
+    upcoming new devel. Filtering then based on biocversion number. This will
+    expose devel orgdbs as soon as generated
+
 CHANGES IN VERSION 3.1.0
 -------------------------
 
