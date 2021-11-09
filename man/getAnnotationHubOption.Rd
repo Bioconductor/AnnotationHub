@@ -50,14 +50,6 @@ setAnnotationHubOption(arg, value)
       specified by \code{http://username:password@proxy.dom.com:8080};
       \code{username:password} and port (e.g. \code{:8080}) are optional.}
 
-    \item{\dQuote{TESTING}:}{logical(1). TRUE/FALSE should the AnnotationHub
-      testing environment be used. AnnotationHub does automatic
-      filtering particularly with regards to OrgDbs. The
-      \code{TESTING=TRUE} setting will allow for all OrgDbs for a given
-      devel version to also be displayed. (This option should really
-      only be set by a OrgDb contributing maintainer for testing and
-      debugging). Default: FALSE.}
-
     \item{\dQuote{LOCAL}:}{logical(1). TRUE/FALSE should the AnnotationHub
       create a hub consisting only of previously downloaded resourcesd.
       Default: FALSE.}
