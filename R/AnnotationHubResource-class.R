@@ -50,6 +50,18 @@ setMethod(".get1", "AnnotationHubResource",
     stop(paste(strwrap(msg), collapse="\n"))
 })
 
+.updateObject <- function(x)
+{
+    if (isS4(x)) {
+        ## Make sure that the package where the class of 'x' is defined is
+        ## loaded before calling updateObject() on 'x'.
+        classdef_pkg <- attr(class(x), "package")
+        if (!is.null(classdef_pkg))
+            .require(classdef_pkg)
+    }
+    updateObject(x)
+}
+
 ##
 ## implementations
 ##
@@ -83,7 +95,11 @@ setMethod(".get1", "BamFileResource",
 ## Michael's AHCytoData is the only package (I think) that uses RDS.
 ## Added Rds to be compatible with Rda naming scheme.
 setClass("RdsResource", contains="AnnotationHubResource")
-setMethod(".get1", "RdsResource", function(x, ...) updateObject(readRDS(cache(getHub(x)))))
+setMethod(".get1", "RdsResource",
+    function(x, ...)
+{
+    .updateObject(readRDS(cache(getHub(x))))
+})
 
 setClass("RDSResource", contains="RdsResource")
 setMethod(".get1", "RDSResource", function(x, ...) callNextMethod(x, ...))
@@ -94,7 +110,7 @@ setClass("RdaResource", contains="AnnotationHubResource")
 setMethod(".get1", "RdaResource",
     function(x, ...)
 {
-    updateObject(get(load(cache(getHub(x)))))
+    .updateObject(get(load(cache(getHub(x)))))
 })
 
 setClass("data.frameResource", contains="RdaResource")
