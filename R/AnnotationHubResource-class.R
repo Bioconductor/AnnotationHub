@@ -59,7 +59,17 @@ setMethod(".get1", "AnnotationHubResource",
         if (!is.null(classdef_pkg))
             .require(classdef_pkg)
     }
-    updateObject(x)
+    ## Make sure to use 'check=FALSE' to skip validation of the returned
+    ## object. The reason we want to skip validation is because validObject()
+    ## is broken on some S3 objects e.g. on igraph objects:
+    ##   ah <- AnnotationHub()
+    ##   x <- ah[["AH60903"]]
+    ##   class(x)  # igraph
+    ##   validObject(x)
+    ##   Error in .classEnv(classDef) : 
+    ##     trying to get slot "package" from an object of a basic class ("NULL")
+    ##     with no slots
+    updateObject(x, check=FALSE)
 }
 
 ##
