@@ -54,13 +54,19 @@ setMethod(".get1", "AnnotationHubResource",
 {
     if (isS4(x)) {
         ## Make sure that the package where the class of 'x' is defined is
-        ## loaded before calling updateObject() on 'x'.
+        ## loaded before calling 'updateObject()' on 'x'. We should normally
+        ## be able to rely on 'attr(class(x), "package")' to get the name of
+        ## that package. However, it seems that for some hub resources
+        ## 'attr(class(x), "package")' is set to ".GlobalEnv" rather than to
+        ## the name of that package. This is the case for example for
+        ## CellMapperList instances EH170 to EH175 in ExperimentHub. Not
+        ## sure how that's allowed but let's just deal with it.
         classdef_pkg <- attr(class(x), "package")
-        if (!is.null(classdef_pkg))
+        if (!(is.null(classdef_pkg) || identical(classdef_pkg, ".GlobalEnv")))
             .require(classdef_pkg)
     }
     ## Make sure to use 'check=FALSE' to skip validation of the returned
-    ## object. The reason we want to skip validation is because validObject()
+    ## object. The reason we want to skip validation is because 'validObject()'
     ## is broken on some S3 objects e.g. on igraph objects:
     ##   ah <- AnnotationHub()
     ##   x <- ah[["AH60903"]]
