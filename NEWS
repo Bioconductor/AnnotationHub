@@ -1,6 +1,11 @@
 CHANGES IN VERSION 3.3.0
 -------------------------
 
+NEW FEATURES
+
+    o (3.3.6) Serialized S4 hub resources (AnnotationHub and ExperimentHub)
+      are now passed thru updateObject() at load-time
+
 USER-VISIBLE MODIFICATIONS
 
     o (3.1.2) Remove TESTING option as only needed to expose devel orgdb
