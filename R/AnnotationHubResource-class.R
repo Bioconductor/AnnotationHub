@@ -52,6 +52,13 @@ setMethod(".get1", "AnnotationHubResource",
 
 .updateObject <- function(x)
 {
+    ## As of Nov 2021, ExperimentHub contains 13 serialized QFeatures instances.
+    ## Unfortunately, the 'updateObject(x, check=FALSE)' call below fails for
+    ## all of them with the "Assay links names are wrong" error message. These
+    ## resources were added on 2020-11-05 (EH3899-EH3909), 2021-04-27 (EH6011),
+    ## and 2021-10-06 (EH7085) by the scpdata people.
+    if (is(x, "QFeatures"))
+        return(x)
     if (isS4(x)) {
         ## Make sure that the package where the class of 'x' is defined is
         ## loaded before calling 'updateObject()' on 'x'. We should normally
