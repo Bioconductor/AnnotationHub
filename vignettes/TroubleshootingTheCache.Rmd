@@ -358,6 +358,27 @@ available. If this was part of a subset to download, remove the resource id from
 the subset.
 
 
+
+# Group Hub/Cache Access
+
+The situation may occur where a hub is desired to be shared across multiple
+users on a system.  This presents permissions errors.  To allow access to
+multiple users create a group that the users belong to and that the underlying
+hub cache belongs too. Permissions of potentially two files need to be altered depending
+on what you would like individuals to be able to accomplish with the hub. A
+read-only hub will require manual manipulatios of the file
+BiocFileCache.sqlite.LOCK so that the group permissions are `g+rw`. To allow
+users to download files to the shared hub, both the
+BiocFileCache.sqlite.LOCK file and the BiocFileCache.sqlite file will need group
+permissions to `g+rw`. Please google how to create a user group for your system
+of interest. To find the location of the hub cache to be able to change the group
+and file permissions, you may run the following in R `ah = AnnotationHub();
+hubCache(ah)`. For quick reference in linux you will use `chown
+currentuser:newgroup` to change the group and `chmod` to change the file
+permissions: `chmod 660` or `chmod g+rw` should accomplish the correct
+permissions.
+
+
 # Default Caching Location Update
 
 
