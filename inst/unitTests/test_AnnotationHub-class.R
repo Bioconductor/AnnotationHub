@@ -90,8 +90,8 @@ test_fileNames <- function(){
 
     tempfile <- fileName(ah)
     ah2 = AnnotationHub(localHub=TRUE)
-    checkIdentical(sort(names(which(!is.na(tempfile)))),
-                   sort(names(AnnotationHub:::.db_uid(ah2))))
+    checkTrue(all(sort(names(AnnotationHub:::.db_uid(ah2))) %in% 
+                  sort(names(which(!is.na(tempfile))))))
 }
 
 test_subset <- function(){
