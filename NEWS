@@ -14,7 +14,11 @@ USER-VISIBLE MODIFICATIONS
     with devel (to be release) and then manually have biocversion added for the
     upcoming new devel. Filtering then based on biocversion number. This will
     expose devel orgdbs as soon as generated
+    
+BUG CORRECTION
 
+    o (3.1.9) Fix broken test. Identical not appropriate. all present appropriate
+    
 CHANGES IN VERSION 3.1.0
 -------------------------
 
