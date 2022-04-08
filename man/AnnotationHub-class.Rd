@@ -123,6 +123,10 @@
   The location of the local cache can be found (and updated) with
   \code{getAnnotationHubCache} and \code{setAnnotationHubCache};
   \code{removeCache} removes all cache resources.
+
+  For common hub troubleshooting, please see the AnnotationHub vignette
+  entitled `vignette("TroubleshootingTheCache", package=AnnotationHub)`.
+
 }
 
 \section{Constructors}{

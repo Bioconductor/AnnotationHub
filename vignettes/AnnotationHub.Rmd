@@ -235,6 +235,13 @@ Please see `r Biocpkg("HubPub")` Vignette "CreateAHubPackage".
 vignette("CreateAHubPackage", package="HubPub")
 ```
 
+# Troubleshooting
+
+Please see AnnotationHub vignette "TroubleshootingTheCache".
+```
+vignette("TroubleshootingTheCache", package=AnnotationHub)
+```
+
 
 # Session info
 
