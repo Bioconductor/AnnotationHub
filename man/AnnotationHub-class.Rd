@@ -99,9 +99,11 @@
   Use \code{AnnotationHub()} to retrieve information about all records
   in the hub. If working offline, add argument \code{localHub=TRUE} to
   work with a local, non-updated hub; It will only have resources
-  available that have previously been downloaded. To force redownload of
-  the hub, \code{refreshHub(hubClass="AnnotationHub")} can be utilized.
-
+  available that have previously been downloaded. If offline, Please
+  also see BiocManager vignette section on offline use to ensure proper
+  funcionality. To force redownload of the hub,
+  \code{refreshHub(hubClass="AnnotationHub")} can be utilized.
+  
   Discover records in a hub using \code{mcols()}, \code{query()},
   \code{subset()}, \code{[}, and \code{display()}.
 

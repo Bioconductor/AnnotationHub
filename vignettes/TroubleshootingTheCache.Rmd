@@ -357,6 +357,25 @@ because of internet access or other issues, the resource will not be
 available. If this was part of a subset to download, remove the resource id from
 the subset.
 
+## Offline localHub usage
+
+There is a flag in the constructor `localHub=TRUE` to use only show previously
+downloaded resources.  If you are using this in an offline setting, please also
+see the [BiocManager vignette on offline
+use](https://cran.r-project.org/web/packages/BiocManager/vignettes/BiocManager.html#offline-use). The
+Hubs use BiocManager::version to filter resources appropriate for your current
+version of R/Bioconductor; therefore the offline usage of BiocManager needs to
+be established. 
+The error that occurs that likely needs offline set up will look similar to the
+following:
+
+``ExperimentHub(localHub=TRUE)
+Error: failed to connect to local data base
+database: ‘/home/user/.cache/R/ExperimentHub/24dc84dbf615e_experimenthub.sqlite3’
+reason: invalid version specification ‘Bioconductor version cannot be validated; no internet connection?’`
+
+``` 
+
 
 
 # Group Hub/Cache Access
