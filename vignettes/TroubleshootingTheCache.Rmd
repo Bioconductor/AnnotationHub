@@ -369,7 +369,8 @@ be established.
 The error that occurs that likely needs offline set up will look similar to the
 following:
 
-``ExperimentHub(localHub=TRUE)
+```
+ExperimentHub(localHub=TRUE)
 Error: failed to connect to local data base
 database: ‘/home/user/.cache/R/ExperimentHub/24dc84dbf615e_experimenthub.sqlite3’
 reason: invalid version specification ‘Bioconductor version cannot be validated; no internet connection?’`
@@ -396,6 +397,39 @@ hubCache(ah)`. For quick reference in linux you will use `chown
 currentuser:newgroup` to change the group and `chmod` to change the file
 permissions: `chmod 660` or `chmod g+rw` should accomplish the correct
 permissions.
+
+
+# Lock file Troubleshooting
+
+Two issues have been commonly reported regarding the lock file.
+
+## Permissions
+
+There could be permission ERROR regarding group and public access. See the
+previous `Group Cache Access` section. 
+
+## Cannot lock file / no lock available
+
+This is an issue with filelock on particular systems. Particular partitions and
+non standard file systems may not support filelock. The solution is to use a
+different section of the system to create the cache. The easiest way to define a
+new cache location is by using environment variables.
+
+In R:
+
+`Sys.setenv(BFC_CACHE=<new cache location>)`
+
+Alternatively, you can set an environment variable globally to avoid having to
+set uniquely in each R session. Please google for specific instructions for
+setting environment variables globally for your particular OS system. 
+
+Other common filelock implemented packages that have specific environment
+variables to control location are:
+
+  * BiocFileCache: BFC_CACHE
+  * ExperimentHub: EXPERIMENT_HUB_CACHE
+  * AnnotationHub: ANNOTATION_HUB_CACHE
+  * biomaRt: BIOMART_CACHE
 
 
 # Default Caching Location Update
