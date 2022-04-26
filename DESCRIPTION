@@ -1,7 +1,7 @@
 Package: AnnotationHub
 Type: Package
 Title: Client to access AnnotationHub resources
-Version: 3.3.12
+Version: 3.4.0
 Authors@R: 
     c(person("Bioconductor Package", "Maintainer", email="maintainer@bioconductor.org",
              role="cre"),
