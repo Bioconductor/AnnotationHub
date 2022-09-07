@@ -342,6 +342,17 @@ setMethod(".get1", "H5FileResource",
     cache(getHub(x))
 })
 
+## CompoundDb 
+setClass("CompDbResource", contains = "AnnotationHubResource")
+
+setMethod(".get1", "CompDbResource",
+    function(x, ...)
+{
+    .require("CompoundDb")
+    yy <- cache(getHub(x))
+    dat <- CompoundDb::CompDb(yy)
+})
+
 ## FilePathResource - to download raw file and return path
 setClass("FilePathResource", contains = "AnnotationHubResource")
 

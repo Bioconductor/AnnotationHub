@@ -210,6 +210,7 @@ DispatchClassList <- function(){
       "mzRpwiz", "mzR::openMSfile(); require mzR",
       "mzRident", "mzR::openIDfile(); require mzR",
       "MSnSet", "get(load()); require MSnbase",
-      "AAStringSet", "Biostrings::readAAStringSet(); require Biostrings"
+      "AAStringSet", "Biostrings::readAAStringSet(); require Biostrings",
+      "CompDb", "CompoundDb::Compdb(); requires CompoundDb"
       ),  ncol=2, byrow=TRUE)
 }
