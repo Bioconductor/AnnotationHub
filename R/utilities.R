@@ -169,6 +169,7 @@ DispatchClassList <- function(){
       "RDS", "readRDS()",
       "Rda", "get(load())",
       "data.frame", "get(load())",
+      "dcf", "read.dcf()",
       "GRanges", "get(load()); requires GenomicRanges",
       "VCF", "get(load()); requires VariantAnnotation",
       "ChainFile",
