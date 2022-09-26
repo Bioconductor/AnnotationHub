@@ -3,6 +3,7 @@ CHANGES IN VERSION 3.5.0
 
 NEW FEATURES
 
+    o (3.5.2) Add dcf dispatchclass
     o (3.5.1) Add CompDb dispatchclass
 
 
