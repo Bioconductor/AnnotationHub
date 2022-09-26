@@ -361,3 +361,12 @@ setMethod(".get1", "FilePathResource",
 {
     cache(getHub(x))
 })
+
+## DCF
+setClass("dcfResource", contains = "AnnotationHubResource")
+
+setMethod(".get1", "dcfResource", function(x, ...) {
+    dcf <- cache(getHub(x))
+    read.dcf(dcf, ...)
+})
+
