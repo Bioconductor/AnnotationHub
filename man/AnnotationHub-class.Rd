@@ -75,9 +75,6 @@
 \alias{query}
 \alias{query,Hub-method}
 
-\alias{display}
-\alias{display,Hub-method}
-
 % as.list / c
 \alias{as.list.Hub}
 \alias{as.list,Hub-method}
@@ -103,9 +100,9 @@
   also see BiocManager vignette section on offline use to ensure proper
   funcionality. To force redownload of the hub,
   \code{refreshHub(hubClass="AnnotationHub")} can be utilized.
-  
+
   Discover records in a hub using \code{mcols()}, \code{query()},
-  \code{subset()}, \code{[}, and \code{display()}.
+  \code{subset()}, and \code{[}.
 
   Retrieve individual records using \code{[[}. On first use of a
   resource, the corresponding files or other hub resources are
@@ -280,12 +277,6 @@
 	genome=="GRCh38")}.
     }
     \item{}{
-      \code{display(object)}:
-      Open a web browser allowing for easy selection of hub records via
-      interactive tabular display. Return value is the subset of hub
-      records identified while navigating the display.
-    }
-    \item{}{
       \code{recordStatus(hub, record)}:
       Returns a \code{data.frame} of the record id and status. \code{hub} must
       be a \code{Hub} object and \code{record} must be a \code{character(1)}.
@@ -430,11 +421,6 @@
   ## AnnotationHub object (by position, character, or logical vector).
   ## Here is a demo of position:
   subHub <- ah[1:3]
-
-  if(interactive()) {
-    ## Display method involves user interaction through web interface
-    ah2 <- display(ah)
-  }
 
   ## recordStatus
   recordStatus(ah, "TEST")
