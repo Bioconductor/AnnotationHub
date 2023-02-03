@@ -212,6 +212,7 @@ DispatchClassList <- function(){
       "mzRident", "mzR::openIDfile(); require mzR",
       "MSnSet", "get(load()); require MSnbase",
       "AAStringSet", "Biostrings::readAAStringSet(); require Biostrings",
-      "CompDb", "CompoundDb::Compdb(); requires CompoundDb"
+      "CompDb", "CompoundDb::Compdb(); requires CompoundDb",
+      "kerasHDF5Model", "keras::load_model_hdf5(); requires keras"
       ),  ncol=2, byrow=TRUE)
 }
