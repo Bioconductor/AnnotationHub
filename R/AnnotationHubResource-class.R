@@ -378,3 +378,12 @@ setMethod(".get1", "kerasHDF5ModelResource", function(x, ...) {
     mod <- cache(getHub(x))
     keras::load_model_hdf5(mod)
 })
+
+## keras HDF5 model weights
+setClass("kerasHDF5ModelWeightsResource", contains = "AnnotationHubResource")
+
+setMethod(".get1", "kerasHDF5ModelWeightsResource", function(x, ...) {
+    .require("keras")
+    wts <- cache(getHub(x))
+    keras::load_model_weights_hdf5(wts)
+})
