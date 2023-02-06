@@ -370,3 +370,20 @@ setMethod(".get1", "dcfResource", function(x, ...) {
     read.dcf(dcf, ...)
 })
 
+## keras HDF5 model
+setClass("kerasHDF5ModelResource", contains = "AnnotationHubResource")
+
+setMethod(".get1", "kerasHDF5ModelResource", function(x, ...) {
+    .require("keras")
+    mod <- cache(getHub(x))
+    keras::load_model_hdf5(mod)
+})
+
+## keras HDF5 model weights
+setClass("kerasHDF5ModelWeightsResource", contains = "AnnotationHubResource")
+
+setMethod(".get1", "kerasHDF5ModelWeightsResource", function(x, ...) {
+    .require("keras")
+    wts <- cache(getHub(x))
+    keras::load_model_weights_hdf5(wts)
+})
