@@ -111,16 +111,18 @@ ahs <- query(ah, c('inparanoid8', 'ailuropoda'))
 ahs
 ```
 
+## Interactive retrieval of resources with BiocHubsShiny
+
 We can perform the same query using the `BiocHubsShiny()` function from the
 eponymous package. In the 'dataprovider' field we enter `inparanoid8` and
 `ailuropoda` in the species field.
 
-```{r interactiveDisplay, eval=FALSE}
+```{r BiocHubsShiny, eval=FALSE}
 BiocHubsShiny::BiocHubsShiny()
 ```
 
 ```{r,echo=FALSE,fig.cap="BiocHubsShiny query with terms dataprovider = 'inparanoid' and species = 'ailuropoda'"}
-knitr::include_graphics("display.png")
+knitr::include_graphics("ailMel1_BiocHubsShiny.png")
 ```
 
 By default 6 entries are displayed per page, we can change this using
