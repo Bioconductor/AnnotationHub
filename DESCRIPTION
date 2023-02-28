@@ -25,8 +25,7 @@ Description: This package provides a client for the Bioconductor
 License: Artistic-2.0
 Depends: BiocGenerics (>= 0.15.10), BiocFileCache (>= 1.5.1)
 Imports: utils, methods, grDevices, RSQLite, BiocManager, BiocVersion, curl, rappdirs,
-    AnnotationDbi (>= 1.31.19), S4Vectors, interactiveDisplayBase, httr, yaml,
-    dplyr
+    AnnotationDbi (>= 1.31.19), S4Vectors, httr, yaml, dplyr, interactiveDisplayBase
 Suggests: IRanges, GenomicRanges, GenomeInfoDb, VariantAnnotation, Rsamtools,
     rtracklayer, BiocStyle, knitr, AnnotationForge, rBiopaxParser,
     RUnit, GenomicFeatures, MSnbase, mzR, Biostrings,

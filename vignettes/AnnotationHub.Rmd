@@ -111,27 +111,26 @@ ahs <- query(ah, c('inparanoid8', 'ailuropoda'))
 ahs
 ```
 
-We can also look at the `AnnotationHub` object in a browser using the
-`display()` function. We can then filter the `AnnotationHub` object
-for _chainFile__ by either using the Global search field on the top
-right corner of the page or the in-column search field for `rdataclass'.
+We can perform the same query using the `BiocHubsShiny()` function from the
+eponymous package. In the 'dataprovider' field we enter `inparanoid8` and
+`ailuropoda` in the species field.
 
-```{r display, eval=FALSE}
-d <- display(ah)
+```{r interactiveDisplay, eval=FALSE}
+BiocHubsShiny::BiocHubsShiny()
 ```
 
-![](display.png)
-Displaying and filtering the Annotation Hub object in a browser
+```{r,echo=FALSE,fig.cap="BiocHubsShiny query with terms dataprovider = 'inparanoid' and species = 'ailuropoda'"}
+knitr::include_graphics("display.png")
+```
 
-By default 1000 entries are displayed per page, we can change this using
-the filter on the top of the page or navigate through different pages
-using the page scrolling feature at the bottom of the page. 
+By default 6 entries are displayed per page, we can change this using
+the drop down menu at the top of the table. We can also navigate through
+different pages using the page scrolling feature at the bottom right of the
+table.
 
-We can also select the rows of interest to us and send them back to
-the R session using 'Return rows to R session' button ; this sets a
-filter internally which filters the `AnnotationHub` object. The names
-of the selected AnnotationHub elements displayed at the top of the
-page.
+We can select the rows of interest and send the metadata back to
+the R session using the 'Send metadata' button. The resource identifiers
+are located in the "HUBID" column of the metadata table (`ah_meta`) returned.
 
 # Using `AnnotationHub` to retrieve data
 
