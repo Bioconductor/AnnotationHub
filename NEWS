@@ -7,7 +7,7 @@ NEW FEATURES
 
 DEPRECATED
 
-    o (3.7.2) Deprecate display in favor of BiocHubShiny 
+    o (3.7.2) Deprecate display in favor of BiocHubsShiny; see vignette
 
 
 CHANGES IN VERSION 3.5.0
