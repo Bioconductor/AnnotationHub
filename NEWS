@@ -1,3 +1,15 @@
+CHANGES IN VERSION 3.7.0
+-------------------------
+
+NEW FEATURES
+
+    o (3.7.1) Add DispatchClass for keras model weights
+
+DEPRECATED
+
+    o (3.7.2) Deprecate display in favor of BiocHubShiny 
+
+
 CHANGES IN VERSION 3.5.0
 -------------------------
 
