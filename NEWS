@@ -3,7 +3,8 @@ CHANGES IN VERSION 3.7.0
 
 NEW FEATURES
 
-    o (3.7.1) Add DispatchClass for keras model weights
+     o (3.7.4) Suppress snapshot date unless interactive session 
+     o (3.7.1) Add DispatchClass for keras model weights
 
 DEPRECATED
 

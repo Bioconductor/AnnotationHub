@@ -44,8 +44,10 @@ setClass("Hub",
     hub <- new(.class, cache=cache, hub=url, date=db_date,
                .db_path=db_path, .db_uid=db_uid, isLocalHub=localHub, ...)
 
-    message("snapshotDate(): ", snapshotDate(hub))
-
+    if(interactive()){
+        message("snapshotDate(): ", snapshotDate(hub))
+    }
+    
     if (!localHub){
         index <- .db_create_index(hub)
         .db_index(hub) <- index
