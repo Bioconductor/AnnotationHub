@@ -48,7 +48,9 @@ setAnnotationHubOption(arg, value)
       a \code{request} object returned by \code{httr::use_proxy()}, or a
       well-formed URL as character(1). The URL can be completely
       specified by \code{http://username:password@proxy.dom.com:8080};
-      \code{username:password} and port (e.g. \code{:8080}) are optional.}
+      \code{username:password} and port (e.g. \code{:8080}) are
+      optional.If behind a proxy it will also be useful to set the
+      \code{httr::set_config(proxy)} with the proxy information.}
 
     \item{\dQuote{LOCAL}:}{logical(1). TRUE/FALSE should the AnnotationHub
       create a hub consisting only of previously downloaded resourcesd.

@@ -244,6 +244,23 @@ vignette("TroubleshootingTheCache", package=AnnotationHub)
 ```
 
 
+
+# Accessing Behind A Proxy
+
+The AnnotationHub uses CRAN package `httr` functions `HEAD` and `GET` for accessing
+web resources. This can be problematic if operating behind a proxy. The easiest
+solution is to set the `httr::set_config` with the proxy information.
+
+```
+proxy <- httr::use_proxy("http://my_user:my_password@myproxy:8080")
+## or
+proxy <- httr::use_proxy(Sys.getenv('http_proxy'))
+httr::set_config(proxy)
+AnnotationHub::setAnnotationHubOption("PROXY", proxy)
+```
+
+
+
 # Session info
 
 ```{r sessionInfo}

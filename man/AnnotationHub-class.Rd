@@ -101,6 +101,10 @@
   funcionality. To force redownload of the hub,
   \code{refreshHub(hubClass="AnnotationHub")} can be utilized.
 
+  If you are operating behind a proxy please see the AnnotationHub
+  Vignette section on "Accessing behind a Proxy" for setting up
+  configuration to allow AnnotationHub to run properly.
+
   Discover records in a hub using \code{mcols()}, \code{query()},
   \code{subset()}, and \code{[}.
 
