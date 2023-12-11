@@ -18,7 +18,6 @@ importFrom(httr,
     stop_for_status, status_code, use_proxy, HEAD, headers
 )
 importFrom(yaml, yaml.load)
-importFrom(interactiveDisplayBase, display)
 
 importMethodsFrom(AnnotationDbi, dbconn, dbfile)
 importFrom(AnnotationDbi, dbFileConnect)

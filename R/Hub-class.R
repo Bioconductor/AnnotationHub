@@ -47,7 +47,7 @@ setClass("Hub",
     if(interactive()){
         message("snapshotDate(): ", snapshotDate(hub))
     }
-    
+
     if (!localHub){
         index <- .db_create_index(hub)
         .db_index(hub) <- index
@@ -664,20 +664,6 @@ setMethod("show", "Hub", function(object)
     else
         .show(object)
 })
-
-setMethod("display", signature(object="Hub"),
-    function(object) {
-        .Defunct(
-            "BiocHubsShiny", "BiocHubsShiny",
-            c(
-                "'display,Hub-method' is deprecated.\n",
-                "Use 'BiocHubsShiny::BiocHubsShiny' instead.\n",
-                "See help(\"AnnotationHub-deprecated\")"
-            )
-        )
-    }
-)
-
 
 setMethod("recordStatus", "Hub",
     function(hub, record) {

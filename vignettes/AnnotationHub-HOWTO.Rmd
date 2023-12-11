@@ -158,7 +158,7 @@ E126 <- query(ah , c("EpigenomeRoadMap", "E126", "H3K4ME2"))
 E126
 ```
 Hub resources can also be selected using `$`, `subset()`, and
-`display()`; see the main
+`BiocHubsShiny()`; see the main
 [_AnnotationHub_ vignette](AnnotationHub.html) for additional detail.
 
 Hub resources are imported as the appropriate _Bioconductor_ object
