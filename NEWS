@@ -4,7 +4,8 @@ CHANGES IN VERSION 3.10.0
 NEW FEATURES
 
     o (3.9.1) Remove the defunct `display` method for AnnotationHub.
-
+    o (3.9.1) Rename vignette from TroubleshootingTheCache to TroubleshootingTheHubs
+    
 CHANGES IN VERSION 3.7.0
 -------------------------
 
