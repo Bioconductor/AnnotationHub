@@ -238,9 +238,9 @@ vignette("CreateAHubPackage", package="HubPub")
 
 # Troubleshooting
 
-Please see AnnotationHub vignette "TroubleshootingTheCache".
+Please see AnnotationHub vignette "TroubleshootingTheHubs".
 ```
-vignette("TroubleshootingTheCache", package=AnnotationHub)
+vignette("TroubleshootingTheHubs", package="AnnotationHub")
 ```
 
 

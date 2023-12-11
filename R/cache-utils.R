@@ -59,7 +59,7 @@ removeCache <- function(x, ask=TRUE){
         localFiles <- bfcinfo(bfc)$rpath[match(rnames, bfcinfo(bfc)$rname)]
     }, error=function(err){
         stop("Corrupt Cache: resource id",
-             "\n  See AnnotationHub's TroubleshootingTheCache vignette section on corrupt cache",
+             "\n  See AnnotationHub's TroubleshootingTheHubs vignette section on corrupt cache",
              "\n  cache: ", bfccache(bfc),
              "\n  reason: ", conditionMessage(err),
              call.=FALSE)
@@ -126,7 +126,7 @@ removeCache <- function(x, ask=TRUE){
                           baseFileName[duplicated(baseFileName)]]
         if(any(unname(cachepath) %in% names(files)))
             warning("Corrupt Cache: resource path",
-                 "\n  See AnnotationHub's TroubleshootingTheCache vignette section on corrupt cache",
+                 "\n  See AnnotationHub's TroubleshootingTheHubs vignette section on corrupt cache",
                  "\n  cache: ", bfccache(bfc),
                  "\n  potential duplicate files: ",
                  "\n    ", paste0(files[order(names(files))],
@@ -146,7 +146,7 @@ removeCache <- function(x, ask=TRUE){
         rid <- res %>% collect(Inf) %>% `[[`("rid")
         if (cnt > 1){
             stop("Corrupt Cache: resource path",
-                 "\n  See AnnotationHub's TroubleshootingTheCache vignette section on corrupt cache",
+                 "\n  See AnnotationHub's TroubleshootingTheHubs vignette section on corrupt cache",
                  "\n  cache: ", bfccache(bfc),
                  rpath, call.=FALSE
                  )
