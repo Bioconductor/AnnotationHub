@@ -5,7 +5,7 @@ output:
     toc: true
 vignette: >
   % \VignetteIndexEntry{AnnotationHub: AnnotationHub HOW TO's}
-  % \VignetteDepends{AnnotationHub, GenomicFeatures, Rsamtools}
+  % \VignetteDepends{AnnotationHub, txdbmaker, Rsamtools}
   % \VignetteEngine{knitr::rmarkdown}
 ---
 
@@ -14,7 +14,7 @@ options(width=100)
 suppressPackageStartupMessages({
     ## load here to avoid noise in the body of the vignette
     library(AnnotationHub)
-    library(GenomicFeatures)
+    library(txdbmaker)
     library(Rsamtools)
     library(VariantAnnotation)
 })
@@ -23,7 +23,7 @@ BiocStyle::markdown()
 
 **Package**: `r Biocpkg("AnnotationHub")`<br />
 **Authors**: `r packageDescription("AnnotationHub")[["Author"]] `<br />
-**Modified**: Sun Jun 28 10:41:23 2015<br />
+**Modified**: Mon March 18 2024<br />
 **Compiled**: `r date()`
 
 
@@ -199,7 +199,7 @@ _Bioconductor_ represents gene models using 'transcript'
 databases. These are available via packages such as
 `r Biocannopkg("TxDb.Hsapiens.UCSC.hg38.knownGene")`
 or can be constructed using functions such as
-`r Biocpkg("GenomicFeatures")`::`makeTxDbFromBiomart()`.
+`r Biocpkg("txdbmaker")`::`makeTxDbFromBiomart()`.
 
 _AnnotationHub_ provides an easy way to work with gene models
 published by Ensembl. Let's see what Ensembl's Release-94 has in terms
@@ -236,7 +236,7 @@ It is trivial to make a TxDb instance of this subset (or of the entire
 gtf)
 
 ```{r takifugu-txdb}
-library(GenomicFeatures)         # for makeTxDbFromGRanges
+library(txdbmaker)         # for makeTxDbFromGRanges
 txdb <- makeTxDbFromGRanges(gtf_subset)
 ```
 
