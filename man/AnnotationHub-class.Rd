@@ -132,11 +132,10 @@
 
 \section{Constructors}{
   \describe{
-    \item{}{
-      \code{AnnotationHub(..., hub=getAnnotationHubOption("URL"),
+    \item{\code{AnnotationHub(..., hub=getAnnotationHubOption("URL"),
 	cache=getAnnotationHubOption("CACHE"),
 	proxy=getAnnotationHubOption("PROXY"),
-	localHub=getAnnotationHubOption("LOCAL"))}:
+	localHub=getAnnotationHubOption("LOCAL"))}:}{
 
       Create an \code{AnnotationHub} instance, possibly updating the
       current database of records.
@@ -149,36 +148,29 @@
   AnnotationHub objects.
 
   \describe{
-    \item{}{
-      \code{hubCache(x)}:
+    \item{\code{hubCache(x)}:}{
       Gets the file system location of the local AnnotationHub cache.
     }
-    \item{}{
-      \code{hubUrl(x)}:
+    \item{\code{hubUrl(x)}:}{
       Gets the URL for the online hub.
     }
-   \item{}{
-      \code{isLocalHub(x)}:
+   \item{\code{isLocalHub(x)}:}{
       Get whether or not constructor was called with \code{localHub=TRUE}.
     }
-    \item{}{
-      \code{length(x)}:
+    \item{\code{length(x)}:}{
       Get the number of hub records.
     }
-    \item{}{
-      \code{names(x)}:
+    \item{\code{names(x)}:}{
       Get the names (AnnotationHub unique identifiers, of the form
       AH12345) of the hub records.
     }
-    \item{}{
-      \code{fileName(x)}:
+    \item{\code{fileName(x)}:}{
       Get the file path of the hub records as stored in the local cache
       (AnnotationHub files are stored as unique numbers, of the form
       12345).  NA is returned for those records which have not been
       cached.
     }
-    \item{}{
-      \code{mcols(x)}:
+    \item{\code{mcols(x)}:}{
       Get the metadata columns describing each record. Columns include:
       \describe{
 
@@ -213,16 +205,13 @@
       }
     }
 
-    \item{}{
-      \code{dbconn(x)}:
+    \item{\code{dbconn(x)}:}{
       Return an open connection to the underyling SQLite database.}
 
-    \item{}{
-      \code{dbfile(x)}:
+    \item{\code{dbfile(x)}:}{
       Return the full path the underyling SQLite database.}
 
-    \item{}{
-      \code{.db_close(conn)}:
+    \item{\code{.db_close(conn)}:}{
       Close the SQLite connection \code{conn} returned by \code{dbconn(x)}.}
 
   }
@@ -232,25 +221,21 @@
   In the code snippets below, \code{x} is an AnnotationHub object.
 
   \describe{
-    \item{}{
-      \code{x$name}:
+    \item{\code{x$name}:}{
       Convenient reference to individual metadata columns, e.g.,
       \code{x$species}.
     }
-    \item{}{
-      \code{x[i]}:
+    \item{\code{x[i]}:}{
       Numerical, logical, or character vector (of AnnotationHub names)
       to subset the hub, e.g., \code{x[x$species == "Homo sapiens"]}.
     }
-    \item{}{
-      \code{x[[i, force=FALSE, verbose=TRUE]]}:
+    \item{\code{x[[i, force=FALSE, verbose=TRUE]]}:}{
       Numerical or character scalar to retrieve (if necessary) and
       import the resource into R. If a user wants to download the file
       again and not use the cache version add the argument
       \code{force=TRUE}. \code{verbose=FALSE} will quiet status messages.
     }
-    \item{}{
-      \code{query(x, pattern, ignore.case=TRUE, pattern.op= `&`)}:
+    \item{\code{query(x, pattern, ignore.case=TRUE, pattern.op= `&`)}:}{
       Return an AnnotationHub subset containing only those elements
       whose metadata matches \code{pattern}. Matching uses
       \code{pattern} as in \code{\link{grepl}} to search the
@@ -271,8 +256,7 @@
 	  \code{?base::Ops} for more information.}
       }
     }
-    \item{}{
-      \code{subset(x, subset)}:
+    \item{\code{subset(x, subset)}:}{
       Return the subset of records containing only those elements whose
       metadata satisfies the \emph{expression} in \code{subset}. The
       expression can reference columns of \code{mcols(x)}, and should
@@ -280,8 +264,7 @@
       e.g., \code{subset(x, species == "Homo sapiens" &
 	genome=="GRCh38")}.
     }
-    \item{}{
-      \code{recordStatus(hub, record)}:
+    \item{\code{recordStatus(hub, record)}:}{
       Returns a \code{data.frame} of the record id and status. \code{hub} must
       be a \code{Hub} object and \code{record} must be a \code{character(1)}.
       Can be used to discover why a resource was removed from the hub.
@@ -292,18 +275,15 @@
 \section{Cache and hub management}{
   In the code snippets below, \code{x} is an AnnotationHub object.
   \describe{
-    \item{}{
-      \code{snapshotDate(x)} and \code{snapshotDate(x) <- value}:
+    \item{\code{snapshotDate(x)}:}{ and \code{snapshotDate(x) <- value}:
       Gets or sets the date for the snapshot in use. \code{value} should
       be one of \code{possibleDates()}.
     }
-    \item{}{
-      \code{possibleDates(x)}:
+    \item{\code{possibleDates(x)}:}{
       Lists the valid snapshot dates for the version of Bioconductor that
       is being run (e.g., BiocManager::version()).
     }
-    \item{}{
-      \code{cache(x)} and \code{cache(x) <- NULL}: Adds (downloads) all
+    \item{\code{cache(x)}:}{ and \code{cache(x) <- NULL}: Adds (downloads) all
       resources in \code{x}, or removes all local resources
       corresponding to the records in \code{x} from the cache. In the later case,
       \code{x} would typically be a small subset of AnnotationHub
@@ -314,32 +294,27 @@
       for removing cached resources, or \code{removeCache} for deleting the hub
       cache entirely.
     }
-    \item{}{
-      \code{hubUrl(x)}:
+    \item{\code{hubUrl(x)}:}{
       Gets the URL for the online AnnotationHub.
     }
-    \item{}{
-      \code{hubCache(x)}:
+    \item{\code{hubCache(x)}:}{
       Gets the file system location of the local AnnotationHub cache.
     }
-    \item{}{
-      \code{refreshHub(..., hub, cache, proxy,
-	hubClass=c("AnnotationHub", "ExperimentHub"))}:
+    \item{\code{refreshHub(..., hub, cache, proxy,
+	hubClass=c("AnnotationHub", "ExperimentHub"))}:}{
       Force redownload of Hub sqlite file. This returns a Hub object as
       if calling the constructor (ie. AnnotationHub()). For force
       redownload specifically for AnnotationHub the base call should be
       \code{refreshHub(hubClass="AnnotationHub")}
     }
-    \item{}{
-      \code{removeResources(hub, ids)}:
+    \item{\code{removeResources(hub, ids)}:}{
       Removes listed ids from the local cache. ids are "AH" ids. Returns
       an updated hub object. To work with updated hub object suggested
       syntax is to reassign (ie. \code{hub = removeResources(hub,
       "AH1")}). If ids are missing will remove all previously downloaded
       local resources.
     }
-    \item{}{
-      \code{removeCache(x, ask=TRUE)}:
+    \item{\code{removeCache(x, ask=TRUE)}:}{
       Removes local AnnotationHub database and all related resources. After
       calling this function, the user will have to download any AnnotationHub
       resources again.
@@ -350,13 +325,11 @@
 \section{Coercion}{
   In the code snippets below, \code{x} is an AnnotationHub object.
   \describe{
-    \item{}{
-      \code{as.list(x)}:
+    \item{\code{as.list(x)}:}{
       Coerce x to a list of hub instances, one entry per
       element. Primarily for internal use.
     }
-    \item{}{
-      \code{c(x, ...)}:
+    \item{\code{c(x, ...)}:}{
       Concatenate one or more sub-hub. Sub-hubs must reference the same
       AnnotationHub instance. Duplicate entries are removed.
     }
