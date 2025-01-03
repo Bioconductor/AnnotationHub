@@ -155,12 +155,20 @@ refreshHub <- function(..., hub, cache, proxy,
 ###
 
 ## returns the release date for BiocManager::version()
-.biocVersionDate <- function(biocversion) {
+.biocVersionDate <- function(biocversion, proxy) {
     if (length(biocversion) > 1L)
         stop("length(biocversion) must == 1")
 
-    yaml <- httr::content(GET("https://bioconductor.org/config.yaml"),
-                    encoding="UTF-8", as="text")
+    if (proxy == ""){
+        proxy <- NULL
+    }
+
+    req <- request("https://bioconductor.org/config.yaml")
+    # Apply the proxy if it's not NULL
+    if (!is.null(proxy)) {
+        req <- req %>% req_proxy(proxy)
+    }
+    yaml <-  req %>% req_perform() %>% resp_body_string(encoding = "UTF-8")
     obj <- yaml.load(yaml)
     release_dates <- obj$release_dates
     version_date <- release_dates[biocversion == names(release_dates)]
@@ -172,9 +180,9 @@ refreshHub <- function(..., hub, cache, proxy,
 }
 
 ## single date closest to the release date for BiocManager::version()
-.restrictDateByVersion <- function(path) {
+.restrictDateByVersion <- function(path, proxy) {
     dates <- as.POSIXlt(.possibleDates(path), format='%Y-%m-%d')
-    restrict <- as.POSIXlt(.biocVersionDate(BiocManager::version()),
+    restrict <- as.POSIXlt(.biocVersionDate(BiocManager::version(), proxy),
                            format='%Y-%m-%d')
     if (length(restrict))  ## release
         as.character(max(dates[dates <= restrict]))
@@ -194,10 +202,10 @@ refreshHub <- function(..., hub, cache, proxy,
 }
 
 ## dates restricted by snapshotDate (and hence BiocManager::version())
-possibleDates <- function(x) {
+possibleDates <- function(x, proxy) {
     path <- dbfile(x)
     dates <- .possibleDates(path)
-    restrict <- .restrictDateByVersion(path)
+    restrict <- .restrictDateByVersion(path, proxy)
     dates[as.POSIXlt(dates) <= as.POSIXlt(restrict)]
 }
 

@@ -30,9 +30,7 @@ AnnotationHub <-
     }
     if (!is.null(proxy)) {
         message("Assuming valid proxy connection through '",
-                ifelse(is(proxy,"request"),
-                       paste(unlist(proxy), collapse=":"),
-                       proxy),
+                proxy,
                 "'",
                 "\n If you experience connection issues consider ",
                 "using 'localHub=TRUE'")

@@ -29,7 +29,7 @@ setClass("Hub",
     # find snapshot date
     if (!localHub){
         tryCatch({
-            db_date <- .restrictDateByVersion(db_path)
+            db_date <- .restrictDateByVersion(db_path, proxy)
         }, error=function(err) {
             stop("failed to connect",
                  "\n  reason: ", conditionMessage(err),
@@ -499,7 +499,10 @@ getSize <- function(hub, tbl)
     vapply(urls,
            FUN=function(url){
                tryCatch({
-                   headers(HEAD(url))$`content-length`
+                   response = request(url) %>% req_method("HEAD") %>% req_perform()
+                   ifelse(resp_header_exists(response, "content-length"),
+                          resp_header(response, "content-length"),
+                          NA_character_)
                }, error = function(err){
                    NA_character_
                })
