@@ -54,8 +54,7 @@ setAnnotationHubOption(arg, value)
       for httr2 requests. To get around this you can also set a system
       wide environment variable "ANNOTATION_HUB_PROXY" for AnnotationHub
       proxy or "HUB_PROXY" that will work across all Hub classes
-      (e.g. AnnotationHub and ExperimentHub)}    
-    
+      (e.g. AnnotationHub and ExperimentHub)    
     }
 
     \item{\dQuote{LOCAL}:}{logical(1). TRUE/FALSE should the AnnotationHub
