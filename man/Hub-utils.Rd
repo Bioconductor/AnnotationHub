@@ -82,8 +82,9 @@ getInfoOnIds(hub, 69303)
 "https://annotationhub.bioconductor.org/fetch/69303"
 
 # or in R
-httr::GET("https://annotationhub.bioconductor.org/fetch/69303",
-	  write_disk(<pathToSave/69303>, overwrite=FALSE))
+library(httr2)
+req <- request("https://annotationhub.bioconductor.org/fetch/69303")
+response <- req_perform(req, path=<pathToSave/69303>, ...)
 
 # 3. To add to a hub cache (not recommended)
 hub <- AnnotationHub()

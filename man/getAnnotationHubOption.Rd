@@ -38,19 +38,25 @@ setAnnotationHubOption(arg, value)
       avoid accidental download of a large number of AnnotationHub
       members.}
 
-    \item{\dQuote{PROXY}:}{\code{request} object returned by
-      \code{httr::use_proxy()}. The \code{request} object describes a proxy
+    \item{\dQuote{PROXY}:}{Describes a proxy
       connection allowing Internet access, usually through a restrictive
       firewall. Setting this option sends all AnnotationHub requests through
-      the proxy. Default: NULL.
+      the proxy. Default: NULL. 
 
       In \code{setAnnotationHubOption("PROXY", value)}, \code{value} can be one of NULL,
-      a \code{request} object returned by \code{httr::use_proxy()}, or a
-      well-formed URL as character(1). The URL can be completely
+      or a well-formed URL as character(1). The URL can be completely
       specified by \code{http://username:password@proxy.dom.com:8080};
       \code{username:password} and port (e.g. \code{:8080}) are
-      optional.If behind a proxy it will also be useful to set the
-      \code{httr::set_config(proxy)} with the proxy information.}
+      optional.
+
+      Unfortunately unlike the previously used
+      `httr::set_config`, there is no option to globally set the proxy
+      for httr2 requests. To get around this you can also set a system
+      wide environment variable "ANNOTATION_HUB_PROXY" for AnnotationHub
+      proxy or "HUB_PROXY" that will work across all Hub classes
+      (e.g. AnnotationHub and ExperimentHub)}    
+    
+    }
 
     \item{\dQuote{LOCAL}:}{logical(1). TRUE/FALSE should the AnnotationHub
       create a hub consisting only of previously downloaded resourcesd.

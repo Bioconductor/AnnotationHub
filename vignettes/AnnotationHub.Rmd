@@ -247,17 +247,23 @@ vignette("TroubleshootingTheHubs", package="AnnotationHub")
 
 # Accessing Behind A Proxy
 
-The AnnotationHub uses CRAN package `httr` functions `HEAD` and `GET` for accessing
-web resources. This can be problematic if operating behind a proxy. The easiest
-solution is to set the `httr::set_config` with the proxy information.
+
+The ExperimentHub and AnnotationHub use CRAN package `httr2` functions for accessing and downloading
+web resources. This can be problematic if operating behind a
+proxy. You can pass proxy information for Hubs by setting the options like the following:
 
 ```
-proxy <- httr::use_proxy("http://my_user:my_password@myproxy:8080")
-## or
-proxy <- httr::use_proxy(Sys.getenv('http_proxy'))
-httr::set_config(proxy)
+proxy <- "http://my_user:my_password@myproxy:8080"
 AnnotationHub::setAnnotationHubOption("PROXY", proxy)
+## or 
+ExperimentHub::setExperimentHubOption("PROXY", proxy)
 ```
+
+Unfortunately unlike the previously used `httr::set_config`, there is no
+option to globally set the proxy for httr2 requests. To get around this you can
+also set a system wide environment variable "ANNOTATION_HUB_PROXY" for
+AnnotationHub, "EXPERIMENT_HUB_PROXY" for ExperimentHub, or "HUB_PROXY" that
+will work across all Hub classes (e.g. AnnotationHub and ExperimentHub)}
 
 
 
