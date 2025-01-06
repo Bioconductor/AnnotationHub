@@ -127,6 +127,7 @@ setReplaceMethod("isLocalHub", "Hub",
     function(x, value)
 {
     stopifnot(value %in% c(TRUE, FALSE))
+    proxy <- .getProxyValue(x)
     # not a no op
     if (isLocalHub(x) != value){
         # switch from FALSE to TRUE
@@ -136,7 +137,7 @@ setReplaceMethod("isLocalHub", "Hub",
         # switch from TRUE to FALSE
         }else{
             db_path <- x@.db_path
-            db_date <- .restrictDateByVersion(db_path)
+            db_date <- .restrictDateByVersion(db_path, proxy)
             db_uid <- .db_uid0(db_path, db_date, value)
             x <- new(as.character(class(x)), cache=hubCache(x), hub=hubUrl(x),
                      date=db_date, .db_path=db_path, .db_uid=db_uid,
@@ -159,9 +160,10 @@ setReplaceMethod("snapshotDate", "Hub",
     }, error=function(err) {
         stop("'value' must be a single date or character string")
     })
+    proxy <- .getProxyValue(x)
 
     ## 'value' must be < BiocManager::version() release date
-    restrict <- .restrictDateByVersion(dbfile(x))
+    restrict <- .restrictDateByVersion(dbfile(x), proxy)
     dates <- .possibleDates(dbfile(x))
     valid_range <- range(dates[as.POSIXlt(dates) <= as.POSIXlt(restrict)])
     if (as.POSIXlt(value) > max(valid_range) ||
@@ -345,7 +347,8 @@ setReplaceMethod("cache", "Hub",
     localHub <- isLocalHub(x)
     db_path <- x@.db_path
     if (!localHub){
-        db_date <- .restrictDateByVersion(db_path)
+        proxy <- .getProxyValue(x)
+        db_date <- .restrictDateByVersion(db_path, proxy)
     } else {
         dates <-.possibleDates(db_path)
         db_date <- dates[length(dates)]
@@ -419,7 +422,8 @@ setMethod("removeResources", "character",
                 localHub <- isLocalHub(hub)
                 db_path <- hub@.db_path
                 if (!localHub){
-                    db_date <- .restrictDateByVersion(db_path)
+                    proxy <- .getProxyValue(x)
+                    db_date <- .restrictDateByVersion(db_path, proxy)
                 } else {
                     dates <-.possibleDates(db_path)
                     db_date <- dates[length(dates)]

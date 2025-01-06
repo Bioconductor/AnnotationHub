@@ -13,11 +13,8 @@ importFrom(grDevices, rgb)
 importFrom(utils, packageVersion, read.csv, read.delim, unzip,
     capture.output, read.table, .DollarNames
 )
-importFrom(httr,
-    GET, content, parse_url, progress, write_disk,
-    stop_for_status, status_code, use_proxy, HEAD, headers
-)
 importFrom(yaml, yaml.load)
+import(httr2)
 
 importMethodsFrom(AnnotationDbi, dbconn, dbfile)
 importFrom(AnnotationDbi, dbFileConnect)
@@ -71,8 +68,8 @@ export(
     .Hub, AnnotationHub,
     removeCache,
     getAnnotationHubOption, setAnnotationHubOption,
-    possibleDates, mcols,
-    .httr_proxy, .hub_option_key, .db_close,
+    possibleDates, mcols, .getProxyValue,
+    .hub_option_key, .db_close,
     recordStatus, DispatchClassList, refreshHub
 )
 

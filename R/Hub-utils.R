@@ -159,7 +159,7 @@ refreshHub <- function(..., hub, cache, proxy,
     if (length(biocversion) > 1L)
         stop("length(biocversion) must == 1")
 
-    if (proxy == ""){
+    if ((proxy == "") || is.null(proxy)){
         proxy <- NULL
     }
 
@@ -202,9 +202,10 @@ refreshHub <- function(..., hub, cache, proxy,
 }
 
 ## dates restricted by snapshotDate (and hence BiocManager::version())
-possibleDates <- function(x, proxy) {
+possibleDates <- function(x) {
     path <- dbfile(x)
     dates <- .possibleDates(path)
+    proxy <- .getProxyValue(x)
     restrict <- .restrictDateByVersion(path, proxy)
     dates[as.POSIXlt(dates) <= as.POSIXlt(restrict)]
 }
@@ -419,4 +420,19 @@ convertHub <- function(oldcachepath=NULL, newcachepath=NULL,
 
 
     hubCache(hub)
+}
+
+.getProxyValue <- function(x){
+
+    proxy <- NULL
+    if(is(x, "AnnotationHub")){
+        proxy <- getAnnotationHubOption("PROXY")
+    }
+    if(is(x, "ExperimentHub")){
+        proxy <- getExperimentHubOption("PROXY")
+    }
+    if(is.null(proxy) && is(x, "Hub")){
+        proxy <- Sys.getenv("HUB_PROXY")
+    }
+    proxy
 }
