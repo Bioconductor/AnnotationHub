@@ -43,8 +43,8 @@ setAnnotationHubOption(arg, value)
       firewall. Setting this option sends all AnnotationHub requests through
       the proxy. Default: NULL. 
 
-      In \code{setAnnotationHubOption("PROXY", value)}, \code{value} can be one of NULL,
-      or a well-formed URL as character(1). The URL can be completely
+      In \code{setAnnotationHubOption("PROXY", value)}, \code{value} can
+      be NULL or a well-formed URL as character(1). The URL can be completely
       specified by \code{http://username:password@proxy.dom.com:8080};
       \code{username:password} and port (e.g. \code{:8080}) are
       optional.
