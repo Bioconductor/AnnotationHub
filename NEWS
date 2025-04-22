@@ -1,3 +1,10 @@
+CHANGES IN VERSION 3.99.0
+----------------------
+
+MAJOR UPDATES
+
+    o Update downloading method from httr to httr2
+
 CHANGES IN VERSION 3.13.0
 -------------------------
 
