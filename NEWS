@@ -3,7 +3,12 @@ CHANGES IN VERSION 3.99.0
 
 MAJOR UPDATES
 
-    o Update downloading method from httr to httr2
+    o 3.99.0 Update downloading method from httr to httr2
+
+BUG CORRECTION
+
+    o 3.99.1 Fix bug preventing status message with removeResource
+
 
 CHANGES IN VERSION 3.13.0
 -------------------------

@@ -422,7 +422,7 @@ setMethod("removeResources", "character",
                 localHub <- isLocalHub(hub)
                 db_path <- hub@.db_path
                 if (!localHub){
-                    proxy <- .getProxyValue(x)
+                    proxy <- .getProxyValue(hub)
                     db_date <- .restrictDateByVersion(db_path, proxy)
                 } else {
                     dates <-.possibleDates(db_path)
