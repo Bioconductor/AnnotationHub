@@ -232,7 +232,7 @@ possibleDates <- function(x) {
 
 ## This is the function that gets stuff (metadata AND files) from S3
 .hub_resource <-
-    function(x, resource, cachepath, proxy, verbose=FALSE)
+    function(x, resource, cachepath, proxy, config, verbose=FALSE)
 {
     len <- length(resource)
     if (len > 0L) {
@@ -244,16 +244,17 @@ possibleDates <- function(x) {
     bfc <- .get_cache(x)
     hubpath <- .hub_resource_path(hub, resource)
     mapply(.hub_cache_resource, hubpath, names(cachepath), cachepath, MoreArgs=list(proxy=proxy,
-                                                        bfc=bfc))
+                                                        bfc=bfc, config=config))
 }
 
 
 ## example of hub resource (sometimes convenient)
 ## hub = 'https://annotationhub.bioconductor.org/metadata/annotationhub.sqlite3'
-.hub_cache_resource <- function(hubpath, namescachepath, cachepath, bfc, proxy)
+.hub_cache_resource <- function(hubpath, namescachepath, cachepath, bfc, proxy, config)
 {
 
     if (is.null(proxy)) proxy=""
+    if (is.null(config)) config = list()
 
     tryCatch({
         rnames <- paste(namescachepath, cachepath, sep=" : ")
@@ -266,9 +267,9 @@ possibleDates <- function(x) {
                  rnames,
                  "\n  See AnnotationHub's TroubleshootingTheHubs vignette section on corrupt cache", call.=FALSE)
         } else if (cnt == 0){
-            bfcadd(bfc, rname=rnames, fpath=hubpath, proxy=proxy)
+            bfcadd(bfc, rname=rnames, fpath=hubpath, proxy=proxy, config=config)
         } else {
-            bfcdownload(bfc, rid=rid, ask=FALSE, proxy=proxy)
+            bfcdownload(bfc, rid=rid, ask=FALSE, proxy=proxy, config=config)
         }
         TRUE
     }, error=function(err) {
@@ -287,7 +288,7 @@ possibleDates <- function(x) {
 ###
 
 .Hub_get1 <-
-    function(x, force, verbose)
+    function(x, force, verbose, config)
 {
     if (!length(x))
         stop("no records found for the given index")
@@ -314,7 +315,7 @@ possibleDates <- function(x) {
     })
 
     tryCatch({
-        fls <-  cache(getHub(class), force=force, verbose=verbose)
+        fls <-  cache(getHub(class), config=config, force=force, verbose=verbose)
         .get1(class)
     }, error=function(err) {
 
@@ -351,7 +352,7 @@ convertHub <- function(oldcachepath=NULL, newcachepath=NULL,
                        hubType=c("AnnotationHub", "ExperimentHub"),
                        proxy=getAnnotationHubOption("PROXY"),
                        max.downloads=getAnnotationHubOption("MAX_DOWNLOADS"),
-                       force=FALSE, verbose=TRUE)
+                       force=FALSE, verbose=TRUE, config=list())
 {
 
     hubType <- match.arg(hubType)
@@ -397,7 +398,7 @@ convertHub <- function(oldcachepath=NULL, newcachepath=NULL,
     tryCatch({
         .cache_internal(subHub,
                         proxy=proxy, max.downloads=max.downloads,
-                        force=force, verbose=verbose)
+                        force=force, verbose=verbose, config=config)
     }, error = function(err) {
         warning("Not all resources downloaded correctly.",
                 "It may be beneficial to rerun 'convertHub()'",

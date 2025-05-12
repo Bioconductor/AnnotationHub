@@ -28,7 +28,7 @@ removeCache <- function(x, ask=TRUE){
 
 
 .cache_internal <- function(x, proxy, max.downloads,
-                            force, verbose)
+                            force, verbose, config)
 {
     cachepath <- .named_cache_path(x)
     localHub <- isLocalHub(x)
@@ -36,11 +36,11 @@ removeCache <- function(x, ask=TRUE){
     bfc <- .get_cache(x)
 
     if(!localHub){
-        need <- .cache_download_ok(x, cachepath, max.downloads, force, verbose)
+        need <- .cache_download_ok(x, cachepath, max.downloads, force, verbose, config=config)
 
         ok <- .hub_resource(x, as.character(cachepath)[need],
-                            cachepath[need], proxy=proxy, verbose=verbose
-                            )
+                            cachepath[need], proxy=proxy, verbose=verbose,
+                            config=config)
 
         if (!all(ok))
             stop(sum(!ok), " resources failed to download", call. = FALSE)
@@ -72,13 +72,13 @@ removeCache <- function(x, ask=TRUE){
     localFiles
 }
 
-.cache_download_ok <- function(x, cachepath, max.downloads, force, verbose)
+.cache_download_ok <- function(x, cachepath, max.downloads, force, verbose, config)
 {
     if (force){
         need <- rep(TRUE, length(cachepath))
     } else {
         bfc <- .get_cache(x)
-        need <- .updateEntry(bfc, cachepath)
+        need <- .updateEntry(bfc, cachepath, config=config)
     }
     n <- sum(need)
 
@@ -100,7 +100,7 @@ removeCache <- function(x, ask=TRUE){
     need
 }
 
-.updateEntry <- function(bfc, cachepath)
+.updateEntry <- function(bfc, cachepath, config)
 {
 
     locFiles <- dir(bfccache(bfc))
@@ -140,7 +140,7 @@ removeCache <- function(x, ask=TRUE){
     names(allUpdate) <- as.character(cachepath)
     fndFiles <-  which(cachepath %in% baseFileName)
 
-    Update <- function(rpath, bfc){
+    Update <- function(rpath, bfc, config){
         res <- bfcquery(bfc, rpath, fields="rpath", exact=TRUE)
         cnt <- bfccount(res)
         rid <- res %>% collect(Inf) %>% `[[`("rid")
@@ -154,7 +154,7 @@ removeCache <- function(x, ask=TRUE){
             TRUE
         } else {
             tryCatch({
-                bfcneedsupdate(bfc, rids=rid)
+                bfcneedsupdate(bfc, rids=rid, config=config)
             }, error=function(e){
                 ahidnf <- res %>% collect(Inf) %>% `[[`("rname") %>%
                     strsplit(split=" : ") %>% `[[`(1) %>% `[`(1)
@@ -170,7 +170,7 @@ removeCache <- function(x, ask=TRUE){
 
         update <- vapply(locFiles[match(cachepath[fndFiles], names(locFiles))],
                          FUN=Update, FUN.VALUE=logical(1), USE.NAMES=TRUE,
-                         bfc=bfc)
+                         bfc=bfc, config=config)
         if (anyNA(update))
             # if no caching information use local file
             update[is.na(update)] = FALSE

@@ -8,6 +8,7 @@ MAJOR UPDATES
 BUG CORRECTION
 
     o 3.99.1 Fix bug preventing status message with removeResource
+    o 3.99.2 Add ability to pass a config argument to download resources
 
 
 CHANGES IN VERSION 3.13.0
