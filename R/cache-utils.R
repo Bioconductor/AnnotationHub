@@ -28,7 +28,7 @@ removeCache <- function(x, ask=TRUE){
 
 
 .cache_internal <- function(x, proxy, max.downloads,
-                            force, verbose, config)
+                            force, verbose, config, progress)
 {
     cachepath <- .named_cache_path(x)
     localHub <- isLocalHub(x)
@@ -40,7 +40,7 @@ removeCache <- function(x, ask=TRUE){
 
         ok <- .hub_resource(x, as.character(cachepath)[need],
                             cachepath[need], proxy=proxy, verbose=verbose,
-                            config=config)
+                            config=config, progress=progress)
 
         if (!all(ok))
             stop(sum(!ok), " resources failed to download", call. = FALSE)

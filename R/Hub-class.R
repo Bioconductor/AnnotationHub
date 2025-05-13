@@ -255,13 +255,13 @@ setMethod("[", c("Hub", "character", "missing"),
 })
 
 setMethod("[[", c("Hub", "numeric", "missing"),
-    function(x, i, j, ..., force=FALSE, verbose=TRUE, config=list())
+    function(x, i, j, ..., force=FALSE, verbose=TRUE, config=list(), progress=TRUE)
 {
-    .Hub_get1(x[i], force=force, verbose=verbose, config=config)
+    .Hub_get1(x[i], force=force, verbose=verbose, config=config, progress=progress)
 })
 
 setMethod("[[", c("Hub", "character", "missing"),
-    function(x, i, j, ..., force=FALSE, verbose=TRUE, config=list())
+    function(x, i, j, ..., force=FALSE, verbose=TRUE, config=list(), progress=TRUE)
 {
     if (length(i) != 1L)
         stop("'i' must be length 1")
@@ -299,7 +299,7 @@ setMethod("[[", c("Hub", "character", "missing"),
             msg <- paste0(msg, "   Resource removed on: ", status$dateremoved)
         stop(msg, call.=FALSE)
     }
-    .Hub_get1(x[idx], force=force, verbose=verbose, config=config)
+    .Hub_get1(x[idx], force=force, verbose=verbose, config=config, progress=progress)
 })
 
 
@@ -308,10 +308,10 @@ setMethod("[[", c("Hub", "character", "missing"),
 ###
 
 setMethod("cache", "Hub",
-    function(x, ..., proxy, max.downloads, config=list(), force=FALSE, verbose=FALSE)
+    function(x, ..., proxy, max.downloads, config=list(), progress=TRUE, force=FALSE, verbose=FALSE)
         .cache_internal(x,
                         proxy=proxy, max.downloads=max.downloads,
-                        force=force, verbose=verbose, config=config)
+                        force=force, verbose=verbose, config=config, progress=progress)
 )
 
 

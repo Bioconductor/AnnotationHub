@@ -69,6 +69,7 @@ setMethod("cache", "AnnotationHub",
         max.downloads=getAnnotationHubOption("MAX_DOWNLOADS"),
         force=force,
         verbose=verbose,
-        config=config
+        config=config,
+        progress=progress
     )
 })
