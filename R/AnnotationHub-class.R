@@ -59,7 +59,7 @@ AnnotationHub <-
 ###
 
 setMethod("cache", "AnnotationHub",
-    function(x, ..., force=FALSE, verbose=FALSE, config=list())
+    function(x, ..., force=FALSE, verbose=FALSE, config=list(), progress=TRUE)
 {
     callNextMethod(
         x,
