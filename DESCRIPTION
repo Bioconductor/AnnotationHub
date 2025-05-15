@@ -42,3 +42,4 @@ Collate: AnnotationHubOption.R AllGenerics.R Hub-class.R db-utils.R
 VignetteBuilder: knitr
 BugReports: https://github.com/Bioconductor/AnnotationHub/issues
 NeedsCompilation: yes
+RoxygenNote: 7.3.2
