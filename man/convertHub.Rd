@@ -12,7 +12,7 @@ convertHub(oldcachepath=NULL,
            hubType=c("AnnotationHub", "ExperimentHub"),
            proxy=getAnnotationHubOption("PROXY"),
            max.downloads=getAnnotationHubOption("MAX_DOWNLOADS"),
-           force=FALSE, verbose=TRUE)
+           force=FALSE, verbose=TRUE, config=list(), progress=TRUE)
 }
 \arguments{
   \item{oldcachepath}{character(1) complete file path location of the
@@ -34,6 +34,11 @@ convertHub(oldcachepath=NULL,
   \item{force}{logical(1). Force re-download of a resource rather than
     using a cached version.}
   \item{verbose}{logical(1). Print out status messages.}
+  \item{config}{list() passed as argument to \code{httr2::req_options}. The
+    names of items should be valid curl options as defined in
+    \code{curl::curl_options}.}
+  \item{progress}{TRUE/FALSE if progress bar for downloads in
+    interactive session should be shown}
 }
 \value{character(1). File path of new cache location. If \code{verbose}
   also prints status messages for downloading files and any files that

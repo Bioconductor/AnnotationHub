@@ -253,7 +253,10 @@ possibleDates <- function(x) {
 .hub_cache_resource <- function(hubpath, namescachepath, cachepath, bfc, proxy,
                                 config, progress)
 {
-
+    if (missing(proxy)) proxy=""
+    if (missing(config)) config=list()
+    if (missing(progress)) progress=TRUE
+    
     if (is.null(proxy)) proxy=""
     if (is.null(config)) config = list()
 
