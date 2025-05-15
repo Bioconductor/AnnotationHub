@@ -40,7 +40,7 @@ convertHub(oldcachepath=NULL,
   were not redownloaded.}
 \examples{
 # To transition over from old default to new default location
-\dontrun{convertHub()}
+convertHub()
 }
 \author{Lori Shepherd}
 \seealso{\code{\link{AnnotationHub}},

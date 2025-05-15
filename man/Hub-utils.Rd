@@ -56,12 +56,9 @@ given resources download size.
   collected is ah_id, fetch_id, title, rdataclass, availablitiy status,
   biocversion when added, date when added, date when removed, and file size.}
 \examples{
-
-\dontrun{
+hub <- AnnotationHub()
 getInfoOnIds(hub, c("AH2","AH5012"))
 getInfoOnIds(hub, 69303)
-
-}
 
 # If using in conjunction with convertHub,
 #
