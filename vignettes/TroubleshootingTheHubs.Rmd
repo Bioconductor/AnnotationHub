@@ -34,7 +34,7 @@ The ExperimentHub and AnnotationHub use CRAN package `httr2` functions for acces
 web resources. This can be problematic if operating behind a
 proxy. You can pass proxy information for Hubs by setting the options like the following:
 
-```
+```{r eval=FALSE}
 proxy <- "http://my_user:my_password@myproxy:8080"
 AnnotationHub::setAnnotationHubOption("PROXY", proxy)
 ## or 
@@ -46,6 +46,19 @@ option to globally set the proxy for httr2 requests. To get around this you can
 also set a system wide environment variable "ANNOTATION_HUB_PROXY" for
 AnnotationHub, "EXPERIMENT_HUB_PROXY" for ExperimentHub, or "HUB_PROXY" that
 will work across all Hub classes (e.g. AnnotationHub and ExperimentHub)}
+
+# Other configuration options for resource downloading
+
+As mentioned previously, There is no global option like `httr::set_config` to
+set configuration options when using httr2. A `config` argument may be passed to
+`[[` and `cache` functions. This argument is a R list object that will be passed
+to `httr2::req_options`. The names of the items should be valid curl options as
+defined in `curl::curl_options`.
+
+```{r eval=FALSE}
+ssl_opts <- list(verbose = 1L,ssl_verifypeer = 0L, ssl_verifyhost = 0L)
+
+```
 
 ## Invalid Cache
 

@@ -1,7 +1,7 @@
 Package: AnnotationHub
 Type: Package
 Title: Client to access AnnotationHub resources
-Version: 3.99.1
+Version: 3.99.5
 Authors@R: 
     c(person("Bioconductor Package", "Maintainer", email="maintainer@bioconductor.org",
              role="cre"),
@@ -23,7 +23,7 @@ Description: This package provides a client for the Bioconductor
     files retrieved by the user, helping with quick and reproducible
     access.
 License: Artistic-2.0
-Depends: BiocGenerics (>= 0.15.10), BiocFileCache (>= 2.99.0)
+Depends: BiocGenerics (>= 0.15.10), BiocFileCache (>= 2.99.3)
 Imports: utils, methods, grDevices, RSQLite, BiocManager, BiocVersion, curl, rappdirs,
     AnnotationDbi (>= 1.31.19), S4Vectors, httr2, yaml, dplyr
 Suggests: IRanges, GenomicRanges, GenomeInfoDb, VariantAnnotation, Rsamtools,
@@ -42,3 +42,4 @@ Collate: AnnotationHubOption.R AllGenerics.R Hub-class.R db-utils.R
 VignetteBuilder: knitr
 BugReports: https://github.com/Bioconductor/AnnotationHub/issues
 NeedsCompilation: yes
+RoxygenNote: 7.3.2

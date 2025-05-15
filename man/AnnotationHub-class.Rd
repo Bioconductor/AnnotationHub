@@ -229,11 +229,16 @@
       Numerical, logical, or character vector (of AnnotationHub names)
       to subset the hub, e.g., \code{x[x$species == "Homo sapiens"]}.
     }
-    \item{\code{x[[i, force=FALSE, verbose=TRUE]]}:}{
+    \item{\code{x[[i, force=FALSE, verbose=TRUE, config=list(), progress=TRUE]]}:}{
       Numerical or character scalar to retrieve (if necessary) and
       import the resource into R. If a user wants to download the file
       again and not use the cache version add the argument
-      \code{force=TRUE}. \code{verbose=FALSE} will quiet status messages.
+      \code{force=TRUE}. \code{verbose=FALSE} will quiet status
+      messages. \code{config=list()} passes arguments to
+      \code{httr2::req_options}. The names of the items should be valid
+      curl options as defined in \code{curl::curl_options}. A progress bar
+      for longer downloads is active by default but can be controlled
+      with the argument \code{progress=TRUE}.
     }
     \item{\code{query(x, pattern, ignore.case=TRUE, pattern.op= `&`)}:}{
       Return an AnnotationHub subset containing only those elements
@@ -292,7 +297,7 @@
       the original object will need to be reconstructed to reflect the
       removed resources. See also \code{removeResources} for a nicer interface
       for removing cached resources, or \code{removeCache} for deleting the hub
-      cache entirely.
+      cache entirely. See also additional arguments from \code{[[}.
     }
     \item{\code{hubUrl(x)}:}{
       Gets the URL for the online AnnotationHub.

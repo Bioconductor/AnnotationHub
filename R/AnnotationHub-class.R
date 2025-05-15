@@ -59,7 +59,7 @@ AnnotationHub <-
 ###
 
 setMethod("cache", "AnnotationHub",
-    function(x, ..., force=FALSE, verbose=FALSE)
+    function(x, ..., force=FALSE, verbose=FALSE, config=list(), progress=TRUE)
 {
     callNextMethod(
         x,
@@ -68,6 +68,8 @@ setMethod("cache", "AnnotationHub",
         proxy=getAnnotationHubOption("PROXY"),
         max.downloads=getAnnotationHubOption("MAX_DOWNLOADS"),
         force=force,
-        verbose=verbose
+        verbose=verbose,
+        config=config,
+        progress=progress
     )
 })
