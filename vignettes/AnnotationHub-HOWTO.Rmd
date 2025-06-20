@@ -335,7 +335,8 @@ To bring these ranges in the same chromosome
 naming convention (ie UCSC), we would use
 
 ```{r}
-seqlevelsStyle(variants) <-seqlevelsStyle(peaks)
+library(GenomeInfoDb)
+seqlevelsStyle(variants) <- seqlevelsStyle(peaks)
 ```
 
 And then finally to find which variants overlap these broadPeaks we would use:

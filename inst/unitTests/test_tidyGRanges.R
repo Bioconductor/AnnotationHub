@@ -5,28 +5,28 @@ test_tidyGRanges <- function() {
     gr1 <- AnnotationHub:::.tidyGRanges(gr=gr, metadata=FALSE, genome="hg19")
 
     chr <- paste0("chr", c(1, 2, 3, 10, "M"))
-    checkIdentical(chr, GenomeInfoDb::seqlevels(gr1))
-    checkIdentical(setNames(rep("hg19", 5), chr), GenomeInfoDb::genome(gr1))
+    checkIdentical(chr, Seqinfo::seqlevels(gr1))
+    checkIdentical(setNames(rep("hg19", 5), chr), Seqinfo::genome(gr1))
     checkIdentical(setNames(rep(c(FALSE, TRUE), c(4, 1)), chr),
-                   GenomeInfoDb::isCircular(gr1))
+                   Seqinfo::isCircular(gr1))
 
-    # case -2 genome not supported by GenomeInfoDb::Seqinfo
+    # case -2 genome not supported by Seqinfo::Seqinfo
     gr2 <- AnnotationHub:::.tidyGRanges(gr=gr, metadata=FALSE, genome="NotFound")
-    checkIdentical(setNames(rep("NotFound", 5), chr), GenomeInfoDb::genome(gr2))
+    checkIdentical(setNames(rep("NotFound", 5), chr), Seqinfo::genome(gr2))
     checkIdentical(setNames(rep(c(FALSE, TRUE), c(4, 1)), chr),
-               GenomeInfoDb::isCircular(gr2))
+               Seqinfo::isCircular(gr2))
 
 
     # case -3 GRanges has incorrect/missing seqinfo
-    GenomeInfoDb::seqlengths(gr) <- c(1,2,3,4,5)
-    GenomeInfoDb::isCircular(gr) <- rep(FALSE,5)
-    GenomeInfoDb::genome(gr) <- "hg19"
+    Seqinfo::seqlengths(gr) <- c(1,2,3,4,5)
+    Seqinfo::isCircular(gr) <- rep(FALSE,5)
+    Seqinfo::genome(gr) <- "hg19"
     gr1 <- AnnotationHub:::.tidyGRanges(gr=gr, metadata=FALSE, genome="hg19")
 
     chr <- paste0("chr", c(1, 2, 3, 10, "M"))
-    checkIdentical(chr, GenomeInfoDb::seqlevels(gr1))
-    checkIdentical(setNames(rep("hg19", 5), chr), GenomeInfoDb::genome(gr1))
+    checkIdentical(chr, Seqinfo::seqlevels(gr1))
+    checkIdentical(setNames(rep("hg19", 5), chr), Seqinfo::genome(gr1))
     checkIdentical(setNames(rep(c(FALSE, TRUE), c(4, 1)), chr),
-               GenomeInfoDb::isCircular(gr1))
+               Seqinfo::isCircular(gr1))
  
 } 

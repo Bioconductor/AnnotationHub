@@ -52,12 +52,12 @@
 
 ## tidyGRanges
 
-.metadataForAH <- 
+.metadataForAH <-
     function(x, ...)
 {
     stopifnot(length(getHub(x)) == 1)
     meta <- getHub(x)
-    list(AnnotationHubName=names(meta), 
+    list(AnnotationHubName=names(meta),
          `File Name`=basename(meta$sourceurl),
          `Data Source`=meta$sourceurl,
          `Provider`=meta$dataprovider,
@@ -68,7 +68,7 @@
 .guessIsCircular <-
     function(x)
 {
-    ans <- GenomeInfoDb::isCircular(x)
+    ans <- Seqinfo::isCircular(x)
     idx <- is.na(ans)
     test <- names(ans) %in% c("MT", "MtDNA", "dmel_mitochondrion_genome",
                               "Mito", "chrM")
@@ -80,81 +80,78 @@
 # 1. add metdata() to GRanges containing the names() of hub object
 # 2. sortSeqlevels()
 # 3. fill the seqinfo with correct information
-# for step 3 - comparison is done with existingSeqinfo and 
-# GenomeInfoDb::Seqinfo() - currently if its not the same, seqinfo is replaced.
+# for step 3 - comparison is done with existingSeqinfo and
+# Seqinfo::Seqinfo() - currently if its not the same, seqinfo is replaced.
 
-.tidyGRanges <- 
+.tidyGRanges <-
     function(x, gr, sort=TRUE, guess.circular=TRUE, addGenome=TRUE,
              metadata=TRUE, genome=getHub(x)$genome)
 {
     if (metadata)
         metadata(gr)  <- .metadataForAH(x)
 
-    ## BEWARE: 
-    ## 1) GenomeInfoDb::Seqinfo doesnt sortSeqlevels - so we need to 
+    ## BEWARE:
+    ## 1) Seqinfo::Seqinfo() doesnt sortSeqlevels - so we need to
     ## sortSeqlevels before comparison else identical wont work.
     ## 2) case - the input GRanges might have a subset of seqlevels whereas
-    ## the GenomeInfoDb::Seqinfo returns all seqlevels with scaffolds
-    ## from an assembly.  
-    ## 3)only 10-15 genomes supported by GenomeInfoDb::Seqinfo
+    ## Seqinfo::Seqinfo() returns all seqlevels with scaffolds
+    ## from an assembly.
+    ## 3) only 10-15 genomes supported by Seqinfo::Seqinfo()
 
     tryCatch({
-        loadNamespace("GenomeInfoDb")
+        loadNamespace("Seqinfo")
     }, error=function(err) {
         ## quietly return un-tidied GRanges (?)
         return(gr)
-    })      
-    
-    
-    if (sort)
-        gr <- GenomeInfoDb::sortSeqlevels(gr) 
-    existingSeqinfo <- GenomeInfoDb::seqinfo(gr)    
+    })
 
-    ## Not all Genome's are supported by GenomeInfoDb::Seqinfo
+    if (sort)
+        gr <- Seqinfo::sortSeqlevels(gr)
+    existingSeqinfo <- Seqinfo::seqinfo(gr)
+
+    ## Not all Genome's are supported by Seqinfo::Seqinfo()
     newSeqinfo <- tryCatch({
-        GenomeInfoDb::Seqinfo(genome=genome)
+        Seqinfo::Seqinfo(genome=genome)
     }, error= function(err) {
          NULL
     })
-    
-    if (is.null(newSeqinfo) || !all(GenomeInfoDb::seqlevels(gr) %in% GenomeInfoDb::seqlevels(newSeqinfo))) {
+
+    if (is.null(newSeqinfo) || !all(Seqinfo::seqlevels(gr) %in% Seqinfo::seqlevels(newSeqinfo))) {
         ## use guess work to populate
         if (guess.circular)
-            GenomeInfoDb::isCircular(existingSeqinfo)  <- 
+            Seqinfo::isCircular(existingSeqinfo)  <-
                 .guessIsCircular(existingSeqinfo)
         if (addGenome)
-            GenomeInfoDb::genome(existingSeqinfo) <- genome
+            Seqinfo::genome(existingSeqinfo) <- genome
         if (sort || guess.circular || addGenome) {
-            new2old <- match(GenomeInfoDb::seqlevels(existingSeqinfo),
-                        GenomeInfoDb::seqlevels(gr))
-            GenomeInfoDb::seqinfo(gr, new2old=new2old) <- existingSeqinfo
+            new2old <- match(Seqinfo::seqlevels(existingSeqinfo),
+                        Seqinfo::seqlevels(gr))
+            Seqinfo::seqinfo(gr, new2old=new2old) <- existingSeqinfo
         }
         return(gr)
     }
-   
 
-    
-    newSeqinfo <- newSeqinfo[GenomeInfoDb::seqlevels(gr)]
+    newSeqinfo <- newSeqinfo[Seqinfo::seqlevels(gr)]
     # comapre the current and new seqinfo
-    diffSeqlengths <- setdiff(GenomeInfoDb::seqlengths(newSeqinfo), 
-                          GenomeInfoDb::seqlengths(existingSeqinfo))  
-    diffSeqnames <- setdiff(GenomeInfoDb::seqnames(newSeqinfo), 
-                        GenomeInfoDb::seqnames(existingSeqinfo)) 
-    diffGenome <- identical(unique(GenomeInfoDb::genome(newSeqinfo)), 
-                      unique(GenomeInfoDb::genome(existingSeqinfo))) 
-    diffIscircular <- identical(table(GenomeInfoDb::isCircular(newSeqinfo)), 
-                          table(GenomeInfoDb::isCircular(existingSeqinfo)))
+    diffSeqlengths <- setdiff(Seqinfo::seqlengths(newSeqinfo),
+                          Seqinfo::seqlengths(existingSeqinfo))
+    diffSeqnames <- setdiff(Seqinfo::seqnames(newSeqinfo),
+                        Seqinfo::seqnames(existingSeqinfo))
+    diffGenome <- identical(unique(Seqinfo::genome(newSeqinfo)),
+                      unique(Seqinfo::genome(existingSeqinfo)))
+    diffIscircular <- identical(table(Seqinfo::isCircular(newSeqinfo)),
+                          table(Seqinfo::isCircular(existingSeqinfo)))
     len <- c(length(diffSeqlengths), length(diffSeqnames))
-    
-    # if its the same dont replace 
-    if(all(unique(len)==0 & diffGenome & diffIscircular))
-        return(gr)   
 
-    ## Replace incorrect seqinfo 
+    # if its the same dont replace
+    if(all(unique(len)==0 & diffGenome & diffIscircular))
+        return(gr)
+
+    ## Replace incorrect seqinfo
     if (sort || guess.circular || addGenome) {
-        new2old <- match(GenomeInfoDb::seqlevels(gr), 
-                         GenomeInfoDb::seqlevels(newSeqinfo))
-        GenomeInfoDb::seqinfo(gr, new2old=new2old) <- newSeqinfo
+        new2old <- match(Seqinfo::seqlevels(gr),
+                         Seqinfo::seqlevels(newSeqinfo))
+        Seqinfo::seqinfo(gr, new2old=new2old) <- newSeqinfo
     }
     gr
 }
@@ -173,11 +170,11 @@ DispatchClassList <- function(){
       "GRanges", "get(load()); requires GenomicRanges",
       "VCF", "get(load()); requires VariantAnnotation",
       "ChainFile",
-      "rtracklayer::import.chain(); requires rtracklayer and GenomeInfoDb; before using import.chain internally uses gzfile and writeBin to extract data from file; files saved as chain.gz",
+      "rtracklayer::import.chain(); requires rtracklayer and Seqinfo; before using import.chain internally uses gzfile and writeBin to extract data from file; files saved as chain.gz",
       "TwoBitFile", "rtracklayer::TwoBitFile(); requires rtracklayer",
       "GFFFile",
       "rtracklayer::import(); require rtracklayer and GenomeInfoDB; after import converts to GRanges object",
-      "GFF3File", "rtracklayer::import(); require rtracklayer", 
+      "GFF3File", "rtracklayer::import(); require rtracklayer",
       "BigWig", "rtracklayer::BigWigFile(); require rtracklayer",
       "dbSNPVCFFile",
       "VariantAnnotation::VcfFile(); require VariantAnnotation; files saved as vcf.gz and vcf.gz.tbi",

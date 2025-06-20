@@ -1,7 +1,7 @@
 Package: AnnotationHub
 Type: Package
 Title: Client to access AnnotationHub resources
-Version: 3.99.5
+Version: 3.99.6
 Authors@R: 
     c(person("Bioconductor Package", "Maintainer", email="maintainer@bioconductor.org",
              role="cre"),
@@ -26,8 +26,8 @@ License: Artistic-2.0
 Depends: BiocGenerics (>= 0.15.10), BiocFileCache (>= 2.99.3)
 Imports: utils, methods, grDevices, RSQLite, BiocManager, BiocVersion, curl, rappdirs,
     AnnotationDbi (>= 1.31.19), S4Vectors, httr2, yaml, dplyr
-Suggests: IRanges, GenomicRanges, GenomeInfoDb, VariantAnnotation, Rsamtools,
-    rtracklayer, BiocStyle, knitr, AnnotationForge, rBiopaxParser,
+Suggests: IRanges, Seqinfo, GenomeInfoDb, GenomicRanges, VariantAnnotation,
+    Rsamtools, rtracklayer, BiocStyle, knitr, AnnotationForge, rBiopaxParser,
     RUnit, txdbmaker, MSnbase, mzR, Biostrings, CompoundDb, keras,
     ensembldb, SummarizedExperiment, ExperimentHub, gdsfmt, rmarkdown, HubPub
 Enhances: AnnotationHubData

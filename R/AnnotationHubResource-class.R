@@ -156,11 +156,11 @@ setMethod(".get1", "ChainFileResource",
     function(x, ...)
 {
     .require("rtracklayer")
-    .require("GenomeInfoDb")
+    .require("Seqinfo")
     chain <- cache(getHub(x))
     tf <- .gunzip(chain, tempfile())
     tf <- rtracklayer::import.chain(tf)
-    tf[GenomeInfoDb::sortSeqlevels(names(tf))]
+    tf[Seqinfo::sortSeqlevels(names(tf))]
 })
 
 setClass("TwoBitFileResource", contains="AnnotationHubResource")
@@ -180,7 +180,7 @@ setMethod(".get1", "GTFFileResource",
 {
     message("Importing File into R ..")
     .require("rtracklayer")
-    .require("GenomeInfoDb")
+    .require("Seqinfo")
     yy <- getHub(x)
     gtf <- rtracklayer::import(cache(yy), format="gtf", genome=yy$genome, ...)
     .tidyGRanges(x, gtf)
