@@ -39,8 +39,15 @@ convertHub(oldcachepath=NULL,
   also prints status messages for downloading files and any files that
   were not redownloaded.}
 \examples{
+## new default location
+newloc <- tools::R_user_dir("AnnotationHub", which = "cache")
+newloc
+\dontrun{
+## old default location
+oldloc <- rappdirs::user_cache_dir("AnnotationHub")
 # To transition over from old default to new default location
-convertHub()
+convertHub(oldcachepath=oldloc, newcachepath=newloc)
+}
 }
 \author{Lori Shepherd}
 \seealso{\code{\link{AnnotationHub}},
