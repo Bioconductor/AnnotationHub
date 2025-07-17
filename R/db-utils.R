@@ -57,7 +57,7 @@ setMethod("dbfile", "Hub",
     bad <- value[!value %in% .db_uid(x)]
     if (any(bad))
         stop("invalid subscripts: ",
-             paste(sQuote(S4Vectors:::selectSome(bad)), collapse=", "))
+             paste(sQuote(BiocBaseUtils::selectSome(bad)), collapse=", "))
     slot(x, ".db_uid") <- value
     x
 }
