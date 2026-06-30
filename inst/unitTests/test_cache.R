@@ -18,7 +18,9 @@ test_cache <- function(){
                                           proxy=getAnnotationHubOption("PROXY"),
                                           localHub=FALSE)
     if (.Platform$OS.type == "windows"){
-        checkIdentical(normalizePath(hubCache(ah),winslash="/"), dirname(temp))
+        checkIdentical(
+            normalizePath(hubCache(ah)), normalizePath(dirname(temp))
+        )
     }else{
         checkIdentical(hubCache(ah), dirname(temp))
     }
