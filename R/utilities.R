@@ -211,6 +211,7 @@ DispatchClassList <- function(){
       "AAStringSet", "Biostrings::readAAStringSet(); require Biostrings",
       "CompDb", "CompoundDb::Compdb(); requires CompoundDb",
       "kerasHDF5Model", "keras::load_model_hdf5(); requires keras",
-      "kerasHDF5ModelWeights", "keras::load_model_weights_hdf5(); requires keras"
+      "kerasHDF5ModelWeights", "keras::load_model_weights_hdf5(); requires keras",
+      "MspSpectra", "MsBackendMsp::MspSpectra(); requires MsBackendMsp"
       ),  ncol=2, byrow=TRUE)
 }

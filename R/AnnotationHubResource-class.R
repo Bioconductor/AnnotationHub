@@ -387,3 +387,12 @@ setMethod(".get1", "kerasHDF5ModelWeightsResource", function(x, ...) {
     wts <- cache(getHub(x))
     keras::load_model_weights_hdf5(wts)
 })
+
+## MSP format returns Spectra object
+setClass("MspSpectraResource", contains = "AnnotationHubResource")
+
+setMethod(".get1", "MspSpectraResource", function(x, ...) {
+    .require("MsBackendMsp")
+    mod <- cache(getHub(x))
+    MsBackendMsp::MspSpectra(mod)
+})
